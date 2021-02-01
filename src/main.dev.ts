@@ -14,10 +14,9 @@ import path from "path";
 import { app, BrowserWindow, shell } from "electron";
 import { autoUpdater } from "electron-updater";
 import log from "electron-log";
-import cfg from "electron-cfg";
 import MenuBuilder from "./menu";
 
-import GetDemoPath from "./GetDemoPath";
+import GetDemosPath from "./GetDemoPath";
 
 export default class AppUpdater {
   constructor() {
@@ -70,16 +69,13 @@ const createWindow = async () => {
     return path.join(RESOURCES_PATH, ...paths);
   };
 
-  if (!cfg.has("demos.path")) {
-    GetDemoPath();
-  }
-
   mainWindow = new BrowserWindow({
     show: false,
     width: 1536,
     height: 728,
     icon: getAssetPath("icon.png"),
     webPreferences: {
+      enableRemoteModule: true,
       nodeIntegration: true,
     },
   });
