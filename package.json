@@ -33,7 +33,7 @@
   },
   "build": {
     "productName": "DemoMan",
-    "appId": "com.narcha.demoman",
+    "appId": "narcha.demoman",
     "files": [
       "dist/",
       "node_modules/",
