@@ -25,15 +25,15 @@
       "prettier --ignore-path .eslintignore --parser json --write"
     ],
     "*.{css,scss}": [
-      "prettier --ignore-path .eslintignore --single-quote --write"
+      "prettier --ignore-path .eslintignore --write"
     ],
     "*.{html,md,yml}": [
-      "prettier --ignore-path .eslintignore --single-quote --write"
+      "prettier --ignore-path .eslintignore --write"
     ]
   },
   "build": {
-    "productName": "ElectronReact",
-    "appId": "org.erb.ElectronReact",
+    "productName": "DemoMan",
+    "appId": "com.narcha.demoman",
     "files": [
       "dist/",
       "node_modules/",
@@ -76,7 +76,7 @@
       "target": [
         "AppImage"
       ],
-      "category": "Development"
+      "category": "Utility"
     },
     "directories": {
       "app": "src",
@@ -88,8 +88,8 @@
     ],
     "publish": {
       "provider": "github",
-      "owner": "electron-react-boilerplate",
-      "repo": "electron-react-boilerplate"
+      "owner": "narcha",
+      "repo": "DemoMan"
     }
   },
   "jest": {
