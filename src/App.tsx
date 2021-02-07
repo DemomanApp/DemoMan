@@ -8,9 +8,12 @@ import SelectDemoPathModal from "./SelectDemoPathModal";
 class Main extends React.Component<unknown> {
   private modal: React.RefObject<SelectDemoPathModal>;
 
+  private table: React.RefObject<DemoTable>;
+
   constructor(props: unknown) {
     super(props);
     this.modal = React.createRef();
+    this.table = React.createRef();
   }
 
   componentDidMount() {
@@ -23,10 +26,17 @@ class Main extends React.Component<unknown> {
 
   render() {
     return (
-      <div>
-        <DemoTable />
-        <SelectDemoPathModal ref={this.modal} />
-      </div>
+      <>
+        <div>
+          <DemoTable ref={this.table} />
+        </div>
+        <SelectDemoPathModal
+          ref={this.modal}
+          onComplete={() => {
+            this.table.current?.RefreshDemoList();
+          }}
+        />
+      </>
     );
   }
 }

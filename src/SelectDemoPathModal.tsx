@@ -8,14 +8,24 @@ import DialogTitle from "@material-ui/core/DialogTitle";
 
 import GetDemosPath from "./GetDemoPath";
 
+type SelectDemoPathModalProps = {
+  onComplete: () => void;
+};
+
+type SelectDemoPathModalState = {
+  open: boolean;
+  onComplete: () => void;
+};
+
 export default class SelectDemoPathModal extends React.PureComponent<
-  unknown,
-  { open: boolean }
+  SelectDemoPathModalProps,
+  SelectDemoPathModalState
 > {
-  constructor(props: unknown) {
+  constructor(props: SelectDemoPathModalProps) {
     super(props);
     this.state = {
       open: false,
+      onComplete: props.onComplete,
     };
   }
 
@@ -24,12 +34,14 @@ export default class SelectDemoPathModal extends React.PureComponent<
   }
 
   handleClose = () => {
+    const { onComplete } = this.state;
     this.setOpen(false);
+    onComplete();
   };
 
   handleChoose = () => {
     if (GetDemosPath()) {
-      this.setOpen(false);
+      this.handleClose();
     }
   };
 
@@ -42,7 +54,7 @@ export default class SelectDemoPathModal extends React.PureComponent<
         disableBackdropClick
         disableEscapeKeyDown
       >
-        <DialogTitle>One-time setup</DialogTitle>
+        <DialogTitle>First time setup</DialogTitle>
         <DialogContent>
           <DialogContentText>
             It looks like you&apos;re opening DemoMan for the first time. <br />
