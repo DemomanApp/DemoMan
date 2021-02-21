@@ -47,6 +47,8 @@ function CustomTimeCell(row: DemoListEntry) {
 function CustomBirthtimeCell(row: DemoListEntry) {
   const date = new Date(row.birthtime);
   return (
+    // "whiteSpace: nowrap" should prevent stuff like "PM"
+    // from the time string being pushed to a new line.
     <div style={{ whiteSpace: "nowrap" }}>
       {date.toLocaleDateString()}
       <br />
