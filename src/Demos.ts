@@ -11,6 +11,8 @@ const HEADER_SIZE = 8 + 4 + 4 + 260 + 260 + 260 + 260 + 4 + 4 + 4 + 4;
 export class Demo {
   filename: string;
 
+  creation_time: Date;
+
   cachedHeader: DemoHeader | null;
 
   cachedEvents: DemoEvent[] | null;
@@ -19,6 +21,7 @@ export class Demo {
     this.filename = filename;
     this.cachedHeader = null;
     this.cachedEvents = null;
+    this.creation_time = new Date(0);
   }
 
   readFileHeader(): DemoHeader {
@@ -32,6 +35,7 @@ export class Demo {
       );
       throw new InvalidDemoFileError();
     }
+    this.creation_time = fs.fstatSync(fd).birthtime;
     fs.closeSync(fd);
     const sr = new StreamReader(buf);
 
@@ -118,12 +122,10 @@ export function getDemosInDirectory(dirPath: string) {
     return [];
   }
 
-  // const demoList: string[] = [];
   const demoList: Demo[] = [];
   files.forEach((file) => {
     if (file.endsWith(".dem")) {
       log.debug(`Found demo file ${file}`);
-      // demoList.push(file);
       demoList.push(new Demo(path.join(dirPath, file)));
     } else {
       log.debug(`Found non-demo file ${file}, skipping.`);

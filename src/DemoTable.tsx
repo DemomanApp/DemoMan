@@ -19,6 +19,7 @@ interface DemoListEntry {
   server: string;
   numEvents: number;
   numTicks: number;
+  birthtime: number;
 }
 
 function leftPadTwo(val: string) {
@@ -31,6 +32,7 @@ function formatPlaybackTime(seconds: number): string {
   const fMinutes = tMinutes % 60;
   const fHours = Math.floor(tMinutes / 60);
   /* eslint-disable */
+  // prettier-ignore
   return `${
     leftPadTwo(fHours.toString())}:${
     leftPadTwo(fMinutes.toString())}:${
@@ -38,19 +40,32 @@ function formatPlaybackTime(seconds: number): string {
   /* eslint-enable */
 }
 
-const CustomTimeCell = ({ row }: { row: DemoListEntry }) => (
-  <div>{formatPlaybackTime(row.playbackTime)}</div>
-);
+function CustomTimeCell(row: DemoListEntry) {
+  return <div>{formatPlaybackTime(row.playbackTime)}</div>;
+}
+
+function CustomBirthtimeCell(row: DemoListEntry) {
+  const date = new Date(row.birthtime);
+  return (
+    <div style={{ whiteSpace: "nowrap" }}>
+      {date.toLocaleDateString()}
+      <br />
+      {date.toLocaleTimeString()}
+    </div>
+  );
+}
 
 function getDemoListEntry(demo: Demo): DemoListEntry {
+  const header = demo.header();
   return {
     filename: demo.getShortName(),
-    map: demo.header().mapName,
-    playbackTime: demo.header().playbackTime,
-    player: demo.header().clientName,
-    server: demo.header().serverName,
+    map: header.mapName,
+    playbackTime: header.playbackTime,
+    player: header.clientName,
+    server: header.serverName,
     numEvents: demo.events().length,
-    numTicks: demo.header().numTicks,
+    numTicks: header.numTicks,
+    birthtime: demo.birthtime,
   };
 }
 
@@ -70,7 +85,7 @@ const columns = [
     name: "Playback Time",
     selector: "playbackTime",
     sortable: true,
-    cell: (row: DemoListEntry) => <CustomTimeCell row={row} />,
+    cell: CustomTimeCell,
     grow: 0.2,
     right: true,
   },
@@ -101,6 +116,14 @@ const columns = [
     right: true,
   },
   {
+    name: "Created",
+    selector: "birthtime",
+    sortable: true,
+    cell: CustomBirthtimeCell,
+    grow: 0.1,
+    center: true,
+  },
+  {
     name: "View",
     cell: () => (
       <IconButton color="primary">
@@ -108,10 +131,11 @@ const columns = [
       </IconButton>
     ),
     button: true,
+    grow: 0.1,
   },
 ];
 
-createTheme("theme_demoman_dark", {
+createTheme("demoman_dark", {
   text: {
     primary: "#268bd2",
     secondary: "#2aa198",
