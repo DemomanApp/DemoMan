@@ -74,8 +74,9 @@ const createWindow = async () => {
     process.env.ELECTRON_IS_DEV = "1";
     log.info("Debug mode enabled");
   } else {
-    log.transports.console.level = false;
-    log.transports.file.level = false;
+    log.transports.console.level = "info";
+    log.transports.file.level = "info";
+    log.info("Debug mode disabled");
   }
 
   mainWindow = new BrowserWindow({
