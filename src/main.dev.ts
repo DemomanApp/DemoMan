@@ -66,6 +66,18 @@ const createWindow = async () => {
     return path.join(RESOURCES_PATH, ...paths);
   };
 
+  if (app.commandLine.hasSwitch("debug")) {
+    log.transports.console.level = "debug";
+    log.transports.file.level = "debug";
+    // electron-log disables IPC transport (needed for logging from the renderer)
+    // for performance reasons when the app is packaged, unless this variable is set.
+    process.env.ELECTRON_IS_DEV = "1";
+    log.info("Debug mode enabled");
+  } else {
+    log.transports.console.level = false;
+    log.transports.file.level = false;
+  }
+
   mainWindow = new BrowserWindow({
     show: false,
     width: 1536,
@@ -111,7 +123,7 @@ const createWindow = async () => {
 
   // Remove this if your app does not use auto updates
   // eslint-disable-next-line
-  new AppUpdater();
+  // new AppUpdater();
 };
 
 /**
