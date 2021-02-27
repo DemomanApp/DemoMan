@@ -8,6 +8,7 @@ import ChevronRightIcon from "@material-ui/icons/ChevronRight";
 import IconButton from "@material-ui/core/IconButton";
 import DeleteIcon from "@material-ui/icons/Delete";
 import RefreshIcon from "@material-ui/icons/Refresh";
+import Tooltip from "@material-ui/core/Tooltip";
 
 import { Demo, getDemosInDirectory } from "./Demos";
 
@@ -20,6 +21,22 @@ interface DemoListEntry {
   numEvents: number;
   numTicks: number;
   birthtime: number;
+  filesize: number;
+}
+
+function getDemoListEntry(demo: Demo): DemoListEntry {
+  const header = demo.header();
+  return {
+    filename: demo.getShortName(),
+    map: header.mapName,
+    playbackTime: header.playbackTime,
+    player: header.clientName,
+    server: header.serverName,
+    numEvents: demo.events().length,
+    numTicks: header.numTicks,
+    birthtime: demo.birthtime,
+    filesize: demo.filesize,
+  };
 }
 
 function leftPadTwo(val: string) {
@@ -40,6 +57,20 @@ function formatPlaybackTime(seconds: number): string {
   /* eslint-enable */
 }
 
+function formatFileSize(bytes: number): string {
+  const units = ["B", "kB", "MB", "GB"];
+  let size = bytes;
+  let i = 0;
+  while (size > 1000) {
+    size /= 1000;
+    i += 1;
+  }
+  if (i > 3) {
+    i = 3;
+  }
+  return `${size.toFixed(1)} ${units[i]}`;
+}
+
 function CustomTimeCell(row: DemoListEntry) {
   return <div>{formatPlaybackTime(row.playbackTime)}</div>;
 }
@@ -57,18 +88,18 @@ function CustomBirthtimeCell(row: DemoListEntry) {
   );
 }
 
-function getDemoListEntry(demo: Demo): DemoListEntry {
-  const header = demo.header();
-  return {
-    filename: demo.getShortName(),
-    map: header.mapName,
-    playbackTime: header.playbackTime,
-    player: header.clientName,
-    server: header.serverName,
-    numEvents: demo.events().length,
-    numTicks: header.numTicks,
-    birthtime: demo.birthtime,
-  };
+function CustomFilesizeCell(row: DemoListEntry) {
+  return <div>{formatFileSize(row.filesize)}</div>;
+}
+
+function CustomDetailsButtonCell(row: DemoListEntry) {
+  return (
+    <Tooltip title="View details" arrow>
+      <IconButton color="primary">
+        <ChevronRightIcon />
+      </IconButton>
+    </Tooltip>
+  );
 }
 
 const columns = [
@@ -126,12 +157,16 @@ const columns = [
     center: true,
   },
   {
-    name: "View",
-    cell: () => (
-      <IconButton color="primary">
-        <ChevronRightIcon />
-      </IconButton>
-    ),
+    name: "Size",
+    selector: "filesize",
+    sortable: true,
+    cell: CustomFilesizeCell,
+    grow: 0.1,
+    center: true,
+  },
+  {
+    name: "Details",
+    cell: CustomDetailsButtonCell,
     button: true,
     grow: 0.1,
   },

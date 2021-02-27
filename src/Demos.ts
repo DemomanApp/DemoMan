@@ -11,7 +11,9 @@ const HEADER_SIZE = 8 + 4 + 4 + 260 + 260 + 260 + 260 + 4 + 4 + 4 + 4;
 export class Demo {
   filename: string;
 
-  creation_time: Date;
+  birthtime: number;
+
+  filesize: number;
 
   cachedHeader: DemoHeader | null;
 
@@ -21,7 +23,8 @@ export class Demo {
     this.filename = filename;
     this.cachedHeader = null;
     this.cachedEvents = null;
-    this.creation_time = new Date(0);
+    this.birthtime = 0;
+    this.filesize = 0;
   }
 
   readFileHeader(): DemoHeader {
@@ -35,7 +38,9 @@ export class Demo {
       );
       throw new InvalidDemoFileError();
     }
-    this.creation_time = fs.fstatSync(fd).birthtime;
+    const stats = fs.fstatSync(fd);
+    this.birthtime = stats.birthtimeMs;
+    this.filesize = stats.size;
     fs.closeSync(fd);
     const sr = new StreamReader(buf);
 
