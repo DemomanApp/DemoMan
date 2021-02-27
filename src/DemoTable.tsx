@@ -8,6 +8,7 @@ import ChevronRightIcon from "@material-ui/icons/ChevronRight";
 import IconButton from "@material-ui/core/IconButton";
 import DeleteIcon from "@material-ui/icons/Delete";
 import RefreshIcon from "@material-ui/icons/Refresh";
+import LinearProgress from "@material-ui/core/LinearProgress";
 import Tooltip from "@material-ui/core/Tooltip";
 
 import { Demo, getDemosInDirectory } from "./Demos";
@@ -194,16 +195,13 @@ createTheme("demoman_dark", {
   },
 });
 
-function getDemosPath() {
-  return cfg.get("demos.path");
-}
-
 type DemoTableProps = unknown;
 
 type DemoTableState = {
   selectedRows: DemoListEntry[];
   toggleCleared: boolean;
   data: DemoListEntry[];
+  progressPending: boolean;
 };
 
 export default class DemoTable extends PureComponent<
@@ -215,15 +213,29 @@ export default class DemoTable extends PureComponent<
     this.state = {
       selectedRows: [],
       toggleCleared: false,
-      data: getDemosInDirectory(getDemosPath()).map(getDemoListEntry),
+      data: [],
+      progressPending: false,
     };
   }
 
+  componentDidMount() {
+    if (cfg.has("demos.path")) {
+      this.RefreshDemoList();
+    }
+  }
+
   RefreshDemoList = () => {
+    // this will be made async later.
     this.setState({
       selectedRows: [],
-      data: getDemosInDirectory(getDemosPath()).map(getDemoListEntry),
+      data: [],
+      progressPending: true,
     });
+    const newDemos = getDemosInDirectory(cfg.get("demos.path"));
+    this.setState({
+      data: newDemos.map(getDemoListEntry),
+    });
+    this.setState({ progressPending: false });
   };
 
   deleteMultiple = () => {
@@ -235,27 +247,12 @@ export default class DemoTable extends PureComponent<
     }
   };
 
-  /* eslint-disable react/sort-comp */
-  actions = (
-    <IconButton color="default" onClick={this.RefreshDemoList}>
-      <RefreshIcon />
-    </IconButton>
-  );
-
-  contextActions = (
-    <IconButton color="default" onClick={this.deleteMultiple}>
-      <DeleteIcon />
-    </IconButton>
-  );
-  /* eslint-enable react/sort-comp */
-
   handleChange = (selectedRowState: {
     allSelected: boolean;
     selectedCount: number;
     selectedRows: DemoListEntry[];
   }) => {
     this.setState({ selectedRows: selectedRowState.selectedRows });
-    console.log("Selected Rows: ", selectedRowState.selectedRows);
   };
 
   handleRowClicked = (row: DemoListEntry) => {
@@ -263,7 +260,7 @@ export default class DemoTable extends PureComponent<
   };
 
   render() {
-    const { data, toggleCleared } = this.state;
+    const { data, toggleCleared, progressPending } = this.state;
 
     return (
       <DataTable
@@ -274,9 +271,17 @@ export default class DemoTable extends PureComponent<
         keyField="filename"
         selectableRows
         highlightOnHover
-        actions={this.actions}
+        actions={
+          <IconButton color="default" onClick={this.RefreshDemoList}>
+            <RefreshIcon />
+          </IconButton>
+        }
         data={data}
-        contextActions={this.contextActions}
+        contextActions={
+          <IconButton color="default" onClick={this.deleteMultiple}>
+            <DeleteIcon />
+          </IconButton>
+        }
         selectableRowsComponent={Checkbox}
         selectableRowsComponentProps={{ color: "primary" }}
         sortIcon={<ArrowDownward />}
@@ -288,6 +293,8 @@ export default class DemoTable extends PureComponent<
         // 56px is the height of the table title, 57px is the height of the header.
         fixedHeaderScrollHeight="calc(100vh - (56px + 57px))"
         // theme="theme_demoman_dark"
+        progressPending={progressPending}
+        progressComponent={<LinearProgress />}
       />
     );
   }
