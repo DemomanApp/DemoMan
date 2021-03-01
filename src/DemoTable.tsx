@@ -25,15 +25,15 @@ interface DemoListEntry {
   filesize: number;
 }
 
-function getDemoListEntry(demo: Demo): DemoListEntry {
-  const header = demo.header();
+async function getDemoListEntry(demo: Demo): Promise<DemoListEntry> {
+  const header = await demo.header();
   return {
     filename: demo.getShortName(),
     map: header.mapName,
     playbackTime: header.playbackTime,
     player: header.clientName,
     server: header.serverName,
-    numEvents: demo.events().length,
+    numEvents: (await demo.events()).length,
     numTicks: header.numTicks,
     birthtime: demo.birthtime,
     filesize: demo.filesize,
@@ -224,18 +224,35 @@ export default class DemoTable extends PureComponent<
     }
   }
 
-  RefreshDemoList = () => {
-    // this will be made async later.
+  RefreshDemoList = async () => {
     this.setState({
       selectedRows: [],
       data: [],
       progressPending: true,
     });
-    const newDemos = getDemosInDirectory(cfg.get("demos.path"));
+    const newDemos = await getDemosInDirectory(cfg.get("demos.path"));
+    const newData = await Promise.all(newDemos.map(getDemoListEntry));
     this.setState({
-      data: newDemos.map(getDemoListEntry),
+      data: newData,
+      progressPending: false,
     });
-    this.setState({ progressPending: false });
+    // incremental loading prototype,
+    // to be experimented with
+    // const interval = setInterval(() => {
+    //   const e = newData.pop();
+    //   if (e !== undefined) {
+    //     this.setState((state) => {
+    //       return {
+    //         data: [...state.data, e],
+    //       };
+    //     });
+    //   } else {
+    //     clearInterval(interval);
+    //   }
+    // }, 5);
+    // this.setState({
+    //   progressPending: false,
+    // });
   };
 
   deleteMultiple = () => {

@@ -1,4 +1,4 @@
-import fs from "fs";
+import { promises as fs } from "fs";
 import path from "path";
 import log from "electron-log";
 
@@ -27,21 +27,22 @@ export class Demo {
     this.filesize = 0;
   }
 
-  readFileHeader(): DemoHeader {
+  async readFileHeader(): Promise<DemoHeader> {
     log.debug(`Reading file header of ${this.filename}`);
-    const fd = fs.openSync(this.filename, "r");
+    const fd = await fs.open(this.filename, "r");
+    const stats = await fs.stat(this.filename);
     const buf = Buffer.allocUnsafe(HEADER_SIZE);
-    const bytesRead = fs.readSync(fd, buf, 0, HEADER_SIZE, 0);
+
+    const { bytesRead } = await fd.read(buf, 0, HEADER_SIZE, 0);
     if (bytesRead !== HEADER_SIZE) {
       log.warn(
         `Error reading file ${this.filename}: read ${bytesRead} bytes, expected ${HEADER_SIZE}.`
       );
       throw new InvalidDemoFileError();
     }
-    const stats = fs.fstatSync(fd);
     this.birthtime = stats.birthtimeMs;
     this.filesize = stats.size;
-    fs.closeSync(fd);
+    fd.close();
     const sr = new StreamReader(buf);
 
     const filestamp = sr.readString(8);
@@ -75,12 +76,12 @@ export class Demo {
     return path.basename(this.filename, ".dem");
   }
 
-  readEvents(): DemoEvent[] {
+  async readEvents(): Promise<DemoEvent[]> {
     const jsonPath = this.getJSONPath();
     log.debug(`Looking for events file at ${jsonPath}`);
     let content;
     try {
-      content = fs.readFileSync(jsonPath);
+      content = await fs.readFile(jsonPath);
     } catch (e) {
       if (e.code === "ENOENT") {
         return [];
@@ -95,33 +96,33 @@ export class Demo {
     }
   }
 
-  getHeader() {
-    const newHeader = this.readFileHeader();
+  async getHeader() {
+    const newHeader = await this.readFileHeader();
     this.cachedHeader = newHeader;
     return newHeader;
   }
 
-  getEvents() {
-    const newEvents = this.readEvents();
+  async getEvents() {
+    const newEvents = await this.readEvents();
     this.cachedEvents = newEvents;
     return newEvents;
   }
 
-  header() {
+  async header() {
     return this.cachedHeader || this.getHeader();
   }
 
-  events() {
+  async events() {
     return this.cachedEvents || this.getEvents();
   }
 }
 
-export function getDemosInDirectory(dirPath: string) {
+export async function getDemosInDirectory(dirPath: string) {
   log.debug(`Finding demo files in ${dirPath}`);
 
   let files;
   try {
-    files = fs.readdirSync(dirPath);
+    files = await fs.readdir(dirPath);
   } catch (e) {
     log.error(`Error reading path ${dirPath}: ${e}`);
     return [];
