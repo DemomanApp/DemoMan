@@ -8,8 +8,9 @@ import ChevronRightIcon from "@material-ui/icons/ChevronRight";
 import IconButton from "@material-ui/core/IconButton";
 import DeleteIcon from "@material-ui/icons/Delete";
 import RefreshIcon from "@material-ui/icons/Refresh";
-import LinearProgress from "@material-ui/core/LinearProgress";
 import Tooltip from "@material-ui/core/Tooltip";
+
+import loading from "../assets/loading.gif";
 
 import { Demo, getDemosInDirectory } from "./Demos";
 
@@ -309,9 +310,20 @@ export default class DemoTable extends PureComponent<
         fixedHeader
         // 56px is the height of the table title, 57px is the height of the header.
         fixedHeaderScrollHeight="calc(100vh - (56px + 57px))"
-        // theme="theme_demoman_dark"
+        // theme="demoman_dark"
         progressPending={progressPending}
-        progressComponent={<LinearProgress />}
+        progressComponent={
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+            }}
+          >
+            <img src={loading} alt="loading..." width="128px" />
+            <span style={{ fontSize: "20px", margin: "1rem" }}>Loading...</span>
+          </div>
+        }
       />
     );
   }
