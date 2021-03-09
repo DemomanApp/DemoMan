@@ -5,6 +5,14 @@ html {
 body {
   margin: 0px;
 }
+.rdt_TableCol {
+  padding-left: 8px;
+  padding-right: 8px;
+}
+.rdt_TableCell {
+  padding-left: 8px;
+  padding-right: 8px;
+}
 .rdt_TableHeadRow {
   padding: 0px 16px;
 }
