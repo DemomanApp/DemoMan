@@ -174,28 +174,6 @@ const columns = [
   },
 ];
 
-createTheme("demoman_dark", {
-  text: {
-    primary: "#268bd2",
-    secondary: "#2aa198",
-  },
-  background: {
-    default: "#002b36",
-  },
-  context: {
-    background: "#cb4b16",
-    text: "#FFFFFF",
-  },
-  divider: {
-    default: "#073642",
-  },
-  action: {
-    button: "rgba(0,0,0,.54)",
-    hover: "rgba(0,0,0,.08)",
-    disabled: "rgba(0,0,0,.12)",
-  },
-});
-
 type DemoTableProps = unknown;
 
 type DemoTableState = {
@@ -324,6 +302,7 @@ export default class DemoTable extends PureComponent<
             <span style={{ fontSize: "20px", margin: "1rem" }}>Loading...</span>
           </div>
         }
+        theme="dark"
       />
     );
   }
