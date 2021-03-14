@@ -83,6 +83,8 @@ const createWindow = async () => {
     show: false,
     width: 1536,
     height: 728,
+    minWidth: 1225,
+    useContentSize: true,
     icon: getAssetPath("icon.png"),
     webPreferences: {
       enableRemoteModule: true,
