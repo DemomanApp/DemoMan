@@ -4,7 +4,6 @@ import cfg from "electron-cfg";
 
 import Checkbox from "@material-ui/core/Checkbox";
 import ArrowDownward from "@material-ui/icons/ArrowDownward";
-import ChevronRightIcon from "@material-ui/icons/ChevronRight";
 import IconButton from "@material-ui/core/IconButton";
 import DeleteIcon from "@material-ui/icons/Delete";
 import RefreshIcon from "@material-ui/icons/Refresh";
@@ -13,6 +12,7 @@ import Tooltip from "@material-ui/core/Tooltip";
 import loading from "../assets/loading.gif";
 
 import { Demo, getDemosInDirectory } from "./Demos";
+import { formatFileSize, formatPlaybackTime } from "./util";
 
 interface DemoListEntry {
   filename: string;
@@ -24,6 +24,7 @@ interface DemoListEntry {
   numTicks: number;
   birthtime: number;
   filesize: number;
+  demo: Demo;
 }
 
 async function getDemoListEntry(demo: Demo): Promise<DemoListEntry> {
@@ -38,39 +39,8 @@ async function getDemoListEntry(demo: Demo): Promise<DemoListEntry> {
     numTicks: header.numTicks,
     birthtime: demo.birthtime,
     filesize: demo.filesize,
+    demo,
   };
-}
-
-function leftPadTwo(val: string) {
-  return `00${val}`.slice(-Math.max(val.length, 2));
-}
-
-function formatPlaybackTime(seconds: number): string {
-  const fSeconds = Math.floor(seconds % 60);
-  const tMinutes = Math.floor(seconds / 60);
-  const fMinutes = tMinutes % 60;
-  const fHours = Math.floor(tMinutes / 60);
-  /* eslint-disable */
-  // prettier-ignore
-  return `${
-    leftPadTwo(fHours.toString())}:${
-    leftPadTwo(fMinutes.toString())}:${
-    leftPadTwo(fSeconds.toString())}`;
-  /* eslint-enable */
-}
-
-function formatFileSize(bytes: number): string {
-  const units = ["B", "kB", "MB", "GB"];
-  let size = bytes;
-  let i = 0;
-  while (size > 1000) {
-    size /= 1000;
-    i += 1;
-  }
-  if (i > 3) {
-    i = 3;
-  }
-  return `${size.toFixed(1)} ${units[i]}`;
 }
 
 function CustomTimeCell(row: DemoListEntry) {
@@ -92,16 +62,6 @@ function CustomBirthtimeCell(row: DemoListEntry) {
 
 function CustomFilesizeCell(row: DemoListEntry) {
   return <div>{formatFileSize(row.filesize)}</div>;
-}
-
-function CustomDetailsButtonCell(row: DemoListEntry) {
-  return (
-    <Tooltip title="View details" arrow>
-      <IconButton color="primary">
-        <ChevronRightIcon />
-      </IconButton>
-    </Tooltip>
-  );
 }
 
 const columns = [
@@ -147,7 +107,7 @@ const columns = [
     name: "Ticks",
     selector: "numTicks",
     sortable: true,
-    grow: 0.5,
+    grow: 0.1,
     right: true,
   },
   {
@@ -165,12 +125,6 @@ const columns = [
     cell: CustomFilesizeCell,
     grow: 0.1,
     center: true,
-  },
-  {
-    name: "Details",
-    cell: CustomDetailsButtonCell,
-    button: true,
-    grow: 0.1,
   },
 ];
 
@@ -196,7 +150,9 @@ createTheme("demoman_dark", {
   },
 });
 
-type DemoTableProps = unknown;
+type DemoTableProps = {
+  viewDemo: (demo: Demo) => void;
+};
 
 type DemoTableState = {
   selectedRows: DemoListEntry[];
@@ -209,6 +165,8 @@ export default class DemoTable extends PureComponent<
   DemoTableProps,
   DemoTableState
 > {
+  viewDemo: (demo: Demo) => void;
+
   constructor(props: DemoTableProps) {
     super(props);
     this.state = {
@@ -217,6 +175,7 @@ export default class DemoTable extends PureComponent<
       data: [],
       progressPending: false,
     };
+    this.viewDemo = props.viewDemo;
   }
 
   componentDidMount() {
@@ -273,10 +232,6 @@ export default class DemoTable extends PureComponent<
     this.setState({ selectedRows: selectedRowState.selectedRows });
   };
 
-  handleRowClicked = (row: DemoListEntry) => {
-    console.log(`${row.filename} was clicked!`);
-  };
-
   render() {
     const { data, toggleCleared, progressPending } = this.state;
 
@@ -290,9 +245,11 @@ export default class DemoTable extends PureComponent<
         selectableRows
         highlightOnHover
         actions={
-          <IconButton color="default" onClick={this.RefreshDemoList}>
-            <RefreshIcon />
-          </IconButton>
+          <Tooltip title="Reload demos">
+            <IconButton color="default" onClick={this.RefreshDemoList}>
+              <RefreshIcon />
+            </IconButton>
+          </Tooltip>
         }
         data={data}
         contextActions={
@@ -306,7 +263,10 @@ export default class DemoTable extends PureComponent<
         // selectableRowsComponentProps={selectProps}
         onSelectedRowsChange={this.handleChange}
         clearSelectedRows={toggleCleared}
-        onRowClicked={this.handleRowClicked}
+        pointerOnHover
+        onRowClicked={(row: DemoListEntry) => {
+          this.viewDemo(row.demo);
+        }}
         fixedHeader
         // 56px is the height of the table title, 57px is the height of the header.
         fixedHeaderScrollHeight="calc(100vh - (56px + 57px))"
