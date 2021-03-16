@@ -14,6 +14,11 @@ import path from "path";
 import { app, BrowserWindow, shell, Menu } from "electron";
 import { autoUpdater } from "electron-updater";
 import log from "electron-log";
+import cfg from "electron-cfg";
+
+import { loadPreferredTheme } from "./theme";
+
+cfg.logger(log);
 
 export default class AppUpdater {
   constructor() {
@@ -51,6 +56,7 @@ const installExtensions = async () => {
 };
 
 const createWindow = async () => {
+  loadPreferredTheme();
   if (
     process.env.NODE_ENV === "development" ||
     process.env.DEBUG_PROD === "true"
@@ -83,6 +89,8 @@ const createWindow = async () => {
     show: false,
     width: 1536,
     height: 728,
+    minWidth: 1225,
+    useContentSize: true,
     icon: getAssetPath("icon.png"),
     webPreferences: {
       enableRemoteModule: true,
