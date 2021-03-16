@@ -14,6 +14,9 @@ import path from "path";
 import { app, BrowserWindow, shell, Menu } from "electron";
 import { autoUpdater } from "electron-updater";
 import log from "electron-log";
+import cfg from "electron-cfg";
+
+cfg.logger(log);
 
 export default class AppUpdater {
   constructor() {
