@@ -11,7 +11,7 @@
 import "core-js/stable";
 import "regenerator-runtime/runtime";
 import path from "path";
-import { app, BrowserWindow, shell, Menu } from "electron";
+import { app, BrowserWindow, shell, Menu, nativeTheme } from "electron";
 import { autoUpdater } from "electron-updater";
 import log from "electron-log";
 import cfg from "electron-cfg";
@@ -91,6 +91,7 @@ const createWindow = async () => {
     height: 728,
     minWidth: 1225,
     useContentSize: true,
+    backgroundColor: nativeTheme.shouldUseDarkColors ? "#424242" : "#ffffff",
     icon: getAssetPath("icon.png"),
     webPreferences: {
       enableRemoteModule: true,
