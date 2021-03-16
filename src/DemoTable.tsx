@@ -1,5 +1,5 @@
 import React, { PureComponent } from "react";
-import DataTable, { createTheme } from "react-data-table-component";
+import DataTable from "react-data-table-component";
 import cfg from "electron-cfg";
 
 import Checkbox from "@material-ui/core/Checkbox";
@@ -13,6 +13,7 @@ import Tooltip from "@material-ui/core/Tooltip";
 import loading from "../assets/loading.gif";
 
 import { Demo, getDemosInDirectory } from "./Demos";
+import { getPreferredTheme } from "./theme";
 
 interface DemoListEntry {
   filename: string;
@@ -302,7 +303,7 @@ export default class DemoTable extends PureComponent<
             <span style={{ fontSize: "20px", margin: "1rem" }}>Loading...</span>
           </div>
         }
-        theme="dark"
+        theme={getPreferredTheme()}
       />
     );
   }

@@ -14,6 +14,7 @@ import path from "path";
 import { app, BrowserWindow, shell, Menu } from "electron";
 import { autoUpdater } from "electron-updater";
 import log from "electron-log";
+import { loadPreferredTheme } from "./theme";
 
 export default class AppUpdater {
   constructor() {
@@ -51,6 +52,7 @@ const installExtensions = async () => {
 };
 
 const createWindow = async () => {
+  loadPreferredTheme();
   if (
     process.env.NODE_ENV === "development" ||
     process.env.DEBUG_PROD === "true"
