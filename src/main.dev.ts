@@ -16,6 +16,8 @@ import { autoUpdater } from "electron-updater";
 import log from "electron-log";
 import cfg from "electron-cfg";
 
+import { loadPreferredTheme } from "./theme";
+
 cfg.logger(log);
 
 export default class AppUpdater {
@@ -54,6 +56,7 @@ const installExtensions = async () => {
 };
 
 const createWindow = async () => {
+  loadPreferredTheme();
   if (
     process.env.NODE_ENV === "development" ||
     process.env.DEBUG_PROD === "true"
