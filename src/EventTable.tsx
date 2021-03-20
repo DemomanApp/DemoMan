@@ -1,6 +1,5 @@
 import React, { PureComponent } from "react";
 import DataTable from "react-data-table-component";
-import cfg from "electron-cfg";
 
 import ArrowDownward from "@material-ui/icons/ArrowDownward";
 import IconButton from "@material-ui/core/IconButton";
@@ -8,10 +7,10 @@ import ClearIcon from "@material-ui/icons/Clear";
 import SaveIcon from "@material-ui/icons/Save";
 import AddIcon from "@material-ui/icons/Add";
 import Tooltip from "@material-ui/core/Tooltip";
-import { makeStyles } from "@material-ui/core/styles";
 
 import { Demo } from "./Demos";
 import DemoEvent from "./DemoEvent";
+import { getPreferredTheme } from "./theme";
 
 const columns = [
   {
@@ -90,6 +89,11 @@ export default class EventTable extends PureComponent<
         defaultSortField="tick"
         defaultSortAsc
         highlightOnHover
+        noDataComponent={
+          <div style={{ height: "2rem" }}>
+            This demo doesn&apos;t have any events recorded.
+          </div>
+        }
         actions={
           <>
             <Tooltip title="Add event">
@@ -120,7 +124,8 @@ export default class EventTable extends PureComponent<
         // 20px and 5px: padding,
         // 56px: table title,
         // 57px: table header.
-        fixedHeaderScrollHeight="calc(100vh - 64px - 2 * 20px - 2 * (5px) - 56px - 57px)"
+        fixedHeaderScrollHeight="calc(100vh - 64px - 2 * 20px - 2 * 5px - 56px - 57px)"
+        theme={getPreferredTheme()}
       />
     );
   }
