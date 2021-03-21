@@ -1,6 +1,10 @@
 import React, { PureComponent } from "react";
-import DataTable from "react-data-table-component";
+import DataTable, {
+  createTheme,
+  defaultThemes,
+} from "react-data-table-component";
 import cfg from "electron-cfg";
+import merge from "deepmerge";
 
 import Checkbox from "@material-ui/core/Checkbox";
 import ArrowDownward from "@material-ui/icons/ArrowDownward";
@@ -128,6 +132,13 @@ const columns = [
     center: true,
   },
 ];
+
+createTheme(
+  "dark_alt",
+  merge(defaultThemes.dark, { background: { default: "#303030" } })
+);
+
+createTheme("light_alt", { background: { default: "#fafafa" } });
 
 type DemoTableProps = {
   viewDemo: (demo: Demo) => void;
@@ -273,7 +284,7 @@ export default class DemoTable extends PureComponent<
             <span style={{ fontSize: "20px", margin: "1rem" }}>Loading...</span>
           </div>
         }
-        theme={getPreferredTheme()}
+        theme={`${getPreferredTheme()}_alt`}
       />
     );
   }

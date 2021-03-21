@@ -91,7 +91,7 @@ const createWindow = async () => {
     height: 728,
     minWidth: 1225,
     useContentSize: true,
-    backgroundColor: nativeTheme.shouldUseDarkColors ? "#424242" : "#ffffff",
+    backgroundColor: nativeTheme.shouldUseDarkColors ? "#303030" : "#fafafa",
     icon: getAssetPath("icon.png"),
     webPreferences: {
       enableRemoteModule: true,
