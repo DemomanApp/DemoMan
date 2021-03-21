@@ -1,19 +1,19 @@
 import React from "react";
 
-import AppBar from "@material-ui/core/AppBar";
+import withStyles from "@material-ui/core/styles/withStyles";
 import Dialog from "@material-ui/core/Dialog";
 import IconButton from "@material-ui/core/IconButton";
-import Toolbar from "@material-ui/core/Toolbar";
 import CloseIcon from "@material-ui/icons/Close";
 import Zoom from "@material-ui/core/Zoom";
 import Container from "@material-ui/core/Container";
 import Paper from "@material-ui/core/Paper";
 import Grid from "@material-ui/core/Grid";
+import Divider from "@material-ui/core/Divider";
 
 import { Demo } from "./Demos";
 import { DemoHeader } from "./DemoHeader";
-import { formatFileSize, formatPlaybackTime } from "./util";
 import EventTable from "./EventTable";
+import DemoDetailsList from "./DemoDetailsList";
 
 type DemoDetailsProps = {
   demo: Demo | null;
@@ -77,82 +77,72 @@ export default class DemoDetails extends React.Component<
           this.setOpen(false);
         }}
         TransitionComponent={Zoom}
+        PaperComponent={withStyles((theme) => ({
+          root: {
+            backgroundColor: theme.palette.background.default,
+          },
+        }))(Paper)}
       >
-        <AppBar position="static" style={{ height: "64px" }}>
-          <Toolbar>
-            <IconButton
-              edge="start"
-              color="inherit"
-              onClick={() => {
-                this.setOpen(false);
-              }}
-            >
-              <CloseIcon />
-            </IconButton>
-            <h2>{demo.getShortName()}</h2>
-          </Toolbar>
-        </AppBar>
         <Container>
-          <Grid
-            container
-            alignItems="stretch"
-            justify="space-around"
-            style={{
-              padding: "20px",
-            }}
-          >
+          <Grid container direction="column">
             <Grid
               item
               container
-              direction="column"
-              xs={8}
-              alignItems="stretch"
-              spacing={10}
+              justify="space-between"
+              alignItems="center"
+              style={{ height: "64px" }}
             >
               <Grid item>
-                <div
-                  style={{
-                    width: "320px",
-                    height: "200px",
-                    backgroundColor: "#666",
-                    textAlign: "center",
+                <h2>{demo.getShortName()}</h2>
+              </Grid>
+              <Grid item>
+                <IconButton
+                  onClick={() => {
+                    this.setOpen(false);
                   }}
                 >
-                  <h2>{demoHeader.mapName}</h2> <br />
-                  (Map thumbnail coming soon&trade;)
-                </div>
-              </Grid>
-              <Grid item container spacing={1}>
-                <Grid item xs={4} style={{ textAlign: "right" }}>
-                  Recorded on
-                </Grid>
-                <Grid item xs={8}>
-                  {new Date(demo.birthtime).toLocaleString()}
-                </Grid>
-                <Grid item xs={4} style={{ textAlign: "right" }}>
-                  Size
-                </Grid>
-                <Grid item xs={8}>
-                  {formatFileSize(demo.filesize)}
-                </Grid>
-                <Grid item xs={4} style={{ textAlign: "right" }}>
-                  Playback time
-                </Grid>
-                <Grid item xs={8}>
-                  {formatPlaybackTime(demoHeader.playbackTime)}
-                </Grid>
-                <Grid item xs={4} style={{ textAlign: "right" }}>
-                  Server
-                </Grid>
-                <Grid item xs={8}>
-                  {demoHeader.serverName}
-                </Grid>
+                  <CloseIcon />
+                </IconButton>
               </Grid>
             </Grid>
-            <Grid item xs={4}>
-              <Paper elevation={3} style={{ padding: "5px", flexGrow: 1 }}>
-                <EventTable demo={demo} />
-              </Paper>
+            <Grid item>
+              <Divider />
+            </Grid>
+            <Grid
+              item
+              container
+              alignItems="stretch"
+              justify="space-around"
+              style={{ padding: "24px" }}
+            >
+              <Grid
+                item
+                container
+                direction="column"
+                xs={6}
+                alignItems="center"
+              >
+                <Grid item>
+                  <div
+                    style={{
+                      width: "320px",
+                      height: "200px",
+                      backgroundColor: "#666",
+                      textAlign: "center",
+                    }}
+                  >
+                    <h2 style={{ margin: "0px" }}>{demoHeader.mapName}</h2>{" "}
+                    <br />
+                    (Map thumbnail coming soon&trade;)
+                  </div>
+                </Grid>
+                <DemoDetailsList demo={demo} demoHeader={demoHeader} />
+              </Grid>
+              <Grid item xs={6}>
+                <Paper elevation={3} style={{ padding: "5px" }}>
+                  <EventTable demo={demo} />
+                </Paper>
+              </Grid>
             </Grid>
           </Grid>
         </Container>

@@ -120,11 +120,12 @@ export default class EventTable extends PureComponent<
         data={data}
         sortIcon={<ArrowDownward />}
         fixedHeader
-        // 64px: AppBar,
-        // 20px and 5px: padding,
+        // 64px: Page title,
+        // 1px: Divider,
+        // 24px and 5px: padding,
         // 56px: table title,
         // 57px: table header.
-        fixedHeaderScrollHeight="calc(100vh - 64px - 2 * 20px - 2 * 5px - 56px - 57px)"
+        fixedHeaderScrollHeight="calc(100vh - 64px - 1px - 2 * 24px - 2 * 5px - 56px - 57px)"
         theme={getPreferredTheme()}
       />
     );
