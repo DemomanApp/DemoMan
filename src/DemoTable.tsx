@@ -274,11 +274,21 @@ export default class DemoTable extends PureComponent<
           </IconButton>
         }
         data={data}
+        noDataComponent={
+          <div>
+            No demos found. Make sure you&apos;ve set the correct file path.
+          </div>
+        }
         contextActions={
           <IconButton color="default" onClick={this.deleteMultiple}>
             <DeleteIcon />
           </IconButton>
         }
+        contextMessage={{
+          singular: "Demo",
+          plural: "Demos",
+          message: "selected",
+        }}
         selectableRowsComponent={Checkbox}
         selectableRowsComponentProps={{ color: "primary" }}
         sortIcon={<ArrowDownward />}
