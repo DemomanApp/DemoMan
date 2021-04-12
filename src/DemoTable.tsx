@@ -168,7 +168,7 @@ export default class DemoTable extends PureComponent<
   }
 
   componentDidMount() {
-    if (cfg.has("demos.path")) {
+    if (cfg.has("demo_path")) {
       this.RefreshDemoList();
     }
   }
@@ -179,7 +179,7 @@ export default class DemoTable extends PureComponent<
       data: [],
       progressPending: true,
     });
-    const newDemos = await getDemosInDirectory(cfg.get("demos.path"));
+    const newDemos = await getDemosInDirectory(cfg.get("demo_path"));
     const newData = await Promise.all(newDemos.map(getDemoListEntry));
     this.setState({
       data: newData,

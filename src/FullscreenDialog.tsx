@@ -9,6 +9,7 @@ import Container from "@material-ui/core/Container";
 import Paper from "@material-ui/core/Paper";
 import Grid from "@material-ui/core/Grid";
 import Divider from "@material-ui/core/Divider";
+import Typography from "@material-ui/core/Typography";
 
 type FullscreenDialogProps = {
   title: string;
@@ -41,7 +42,7 @@ export default function FullscreenDialog(props: FullscreenDialogProps) {
             style={{ height: "64px" }}
           >
             <Grid item>
-              <h2>{title}</h2>
+              <Typography variant="h5">{title}</Typography>
             </Grid>
             <Grid item>
               <IconButton onClick={onClose}>

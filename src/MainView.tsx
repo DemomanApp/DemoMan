@@ -26,7 +26,7 @@ export default class MainView extends React.Component<unknown> {
   }
 
   componentDidMount() {
-    if (!cfg.has("demos.path")) {
+    if (!cfg.has("demo_path")) {
       if (this.modal.current) {
         this.modal.current.setOpen(true);
       }
@@ -42,6 +42,7 @@ export default class MainView extends React.Component<unknown> {
 
   viewSettings = () => {
     if (this.settings.current) {
+      this.settings.current.setState({ unsavedChanges: {} });
       this.settings.current.setOpen(true);
     }
   };

@@ -11,7 +11,14 @@
 import "core-js/stable";
 import "regenerator-runtime/runtime";
 import path from "path";
-import { app, BrowserWindow, shell, Menu, nativeTheme } from "electron";
+import {
+  app,
+  BrowserWindow,
+  shell,
+  Menu,
+  nativeTheme,
+  ipcMain,
+} from "electron";
 import { autoUpdater } from "electron-updater";
 import log from "electron-log";
 import cfg from "electron-cfg";
@@ -19,6 +26,10 @@ import cfg from "electron-cfg";
 import { loadPreferredTheme } from "./theme";
 
 cfg.logger(log);
+
+ipcMain.on("update-theme", (event, newTheme) => {
+  nativeTheme.themeSource = newTheme;
+});
 
 export default class AppUpdater {
   constructor() {
