@@ -6,6 +6,7 @@ import { Demo } from "./Demos";
 import DemoTable from "./DemoTable";
 import SelectDemoPathModal from "./SelectDemoPathModal";
 import DemoDetails from "./DemoDetailsView";
+import SettingsView from "./SettingsView";
 
 export default class MainView extends React.Component<unknown> {
   private modal: React.RefObject<SelectDemoPathModal>;
@@ -14,15 +15,18 @@ export default class MainView extends React.Component<unknown> {
 
   private demoDetails: React.RefObject<DemoDetails>;
 
+  private settings: React.RefObject<SettingsView>;
+
   constructor(props: unknown) {
     super(props);
     this.modal = React.createRef();
     this.table = React.createRef();
     this.demoDetails = React.createRef();
+    this.settings = React.createRef();
   }
 
   componentDidMount() {
-    if (!cfg.has("demos.path")) {
+    if (!cfg.has("demo_path")) {
       if (this.modal.current) {
         this.modal.current.setOpen(true);
       }
@@ -33,15 +37,24 @@ export default class MainView extends React.Component<unknown> {
     log.debug(`Viewing demo ${demo.filename}`);
     if (this.demoDetails.current) {
       this.demoDetails.current.viewDemo(demo);
-      // this.demoDetails.current.setDemo(demo);
-      // this.demoDetails.current.setOpen(true);
+    }
+  };
+
+  viewSettings = () => {
+    if (this.settings.current) {
+      this.settings.current.setState({ unsavedChanges: {} });
+      this.settings.current.setOpen(true);
     }
   };
 
   render() {
     return (
       <>
-        <DemoTable ref={this.table} viewDemo={this.viewDemo} />
+        <DemoTable
+          ref={this.table}
+          viewDemo={this.viewDemo}
+          viewSettings={this.viewSettings}
+        />
         <SelectDemoPathModal
           ref={this.modal}
           onComplete={() => {
@@ -49,6 +62,7 @@ export default class MainView extends React.Component<unknown> {
           }}
         />
         <DemoDetails ref={this.demoDetails} demo={null} />
+        <SettingsView ref={this.settings} />
       </>
     );
   }

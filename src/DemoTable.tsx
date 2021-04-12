@@ -11,6 +11,7 @@ import ArrowDownward from "@material-ui/icons/ArrowDownward";
 import IconButton from "@material-ui/core/IconButton";
 import DeleteIcon from "@material-ui/icons/Delete";
 import RefreshIcon from "@material-ui/icons/Refresh";
+import SettingsIcon from "@material-ui/icons/Settings";
 import Tooltip from "@material-ui/core/Tooltip";
 
 import loading from "../assets/loading.gif";
@@ -142,6 +143,7 @@ createTheme("light_alt", { background: { default: "#fafafa" } });
 
 type DemoTableProps = {
   viewDemo: (demo: Demo) => void;
+  viewSettings: () => void;
 };
 
 type DemoTableState = {
@@ -155,8 +157,6 @@ export default class DemoTable extends PureComponent<
   DemoTableProps,
   DemoTableState
 > {
-  viewDemo: (demo: Demo) => void;
-
   constructor(props: DemoTableProps) {
     super(props);
     this.state = {
@@ -165,11 +165,10 @@ export default class DemoTable extends PureComponent<
       data: [],
       progressPending: false,
     };
-    this.viewDemo = props.viewDemo;
   }
 
   componentDidMount() {
-    if (cfg.has("demos.path")) {
+    if (cfg.has("demo_path")) {
       this.RefreshDemoList();
     }
   }
@@ -180,7 +179,7 @@ export default class DemoTable extends PureComponent<
       data: [],
       progressPending: true,
     });
-    const newDemos = await getDemosInDirectory(cfg.get("demos.path"));
+    const newDemos = await getDemosInDirectory(cfg.get("demo_path"));
     const newData = await Promise.all(newDemos.map(getDemoListEntry));
     this.setState({
       data: newData,
@@ -224,6 +223,7 @@ export default class DemoTable extends PureComponent<
 
   render() {
     const { data, toggleCleared, progressPending } = this.state;
+    const { viewDemo, viewSettings } = this.props;
 
     return (
       <DataTable
@@ -235,11 +235,18 @@ export default class DemoTable extends PureComponent<
         selectableRows
         highlightOnHover
         actions={
-          <Tooltip title="Reload demos">
-            <IconButton color="default" onClick={this.RefreshDemoList}>
-              <RefreshIcon />
-            </IconButton>
-          </Tooltip>
+          <>
+            <Tooltip title="Reload demos">
+              <IconButton color="default" onClick={this.RefreshDemoList}>
+                <RefreshIcon />
+              </IconButton>
+            </Tooltip>
+            <Tooltip title="Settings">
+              <IconButton color="default" onClick={viewSettings}>
+                <SettingsIcon />
+              </IconButton>
+            </Tooltip>
+          </>
         }
         data={data}
         noDataComponent={
@@ -265,7 +272,7 @@ export default class DemoTable extends PureComponent<
         clearSelectedRows={toggleCleared}
         pointerOnHover
         onRowClicked={(row: DemoListEntry) => {
-          this.viewDemo(row.demo);
+          viewDemo(row.demo);
         }}
         fixedHeader
         // 56px is the height of the table title, 57px is the height of the header.

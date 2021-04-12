@@ -6,7 +6,7 @@ import DialogContent from "@material-ui/core/DialogContent";
 import DialogContentText from "@material-ui/core/DialogContentText";
 import DialogTitle from "@material-ui/core/DialogTitle";
 
-import GetDemosPath from "./GetDemoPath";
+import { GetSetDemoPath } from "./GetDemoPath";
 
 type SelectDemoPathModalProps = {
   onComplete: () => void;
@@ -40,7 +40,7 @@ export default class SelectDemoPathModal extends React.PureComponent<
   };
 
   handleChoose = () => {
-    if (GetDemosPath()) {
+    if (GetSetDemoPath()) {
       this.handleClose();
     }
   };
@@ -62,7 +62,7 @@ export default class SelectDemoPathModal extends React.PureComponent<
           </DialogContentText>
         </DialogContent>
         <DialogActions>
-          <Button onClick={this.handleChoose} color="primary">
+          <Button onClick={this.handleChoose} variant="outlined">
             Choose...
           </Button>
         </DialogActions>
