@@ -53,9 +53,7 @@ export default function FullscreenDialog(props: FullscreenDialogProps) {
           <Grid item>
             <Divider />
           </Grid>
-          <Grid item style={{ padding: "24px" }}>
-            {children}
-          </Grid>
+          {children}
         </Grid>
       </Container>
     </Dialog>

@@ -72,37 +72,35 @@ export default class DemoDetails extends React.Component<
           this.setOpen(false);
         }}
       >
-        <Container>
-          <Grid
-            item
-            container
-            alignItems="stretch"
-            justify="space-around"
-            style={{ padding: "24px" }}
-          >
-            <Grid item container direction="column" xs={6} alignItems="center">
-              <Grid item>
-                <div
-                  style={{
-                    width: "320px",
-                    height: "200px",
-                    backgroundColor: "#666",
-                    textAlign: "center",
-                  }}
-                >
-                  <h2 style={{ margin: "0px" }}>{demoHeader.mapName}</h2> <br />
-                  (Map thumbnail coming soon&trade;)
-                </div>
-              </Grid>
-              <DemoDetailsList demo={demo} demoHeader={demoHeader} />
+        <Grid
+          item
+          container
+          alignItems="stretch"
+          justify="space-around"
+          style={{ padding: "24px" }}
+        >
+          <Grid item container direction="column" xs={6} alignItems="center">
+            <Grid item>
+              <div
+                style={{
+                  width: "320px",
+                  height: "200px",
+                  backgroundColor: "#666",
+                  textAlign: "center",
+                }}
+              >
+                <h2 style={{ margin: "0px" }}>{demoHeader.mapName}</h2> <br />
+                (Map thumbnail coming soon&trade;)
+              </div>
             </Grid>
-            <Grid item xs={6}>
-              <Paper elevation={3} style={{ padding: "5px" }}>
-                <EventTable demo={demo} />
-              </Paper>
-            </Grid>
+            <DemoDetailsList demo={demo} demoHeader={demoHeader} />
           </Grid>
-        </Container>
+          <Grid item xs={6}>
+            <Paper elevation={3} style={{ padding: "5px" }}>
+              <EventTable demo={demo} />
+            </Paper>
+          </Grid>
+        </Grid>
       </FullscreenDialog>
     );
   }
