@@ -8,7 +8,7 @@ export function GetDemoPath(defaultPath = undefined) {
   const filePaths = dialog.showOpenDialogSync({
     title: "Select your demo folder",
     defaultPath,
-    properties: ["openDirectory"],
+    properties: ["openDirectory", "showHiddenFiles"],
   });
 
   // This happens when the user cancels the path selection
