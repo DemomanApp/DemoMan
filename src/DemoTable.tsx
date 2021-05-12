@@ -12,6 +12,7 @@ import IconButton from "@material-ui/core/IconButton";
 import DeleteIcon from "@material-ui/icons/Delete";
 import RefreshIcon from "@material-ui/icons/Refresh";
 import SettingsIcon from "@material-ui/icons/Settings";
+import InfoIcon from "@material-ui/icons/InfoOutlined";
 import Tooltip from "@material-ui/core/Tooltip";
 
 import loading from "../assets/loading.gif";
@@ -19,6 +20,7 @@ import loading from "../assets/loading.gif";
 import { Demo, getDemosInDirectory } from "./Demos";
 import { formatFileSize, formatPlaybackTime } from "./util";
 import { getPreferredTheme } from "./theme";
+import { DemoListInfo } from "./InfoDialog";
 
 interface DemoListEntry {
   filename: string;
@@ -144,6 +146,7 @@ createTheme("light_alt", { background: { default: "#fafafa" } });
 type DemoTableProps = {
   viewDemo: (demo: Demo) => void;
   viewSettings: () => void;
+  viewInfoDialog: (info: DemoListInfo) => void;
 };
 
 type DemoTableState = {
@@ -221,6 +224,19 @@ export default class DemoTable extends PureComponent<
     this.setState({ selectedRows: selectedRowState.selectedRows });
   };
 
+  viewInfo = () => {
+    const { viewInfoDialog: openInfoDialog } = this.props;
+    const { data } = this.state;
+    let totalFilesize = 0;
+    data.forEach((element) => {
+      totalFilesize += element.filesize;
+    });
+    openInfoDialog({
+      totalDemos: data.length,
+      totalFilesize,
+    });
+  };
+
   render() {
     const { data, toggleCleared, progressPending } = this.state;
     const { viewDemo, viewSettings } = this.props;
@@ -239,6 +255,11 @@ export default class DemoTable extends PureComponent<
             <Tooltip title="Reload demos">
               <IconButton color="default" onClick={this.RefreshDemoList}>
                 <RefreshIcon />
+              </IconButton>
+            </Tooltip>
+            <Tooltip title="Info">
+              <IconButton color="default" onClick={this.viewInfo}>
+                <InfoIcon />
               </IconButton>
             </Tooltip>
             <Tooltip title="Settings">

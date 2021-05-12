@@ -7,6 +7,7 @@ import DemoTable from "./DemoTable";
 import SelectDemoPathModal from "./SelectDemoPathModal";
 import DemoDetails from "./DemoDetailsView";
 import SettingsView from "./SettingsView";
+import { InfoDialog, DemoListInfo } from "./InfoDialog";
 
 export default class MainView extends React.Component<unknown> {
   private modal: React.RefObject<SelectDemoPathModal>;
@@ -17,12 +18,15 @@ export default class MainView extends React.Component<unknown> {
 
   private settings: React.RefObject<SettingsView>;
 
+  private info: React.RefObject<InfoDialog>;
+
   constructor(props: unknown) {
     super(props);
     this.modal = React.createRef();
     this.table = React.createRef();
     this.demoDetails = React.createRef();
     this.settings = React.createRef();
+    this.info = React.createRef();
   }
 
   componentDidMount() {
@@ -47,6 +51,13 @@ export default class MainView extends React.Component<unknown> {
     }
   };
 
+  viewInfoDialog = (info: DemoListInfo) => {
+    if (this.info.current) {
+      this.info.current.setInfo(info);
+      this.info.current.setOpen(true);
+    }
+  };
+
   render() {
     return (
       <>
@@ -54,6 +65,7 @@ export default class MainView extends React.Component<unknown> {
           ref={this.table}
           viewDemo={this.viewDemo}
           viewSettings={this.viewSettings}
+          viewInfoDialog={this.viewInfoDialog}
         />
         <SelectDemoPathModal
           ref={this.modal}
@@ -63,6 +75,7 @@ export default class MainView extends React.Component<unknown> {
         />
         <DemoDetails ref={this.demoDetails} demo={null} />
         <SettingsView ref={this.settings} />
+        <InfoDialog ref={this.info} />
       </>
     );
   }
