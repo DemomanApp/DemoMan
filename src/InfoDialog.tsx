@@ -1,6 +1,5 @@
 import React from "react";
 
-import Dialog from "@material-ui/core/Dialog";
 import Grid from "@material-ui/core/Grid";
 
 import { formatFileSize } from "./util";
