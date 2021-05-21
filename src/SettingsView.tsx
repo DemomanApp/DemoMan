@@ -30,6 +30,13 @@ export default class SettingsView extends React.Component<
     this.setState({ open: value });
   }
 
+  cancel = () => {
+    this.setState({
+      unsavedChanges: {},
+      open: false,
+    });
+  };
+
   render() {
     const { open, unsavedChanges } = this.state;
     const themeSetting = cfg.get("theme");
@@ -101,7 +108,14 @@ export default class SettingsView extends React.Component<
             </Grid>
           </Grid>
           <Grid item container justify="flex-end">
-            <Grid item>
+            <Grid item style={{ marginTop: "8px" }}>
+              <Button
+                variant="outlined"
+                onClick={this.cancel}
+                style={{ marginRight: "16px" }}
+              >
+                Cancel
+              </Button>
               <Button
                 variant="outlined"
                 disabled={Object.entries(unsavedChanges).length === 0}
