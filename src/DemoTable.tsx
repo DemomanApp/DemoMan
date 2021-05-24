@@ -14,6 +14,7 @@ import RefreshIcon from "@material-ui/icons/Refresh";
 import SettingsIcon from "@material-ui/icons/Settings";
 import InfoIcon from "@material-ui/icons/InfoOutlined";
 import Tooltip from "@material-ui/core/Tooltip";
+import blue from "@material-ui/core/colors/blue";
 
 import loading from "../assets/loading.gif";
 
@@ -138,10 +139,20 @@ const columns = [
 
 createTheme(
   "dark_alt",
-  merge(defaultThemes.dark, { background: { default: "#303030" } })
+  merge(defaultThemes.dark, {
+    background: { default: "#303030" },
+    context: {
+      background: blue[500],
+    },
+  })
 );
 
-createTheme("light_alt", { background: { default: "#fafafa" } });
+createTheme("light_alt", {
+  background: { default: "#fafafa" },
+  context: {
+    background: blue[500],
+  },
+});
 
 type DemoTableProps = {
   viewDemo: (demo: Demo) => void;
