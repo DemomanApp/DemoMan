@@ -90,10 +90,24 @@ export class Demo {
     }
     try {
       const parsedJson = JSON.parse(content.toString());
-      return parsedJson.events;
+      return parsedJson.events || [];
     } catch (error) {
       return [];
     }
+  }
+
+  async writeEvents(events: DemoEvent[]) {
+    this.cachedEvents = events;
+    const jsonPath = this.getJSONPath();
+    if (events.length === 0) {
+      log.debug(`Deleting events file at ${jsonPath}`);
+      await fs.rm(jsonPath, { force: true });
+      return;
+    }
+    log.debug(`Writing to events file at ${jsonPath}`);
+    const fd = await fs.open(jsonPath, "w");
+    await fd.write(JSON.stringify({ events }, null, "\t"));
+    fd.close();
   }
 
   async getHeader() {
