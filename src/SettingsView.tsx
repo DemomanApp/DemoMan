@@ -110,14 +110,16 @@ export default class SettingsView extends React.Component<
           <Grid item container justify="flex-end">
             <Grid item style={{ marginTop: "8px" }}>
               <Button
-                variant="outlined"
+                variant="contained"
+                color="secondary"
                 onClick={this.cancel}
                 style={{ marginRight: "16px" }}
               >
                 Cancel
               </Button>
               <Button
-                variant="outlined"
+                variant="contained"
+                color="primary"
                 disabled={Object.entries(unsavedChanges).length === 0}
                 onClick={() => {
                   Object.entries(unsavedChanges).forEach(([key, value]) => {
