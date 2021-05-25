@@ -1,4 +1,4 @@
-import { promises as fs } from "fs";
+import fs from "fs";
 import path from "path";
 import log from "electron-log";
 
@@ -27,13 +27,13 @@ export class Demo {
     this.filesize = 0;
   }
 
-  async readFileHeader(): Promise<DemoHeader> {
+  readFileHeader(): DemoHeader {
     log.debug(`Reading file header of ${this.filename}`);
-    const fd = await fs.open(this.filename, "r");
-    const stats = await fs.stat(this.filename);
+    const fd = fs.openSync(this.filename, "r");
+    const stats = fs.statSync(this.filename);
     const buf = Buffer.allocUnsafe(HEADER_SIZE);
 
-    const { bytesRead } = await fd.read(buf, 0, HEADER_SIZE, 0);
+    const bytesRead = fs.readSync(fd, buf, 0, HEADER_SIZE, 0);
     if (bytesRead !== HEADER_SIZE) {
       log.warn(
         `Error reading file ${this.filename}: read ${bytesRead} bytes, expected ${HEADER_SIZE}.`
@@ -42,7 +42,7 @@ export class Demo {
     }
     this.birthtime = stats.birthtimeMs;
     this.filesize = stats.size;
-    fd.close();
+    fs.closeSync(fd);
     const sr = new StreamReader(buf);
 
     const filestamp = sr.readString(8);
@@ -76,12 +76,12 @@ export class Demo {
     return path.basename(this.filename, ".dem");
   }
 
-  async readEvents(): Promise<DemoEvent[]> {
+  readEvents(): DemoEvent[] {
     const jsonPath = this.getJSONPath();
     log.debug(`Looking for events file at ${jsonPath}`);
     let content;
     try {
-      content = await fs.readFile(jsonPath);
+      content = fs.readFileSync(jsonPath);
     } catch (e) {
       if (e.code === "ENOENT") {
         return [];
@@ -96,37 +96,37 @@ export class Demo {
     }
   }
 
-  async writeEvents(events: DemoEvent[]) {
+  writeEvents(events: DemoEvent[]) {
     this.cachedEvents = events;
     const jsonPath = this.getJSONPath();
     if (events.length === 0) {
       log.debug(`Deleting events file at ${jsonPath}`);
-      await fs.rm(jsonPath, { force: true });
+      fs.rmSync(jsonPath, { force: true });
       return;
     }
     log.debug(`Writing to events file at ${jsonPath}`);
-    const fd = await fs.open(jsonPath, "w");
-    await fd.write(JSON.stringify({ events }, null, "\t"));
-    fd.close();
+    const fd = fs.openSync(jsonPath, "w");
+    fs.writeSync(fd, JSON.stringify({ events }, null, "\t"));
+    fs.closeSync(fd);
   }
 
-  async getHeader() {
-    const newHeader = await this.readFileHeader();
+  getHeader() {
+    const newHeader = this.readFileHeader();
     this.cachedHeader = newHeader;
     return newHeader;
   }
 
-  async getEvents() {
-    const newEvents = await this.readEvents();
+  getEvents() {
+    const newEvents = this.readEvents();
     this.cachedEvents = newEvents;
     return newEvents;
   }
 
-  async header() {
+  header() {
     return this.cachedHeader || this.getHeader();
   }
 
-  async events() {
+  events() {
     return this.cachedEvents || this.getEvents();
   }
 }
@@ -136,7 +136,9 @@ export async function getDemosInDirectory(dirPath: string) {
 
   let files;
   try {
-    files = await fs.readdir(dirPath);
+    log.debug("before");
+    files = await fs.promises.readdir(dirPath);
+    log.debug("after");
   } catch (e) {
     log.error(`Error reading path ${dirPath}: ${e}`);
     return [];
@@ -146,7 +148,13 @@ export async function getDemosInDirectory(dirPath: string) {
   files.forEach((file) => {
     if (file.endsWith(".dem")) {
       log.debug(`Found demo file ${file}`);
-      demoList.push(new Demo(path.join(dirPath, file)));
+      const newDemo: Demo = new Demo(path.join(dirPath, file));
+      try {
+        newDemo.getHeader();
+      } catch (error) {
+        return;
+      }
+      demoList.push(newDemo);
     } else {
       log.debug(`Found non-demo file ${file}, skipping.`);
     }

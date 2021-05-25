@@ -39,15 +39,15 @@ interface DemoListEntry {
 }
 /* eslint-enable react/no-unused-prop-types */
 
-async function getDemoListEntry(demo: Demo): Promise<DemoListEntry> {
-  const header = await demo.header();
+function getDemoListEntry(demo: Demo): DemoListEntry {
+  const header = demo.header();
   return {
     filename: demo.getShortName(),
     map: header.mapName,
     playbackTime: header.playbackTime,
     player: header.clientName,
     server: header.serverName,
-    numEvents: (await demo.events()).length,
+    numEvents: demo.events().length,
     numTicks: header.numTicks,
     birthtime: demo.birthtime,
     filesize: demo.filesize,
@@ -197,7 +197,7 @@ export default class DemoTable extends PureComponent<
       progressPending: true,
     });
     const newDemos = await getDemosInDirectory(cfg.get("demo_path"));
-    const newData = await Promise.all(newDemos.map(getDemoListEntry));
+    const newData = newDemos.map(getDemoListEntry);
     this.setState({
       data: newData,
       progressPending: false,
