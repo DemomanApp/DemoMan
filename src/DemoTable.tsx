@@ -23,6 +23,8 @@ import { formatFileSize, formatPlaybackTime } from "./util";
 import { getPreferredTheme } from "./theme";
 import { DemoListInfo } from "./InfoDialog";
 
+// Fixes an ESLint false positive
+/* eslint-disable react/no-unused-prop-types */
 interface DemoListEntry {
   filename: string;
   map: string;
@@ -35,6 +37,7 @@ interface DemoListEntry {
   filesize: number;
   demo: Demo;
 }
+/* eslint-enable react/no-unused-prop-types */
 
 async function getDemoListEntry(demo: Demo): Promise<DemoListEntry> {
   const header = await demo.header();
@@ -52,12 +55,12 @@ async function getDemoListEntry(demo: Demo): Promise<DemoListEntry> {
   };
 }
 
-function CustomTimeCell(row: DemoListEntry) {
-  return <div>{formatPlaybackTime(row.playbackTime)}</div>;
+function CustomTimeCell({ playbackTime }: DemoListEntry) {
+  return <div>{formatPlaybackTime(playbackTime)}</div>;
 }
 
-function CustomBirthtimeCell(row: DemoListEntry) {
-  const date = new Date(row.birthtime);
+function CustomBirthtimeCell({ birthtime }: DemoListEntry) {
+  const date = new Date(birthtime);
   return (
     // "whiteSpace: nowrap" should prevent stuff like "PM"
     // from the time string being pushed to a new line.
@@ -69,8 +72,8 @@ function CustomBirthtimeCell(row: DemoListEntry) {
   );
 }
 
-function CustomFilesizeCell(row: DemoListEntry) {
-  return <div>{formatFileSize(row.filesize)}</div>;
+function CustomFilesizeCell({ filesize }: DemoListEntry) {
+  return <div>{formatFileSize(filesize)}</div>;
 }
 
 const columns = [
