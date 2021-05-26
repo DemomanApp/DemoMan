@@ -48,21 +48,19 @@ export default class DemoDetails extends React.Component<
 
   viewDemo = async (demo: Demo) => {
     this.setState({ demo, nextAvailableID: 0 });
-    (async () => {
-      const events = await demo.events();
-      const demoHeader = await demo.header();
-      const entries: EventTableEntry[] = [];
-      let i = 0;
-      for (; i < events.length; i += 1) {
-        entries.push({ id: i, event: events[i] });
-      }
-      this.setState({
-        events: entries,
-        demoHeader,
-        open: true,
-        nextAvailableID: i,
-      });
-    })();
+    const events = demo.events();
+    const demoHeader = demo.header();
+    const entries: EventTableEntry[] = [];
+    let i = 0;
+    for (; i < events.length; i += 1) {
+      entries.push({ id: i, event: events[i] });
+    }
+    this.setState({
+      events: entries,
+      demoHeader,
+      open: true,
+      nextAvailableID: i,
+    });
   };
 
   writeEvents = () => {
