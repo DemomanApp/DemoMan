@@ -259,7 +259,7 @@ export default class DemoTable extends PureComponent<
       <DataTable
         title="Demos"
         columns={columns}
-        defaultSortField="filename"
+        defaultSortField="birthtime"
         defaultSortAsc={false}
         keyField="filename"
         selectableRows
