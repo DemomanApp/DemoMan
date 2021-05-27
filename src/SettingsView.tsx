@@ -47,8 +47,32 @@ export default class SettingsView extends React.Component<
         onClose={() => {
           this.setOpen(false);
         }}
+        actions={
+          <>
+            <Button variant="contained" onClick={this.cancel}>
+              Cancel
+            </Button>
+            <Button
+              variant="contained"
+              color="primary"
+              disabled={Object.entries(unsavedChanges).length === 0}
+              onClick={() => {
+                Object.entries(unsavedChanges).forEach(([key, value]) => {
+                  log.debug(`Applying settings change: ${key} -> ${value}`);
+                  cfg.set(key, value);
+                  if (key === "theme") {
+                    ipcRenderer.send("update-theme", value);
+                  }
+                });
+                window.location.reload();
+              }}
+            >
+              Save changes
+            </Button>
+          </>
+        }
       >
-        <Grid item container direction="column" justify="space-between">
+        <Grid container>
           <Grid
             item
             container
@@ -104,35 +128,6 @@ export default class SettingsView extends React.Component<
                 variant="outlined"
               >
                 Choose...
-              </Button>
-            </Grid>
-          </Grid>
-          <Grid item container justify="flex-end">
-            <Grid item style={{ marginTop: "8px" }}>
-              <Button
-                variant="contained"
-                color="secondary"
-                onClick={this.cancel}
-                style={{ marginRight: "16px" }}
-              >
-                Cancel
-              </Button>
-              <Button
-                variant="contained"
-                color="primary"
-                disabled={Object.entries(unsavedChanges).length === 0}
-                onClick={() => {
-                  Object.entries(unsavedChanges).forEach(([key, value]) => {
-                    log.debug(`Applying settings change: ${key} -> ${value}`);
-                    cfg.set(key, value);
-                    if (key === "theme") {
-                      ipcRenderer.send("update-theme", value);
-                    }
-                  });
-                  window.location.reload();
-                }}
-              >
-                Save changes
               </Button>
             </Grid>
           </Grid>

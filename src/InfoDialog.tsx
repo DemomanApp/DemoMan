@@ -1,6 +1,7 @@
 import React from "react";
 
-import Grid from "@material-ui/core/Grid";
+import Button from "@material-ui/core/Button";
+import DialogContentText from "@material-ui/core/DialogContentText";
 
 import { formatFileSize } from "./util";
 import SmallDialog from "./SmallDialog";
@@ -44,15 +45,22 @@ export class InfoDialog extends React.Component<
         onClose={() => {
           this.setOpen(false);
         }}
+        actions={
+          <Button
+            variant="contained"
+            onClick={() => {
+              this.setOpen(false);
+            }}
+          >
+            Close
+          </Button>
+        }
       >
-        <Grid item container direction="column" justify="space-between">
-          <Grid item style={{ margin: "8px 0px" }}>
-            Number of demos: {info.totalDemos}
-          </Grid>
-          <Grid item style={{ margin: "8px 0px" }}>
-            Total filesize: {formatFileSize(info.totalFilesize)}
-          </Grid>
-        </Grid>
+        <DialogContentText>
+          Number of demos: <b>{info.totalDemos}</b>
+          <br />
+          Total filesize: <b>{formatFileSize(info.totalFilesize)}</b>
+        </DialogContentText>
       </SmallDialog>
     );
   }

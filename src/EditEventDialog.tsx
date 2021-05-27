@@ -130,82 +130,60 @@ export default class EditEventDialog extends React.Component<
         title={isEditing ? "Edit Event" : "Create Event"}
         open={open}
         onClose={this.cancel}
-      >
-        <Grid item container>
-          <Grid
-            item
-            container
-            direction="row"
-            spacing={2}
-            style={{ margin: "8px" }}
-          >
-            <Grid item xs={4}>
-              <TextField
-                required
-                id="input-tick"
-                label="Tick"
-                value={event.event.tick}
-                type="number"
-                onChange={this.validateTickInput}
-                variant="outlined"
-                error={tickError}
-                InputProps={{
-                  startAdornment: (
-                    <InputAdornment position="start">Tick</InputAdornment>
-                  ),
-                }}
-              />
-            </Grid>
-            <Grid item xs={8}>
-              <TextField
-                required
-                id="input-value"
-                label="Value"
-                value={event.event.value}
-                onChange={this.validateValueInput}
-                variant="outlined"
-                error={valueError}
-                fullWidth
-              />
-            </Grid>
-          </Grid>
-          <Grid
-            item
-            container
-            justify="flex-end"
-            spacing={2}
-            style={{ marginTop: "8px" }}
-          >
+        actions={
+          <>
             {isEditing && (
-              <Grid item>
-                <Button
-                  variant="contained"
-                  color="secondary"
-                  onClick={this.delete}
-                >
-                  Delete Event
-                </Button>
-              </Grid>
-            )}
-            <Grid item>
               <Button
                 variant="contained"
                 color="secondary"
-                onClick={this.cancel}
+                onClick={this.delete}
               >
-                Cancel
+                Delete Event
               </Button>
-            </Grid>
-            <Grid item>
-              <Button
-                variant="contained"
-                color="primary"
-                onClick={this.save}
-                disabled={!hasUnsavedChanges}
-              >
-                Save changes
-              </Button>
-            </Grid>
+            )}
+            <Button variant="contained" color="primary" onClick={this.cancel}>
+              Cancel
+            </Button>
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={this.save}
+              disabled={!hasUnsavedChanges}
+            >
+              Save changes
+            </Button>
+          </>
+        }
+      >
+        <Grid container direction="row" spacing={2} style={{ margin: "8px" }}>
+          <Grid item xs={4}>
+            <TextField
+              required
+              id="input-tick"
+              label="Tick"
+              value={event.event.tick}
+              type="number"
+              onChange={this.validateTickInput}
+              variant="outlined"
+              error={tickError}
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">Tick</InputAdornment>
+                ),
+              }}
+            />
+          </Grid>
+          <Grid item xs={8}>
+            <TextField
+              required
+              id="input-value"
+              label="Value"
+              value={event.event.value}
+              onChange={this.validateValueInput}
+              variant="outlined"
+              error={valueError}
+              fullWidth
+            />
           </Grid>
         </Grid>
       </SmallDialog>
