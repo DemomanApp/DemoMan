@@ -1,7 +1,14 @@
 import React from "react";
+import { shell } from "electron";
 
 import Paper from "@material-ui/core/Paper";
 import Grid from "@material-ui/core/Grid";
+import ButtonGroup from "@material-ui/core/ButtonGroup";
+import Tooltip from "@material-ui/core/Tooltip";
+import EditIcon from "@material-ui/icons/Edit";
+import DeleteOutlineIcon from "@material-ui/icons/DeleteOutline";
+import FolderOpenIcon from "@material-ui/icons/FolderOpen";
+import Button from "@material-ui/core/Button";
 
 import { Demo } from "./Demos";
 import { DemoHeader } from "./DemoHeader";
@@ -11,6 +18,8 @@ import DemoDetailsList from "./DemoDetailsList";
 import FullscreenDialog from "./FullscreenDialog";
 import EditEventDialog from "./EditEventDialog";
 import EventTableEntry from "./EventTableEntry";
+import DeleteDialog from "./DeleteDialog";
+import RenameDialog from "./RenameDialog";
 
 type DemoDetailsProps = {
   demo: Demo | null;
@@ -22,6 +31,7 @@ type DemoDetailsState = {
   demoHeader: DemoHeader | null;
   events: EventTableEntry[];
   nextAvailableID: number;
+  deleteDialogOpen: boolean;
 };
 
 export default class DemoDetails extends React.Component<
@@ -29,6 +39,8 @@ export default class DemoDetails extends React.Component<
   DemoDetailsState
 > {
   private editEventDialog: React.RefObject<EditEventDialog>;
+
+  private renameDialog: React.RefObject<RenameDialog>;
 
   constructor(props: DemoDetailsProps) {
     super(props);
@@ -38,8 +50,10 @@ export default class DemoDetails extends React.Component<
       demoHeader: null,
       events: [],
       nextAvailableID: 0,
+      deleteDialogOpen: false,
     };
     this.editEventDialog = React.createRef();
+    this.renameDialog = React.createRef();
   }
 
   setOpen(value: boolean) {
@@ -136,8 +150,41 @@ export default class DemoDetails extends React.Component<
     }
   };
 
+  deleteDialogClose = () => {
+    this.setState({ deleteDialogOpen: false });
+  };
+
+  deleteDialogConfirm = () => {
+    const { demo } = this.state;
+    demo?.delete();
+    this.setState({
+      deleteDialogOpen: false,
+      demo: null,
+      open: false,
+    });
+  };
+
+  renameDialogOpen = () => {
+    const { demo } = this.state;
+    if (this.renameDialog.current !== null && demo !== null) {
+      this.renameDialog.current.open(demo.getShortName());
+    }
+  };
+
+  renameDialogClose = () => {
+    if (this.renameDialog.current !== null) {
+      this.renameDialog.current.close();
+    }
+  };
+
+  renameDialogConfirm = (newName: string) => {
+    const { demo } = this.state;
+    demo?.rename(newName);
+    this.renameDialogClose();
+  };
+
   render() {
-    const { demo, demoHeader, open, events } = this.state;
+    const { demo, demoHeader, open, events, deleteDialogOpen } = this.state;
     if (demo === null || demoHeader === null) {
       return null;
     }
@@ -157,7 +204,14 @@ export default class DemoDetails extends React.Component<
             justify="space-around"
             style={{ padding: "24px" }}
           >
-            <Grid item container direction="column" xs={6} alignItems="center">
+            <Grid
+              item
+              container
+              direction="column"
+              xs={6}
+              alignItems="center"
+              spacing={2}
+            >
               <Grid item>
                 <div
                   style={{
@@ -171,7 +225,36 @@ export default class DemoDetails extends React.Component<
                   (Map thumbnail coming soon&trade;)
                 </div>
               </Grid>
-              <DemoDetailsList demo={demo} demoHeader={demoHeader} />
+              <Grid item>
+                <DemoDetailsList demo={demo} demoHeader={demoHeader} />
+              </Grid>
+              <Grid item>
+                <ButtonGroup variant="outlined">
+                  <Tooltip title="Rename">
+                    <Button onClick={this.renameDialogOpen}>
+                      <EditIcon />
+                    </Button>
+                  </Tooltip>
+                  <Tooltip title="Delete">
+                    <Button
+                      onClick={() => {
+                        this.setState({ deleteDialogOpen: true });
+                      }}
+                    >
+                      <DeleteOutlineIcon />
+                    </Button>
+                  </Tooltip>
+                  <Tooltip title="Show in explorer">
+                    <Button
+                      onClick={() => {
+                        shell.showItemInFolder(demo.filename);
+                      }}
+                    >
+                      <FolderOpenIcon />
+                    </Button>
+                  </Tooltip>
+                </ButtonGroup>
+              </Grid>
             </Grid>
             <Grid item xs={6}>
               <Paper elevation={3} style={{ padding: "5px" }}>
@@ -189,6 +272,17 @@ export default class DemoDetails extends React.Component<
           addCallback={this.addCallback}
           editCallback={this.editCallback}
           deleteCallback={this.deleteCallback}
+        />
+        <DeleteDialog
+          open={deleteDialogOpen}
+          demoName={demo.getShortName()}
+          onClose={this.deleteDialogClose}
+          onConfirm={this.deleteDialogConfirm}
+        />
+        <RenameDialog
+          ref={this.renameDialog}
+          onClose={this.renameDialogClose}
+          onConfirm={this.renameDialogConfirm}
         />
       </>
     );

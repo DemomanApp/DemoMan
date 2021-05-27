@@ -159,7 +159,6 @@ export default class EditEventDialog extends React.Component<
           <Grid item xs={4}>
             <TextField
               required
-              id="input-tick"
               label="Tick"
               value={event.event.tick}
               type="number"
@@ -176,7 +175,6 @@ export default class EditEventDialog extends React.Component<
           <Grid item xs={8}>
             <TextField
               required
-              id="input-value"
               label="Value"
               value={event.event.value}
               onChange={this.validateValueInput}

@@ -129,6 +129,35 @@ export class Demo {
   events() {
     return this.cachedEvents || this.getEvents();
   }
+
+  rename(newName: string) {
+    log.info(`Renaming demo ${this.getShortName()} to ${newName}`);
+    const dir = path.dirname(this.filename);
+    fs.renameSync(this.filename, path.join(dir, `${newName}.dem`));
+    try {
+      fs.renameSync(this.getJSONPath(), path.join(dir, `${newName}.json`));
+    } catch (e) {
+      if (e.code === "ENOENT") {
+        // This demo has no events file, ignore the error
+      } else {
+        throw e;
+      }
+    }
+  }
+
+  delete() {
+    log.info(`Deleting demo ${this.filename}`);
+    fs.rmSync(this.filename);
+    try {
+      fs.rmSync(this.getJSONPath());
+    } catch (e) {
+      if (e.code === "ENOENT") {
+        // This demo has no events file, ignore the error
+      } else {
+        throw e;
+      }
+    }
+  }
 }
 
 export async function getDemosInDirectory(dirPath: string) {
@@ -136,9 +165,7 @@ export async function getDemosInDirectory(dirPath: string) {
 
   let files;
   try {
-    log.debug("before");
     files = await fs.promises.readdir(dirPath);
-    log.debug("after");
   } catch (e) {
     log.error(`Error reading path ${dirPath}: ${e}`);
     return [];
