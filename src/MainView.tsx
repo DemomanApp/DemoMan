@@ -6,7 +6,7 @@ import { Demo } from "./Demos";
 import DemoTable from "./DemoTable";
 import SelectDemoPathModal from "./SelectDemoPathModal";
 import DemoDetails from "./DemoDetailsView";
-import SettingsView from "./SettingsView";
+import SettingsDialog from "./SettingsDialog";
 import { InfoDialog, DemoListInfo } from "./InfoDialog";
 
 export default class MainView extends React.Component<unknown> {
@@ -16,7 +16,7 @@ export default class MainView extends React.Component<unknown> {
 
   private demoDetails: React.RefObject<DemoDetails>;
 
-  private settings: React.RefObject<SettingsView>;
+  private settings: React.RefObject<SettingsDialog>;
 
   private info: React.RefObject<InfoDialog>;
 
@@ -74,7 +74,7 @@ export default class MainView extends React.Component<unknown> {
           }}
         />
         <DemoDetails ref={this.demoDetails} demo={null} />
-        <SettingsView ref={this.settings} />
+        <SettingsDialog ref={this.settings} />
         <InfoDialog ref={this.info} />
       </>
     );

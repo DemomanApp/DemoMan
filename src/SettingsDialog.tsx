@@ -17,7 +17,7 @@ type SettingsViewState = {
   unsavedChanges: { [key: string]: unknown };
 };
 
-export default class SettingsView extends React.Component<
+export default class SettingsDialog extends React.Component<
   Readonly<unknown>,
   SettingsViewState
 > {
