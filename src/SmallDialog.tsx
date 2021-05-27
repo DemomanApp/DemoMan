@@ -21,7 +21,8 @@ export default function SmallDialog(props: SmallDialogProps) {
       open={open}
       onClose={onClose}
       TransitionComponent={Zoom}
-      scroll="body"
+      fullWidth
+      maxWidth="xs"
     >
       <DialogTitle>{title}</DialogTitle>
       <DialogContent>{children}</DialogContent>
