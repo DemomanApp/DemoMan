@@ -6,10 +6,8 @@ import DataTable, {
 import cfg from "electron-cfg";
 import merge from "deepmerge";
 
-import Checkbox from "@material-ui/core/Checkbox";
 import ArrowDownward from "@material-ui/icons/ArrowDownward";
 import IconButton from "@material-ui/core/IconButton";
-import DeleteIcon from "@material-ui/icons/Delete";
 import RefreshIcon from "@material-ui/icons/Refresh";
 import SettingsIcon from "@material-ui/icons/Settings";
 import InfoIcon from "@material-ui/icons/InfoOutlined";
@@ -164,8 +162,6 @@ type DemoTableProps = {
 };
 
 type DemoTableState = {
-  selectedRows: DemoListEntry[];
-  toggleCleared: boolean;
   data: DemoListEntry[];
   progressPending: boolean;
 };
@@ -177,8 +173,6 @@ export default class DemoTable extends PureComponent<
   constructor(props: DemoTableProps) {
     super(props);
     this.state = {
-      selectedRows: [],
-      toggleCleared: false,
       data: [],
       progressPending: false,
     };
@@ -192,7 +186,6 @@ export default class DemoTable extends PureComponent<
 
   RefreshDemoList = async () => {
     this.setState({
-      selectedRows: [],
       data: [],
       progressPending: true,
     });
@@ -221,23 +214,6 @@ export default class DemoTable extends PureComponent<
     // });
   };
 
-  deleteMultiple = () => {
-    const { selectedRows } = this.state;
-    const rows = selectedRows.map((r) => r.filename);
-
-    if (window.confirm(`Are you sure you want to delete:\r ${rows}?`)) {
-      // Delete files
-    }
-  };
-
-  handleChange = (selectedRowState: {
-    allSelected: boolean;
-    selectedCount: number;
-    selectedRows: DemoListEntry[];
-  }) => {
-    this.setState({ selectedRows: selectedRowState.selectedRows });
-  };
-
   viewInfo = () => {
     const { viewInfoDialog: openInfoDialog } = this.props;
     const { data } = this.state;
@@ -252,7 +228,7 @@ export default class DemoTable extends PureComponent<
   };
 
   render() {
-    const { data, toggleCleared, progressPending } = this.state;
+    const { data, progressPending } = this.state;
     const { viewDemo, viewSettings } = this.props;
 
     return (
@@ -262,7 +238,6 @@ export default class DemoTable extends PureComponent<
         defaultSortField="birthtime"
         defaultSortAsc={false}
         keyField="filename"
-        selectableRows
         highlightOnHover
         actions={
           <>
@@ -289,22 +264,7 @@ export default class DemoTable extends PureComponent<
             No demos found. Make sure you&apos;ve set the correct file path.
           </div>
         }
-        contextActions={
-          <IconButton color="default" onClick={this.deleteMultiple}>
-            <DeleteIcon />
-          </IconButton>
-        }
-        contextMessage={{
-          singular: "Demo",
-          plural: "Demos",
-          message: "selected",
-        }}
-        selectableRowsComponent={Checkbox}
-        selectableRowsComponentProps={{ color: "primary" }}
         sortIcon={<ArrowDownward />}
-        // selectableRowsComponentProps={selectProps}
-        onSelectedRowsChange={this.handleChange}
-        clearSelectedRows={toggleCleared}
         pointerOnHover
         onRowClicked={(row: DemoListEntry) => {
           viewDemo(row.demo);
@@ -312,7 +272,6 @@ export default class DemoTable extends PureComponent<
         fixedHeader
         // 56px is the height of the table title, 57px is the height of the header.
         fixedHeaderScrollHeight="calc(100vh - (56px + 57px))"
-        // theme="demoman_dark"
         progressPending={progressPending}
         progressComponent={
           <div
