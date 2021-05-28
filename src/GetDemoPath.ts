@@ -4,7 +4,7 @@ import log from "electron-log";
 
 const { dialog } = electron.remote;
 
-export function GetDemoPath(defaultPath = undefined) {
+export function GetDemoPath(defaultPath?: string) {
   const filePaths = dialog.showOpenDialogSync({
     title: "Select your demo folder",
     defaultPath,
@@ -18,7 +18,7 @@ export function GetDemoPath(defaultPath = undefined) {
   return filePaths[0];
 }
 
-export function GetSetDemoPath(defaultPath = undefined) {
+export function GetSetDemoPath(defaultPath?: string) {
   const newPath = GetDemoPath(defaultPath);
   if (newPath === undefined) {
     log.info("Demo path selection canceled by user.");
