@@ -5,6 +5,9 @@
     ".prettierrc": "jsonc",
     ".eslintignore": "ignore"
   },
+  "editor.insertSpaces": true,
+  "editor.tabSize": 2,
+  "editor.detectIndentation": true,
 
   "javascript.validate.enable": false,
   "javascript.format.enable": false,
