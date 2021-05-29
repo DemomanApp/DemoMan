@@ -9,6 +9,7 @@ import EditIcon from "@material-ui/icons/Edit";
 import DeleteOutlineIcon from "@material-ui/icons/DeleteOutline";
 import FolderOpenIcon from "@material-ui/icons/FolderOpen";
 import Button from "@material-ui/core/Button";
+import styled from "@material-ui/core/styles/styled";
 
 import { Demo } from "./Demos";
 import { DemoHeader } from "./DemoHeader";
@@ -20,6 +21,8 @@ import EditEventDialog from "./EditEventDialog";
 import EventTableEntry from "./EventTableEntry";
 import DeleteDialog from "./DeleteDialog";
 import RenameDialog from "./RenameDialog";
+
+const GroupIconButton = styled(Button)({ padding: "11px" });
 
 type DemoDetailsProps = {
   demo: Demo | null;
@@ -231,27 +234,27 @@ export default class DemoDetails extends React.Component<
               <Grid item>
                 <ButtonGroup variant="outlined">
                   <Tooltip title="Rename">
-                    <Button onClick={this.renameDialogOpen}>
+                    <GroupIconButton onClick={this.renameDialogOpen}>
                       <EditIcon />
-                    </Button>
+                    </GroupIconButton>
                   </Tooltip>
                   <Tooltip title="Delete">
-                    <Button
+                    <GroupIconButton
                       onClick={() => {
                         this.setState({ deleteDialogOpen: true });
                       }}
                     >
                       <DeleteOutlineIcon />
-                    </Button>
+                    </GroupIconButton>
                   </Tooltip>
                   <Tooltip title="Show in explorer">
-                    <Button
+                    <GroupIconButton
                       onClick={() => {
                         shell.showItemInFolder(demo.filename);
                       }}
                     >
                       <FolderOpenIcon />
-                    </Button>
+                    </GroupIconButton>
                   </Tooltip>
                 </ButtonGroup>
               </Grid>
