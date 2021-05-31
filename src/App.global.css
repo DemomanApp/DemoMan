@@ -6,13 +6,9 @@
   padding-left: 8px;
   padding-right: 8px;
 }
-.rdt_TableHeadRow {
-  padding: 0 16px;
-}
 .rdt_TableBody {
-  overflow: auto;
+  overflow: overlay !important;
   height: 100vh;
-  padding-left: 16px;
 }
 .rdt_TableBody::-webkit-scrollbar {
   width: 16px;
