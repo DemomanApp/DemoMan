@@ -154,6 +154,7 @@ export default class EditEventDialog extends React.Component<
             </Button>
           </>
         }
+        maxWidth="sm"
       >
         <Grid container direction="row" spacing={2} style={{ margin: "8px" }}>
           <Grid item xs={4}>

@@ -11,18 +11,19 @@ type SmallDialogProps = {
   open: boolean;
   actions: ReactNode;
   children: ReactNode;
+  maxWidth?: "sm" | "xs" | "md" | "lg" | "xl" | undefined;
   onClose: () => void;
 };
 
 export default function SmallDialog(props: SmallDialogProps) {
-  const { children, title, open, onClose, actions } = props;
+  const { children, title, open, onClose, actions, maxWidth } = props;
   return (
     <Dialog
       open={open}
       onClose={onClose}
       TransitionComponent={Zoom}
       fullWidth
-      maxWidth="xs"
+      maxWidth={maxWidth}
     >
       <DialogTitle>{title}</DialogTitle>
       <DialogContent>{children}</DialogContent>
@@ -30,3 +31,5 @@ export default function SmallDialog(props: SmallDialogProps) {
     </Dialog>
   );
 }
+
+SmallDialog.defaultProps = { maxWidth: "xs" };
