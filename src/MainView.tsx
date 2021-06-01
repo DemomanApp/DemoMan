@@ -8,6 +8,7 @@ import SelectDemoPathModal from "./SelectDemoPathModal";
 import DemoDetails from "./DemoDetailsView";
 import SettingsDialog from "./SettingsDialog";
 import { InfoDialog, DemoListInfo } from "./InfoDialog";
+import AutoDeleteDialog from "./AutoDeleteDialog";
 
 export default class MainView extends React.Component<unknown> {
   private modal: React.RefObject<SelectDemoPathModal>;
@@ -20,6 +21,8 @@ export default class MainView extends React.Component<unknown> {
 
   private info: React.RefObject<InfoDialog>;
 
+  private autoDeleteDialog: React.RefObject<AutoDeleteDialog>;
+
   constructor(props: unknown) {
     super(props);
     this.modal = React.createRef();
@@ -27,6 +30,7 @@ export default class MainView extends React.Component<unknown> {
     this.demoDetails = React.createRef();
     this.settings = React.createRef();
     this.info = React.createRef();
+    this.autoDeleteDialog = React.createRef();
   }
 
   componentDidMount() {
@@ -58,6 +62,10 @@ export default class MainView extends React.Component<unknown> {
     }
   };
 
+  viewAutoDeleteDialog = () => {
+    this.autoDeleteDialog.current?.open();
+  };
+
   render() {
     return (
       <>
@@ -66,6 +74,7 @@ export default class MainView extends React.Component<unknown> {
           viewDemo={this.viewDemo}
           viewSettings={this.viewSettings}
           viewInfoDialog={this.viewInfoDialog}
+          viewAutoDeleteDialog={this.viewAutoDeleteDialog}
         />
         <SelectDemoPathModal
           ref={this.modal}
@@ -82,6 +91,12 @@ export default class MainView extends React.Component<unknown> {
         />
         <SettingsDialog ref={this.settings} />
         <InfoDialog ref={this.info} />
+        <AutoDeleteDialog
+          ref={this.autoDeleteDialog}
+          onClose={() => {
+            this.table.current?.RefreshDemoList();
+          }}
+        />
       </>
     );
   }

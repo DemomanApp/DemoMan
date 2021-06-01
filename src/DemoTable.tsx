@@ -1,4 +1,6 @@
 import React, { PureComponent } from "react";
+import { shell } from "electron";
+
 import DataTable, {
   createTheme,
   defaultThemes,
@@ -11,7 +13,10 @@ import IconButton from "@material-ui/core/IconButton";
 import RefreshIcon from "@material-ui/icons/Refresh";
 import SettingsIcon from "@material-ui/icons/Settings";
 import InfoIcon from "@material-ui/icons/InfoOutlined";
+import MoreHorizIcon from "@material-ui/icons/MoreHoriz";
 import Tooltip from "@material-ui/core/Tooltip";
+import Menu from "@material-ui/core/Menu";
+import MenuItem from "@material-ui/core/MenuItem";
 import blue from "@material-ui/core/colors/blue";
 
 import loading from "../assets/loading.gif";
@@ -20,6 +25,7 @@ import { Demo, getDemosInDirectory } from "./Demos";
 import { formatFileSize, formatPlaybackTime } from "./util";
 import { getPreferredTheme } from "./theme";
 import { DemoListInfo } from "./InfoDialog";
+import convertPrecEvents from "./ConvertPrecEvents";
 
 // Fixes an ESLint false positive
 /* eslint-disable react/no-unused-prop-types */
@@ -159,11 +165,13 @@ type DemoTableProps = {
   viewDemo: (demo: Demo) => void;
   viewSettings: () => void;
   viewInfoDialog: (info: DemoListInfo) => void;
+  viewAutoDeleteDialog: () => void;
 };
 
 type DemoTableState = {
   data: DemoListEntry[];
   progressPending: boolean;
+  moreMenuAnchor: Element | null;
 };
 
 export default class DemoTable extends PureComponent<
@@ -175,6 +183,7 @@ export default class DemoTable extends PureComponent<
     this.state = {
       data: [],
       progressPending: false,
+      moreMenuAnchor: null,
     };
   }
 
@@ -210,66 +219,125 @@ export default class DemoTable extends PureComponent<
     });
   };
 
+  openMoreMenu = (event: React.MouseEvent<HTMLButtonElement>) => {
+    this.setState({ moreMenuAnchor: event.currentTarget });
+  };
+
+  closeMoreMenu = () => {
+    this.setState({ moreMenuAnchor: null });
+  };
+
   render() {
-    const { data, progressPending } = this.state;
-    const { viewDemo, viewSettings } = this.props;
+    const { data, progressPending, moreMenuAnchor } = this.state;
+    const { viewDemo, viewSettings, viewAutoDeleteDialog } = this.props;
 
     return (
-      <DataTable
-        title="Demos"
-        columns={columns}
-        defaultSortField="birthtime"
-        defaultSortAsc={false}
-        keyField="filename"
-        highlightOnHover
-        actions={
-          <>
-            <Tooltip title="Reload demos">
-              <IconButton color="default" onClick={this.RefreshDemoList}>
-                <RefreshIcon />
-              </IconButton>
-            </Tooltip>
-            <Tooltip title="Info">
-              <IconButton color="default" onClick={this.viewInfo}>
-                <InfoIcon />
-              </IconButton>
-            </Tooltip>
-            <Tooltip title="Settings">
-              <IconButton color="default" onClick={viewSettings}>
-                <SettingsIcon />
-              </IconButton>
-            </Tooltip>
-          </>
-        }
-        data={data}
-        noDataComponent={
-          <div>
-            No demos found. Make sure you&apos;ve set the correct file path.
-          </div>
-        }
-        sortIcon={<ArrowDownward />}
-        pointerOnHover
-        onRowClicked={(row: DemoListEntry) => {
-          viewDemo(row.demo);
-        }}
-        fixedHeader
-        // 56px is the height of the table title, 57px is the height of the header.
-        fixedHeaderScrollHeight="calc(100vh - (56px + 57px))"
-        progressPending={progressPending}
-        progressComponent={
-          <div
-            style={{
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-            }}
-          >
-            <img src={loading} alt="loading..." width="128px" />
-            <span style={{ fontSize: "20px", margin: "1rem" }}>Loading...</span>
-          </div>
-        }
-        theme={`${getPreferredTheme()}_alt`}
-      />
+      <>
+        <DataTable
+          title="Demos"
+          columns={columns}
+          defaultSortField="birthtime"
+          defaultSortAsc={false}
+          keyField="filename"
+          highlightOnHover
+          actions={
+            <>
+              <Tooltip title="Reload demos">
+                <IconButton color="default" onClick={this.RefreshDemoList}>
+                  <RefreshIcon />
+                </IconButton>
+              </Tooltip>
+              <Tooltip title="Info">
+                <IconButton color="default" onClick={this.viewInfo}>
+                  <InfoIcon />
+                </IconButton>
+              </Tooltip>
+              <Tooltip title="Settings">
+                <IconButton color="default" onClick={viewSettings}>
+                  <SettingsIcon />
+                </IconButton>
+              </Tooltip>
+              <Tooltip title="More...">
+                <IconButton color="default" onClick={this.openMoreMenu}>
+                  <MoreHorizIcon />
+                </IconButton>
+              </Tooltip>
+
+              <Menu
+                anchorEl={moreMenuAnchor}
+                getContentAnchorEl={null}
+                keepMounted
+                open={moreMenuAnchor !== null}
+                onClose={this.closeMoreMenu}
+                anchorOrigin={{
+                  vertical: "bottom",
+                  horizontal: "center",
+                }}
+                transformOrigin={{
+                  vertical: "top",
+                  horizontal: "right",
+                }}
+              >
+                <MenuItem
+                  onClick={() => {
+                    viewAutoDeleteDialog();
+                    this.closeMoreMenu();
+                  }}
+                >
+                  Auto-delete demos and events...
+                </MenuItem>
+                <MenuItem
+                  onClick={() => {
+                    shell.openPath(cfg.get("demo_path"));
+                    this.closeMoreMenu();
+                  }}
+                >
+                  Open demos folder
+                </MenuItem>
+                <MenuItem
+                  onClick={() => {
+                    convertPrecEvents();
+                    this.closeMoreMenu();
+                    this.RefreshDemoList();
+                  }}
+                >
+                  Convert P-REC bookmarks
+                </MenuItem>
+              </Menu>
+            </>
+          }
+          data={data}
+          noDataComponent={
+            <div>
+              No demos found. Make sure you&apos;ve set the correct file path.
+            </div>
+          }
+          sortIcon={<ArrowDownward />}
+          pointerOnHover
+          onRowClicked={(row: DemoListEntry) => {
+            viewDemo(row.demo);
+          }}
+          fixedHeader
+          // 56px is the height of the table title, 57px is the height of the header.
+          fixedHeaderScrollHeight="calc(100vh - (56px + 57px))"
+          progressPending={progressPending}
+          progressComponent={
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+              }}
+            >
+              <img src={loading} alt="loading..." width="128px" />
+              <span style={{ fontSize: "20px", margin: "1rem" }}>
+                Loading...
+              </span>
+            </div>
+          }
+          theme={`${getPreferredTheme()}_alt`}
+        />
+      </>
     );
   }
 }

@@ -8,6 +8,31 @@ import DemoEvent from "./DemoEvent";
 
 const HEADER_SIZE = 8 + 4 + 4 + 260 + 260 + 260 + 260 + 4 + 4 + 4 + 4;
 
+export function writeEventsFile(
+  events: DemoEvent[],
+  jsonPath: string,
+  overwrite: boolean
+) {
+  if (events.length === 0) {
+    log.debug(`Deleting events file at ${jsonPath}`);
+    fs.rmSync(jsonPath, { force: true });
+    return;
+  }
+  log.debug(`Writing to events file at ${jsonPath}`);
+  let fd;
+  try {
+    fd = fs.openSync(jsonPath, overwrite ? "w" : "wx");
+  } catch (e) {
+    if (e.code === "EEXIST") {
+      log.debug(`Events file at ${jsonPath} already exists, skipping.`);
+      return;
+    }
+    throw e;
+  }
+  fs.writeSync(fd, JSON.stringify({ events }, null, "\t"));
+  fs.closeSync(fd);
+}
+
 export class Demo {
   filename: string;
 
@@ -99,15 +124,7 @@ export class Demo {
   writeEvents(events: DemoEvent[]) {
     this.cachedEvents = events;
     const jsonPath = this.getJSONPath();
-    if (events.length === 0) {
-      log.debug(`Deleting events file at ${jsonPath}`);
-      fs.rmSync(jsonPath, { force: true });
-      return;
-    }
-    log.debug(`Writing to events file at ${jsonPath}`);
-    const fd = fs.openSync(jsonPath, "w");
-    fs.writeSync(fd, JSON.stringify({ events }, null, "\t"));
-    fs.closeSync(fd);
+    writeEventsFile(events, jsonPath, true);
   }
 
   getHeader() {
