@@ -195,23 +195,6 @@ export default class DemoTable extends PureComponent<
       data: newData,
       progressPending: false,
     });
-    // incremental loading prototype,
-    // to be experimented with
-    // const interval = setInterval(() => {
-    //   const e = newData.pop();
-    //   if (e !== undefined) {
-    //     this.setState((state) => {
-    //       return {
-    //         data: [...state.data, e],
-    //       };
-    //     });
-    //   } else {
-    //     clearInterval(interval);
-    //   }
-    // }, 5);
-    // this.setState({
-    //   progressPending: false,
-    // });
   };
 
   viewInfo = () => {
