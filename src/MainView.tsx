@@ -73,7 +73,13 @@ export default class MainView extends React.Component<unknown> {
             this.table.current?.RefreshDemoList();
           }}
         />
-        <DemoDetails ref={this.demoDetails} demo={null} />
+        <DemoDetails
+          ref={this.demoDetails}
+          demo={null}
+          onClose={() => {
+            this.table.current?.RefreshDemoList();
+          }}
+        />
         <SettingsDialog ref={this.settings} />
         <InfoDialog ref={this.info} />
       </>

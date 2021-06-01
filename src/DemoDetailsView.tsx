@@ -26,6 +26,7 @@ const GroupIconButton = styled(Button)({ padding: "11px" });
 
 type DemoDetailsProps = {
   demo: Demo | null;
+  onClose: () => void;
 };
 
 type DemoDetailsState = {
@@ -59,9 +60,11 @@ export default class DemoDetails extends React.Component<
     this.renameDialog = React.createRef();
   }
 
-  setOpen(value: boolean) {
-    this.setState({ open: value });
-  }
+  close = () => {
+    const { onClose } = this.props;
+    this.setState({ open: false });
+    onClose();
+  };
 
   viewDemo = async (demo: Demo) => {
     this.setState({ demo, nextAvailableID: 0 });
@@ -163,8 +166,8 @@ export default class DemoDetails extends React.Component<
     this.setState({
       deleteDialogOpen: false,
       demo: null,
-      open: false,
     });
+    this.close();
   };
 
   renameDialogOpen = () => {
@@ -196,9 +199,7 @@ export default class DemoDetails extends React.Component<
         <FullscreenDialog
           title={demo.getShortName()}
           open={open}
-          onClose={() => {
-            this.setOpen(false);
-          }}
+          onClose={this.close}
         >
           <Grid
             item
