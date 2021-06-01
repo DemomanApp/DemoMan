@@ -133,7 +133,8 @@ export class Demo {
   rename(newName: string) {
     log.info(`Renaming demo ${this.getShortName()} to ${newName}`);
     const dir = path.dirname(this.filename);
-    fs.renameSync(this.filename, path.join(dir, `${newName}.dem`));
+    const newNameFull = path.join(dir, `${newName}.dem`);
+    fs.renameSync(this.filename, newNameFull);
     try {
       fs.renameSync(this.getJSONPath(), path.join(dir, `${newName}.json`));
     } catch (e) {
@@ -143,6 +144,7 @@ export class Demo {
         throw e;
       }
     }
+    this.filename = newNameFull;
   }
 
   delete() {

@@ -186,6 +186,7 @@ export default class DemoDetails extends React.Component<
   renameDialogConfirm = (newName: string) => {
     const { demo } = this.state;
     demo?.rename(newName);
+    this.setState({ demo });
     this.renameDialogClose();
   };
 
