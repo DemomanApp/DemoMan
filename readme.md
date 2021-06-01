@@ -1,4 +1,4 @@
-![Logo](assets/icons/128x128.png)
+![Logo](githubassets/Banner.png)
 
 [![CodeFactor](https://www.codefactor.io/repository/github/narcha/demoman/badge)](https://www.codefactor.io/repository/github/narcha/demoman)
 # DemoMan
