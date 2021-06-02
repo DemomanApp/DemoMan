@@ -64,6 +64,19 @@ export default function convertPrecEvents() {
 
   for (let i = 0; i < Object.keys(events).length; i += 1) {
     const demo = Object.keys(events)[i];
-    writeEventsFile(events[demo], path.join(demoDir, `${demo}.json`), false);
+    // only write events for demos that still exist
+    let demoExists = true;
+    try {
+      fs.statSync(path.join(demoDir, `${demo}.dem`));
+    } catch (e) {
+      if (e.code === "ENOENT") {
+        demoExists = false;
+      } else {
+        throw e;
+      }
+    }
+    if (demoExists) {
+      writeEventsFile(events[demo], path.join(demoDir, `${demo}.json`), false);
+    }
   }
 }
