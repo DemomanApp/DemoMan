@@ -240,12 +240,14 @@ export default class DemoTable extends PureComponent<
   quickFilterChanged = (
     e: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>
   ) => {
-    this.setState({ quickFilterQuery: e.target.value });
     this.updateQuickFilter(e.target.value);
   };
 
   updateQuickFilter = (query: string) => {
     const { data } = this.state;
+    this.setState({
+      quickFilterQuery: query,
+    });
     if (query === "") {
       this.setState({
         filteredData: data,
@@ -298,7 +300,6 @@ export default class DemoTable extends PureComponent<
                 <Tooltip title="Clear filter">
                   <IconButton
                     onClick={() => {
-                      this.setState({ quickFilterQuery: "" });
                       this.updateQuickFilter("");
                     }}
                   >
