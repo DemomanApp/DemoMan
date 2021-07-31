@@ -18,6 +18,10 @@ import Tooltip from "@material-ui/core/Tooltip";
 import Menu from "@material-ui/core/Menu";
 import MenuItem from "@material-ui/core/MenuItem";
 import blue from "@material-ui/core/colors/blue";
+import Paper from "@material-ui/core/Paper";
+import InputBase from "@material-ui/core/InputBase";
+import ClearIcon from "@material-ui/icons/Clear";
+import Divider from "@material-ui/core/Divider";
 
 import loading from "../assets/loading.gif";
 
@@ -170,6 +174,8 @@ type DemoTableProps = {
 
 type DemoTableState = {
   data: DemoListEntry[];
+  filteredData: DemoListEntry[];
+  quickFilterQuery: string;
   progressPending: boolean;
   moreMenuAnchor: Element | null;
 };
@@ -182,6 +188,8 @@ export default class DemoTable extends PureComponent<
     super(props);
     this.state = {
       data: [],
+      filteredData: [],
+      quickFilterQuery: "",
       progressPending: false,
       moreMenuAnchor: null,
     };
@@ -196,6 +204,7 @@ export default class DemoTable extends PureComponent<
   RefreshDemoList = async () => {
     this.setState({
       data: [],
+      filteredData: [],
       progressPending: true,
     });
     const newDemos = await getDemosInDirectory(cfg.get("demo_path"));
@@ -204,6 +213,7 @@ export default class DemoTable extends PureComponent<
       data: newData,
       progressPending: false,
     });
+    this.updateQuickFilter("");
   };
 
   viewInfo = () => {
@@ -227,8 +237,35 @@ export default class DemoTable extends PureComponent<
     this.setState({ moreMenuAnchor: null });
   };
 
+  quickFilterChanged = (
+    e: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>
+  ) => {
+    this.setState({ quickFilterQuery: e.target.value });
+    this.updateQuickFilter(e.target.value);
+  };
+
+  updateQuickFilter = (query: string) => {
+    const { data } = this.state;
+    if (query === "") {
+      this.setState({
+        filteredData: data,
+      });
+    } else {
+      const lowerCaseQuery = query.toLowerCase();
+      this.setState({
+        filteredData: data.filter((value: DemoListEntry) =>
+          [value.filename, value.map, value.player, value.server].some(
+            (attribute: string) =>
+              attribute.toLowerCase().includes(lowerCaseQuery)
+          )
+        ),
+      });
+    }
+  };
+
   render() {
-    const { data, progressPending, moreMenuAnchor } = this.state;
+    const { filteredData, quickFilterQuery, progressPending, moreMenuAnchor } =
+      this.state;
     const { viewDemo, viewSettings, viewAutoDeleteDialog } = this.props;
 
     return (
@@ -242,6 +279,31 @@ export default class DemoTable extends PureComponent<
           highlightOnHover
           actions={
             <>
+              <Paper
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                }}
+              >
+                <InputBase
+                  placeholder="Quick filter"
+                  style={{ paddingLeft: "12px", width: "300px" }}
+                  onChange={this.quickFilterChanged}
+                  value={quickFilterQuery}
+                  spellCheck={false}
+                />
+                <Divider orientation="vertical" style={{ height: "28px" }} />
+                <Tooltip title="Clear filter">
+                  <IconButton
+                    onClick={() => {
+                      this.setState({ quickFilterQuery: "" });
+                      this.updateQuickFilter("");
+                    }}
+                  >
+                    <ClearIcon />
+                  </IconButton>
+                </Tooltip>
+              </Paper>
               <Tooltip title="Reload demos">
                 <IconButton color="default" onClick={this.RefreshDemoList}>
                   <RefreshIcon />
@@ -306,7 +368,7 @@ export default class DemoTable extends PureComponent<
               </Menu>
             </>
           }
-          data={data}
+          data={filteredData}
           noDataComponent={
             <div>
               No demos found. Make sure you&apos;ve set the correct file path.
