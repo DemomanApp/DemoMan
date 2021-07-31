@@ -252,14 +252,16 @@ export default class DemoTable extends PureComponent<
       });
     } else {
       const lowerCaseQuery = query.toLowerCase();
-      this.setState({
-        filteredData: data.filter((value: DemoListEntry) =>
-          [value.filename, value.map, value.player, value.server].some(
-            (attribute: string) =>
-              attribute.toLowerCase().includes(lowerCaseQuery)
-          )
-        ),
-      });
+      setTimeout(() => {
+        this.setState({
+          filteredData: data.filter((value: DemoListEntry) =>
+            [value.filename, value.map, value.player, value.server].some(
+              (attribute: string) =>
+                attribute.toLowerCase().includes(lowerCaseQuery)
+            )
+          ),
+        });
+      }, 0);
     }
   };
 
