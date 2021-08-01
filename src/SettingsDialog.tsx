@@ -3,18 +3,30 @@ import { ipcRenderer } from "electron";
 import cfg from "electron-cfg";
 import log from "electron-log";
 
-import Grid from "@material-ui/core/Grid";
-import Select from "@material-ui/core/Select";
 import MenuItem from "@material-ui/core/MenuItem";
 import Button from "@material-ui/core/Button";
-import Typography from "@material-ui/core/Typography";
+import List from "@material-ui/core/List";
+import ListItem from "@material-ui/core/ListItem";
+import Menu from "@material-ui/core/Menu";
+import ListItemText from "@material-ui/core/ListItemText";
 
 import { GetDemoPath } from "./GetDemoPath";
 import SmallDialog from "./SmallDialog";
 
 type SettingsViewState = {
   open: boolean;
-  unsavedChanges: { [key: string]: unknown };
+  themePickerAnchor: HTMLElement | null;
+  settings: {
+    theme: string;
+    demo_path: string;
+  };
+  settingsChanged: boolean;
+};
+
+const ThemeNames: { [key: string]: string } = {
+  dark: "Dark",
+  light: "Light",
+  system: "Follow system theme",
 };
 
 export default class SettingsDialog extends React.Component<
@@ -23,116 +35,137 @@ export default class SettingsDialog extends React.Component<
 > {
   constructor(props: Readonly<unknown>) {
     super(props);
-    this.state = { open: false, unsavedChanges: {} };
-  }
-
-  setOpen(value: boolean) {
-    this.setState({ open: value });
-  }
-
-  cancel = () => {
-    this.setState({
-      unsavedChanges: {},
+    this.state = {
       open: false,
+      settings: {
+        // Placeholders to make TS happy.
+        // They shouldn't cause any issues, as they are overwritten when
+        // the settings dialog is opened.
+        theme: "",
+        demo_path: "",
+      },
+      settingsChanged: false,
+      themePickerAnchor: null,
+    };
+  }
+
+  open = () => {
+    this.setState({
+      open: true,
+      settings: {
+        theme: cfg.get("theme"),
+        demo_path: cfg.get("demo_path"),
+      },
+      settingsChanged: false,
     });
   };
 
+  close = () => {
+    this.setState({ open: false });
+  };
+
+  selectTheme = (newTheme: string) => {
+    const { settings } = this.state;
+    if (newTheme !== settings.theme) {
+      this.setState({
+        settings: {
+          ...settings,
+          theme: newTheme,
+        },
+        themePickerAnchor: null,
+        settingsChanged: true,
+      });
+    } else {
+      this.setState({
+        themePickerAnchor: null,
+      });
+    }
+  };
+
   render() {
-    const { open, unsavedChanges } = this.state;
-    const themeSetting = cfg.get("theme");
+    const { open, themePickerAnchor, settings, settingsChanged } = this.state;
     return (
-      <SmallDialog
-        open={open}
-        title="Settings"
-        onClose={() => {
-          this.setOpen(false);
-        }}
-        actions={
-          <>
-            <Button variant="contained" onClick={this.cancel}>
-              Cancel
-            </Button>
-            <Button
-              variant="contained"
-              color="primary"
-              disabled={Object.entries(unsavedChanges).length === 0}
-              onClick={() => {
-                Object.entries(unsavedChanges).forEach(([key, value]) => {
-                  log.debug(`Applying settings change: ${key} -> ${value}`);
-                  cfg.set(key, value);
-                  if (key === "theme") {
-                    ipcRenderer.send("update-theme", value);
-                  }
-                });
-                window.location.reload();
+      <>
+        <SmallDialog
+          open={open}
+          title="Settings"
+          maxWidth="sm"
+          onClose={this.close}
+          actions={
+            <>
+              <Button variant="contained" onClick={this.close}>
+                Cancel
+              </Button>
+              <Button
+                variant="contained"
+                color="primary"
+                disabled={!settingsChanged}
+                onClick={() => {
+                  log.debug(`Applying settings: ${settings}`);
+                  cfg.setAll(settings);
+                  ipcRenderer.send("update-theme", settings.theme);
+                  window.location.reload();
+                }}
+              >
+                Save changes
+              </Button>
+            </>
+          }
+        >
+          <List>
+            <ListItem
+              button
+              divider
+              onClick={(event: React.MouseEvent<HTMLElement>) => {
+                this.setState({ themePickerAnchor: event.currentTarget });
               }}
             >
-              Save changes
-            </Button>
-          </>
-        }
-      >
-        <Grid container>
-          <Grid
-            item
-            container
-            justify="space-between"
-            alignItems="center"
-            style={{ margin: "8px 0px" }}
-          >
-            <Grid item>
-              <Typography variant="body1">Theme</Typography>
-            </Grid>
-            <Grid item>
-              <Select
-                defaultValue={themeSetting}
-                onChange={(event) => {
-                  const newTheme = event.target.value;
+              <ListItemText
+                primary="Theme"
+                secondary={ThemeNames[settings.theme]}
+              />
+            </ListItem>
+            <ListItem
+              button
+              onClick={() => {
+                const newPath = GetDemoPath(settings.demo_path);
+                if (newPath !== undefined && newPath !== settings.demo_path) {
                   this.setState({
-                    unsavedChanges: {
-                      ...unsavedChanges,
-                      theme: newTheme,
+                    settings: {
+                      ...settings,
+                      demo_path: newPath,
                     },
+                    settingsChanged: true,
                   });
-                }}
-              >
-                <MenuItem value="system">Follow system theme</MenuItem>
-                <MenuItem value="dark">Dark</MenuItem>
-                <MenuItem value="light">Light</MenuItem>
-              </Select>
-            </Grid>
-          </Grid>
-          <Grid
-            item
-            container
-            justify="space-between"
-            alignItems="center"
-            style={{ margin: "8px 0px" }}
+                }
+              }}
+            >
+              <ListItemText
+                primary="Demo path"
+                secondary={settings.demo_path}
+              />
+            </ListItem>
+          </List>
+          <Menu
+            anchorEl={themePickerAnchor}
+            open={themePickerAnchor !== null}
+            keepMounted
+            onClose={() => {
+              this.setState({ themePickerAnchor: null });
+            }}
           >
-            <Grid item>
-              <Typography variant="body1">Demo path</Typography>
-            </Grid>
-            <Grid item>
-              <Button
-                onClick={() => {
-                  const newPath = GetDemoPath(cfg.get("demo_path"));
-                  if (newPath !== undefined) {
-                    this.setState({
-                      unsavedChanges: {
-                        ...unsavedChanges,
-                        demo_path: newPath,
-                      },
-                    });
-                  }
-                }}
-                variant="outlined"
+            {Object.keys(ThemeNames).map((key) => (
+              <MenuItem
+                key={key}
+                selected={settings.theme === key}
+                onClick={() => this.selectTheme(key)}
               >
-                Choose...
-              </Button>
-            </Grid>
-          </Grid>
-        </Grid>
-      </SmallDialog>
+                {ThemeNames[key]}
+              </MenuItem>
+            ))}
+          </Menu>
+        </SmallDialog>
+      </>
     );
   }
 }
