@@ -48,14 +48,14 @@ interface DemoListEntry {
 /* eslint-enable react/no-unused-prop-types */
 
 function getDemoListEntry(demo: Demo): DemoListEntry {
-  const header = demo.header();
+  const { header, events } = demo;
   return {
     filename: demo.getShortName(),
     map: header.mapName,
     playbackTime: header.playbackTime,
     player: header.clientName,
     server: header.serverName,
-    numEvents: demo.events().length,
+    numEvents: events.length,
     numTicks: header.numTicks,
     birthtime: demo.birthtime,
     filesize: demo.filesize,

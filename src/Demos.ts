@@ -40,41 +40,53 @@ export class Demo {
 
   filesize: number;
 
-  cachedHeader: DemoHeader | null;
+  header: DemoHeader;
 
-  cachedEvents: DemoEvent[] | null;
+  events: DemoEvent[];
 
-  constructor(filename: string) {
+  private constructor(
+    filename: string,
+    header: DemoHeader,
+    events: DemoEvent[],
+    birthtime: number,
+    filesize: number
+  ) {
     this.filename = filename;
-    this.cachedHeader = null;
-    this.cachedEvents = null;
-    this.birthtime = 0;
-    this.filesize = 0;
+    this.header = header;
+    this.events = events;
+    this.birthtime = birthtime;
+    this.filesize = filesize;
   }
 
-  readFileHeader(): DemoHeader {
-    log.debug(`Reading file header of ${this.filename}`);
-    const fd = fs.openSync(this.filename, "r");
-    const stats = fs.statSync(this.filename);
+  static create(filename: string): Demo {
+    const stats = fs.statSync(filename);
+    return new Demo(
+      filename,
+      this.readFileHeader(filename),
+      this.readEvents(this.getJSONPath(filename)),
+      stats.birthtimeMs,
+      stats.size
+    );
+  }
+
+  static readFileHeader(filename: string): DemoHeader {
+    log.debug(`Reading file header of ${filename}`);
+    const fd = fs.openSync(filename, "r");
     const buf = Buffer.allocUnsafe(HEADER_SIZE);
 
     const bytesRead = fs.readSync(fd, buf, 0, HEADER_SIZE, 0);
     if (bytesRead !== HEADER_SIZE) {
       log.warn(
-        `Error reading file ${this.filename}: read ${bytesRead} bytes, expected ${HEADER_SIZE}.`
+        `Error reading file ${filename}: read ${bytesRead} bytes, expected ${HEADER_SIZE}.`
       );
       throw new InvalidDemoFileError();
     }
-    this.birthtime = stats.birthtimeMs;
-    this.filesize = stats.size;
     fs.closeSync(fd);
     const sr = new StreamReader(buf);
 
     const filestamp = sr.readString(8);
     if (filestamp !== "HL2DEMO") {
-      log.warn(
-        `File ${this.filename} has an invalid file stamp '${filestamp}'!`
-      );
+      log.warn(`File ${filename} has an invalid file stamp '${filestamp}'!`);
       throw new InvalidDemoFileError();
     }
 
@@ -93,16 +105,15 @@ export class Demo {
     return header;
   }
 
-  getJSONPath() {
-    return this.filename.replace(/\.dem$/gi, ".json");
+  static getJSONPath(filename: string) {
+    return filename.replace(/\.dem$/gi, ".json");
   }
 
   getShortName() {
     return path.basename(this.filename, ".dem");
   }
 
-  readEvents(): DemoEvent[] {
-    const jsonPath = this.getJSONPath();
+  static readEvents(jsonPath: string): DemoEvent[] {
     log.debug(`Looking for events file at ${jsonPath}`);
     let content;
     try {
@@ -122,29 +133,9 @@ export class Demo {
   }
 
   writeEvents(events: DemoEvent[]) {
-    this.cachedEvents = events;
-    const jsonPath = this.getJSONPath();
+    this.events = events;
+    const jsonPath = Demo.getJSONPath(this.filename);
     writeEventsFile(events, jsonPath, true);
-  }
-
-  getHeader() {
-    const newHeader = this.readFileHeader();
-    this.cachedHeader = newHeader;
-    return newHeader;
-  }
-
-  getEvents() {
-    const newEvents = this.readEvents();
-    this.cachedEvents = newEvents;
-    return newEvents;
-  }
-
-  header() {
-    return this.cachedHeader || this.getHeader();
-  }
-
-  events() {
-    return this.cachedEvents || this.getEvents();
   }
 
   rename(newName: string) {
@@ -153,7 +144,10 @@ export class Demo {
     const newNameFull = path.join(dir, `${newName}.dem`);
     fs.renameSync(this.filename, newNameFull);
     try {
-      fs.renameSync(this.getJSONPath(), path.join(dir, `${newName}.json`));
+      fs.renameSync(
+        Demo.getJSONPath(this.filename),
+        path.join(dir, `${newName}.json`)
+      );
     } catch (e) {
       if (e.code === "ENOENT") {
         // This demo has no events file, ignore the error
@@ -168,7 +162,7 @@ export class Demo {
     log.info(`Deleting demo ${this.filename}`);
     fs.rmSync(this.filename);
     try {
-      fs.rmSync(this.getJSONPath());
+      fs.rmSync(Demo.getJSONPath(this.filename));
     } catch (e) {
       if (e.code === "ENOENT") {
         // This demo has no events file, ignore the error
@@ -194,13 +188,11 @@ export async function getDemosInDirectory(dirPath: string) {
   files.forEach((file) => {
     if (file.endsWith(".dem")) {
       log.debug(`Found demo file ${file}`);
-      const newDemo: Demo = new Demo(path.join(dirPath, file));
       try {
-        newDemo.getHeader();
+        demoList.push(Demo.create(path.join(dirPath, file)));
       } catch (error) {
-        return;
+        // ignore this file if it throws errors
       }
-      demoList.push(newDemo);
     } else {
       log.debug(`Found non-demo file ${file}, skipping.`);
     }

@@ -66,10 +66,9 @@ export default class DemoDetails extends React.Component<
     onClose();
   };
 
-  viewDemo = async (demo: Demo) => {
+  viewDemo = (demo: Demo) => {
     this.setState({ demo, nextAvailableID: 0 });
-    const events = demo.events();
-    const demoHeader = demo.header();
+    const { events, header } = demo;
     const entries: EventTableEntry[] = [];
     let i = 0;
     for (; i < events.length; i += 1) {
@@ -77,7 +76,7 @@ export default class DemoDetails extends React.Component<
     }
     this.setState({
       events: entries,
-      demoHeader,
+      demoHeader: header,
       open: true,
       nextAvailableID: i,
     });
