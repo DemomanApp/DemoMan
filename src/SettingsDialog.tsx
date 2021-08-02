@@ -165,13 +165,14 @@ export default class SettingsDialog extends React.Component<
             </ListItem>
           </List>
           <Menu
-            anchorOrigin={{ horizontal: "center", vertical: "center" }}
-            transformOrigin={{ horizontal: "center", vertical: "top" }}
             anchorEl={themePickerAnchor}
             open={themePickerAnchor !== null}
             keepMounted
             onClose={() => {
               this.setState({ themePickerAnchor: null });
+            }}
+            PaperProps={{
+              style: { border: "1px solid rgba(255, 255, 255, 0.23)" },
             }}
           >
             {Object.keys(ThemeNames).map((key) => (
