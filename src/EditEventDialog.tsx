@@ -141,7 +141,7 @@ export default class EditEventDialog extends React.Component<
                 Delete Event
               </Button>
             )}
-            <Button variant="contained" color="primary" onClick={this.cancel}>
+            <Button variant="contained" onClick={this.cancel}>
               Cancel
             </Button>
             <Button
@@ -150,7 +150,7 @@ export default class EditEventDialog extends React.Component<
               onClick={this.save}
               disabled={!hasUnsavedChanges}
             >
-              Save changes
+              {isEditing ? "Save changes" : "Done"}
             </Button>
           </>
         }
