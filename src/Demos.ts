@@ -8,28 +8,29 @@ import DemoEvent from "./DemoEvent";
 
 const HEADER_SIZE = 8 + 4 + 4 + 260 + 260 + 260 + 260 + 4 + 4 + 4 + 4;
 
-export function writeEventsFile(
+export function writeEventsAndTagsFile(
   events: DemoEvent[],
+  tags: string[],
   jsonPath: string,
   overwrite: boolean
 ) {
   if (events.length === 0) {
-    log.debug(`Deleting events file at ${jsonPath}`);
+    log.debug(`Deleting events/tags file at ${jsonPath}`);
     fs.rmSync(jsonPath, { force: true });
     return;
   }
-  log.debug(`Writing to events file at ${jsonPath}`);
+  log.debug(`Writing to events/tags file at ${jsonPath}`);
   let fd;
   try {
     fd = fs.openSync(jsonPath, overwrite ? "w" : "wx");
   } catch (e) {
     if (e.code === "EEXIST") {
-      log.debug(`Events file at ${jsonPath} already exists, skipping.`);
+      log.debug(`Events/tags file at ${jsonPath} already exists, skipping.`);
       return;
     }
     throw e;
   }
-  fs.writeSync(fd, JSON.stringify({ events }, null, "\t"));
+  fs.writeSync(fd, JSON.stringify({ events, tags }, null, "\t"));
   fs.closeSync(fd);
 }
 
@@ -44,26 +45,32 @@ export class Demo {
 
   events: DemoEvent[];
 
+  tags: string[];
+
   private constructor(
     filename: string,
     header: DemoHeader,
     events: DemoEvent[],
+    tags: string[],
     birthtime: number,
     filesize: number
   ) {
     this.filename = filename;
     this.header = header;
     this.events = events;
+    this.tags = tags;
     this.birthtime = birthtime;
     this.filesize = filesize;
   }
 
   static create(filename: string): Demo {
     const stats = fs.statSync(filename);
+    const [events, tags] = this.readEventsAndTags(this.getJSONPath(filename));
     return new Demo(
       filename,
       this.readFileHeader(filename),
-      this.readEvents(this.getJSONPath(filename)),
+      events,
+      tags,
       stats.birthtimeMs,
       stats.size
     );
@@ -113,29 +120,35 @@ export class Demo {
     return path.basename(this.filename, ".dem");
   }
 
-  static readEvents(jsonPath: string): DemoEvent[] {
+  static readEventsAndTags(jsonPath: string): [DemoEvent[], string[]] {
     log.debug(`Looking for events file at ${jsonPath}`);
     let content;
     try {
       content = fs.readFileSync(jsonPath);
     } catch (e) {
       if (e.code === "ENOENT") {
-        return [];
+        return [[], []];
       }
       throw e;
     }
     try {
       const parsedJson = JSON.parse(content.toString());
-      return parsedJson.events || [];
+      return [parsedJson.events || [], parsedJson.tags || []];
     } catch (error) {
-      return [];
+      return [[], []];
     }
   }
 
   writeEvents(events: DemoEvent[]) {
     this.events = events;
     const jsonPath = Demo.getJSONPath(this.filename);
-    writeEventsFile(events, jsonPath, true);
+    writeEventsAndTagsFile(events, this.tags, jsonPath, true);
+  }
+
+  writeTags(tags: string[]) {
+    this.tags = tags;
+    const jsonPath = Demo.getJSONPath(this.filename);
+    writeEventsAndTagsFile(this.events, tags, jsonPath, true);
   }
 
   rename(newName: string) {

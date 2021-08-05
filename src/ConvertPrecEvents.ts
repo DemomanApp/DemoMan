@@ -4,7 +4,7 @@ import cfg from "electron-cfg";
 import log from "electron-log";
 
 import DemoEvent from "./DemoEvent";
-import { writeEventsFile } from "./Demos";
+import { writeEventsAndTagsFile } from "./Demos";
 
 const regex = /\[[\d/ :]+\] (.*) \("(\w+)" at (\d+)\)/;
 
@@ -76,7 +76,12 @@ export default function convertPrecEvents() {
       }
     }
     if (demoExists) {
-      writeEventsFile(events[demo], path.join(demoDir, `${demo}.json`), false);
+      writeEventsAndTagsFile(
+        events[demo],
+        [],
+        path.join(demoDir, `${demo}.json`),
+        false
+      );
     }
   }
 }
