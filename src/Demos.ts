@@ -149,12 +149,14 @@ export class Demo {
 
   writeEvents(events: DemoEvent[]) {
     this.events = events;
+    Demo.demoCache[this.filename].events = events;
     const jsonPath = Demo.getJSONPath(this.filename);
     writeEventsAndTagsFile(events, this.tags, jsonPath, true);
   }
 
   writeTags(tags: string[]) {
     this.tags = tags;
+    Demo.demoCache[this.filename].tags = tags;
     const jsonPath = Demo.getJSONPath(this.filename);
     writeEventsAndTagsFile(this.events, tags, jsonPath, true);
   }
@@ -176,6 +178,8 @@ export class Demo {
         throw e;
       }
     }
+    Demo.demoCache[newNameFull] = this;
+    delete Demo.demoCache[this.filename];
     this.filename = newNameFull;
   }
 
@@ -191,6 +195,7 @@ export class Demo {
         throw e;
       }
     }
+    delete Demo.demoCache[this.filename];
   }
 }
 
