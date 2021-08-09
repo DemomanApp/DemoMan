@@ -47,6 +47,8 @@ export class Demo {
 
   tags: string[];
 
+  private static demoCache: Record<string, Demo> = {};
+
   private constructor(
     filename: string,
     header: DemoHeader,
@@ -63,17 +65,23 @@ export class Demo {
     this.filesize = filesize;
   }
 
-  static create(filename: string): Demo {
-    const stats = fs.statSync(filename);
-    const [events, tags] = this.readEventsAndTags(this.getJSONPath(filename));
-    return new Demo(
-      filename,
-      this.readFileHeader(filename),
+  static getDemo(filename: string): Demo {
+    const realPath = fs.realpathSync(filename);
+    if (Demo.demoCache[realPath] !== undefined) {
+      return Demo.demoCache[realPath];
+    }
+    const stats = fs.statSync(realPath);
+    const [events, tags] = this.readEventsAndTags(this.getJSONPath(realPath));
+    const newDemo = new Demo(
+      realPath,
+      this.readFileHeader(realPath),
       events,
       tags,
       stats.birthtimeMs,
       stats.size
     );
+    Demo.demoCache[realPath] = newDemo;
+    return newDemo;
   }
 
   static readFileHeader(filename: string): DemoHeader {
@@ -202,7 +210,7 @@ export async function getDemosInDirectory(dirPath: string) {
     if (file.endsWith(".dem")) {
       log.debug(`Found demo file ${file}`);
       try {
-        demoList.push(Demo.create(path.join(dirPath, file)));
+        demoList.push(Demo.getDemo(path.join(dirPath, file)));
       } catch (error) {
         // ignore this file if it throws errors
       }
