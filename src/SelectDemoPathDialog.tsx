@@ -8,20 +8,20 @@ import DialogTitle from "@material-ui/core/DialogTitle";
 
 import { GetSetDemoPath } from "./GetDemoPath";
 
-type SelectDemoPathModalProps = {
+type SelectDemoPathDialogProps = {
   onComplete: () => void;
 };
 
-type SelectDemoPathModalState = {
+type SelectDemoPathDialogState = {
   open: boolean;
   onComplete: () => void;
 };
 
-export default class SelectDemoPathModal extends React.PureComponent<
-  SelectDemoPathModalProps,
-  SelectDemoPathModalState
+export default class SelectDemoPathDialog extends React.PureComponent<
+  SelectDemoPathDialogProps,
+  SelectDemoPathDialogState
 > {
-  constructor(props: SelectDemoPathModalProps) {
+  constructor(props: SelectDemoPathDialogProps) {
     super(props);
     this.state = {
       open: false,

@@ -4,14 +4,14 @@ import log from "electron-log";
 
 import { Demo } from "./Demos";
 import DemoTable from "./DemoTable";
-import SelectDemoPathModal from "./SelectDemoPathModal";
+import SelectDemoPathDialog from "./SelectDemoPathDialog";
 import DemoDetails from "./DemoDetailsView";
 import SettingsDialog from "./SettingsDialog";
 import { InfoDialog, DemoListInfo } from "./InfoDialog";
 import AutoDeleteDialog from "./AutoDeleteDialog";
 
 export default class MainView extends React.Component<unknown> {
-  private modal: React.RefObject<SelectDemoPathModal>;
+  private modal: React.RefObject<SelectDemoPathDialog>;
 
   private table: React.RefObject<DemoTable>;
 
@@ -75,7 +75,7 @@ export default class MainView extends React.Component<unknown> {
           viewInfoDialog={this.viewInfoDialog}
           viewAutoDeleteDialog={this.viewAutoDeleteDialog}
         />
-        <SelectDemoPathModal
+        <SelectDemoPathDialog
           ref={this.modal}
           onComplete={() => {
             this.table.current?.RefreshDemoList();
