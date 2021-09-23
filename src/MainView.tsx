@@ -4,96 +4,105 @@ import log from "electron-log";
 
 import { Demo } from "./Demos";
 import DemoTable from "./DemoTable";
-import SelectDemoPathModal from "./SelectDemoPathModal";
+import SelectDemoPathDialog from "./SelectDemoPathDialog";
 import DemoDetails from "./DemoDetailsView";
 import SettingsDialog from "./SettingsDialog";
 import { InfoDialog, DemoListInfo } from "./InfoDialog";
 import AutoDeleteDialog from "./AutoDeleteDialog";
 
-export default class MainView extends React.Component<unknown> {
-  private modal: React.RefObject<SelectDemoPathModal>;
+type MainViewState = {
+  selectDemoPathDialogOpen: boolean;
+  table: React.RefObject<DemoTable>;
+  demoDetails: React.RefObject<DemoDetails>;
+  settings: React.RefObject<SettingsDialog>;
+  info: React.RefObject<InfoDialog>;
+  autoDeleteDialog: React.RefObject<AutoDeleteDialog>;
+};
 
-  private table: React.RefObject<DemoTable>;
-
-  private demoDetails: React.RefObject<DemoDetails>;
-
-  private settings: React.RefObject<SettingsDialog>;
-
-  private info: React.RefObject<InfoDialog>;
-
-  private autoDeleteDialog: React.RefObject<AutoDeleteDialog>;
-
-  constructor(props: unknown) {
+export default class MainView extends React.Component<
+  Readonly<unknown>,
+  MainViewState
+> {
+  constructor(props: Readonly<unknown>) {
     super(props);
-    this.modal = React.createRef();
-    this.table = React.createRef();
-    this.demoDetails = React.createRef();
-    this.settings = React.createRef();
-    this.info = React.createRef();
-    this.autoDeleteDialog = React.createRef();
-  }
-
-  componentDidMount() {
-    if (!cfg.has("demo_path")) {
-      if (this.modal.current) {
-        this.modal.current.setOpen(true);
-      }
-    }
+    this.state = {
+      table: React.createRef(),
+      demoDetails: React.createRef(),
+      settings: React.createRef(),
+      info: React.createRef(),
+      autoDeleteDialog: React.createRef(),
+      selectDemoPathDialogOpen: !cfg.has("demo_path"),
+    };
   }
 
   viewDemo = (demo: Demo) => {
+    const { demoDetails } = this.state;
     log.debug(`Viewing demo ${demo.filename}`);
-    if (this.demoDetails.current) {
-      this.demoDetails.current.viewDemo(demo);
+    if (demoDetails.current) {
+      demoDetails.current.viewDemo(demo);
     }
   };
 
   viewSettings = () => {
-    if (this.settings.current) {
-      this.settings.current.open();
+    const { settings } = this.state;
+    if (settings.current) {
+      settings.current.open();
     }
   };
 
-  viewInfoDialog = (info: DemoListInfo) => {
-    if (this.info.current) {
-      this.info.current.setInfo(info);
-      this.info.current.setOpen(true);
+  viewInfoDialog = (newInfo: DemoListInfo) => {
+    const { info } = this.state;
+    if (info.current) {
+      info.current.setInfo(newInfo);
+      info.current.setOpen(true);
     }
   };
 
   viewAutoDeleteDialog = () => {
-    this.autoDeleteDialog.current?.open();
+    const { autoDeleteDialog } = this.state;
+    autoDeleteDialog.current?.open();
   };
 
   render() {
+    const {
+      table,
+      selectDemoPathDialogOpen,
+      demoDetails,
+      settings,
+      autoDeleteDialog,
+      info,
+    } = this.state;
     return (
       <>
         <DemoTable
-          ref={this.table}
+          ref={table}
           viewDemo={this.viewDemo}
           viewSettings={this.viewSettings}
           viewInfoDialog={this.viewInfoDialog}
           viewAutoDeleteDialog={this.viewAutoDeleteDialog}
         />
-        <SelectDemoPathModal
-          ref={this.modal}
+        <SelectDemoPathDialog
+          open={selectDemoPathDialogOpen}
           onComplete={() => {
-            this.table.current?.RefreshDemoList();
+            this.setState({
+              selectDemoPathDialogOpen: false,
+            });
+            table.current?.RefreshDemoList();
           }}
         />
         <DemoDetails
-          ref={this.demoDetails}
+          ref={demoDetails}
           demo={null}
           onClose={() => {
-            this.table.current?.RefreshDemoList();
+            table.current?.RefreshDemoList();
           }}
         />
-        <SettingsDialog ref={this.settings} />
-        <InfoDialog ref={this.info} />
+        <SettingsDialog ref={settings} />
+        <InfoDialog ref={info} />
         <AutoDeleteDialog
-          ref={this.autoDeleteDialog}
+          ref={autoDeleteDialog}
           onClose={() => {
-            this.table.current?.RefreshDemoList();
+            table.current?.RefreshDemoList();
           }}
         />
       </>
