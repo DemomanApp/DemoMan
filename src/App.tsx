@@ -2,7 +2,6 @@ import React from "react";
 import {
   createTheme,
   ThemeProvider,
-  Theme,
   StyledEngineProvider,
 } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
@@ -12,11 +11,6 @@ import "@fontsource/nunito";
 
 import MainView from "./MainView";
 import { getPreferredTheme } from "./theme";
-
-declare module "@mui/styles/defaultTheme" {
-  // eslint-disable-next-line @typescript-eslint/no-empty-interface
-  interface DefaultTheme extends Theme {}
-}
 
 const theme = createTheme({
   palette: {
