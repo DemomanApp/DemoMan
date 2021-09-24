@@ -1,6 +1,6 @@
 import React, { ReactNode } from "react";
 
-import withStyles from "@mui/material/styles/withStyles";
+import { withStyles } from "@mui/styles";
 import Dialog from "@mui/material/Dialog";
 import IconButton from "@mui/material/IconButton";
 import CloseIcon from "@mui/icons-material/Close";
