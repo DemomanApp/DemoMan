@@ -8,20 +8,20 @@ import DataTable, {
 import cfg from "electron-cfg";
 import merge from "deepmerge";
 
-import ArrowDownward from "@material-ui/icons/ArrowDownward";
-import IconButton from "@material-ui/core/IconButton";
-import RefreshIcon from "@material-ui/icons/Refresh";
-import SettingsIcon from "@material-ui/icons/Settings";
-import InfoIcon from "@material-ui/icons/InfoOutlined";
-import MoreHorizIcon from "@material-ui/icons/MoreHoriz";
-import Tooltip from "@material-ui/core/Tooltip";
-import Menu from "@material-ui/core/Menu";
-import MenuItem from "@material-ui/core/MenuItem";
-import blue from "@material-ui/core/colors/blue";
-import Paper from "@material-ui/core/Paper";
-import InputBase from "@material-ui/core/InputBase";
-import ClearIcon from "@material-ui/icons/Clear";
-import Divider from "@material-ui/core/Divider";
+import ArrowDownward from "@mui/icons-material/ArrowDownward";
+import IconButton from "@mui/material/IconButton";
+import RefreshIcon from "@mui/icons-material/Refresh";
+import SettingsIcon from "@mui/icons-material/Settings";
+import InfoIcon from "@mui/icons-material/InfoOutlined";
+import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
+import Tooltip from "@mui/material/Tooltip";
+import Menu from "@mui/material/Menu";
+import MenuItem from "@mui/material/MenuItem";
+import blue from "@mui/material/colors/blue";
+import Paper from "@mui/material/Paper";
+import InputBase from "@mui/material/InputBase";
+import ClearIcon from "@mui/icons-material/Clear";
+import Divider from "@mui/material/Divider";
 
 import loading from "../assets/loading.gif";
 

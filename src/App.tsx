@@ -1,8 +1,8 @@
 import React from "react";
-import { createMuiTheme, ThemeProvider } from "@material-ui/core/styles";
-import CssBaseline from "@material-ui/core/CssBaseline";
-import blue from "@material-ui/core/colors/blue";
-import red from "@material-ui/core/colors/red";
+import { createMuiTheme, ThemeProvider } from "@mui/material/styles";
+import CssBaseline from "@mui/material/CssBaseline";
+import blue from "@mui/material/colors/blue";
+import red from "@mui/material/colors/red";
 import "@fontsource/nunito";
 
 import MainView from "./MainView";

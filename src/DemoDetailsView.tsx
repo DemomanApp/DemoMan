@@ -1,15 +1,15 @@
 import React from "react";
 import { shell } from "electron";
 
-import Paper from "@material-ui/core/Paper";
-import Grid from "@material-ui/core/Grid";
-import ButtonGroup from "@material-ui/core/ButtonGroup";
-import Tooltip from "@material-ui/core/Tooltip";
-import EditIcon from "@material-ui/icons/Edit";
-import DeleteOutlineIcon from "@material-ui/icons/DeleteOutline";
-import FolderOpenIcon from "@material-ui/icons/FolderOpen";
-import Button from "@material-ui/core/Button";
-import styled from "@material-ui/core/styles/styled";
+import Paper from "@mui/material/Paper";
+import Grid from "@mui/material/Grid";
+import ButtonGroup from "@mui/material/ButtonGroup";
+import Tooltip from "@mui/material/Tooltip";
+import EditIcon from "@mui/icons-material/Edit";
+import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
+import FolderOpenIcon from "@mui/icons-material/FolderOpen";
+import Button from "@mui/material/Button";
+import styled from "@mui/material/styles/styled";
 
 import { Demo } from "./Demos";
 import { DemoHeader } from "./DemoHeader";
