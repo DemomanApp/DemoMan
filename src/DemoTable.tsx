@@ -2,7 +2,7 @@ import React, { PureComponent } from "react";
 import { shell } from "electron";
 
 import DataTable, {
-  createTheme,
+  createTheme as createTableTheme,
   defaultThemes,
 } from "react-data-table-component";
 import cfg from "electron-cfg";
@@ -148,7 +148,7 @@ const columns = [
   },
 ];
 
-createTheme(
+createTableTheme(
   "dark_alt",
   merge(defaultThemes.dark, {
     background: { default: "#303030" },
@@ -158,7 +158,7 @@ createTheme(
   })
 );
 
-createTheme("light_alt", {
+createTableTheme("light_alt", {
   background: { default: "#fafafa" },
   context: {
     background: blue[500],
