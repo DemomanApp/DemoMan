@@ -37,7 +37,7 @@ export default function FullscreenDialog(props: FullscreenDialogProps) {
           <Grid
             item
             container
-            justify="space-between"
+            justifyContent="space-between"
             alignItems="center"
             style={{ height: "64px" }}
           >
@@ -45,7 +45,7 @@ export default function FullscreenDialog(props: FullscreenDialogProps) {
               <Typography variant="h5">{title}</Typography>
             </Grid>
             <Grid item>
-              <IconButton onClick={onClose}>
+              <IconButton onClick={onClose} size="large">
                 <CloseIcon />
               </IconButton>
             </Grid>

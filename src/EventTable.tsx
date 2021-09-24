@@ -52,7 +52,7 @@ export default function EventTable(props: EventTableProps) {
       }
       actions={
         <Tooltip title="Add event">
-          <IconButton onClick={addEvent}>
+          <IconButton onClick={addEvent} size="large">
             <AddIcon />
           </IconButton>
         </Tooltip>

@@ -194,101 +194,99 @@ export default class DemoDetails extends React.Component<
     if (demo === null || demoHeader === null) {
       return null;
     }
-    return (
-      <>
-        <FullscreenDialog
-          title={demo.getShortName()}
-          open={open}
-          onClose={this.close}
+    return <>
+      <FullscreenDialog
+        title={demo.getShortName()}
+        open={open}
+        onClose={this.close}
+      >
+        <Grid
+          item
+          container
+          alignItems="stretch"
+          justifyContent="space-around"
+          style={{ padding: "24px" }}
         >
           <Grid
             item
             container
-            alignItems="stretch"
-            justify="space-around"
-            style={{ padding: "24px" }}
+            direction="column"
+            xs={6}
+            alignItems="center"
+            spacing={2}
           >
-            <Grid
-              item
-              container
-              direction="column"
-              xs={6}
-              alignItems="center"
-              spacing={2}
-            >
-              <Grid item>
-                <div
-                  style={{
-                    width: "320px",
-                    height: "200px",
-                    backgroundColor: "#666",
-                    textAlign: "center",
-                  }}
-                >
-                  <h2 style={{ margin: "0px" }}>{demoHeader.mapName}</h2> <br />
-                  (Map thumbnail coming soon&trade;)
-                </div>
-              </Grid>
-              <Grid item>
-                <DemoDetailsList demo={demo} demoHeader={demoHeader} />
-              </Grid>
-              <Grid item>
-                <ButtonGroup variant="outlined">
-                  <Tooltip title="Rename">
-                    <GroupIconButton onClick={this.renameDialogOpen}>
-                      <EditIcon />
-                    </GroupIconButton>
-                  </Tooltip>
-                  <Tooltip title="Delete">
-                    <GroupIconButton
-                      onClick={() => {
-                        this.setState({ deleteDialogOpen: true });
-                      }}
-                    >
-                      <DeleteOutlineIcon />
-                    </GroupIconButton>
-                  </Tooltip>
-                  <Tooltip title="Show in explorer">
-                    <GroupIconButton
-                      onClick={() => {
-                        shell.showItemInFolder(demo.filename);
-                      }}
-                    >
-                      <FolderOpenIcon />
-                    </GroupIconButton>
-                  </Tooltip>
-                </ButtonGroup>
-              </Grid>
+            <Grid item>
+              <div
+                style={{
+                  width: "320px",
+                  height: "200px",
+                  backgroundColor: "#666",
+                  textAlign: "center",
+                }}
+              >
+                <h2 style={{ margin: "0px" }}>{demoHeader.mapName}</h2> <br />
+                (Map thumbnail coming soon&trade;)
+              </div>
             </Grid>
-            <Grid item xs={6}>
-              <Paper elevation={3} style={{ padding: "5px" }}>
-                <EventTable
-                  data={events}
-                  editEvent={this.editEvent}
-                  addEvent={this.addEvent}
-                />
-              </Paper>
+            <Grid item>
+              <DemoDetailsList demo={demo} demoHeader={demoHeader} />
+            </Grid>
+            <Grid item>
+              <ButtonGroup variant="outlined">
+                <Tooltip title="Rename">
+                  <GroupIconButton onClick={this.renameDialogOpen}>
+                    <EditIcon />
+                  </GroupIconButton>
+                </Tooltip>
+                <Tooltip title="Delete">
+                  <GroupIconButton
+                    onClick={() => {
+                      this.setState({ deleteDialogOpen: true });
+                    }}
+                  >
+                    <DeleteOutlineIcon />
+                  </GroupIconButton>
+                </Tooltip>
+                <Tooltip title="Show in explorer">
+                  <GroupIconButton
+                    onClick={() => {
+                      shell.showItemInFolder(demo.filename);
+                    }}
+                  >
+                    <FolderOpenIcon />
+                  </GroupIconButton>
+                </Tooltip>
+              </ButtonGroup>
             </Grid>
           </Grid>
-        </FullscreenDialog>
-        <EditEventDialog
-          ref={this.editEventDialog}
-          addCallback={this.addCallback}
-          editCallback={this.editCallback}
-          deleteCallback={this.deleteCallback}
-        />
-        <DeleteDialog
-          open={deleteDialogOpen}
-          demoName={demo.getShortName()}
-          onClose={this.deleteDialogClose}
-          onConfirm={this.deleteDialogConfirm}
-        />
-        <RenameDialog
-          ref={this.renameDialog}
-          onClose={this.renameDialogClose}
-          onConfirm={this.renameDialogConfirm}
-        />
-      </>
-    );
+          <Grid item xs={6}>
+            <Paper elevation={3} style={{ padding: "5px" }}>
+              <EventTable
+                data={events}
+                editEvent={this.editEvent}
+                addEvent={this.addEvent}
+              />
+            </Paper>
+          </Grid>
+        </Grid>
+      </FullscreenDialog>
+      <EditEventDialog
+        ref={this.editEventDialog}
+        addCallback={this.addCallback}
+        editCallback={this.editCallback}
+        deleteCallback={this.deleteCallback}
+      />
+      <DeleteDialog
+        open={deleteDialogOpen}
+        demoName={demo.getShortName()}
+        onClose={this.deleteDialogClose}
+        onConfirm={this.deleteDialogConfirm}
+      />
+      <RenameDialog
+        ref={this.renameDialog}
+        onClose={this.renameDialogClose}
+        onConfirm={this.renameDialogConfirm}
+      />
+    </>;
   }
 }

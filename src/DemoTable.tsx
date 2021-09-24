@@ -272,137 +272,135 @@ export default class DemoTable extends PureComponent<
       this.state;
     const { viewDemo, viewSettings, viewAutoDeleteDialog } = this.props;
 
-    return (
-      <>
-        <DataTable
-          title="Demos"
-          columns={columns}
-          defaultSortField="birthtime"
-          defaultSortAsc={false}
-          keyField="filename"
-          highlightOnHover
-          actions={
-            <>
-              <Paper
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                }}
-              >
-                <InputBase
-                  placeholder="Quick filter"
-                  style={{ paddingLeft: "12px", width: "300px" }}
-                  onChange={this.quickFilterChanged}
-                  value={quickFilterQuery}
-                  spellCheck={false}
-                />
-                <Divider orientation="vertical" style={{ height: "28px" }} />
-                <Tooltip title="Clear filter">
-                  <IconButton
-                    onClick={() => {
-                      this.updateQuickFilter("");
-                    }}
-                  >
-                    <ClearIcon />
-                  </IconButton>
-                </Tooltip>
-              </Paper>
-              <Tooltip title="Reload demos">
-                <IconButton color="default" onClick={this.RefreshDemoList}>
-                  <RefreshIcon />
-                </IconButton>
-              </Tooltip>
-              <Tooltip title="Info">
-                <IconButton color="default" onClick={this.viewInfo}>
-                  <InfoIcon />
-                </IconButton>
-              </Tooltip>
-              <Tooltip title="Settings">
-                <IconButton color="default" onClick={viewSettings}>
-                  <SettingsIcon />
-                </IconButton>
-              </Tooltip>
-              <Tooltip title="More...">
-                <IconButton color="default" onClick={this.openMoreMenu}>
-                  <MoreHorizIcon />
-                </IconButton>
-              </Tooltip>
-
-              <Menu
-                anchorEl={moreMenuAnchor}
-                getContentAnchorEl={null}
-                keepMounted
-                open={moreMenuAnchor !== null}
-                onClose={this.closeMoreMenu}
-                anchorOrigin={{
-                  vertical: "bottom",
-                  horizontal: "center",
-                }}
-                transformOrigin={{
-                  vertical: "top",
-                  horizontal: "right",
-                }}
-              >
-                <MenuItem
-                  onClick={() => {
-                    viewAutoDeleteDialog();
-                    this.closeMoreMenu();
-                  }}
-                >
-                  Auto-delete demos and events...
-                </MenuItem>
-                <MenuItem
-                  onClick={() => {
-                    shell.openPath(cfg.get("demo_path"));
-                    this.closeMoreMenu();
-                  }}
-                >
-                  Open demos folder
-                </MenuItem>
-                <MenuItem
-                  onClick={() => {
-                    convertPrecEvents();
-                    this.closeMoreMenu();
-                    this.RefreshDemoList();
-                  }}
-                >
-                  Convert P-REC bookmarks
-                </MenuItem>
-              </Menu>
-            </>
-          }
-          data={filteredData}
-          noDataComponent={
-            <div>
-              No demos found. Make sure you&apos;ve set the correct file path.
-            </div>
-          }
-          sortIcon={<ArrowDownward />}
-          pointerOnHover
-          onRowClicked={(row: DemoListEntry) => {
-            viewDemo(row.demo);
-          }}
-          fixedHeader
-          // 56px is the height of the table title, 57px is the height of the header.
-          fixedHeaderScrollHeight="calc(100vh - (56px + 57px))"
-          progressPending={progressPending}
-          progressComponent={
-            <div
+    return <>
+      <DataTable
+        title="Demos"
+        columns={columns}
+        defaultSortField="birthtime"
+        defaultSortAsc={false}
+        keyField="filename"
+        highlightOnHover
+        actions={
+          <>
+            <Paper
               style={{
                 display: "flex",
-                flexDirection: "column",
                 alignItems: "center",
               }}
             >
-              <img src={loading} alt="loading..." width="128px" />
-              <span style={{ fontSize: "20px", margin: "1rem" }}>
-                Loading...
-              </span>
-            </div>
-          }
-          theme={`${getPreferredTheme()}_alt`}
-        />
-      </>
-    );
+              <InputBase
+                placeholder="Quick filter"
+                style={{ paddingLeft: "12px", width: "300px" }}
+                onChange={this.quickFilterChanged}
+                value={quickFilterQuery}
+                spellCheck={false}
+              />
+              <Divider orientation="vertical" style={{ height: "28px" }} />
+              <Tooltip title="Clear filter">
+                <IconButton
+                  onClick={() => {
+                    this.updateQuickFilter("");
+                  }}
+                  size="large">
+                  <ClearIcon />
+                </IconButton>
+              </Tooltip>
+            </Paper>
+            <Tooltip title="Reload demos">
+              <IconButton color="default" onClick={this.RefreshDemoList} size="large">
+                <RefreshIcon />
+              </IconButton>
+            </Tooltip>
+            <Tooltip title="Info">
+              <IconButton color="default" onClick={this.viewInfo} size="large">
+                <InfoIcon />
+              </IconButton>
+            </Tooltip>
+            <Tooltip title="Settings">
+              <IconButton color="default" onClick={viewSettings} size="large">
+                <SettingsIcon />
+              </IconButton>
+            </Tooltip>
+            <Tooltip title="More...">
+              <IconButton color="default" onClick={this.openMoreMenu} size="large">
+                <MoreHorizIcon />
+              </IconButton>
+            </Tooltip>
+
+            <Menu
+              anchorEl={moreMenuAnchor}
+              getContentAnchorEl={null}
+              keepMounted
+              open={moreMenuAnchor !== null}
+              onClose={this.closeMoreMenu}
+              anchorOrigin={{
+                vertical: "bottom",
+                horizontal: "center",
+              }}
+              transformOrigin={{
+                vertical: "top",
+                horizontal: "right",
+              }}
+            >
+              <MenuItem
+                onClick={() => {
+                  viewAutoDeleteDialog();
+                  this.closeMoreMenu();
+                }}
+              >
+                Auto-delete demos and events...
+              </MenuItem>
+              <MenuItem
+                onClick={() => {
+                  shell.openPath(cfg.get("demo_path"));
+                  this.closeMoreMenu();
+                }}
+              >
+                Open demos folder
+              </MenuItem>
+              <MenuItem
+                onClick={() => {
+                  convertPrecEvents();
+                  this.closeMoreMenu();
+                  this.RefreshDemoList();
+                }}
+              >
+                Convert P-REC bookmarks
+              </MenuItem>
+            </Menu>
+          </>
+        }
+        data={filteredData}
+        noDataComponent={
+          <div>
+            No demos found. Make sure you&apos;ve set the correct file path.
+          </div>
+        }
+        sortIcon={<ArrowDownward />}
+        pointerOnHover
+        onRowClicked={(row: DemoListEntry) => {
+          viewDemo(row.demo);
+        }}
+        fixedHeader
+        // 56px is the height of the table title, 57px is the height of the header.
+        fixedHeaderScrollHeight="calc(100vh - (56px + 57px))"
+        progressPending={progressPending}
+        progressComponent={
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+            }}
+          >
+            <img src={loading} alt="loading..." width="128px" />
+            <span style={{ fontSize: "20px", margin: "1rem" }}>
+              Loading...
+            </span>
+          </div>
+        }
+        theme={`${getPreferredTheme()}_alt`}
+      />
+    </>;
   }
 }

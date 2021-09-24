@@ -17,12 +17,7 @@ export default function SelectDemoPathDialog(props: SelectDemoPathDialogProps) {
   const { open, onComplete } = props;
 
   return (
-    <Dialog
-      open={open}
-      onClose={onComplete}
-      disableBackdropClick
-      disableEscapeKeyDown
-    >
+    <Dialog open={open} onClose={onComplete} disableEscapeKeyDown>
       <DialogTitle>First time setup</DialogTitle>
       <DialogContent>
         <DialogContentText>
