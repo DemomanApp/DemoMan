@@ -12,9 +12,23 @@ import "@fontsource/nunito";
 import MainView from "./MainView";
 import { getPreferredTheme } from "./theme";
 
+const mode = getPreferredTheme();
 const theme = createTheme({
   palette: {
-    mode: getPreferredTheme(),
+    mode,
+    ...(mode === "light"
+      ? {
+          background: {
+            default: "#fafafa",
+            paper: "#ffffff",
+          },
+        }
+      : {
+          background: {
+            default: "#303030",
+            paper: "#303030",
+          },
+        }),
     primary: blue,
     secondary: red,
   },
