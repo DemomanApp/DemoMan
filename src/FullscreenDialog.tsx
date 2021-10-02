@@ -31,6 +31,7 @@ export default function FullscreenDialog(props: FullscreenDialogProps) {
           backgroundColor: theme.palette.background.default,
         },
       }))(Paper)}
+      PaperProps={{ elevation: 0 }}
     >
       <Container>
         <Grid container direction="column">
