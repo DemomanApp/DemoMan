@@ -156,7 +156,7 @@ export default class EditEventDialog extends React.Component<
         }
         maxWidth="sm"
       >
-        <Grid container direction="row" spacing={2} style={{ margin: "8px" }}>
+        <Grid container direction="row" spacing={2}>
           <Grid item xs={4}>
             <TextField
               required
@@ -171,6 +171,7 @@ export default class EditEventDialog extends React.Component<
                   <InputAdornment position="start">Tick</InputAdornment>
                 ),
               }}
+              margin="dense"
             />
           </Grid>
           <Grid item xs={8}>
@@ -182,6 +183,7 @@ export default class EditEventDialog extends React.Component<
               variant="outlined"
               error={valueError}
               fullWidth
+              margin="dense"
             />
           </Grid>
         </Grid>

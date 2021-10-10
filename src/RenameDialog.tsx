@@ -90,6 +90,7 @@ export default class RenameDialog extends React.Component<
           error={!newNameValid}
           onChange={this.validateNewName}
           fullWidth
+          margin="dense"
         />
       </SmallDialog>
     );
