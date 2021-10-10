@@ -1,8 +1,6 @@
-import electron from "electron";
+import { dialog } from "@electron/remote";
 import cfg from "electron-cfg";
 import log from "electron-log";
-
-const { dialog } = electron.remote;
 
 export function GetDemoPath(defaultPath?: string) {
   const filePaths = dialog.showOpenDialogSync({

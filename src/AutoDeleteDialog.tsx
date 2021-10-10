@@ -4,16 +4,16 @@ import path from "path";
 import cfg from "electron-cfg";
 import log from "electron-log";
 
-import Button from "@material-ui/core/Button";
-import List from "@material-ui/core/List";
-import ListItem from "@material-ui/core/ListItem";
-import ListItemIcon from "@material-ui/core/ListItemIcon";
-import ListItemText from "@material-ui/core/ListItemText";
-import Checkbox from "@material-ui/core/Checkbox";
-import DialogContentText from "@material-ui/core/DialogContentText";
-import Paper from "@material-ui/core/Paper";
-import Divider from "@material-ui/core/Divider";
-import styled from "@material-ui/core/styles/styled";
+import Button from "@mui/material/Button";
+import List from "@mui/material/List";
+import ListItem from "@mui/material/ListItem";
+import ListItemIcon from "@mui/material/ListItemIcon";
+import ListItemText from "@mui/material/ListItemText";
+import Checkbox from "@mui/material/Checkbox";
+import DialogContentText from "@mui/material/DialogContentText";
+import Paper from "@mui/material/Paper";
+import Divider from "@mui/material/Divider";
+import styled from "@mui/material/styles/styled";
 
 import { formatFileSize } from "./util";
 import SmallDialog from "./SmallDialog";

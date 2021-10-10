@@ -1,7 +1,7 @@
 import React from "react";
 
-import Button from "@material-ui/core/Button";
-import DialogContentText from "@material-ui/core/DialogContentText";
+import Button from "@mui/material/Button";
+import DialogContentText from "@mui/material/DialogContentText";
 
 import SmallDialog from "./SmallDialog";
 

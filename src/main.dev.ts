@@ -25,6 +25,8 @@ import cfg from "electron-cfg";
 
 import { loadPreferredTheme } from "./theme";
 
+require("@electron/remote/main").initialize();
+
 cfg.logger(log);
 
 ipcMain.on("update-theme", (event, newTheme) => {

@@ -1,15 +1,15 @@
 import React, { ReactNode } from "react";
 
-import withStyles from "@material-ui/core/styles/withStyles";
-import Dialog from "@material-ui/core/Dialog";
-import IconButton from "@material-ui/core/IconButton";
-import CloseIcon from "@material-ui/icons/Close";
-import Zoom from "@material-ui/core/Zoom";
-import Container from "@material-ui/core/Container";
-import Paper from "@material-ui/core/Paper";
-import Grid from "@material-ui/core/Grid";
-import Divider from "@material-ui/core/Divider";
-import Typography from "@material-ui/core/Typography";
+import { withStyles } from "@mui/styles";
+import Dialog from "@mui/material/Dialog";
+import IconButton from "@mui/material/IconButton";
+import CloseIcon from "@mui/icons-material/Close";
+import Zoom from "@mui/material/Zoom";
+import Container from "@mui/material/Container";
+import Paper from "@mui/material/Paper";
+import Grid from "@mui/material/Grid";
+import Divider from "@mui/material/Divider";
+import Typography from "@mui/material/Typography";
 
 type FullscreenDialogProps = {
   title: string;
@@ -31,13 +31,14 @@ export default function FullscreenDialog(props: FullscreenDialogProps) {
           backgroundColor: theme.palette.background.default,
         },
       }))(Paper)}
+      PaperProps={{ elevation: 0 }}
     >
       <Container>
         <Grid container direction="column">
           <Grid
             item
             container
-            justify="space-between"
+            justifyContent="space-between"
             alignItems="center"
             style={{ height: "64px" }}
           >
@@ -45,7 +46,7 @@ export default function FullscreenDialog(props: FullscreenDialogProps) {
               <Typography variant="h5">{title}</Typography>
             </Grid>
             <Grid item>
-              <IconButton onClick={onClose}>
+              <IconButton onClick={onClose} size="large">
                 <CloseIcon />
               </IconButton>
             </Grid>

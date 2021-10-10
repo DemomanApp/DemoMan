@@ -1,15 +1,13 @@
 import React from "react";
 import { shell } from "electron";
 
-import Paper from "@material-ui/core/Paper";
-import Grid from "@material-ui/core/Grid";
-import ButtonGroup from "@material-ui/core/ButtonGroup";
-import Tooltip from "@material-ui/core/Tooltip";
-import EditIcon from "@material-ui/icons/Edit";
-import DeleteOutlineIcon from "@material-ui/icons/DeleteOutline";
-import FolderOpenIcon from "@material-ui/icons/FolderOpen";
-import Button from "@material-ui/core/Button";
-import styled from "@material-ui/core/styles/styled";
+import Paper from "@mui/material/Paper";
+import Grid from "@mui/material/Grid";
+import Tooltip from "@mui/material/Tooltip";
+import EditIcon from "@mui/icons-material/Edit";
+import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
+import FolderOpenIcon from "@mui/icons-material/FolderOpen";
+import IconButton from "@mui/material/IconButton";
 
 import { Demo } from "./Demos";
 import { DemoHeader } from "./DemoHeader";
@@ -21,8 +19,6 @@ import EditEventDialog from "./EditEventDialog";
 import EventTableEntry from "./EventTableEntry";
 import DeleteDialog from "./DeleteDialog";
 import RenameDialog from "./RenameDialog";
-
-const GroupIconButton = styled(Button)({ padding: "11px" });
 
 type DemoDetailsProps = {
   demo: Demo | null;
@@ -205,7 +201,7 @@ export default class DemoDetails extends React.Component<
             item
             container
             alignItems="stretch"
-            justify="space-around"
+            justifyContent="space-around"
             style={{ padding: "24px" }}
           >
             <Grid
@@ -233,31 +229,29 @@ export default class DemoDetails extends React.Component<
                 <DemoDetailsList demo={demo} demoHeader={demoHeader} />
               </Grid>
               <Grid item>
-                <ButtonGroup variant="outlined">
-                  <Tooltip title="Rename">
-                    <GroupIconButton onClick={this.renameDialogOpen}>
-                      <EditIcon />
-                    </GroupIconButton>
-                  </Tooltip>
-                  <Tooltip title="Delete">
-                    <GroupIconButton
-                      onClick={() => {
-                        this.setState({ deleteDialogOpen: true });
-                      }}
-                    >
-                      <DeleteOutlineIcon />
-                    </GroupIconButton>
-                  </Tooltip>
-                  <Tooltip title="Show in explorer">
-                    <GroupIconButton
-                      onClick={() => {
-                        shell.showItemInFolder(demo.filename);
-                      }}
-                    >
-                      <FolderOpenIcon />
-                    </GroupIconButton>
-                  </Tooltip>
-                </ButtonGroup>
+                <Tooltip title="Rename">
+                  <IconButton onClick={this.renameDialogOpen}>
+                    <EditIcon />
+                  </IconButton>
+                </Tooltip>
+                <Tooltip title="Delete">
+                  <IconButton
+                    onClick={() => {
+                      this.setState({ deleteDialogOpen: true });
+                    }}
+                  >
+                    <DeleteOutlineIcon />
+                  </IconButton>
+                </Tooltip>
+                <Tooltip title="Show in explorer">
+                  <IconButton
+                    onClick={() => {
+                      shell.showItemInFolder(demo.filename);
+                    }}
+                  >
+                    <FolderOpenIcon />
+                  </IconButton>
+                </Tooltip>
               </Grid>
             </Grid>
             <Grid item xs={6}>

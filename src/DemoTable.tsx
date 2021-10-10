@@ -2,26 +2,26 @@ import React, { PureComponent } from "react";
 import { shell } from "electron";
 
 import DataTable, {
-  createTheme,
+  createTheme as createTableTheme,
   defaultThemes,
 } from "react-data-table-component";
 import cfg from "electron-cfg";
 import merge from "deepmerge";
 
-import ArrowDownward from "@material-ui/icons/ArrowDownward";
-import IconButton from "@material-ui/core/IconButton";
-import RefreshIcon from "@material-ui/icons/Refresh";
-import SettingsIcon from "@material-ui/icons/Settings";
-import InfoIcon from "@material-ui/icons/InfoOutlined";
-import MoreHorizIcon from "@material-ui/icons/MoreHoriz";
-import Tooltip from "@material-ui/core/Tooltip";
-import Menu from "@material-ui/core/Menu";
-import MenuItem from "@material-ui/core/MenuItem";
-import blue from "@material-ui/core/colors/blue";
-import Paper from "@material-ui/core/Paper";
-import InputBase from "@material-ui/core/InputBase";
-import ClearIcon from "@material-ui/icons/Clear";
-import Divider from "@material-ui/core/Divider";
+import ArrowDownward from "@mui/icons-material/ArrowDownward";
+import IconButton from "@mui/material/IconButton";
+import RefreshIcon from "@mui/icons-material/Refresh";
+import SettingsIcon from "@mui/icons-material/Settings";
+import InfoIcon from "@mui/icons-material/InfoOutlined";
+import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
+import Tooltip from "@mui/material/Tooltip";
+import Menu from "@mui/material/Menu";
+import MenuItem from "@mui/material/MenuItem";
+import blue from "@mui/material/colors/blue";
+import Paper from "@mui/material/Paper";
+import InputBase from "@mui/material/InputBase";
+import ClearIcon from "@mui/icons-material/Clear";
+import Divider from "@mui/material/Divider";
 
 import loading from "../assets/loading.gif";
 
@@ -148,7 +148,7 @@ const columns = [
   },
 ];
 
-createTheme(
+createTableTheme(
   "dark_alt",
   merge(defaultThemes.dark, {
     background: { default: "#303030" },
@@ -158,7 +158,7 @@ createTheme(
   })
 );
 
-createTheme("light_alt", {
+createTableTheme("light_alt", {
   background: { default: "#fafafa" },
   context: {
     background: blue[500],
@@ -302,35 +302,47 @@ export default class DemoTable extends PureComponent<
                     onClick={() => {
                       this.updateQuickFilter("");
                     }}
+                    size="large"
                   >
                     <ClearIcon />
                   </IconButton>
                 </Tooltip>
               </Paper>
               <Tooltip title="Reload demos">
-                <IconButton color="default" onClick={this.RefreshDemoList}>
+                <IconButton
+                  color="default"
+                  onClick={this.RefreshDemoList}
+                  size="large"
+                >
                   <RefreshIcon />
                 </IconButton>
               </Tooltip>
               <Tooltip title="Info">
-                <IconButton color="default" onClick={this.viewInfo}>
+                <IconButton
+                  color="default"
+                  onClick={this.viewInfo}
+                  size="large"
+                >
                   <InfoIcon />
                 </IconButton>
               </Tooltip>
               <Tooltip title="Settings">
-                <IconButton color="default" onClick={viewSettings}>
+                <IconButton color="default" onClick={viewSettings} size="large">
                   <SettingsIcon />
                 </IconButton>
               </Tooltip>
               <Tooltip title="More...">
-                <IconButton color="default" onClick={this.openMoreMenu}>
+                <IconButton
+                  color="default"
+                  onClick={this.openMoreMenu}
+                  size="large"
+                >
                   <MoreHorizIcon />
                 </IconButton>
               </Tooltip>
 
               <Menu
                 anchorEl={moreMenuAnchor}
-                getContentAnchorEl={null}
                 keepMounted
                 open={moreMenuAnchor !== null}
                 onClose={this.closeMoreMenu}

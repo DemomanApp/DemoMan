@@ -1,16 +1,16 @@
 import React from "react";
 
-import List from "@material-ui/core/List";
-import ListItem from "@material-ui/core/ListItem";
-import ListItemIcon from "@material-ui/core/ListItemIcon";
-import ListItemText from "@material-ui/core/ListItemText";
-import Tooltip from "@material-ui/core/Tooltip";
-import AccessTimeIcon from "@material-ui/icons/AccessTime";
-import CalendarTodayIcon from "@material-ui/icons/CalendarToday";
-import MapIcon from "@material-ui/icons/Map";
-import PersonIcon from "@material-ui/icons/Person";
-import StorageIcon from "@material-ui/icons/Storage";
-import InsertDriveFileIcon from "@material-ui/icons/InsertDriveFile";
+import List from "@mui/material/List";
+import ListItem from "@mui/material/ListItem";
+import ListItemIcon from "@mui/material/ListItemIcon";
+import ListItemText from "@mui/material/ListItemText";
+import Tooltip from "@mui/material/Tooltip";
+import AccessTimeIcon from "@mui/icons-material/AccessTime";
+import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
+import MapIcon from "@mui/icons-material/Map";
+import PersonIcon from "@mui/icons-material/Person";
+import StorageIcon from "@mui/icons-material/Storage";
+import InsertDriveFileIcon from "@mui/icons-material/InsertDriveFile";
 
 import { Demo } from "./Demos";
 import { DemoHeader } from "./DemoHeader";

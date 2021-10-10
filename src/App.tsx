@@ -1,16 +1,34 @@
 import React from "react";
-import { createMuiTheme, ThemeProvider } from "@material-ui/core/styles";
-import CssBaseline from "@material-ui/core/CssBaseline";
-import blue from "@material-ui/core/colors/blue";
-import red from "@material-ui/core/colors/red";
+import {
+  createTheme,
+  ThemeProvider,
+  StyledEngineProvider,
+} from "@mui/material/styles";
+import CssBaseline from "@mui/material/CssBaseline";
+import blue from "@mui/material/colors/blue";
+import red from "@mui/material/colors/red";
 import "@fontsource/nunito";
 
 import MainView from "./MainView";
 import { getPreferredTheme } from "./theme";
 
-const theme = createMuiTheme({
+const mode = getPreferredTheme();
+const theme = createTheme({
   palette: {
-    type: getPreferredTheme(),
+    mode,
+    ...(mode === "light"
+      ? {
+          background: {
+            default: "#fafafa",
+            paper: "#ffffff",
+          },
+        }
+      : {
+          background: {
+            default: "#303030",
+            paper: "#303030",
+          },
+        }),
     primary: blue,
     secondary: red,
   },
@@ -21,9 +39,11 @@ const theme = createMuiTheme({
 
 export default function App() {
   return (
-    <ThemeProvider theme={theme}>
-      <CssBaseline />
-      <MainView />
-    </ThemeProvider>
+    <StyledEngineProvider injectFirst>
+      <ThemeProvider theme={theme}>
+        <CssBaseline />
+        <MainView />
+      </ThemeProvider>
+    </StyledEngineProvider>
   );
 }
