@@ -108,11 +108,12 @@ const createWindow = async () => {
     backgroundColor: nativeTheme.shouldUseDarkColors ? "#303030" : "#fafafa",
     icon: getAssetPath("icon.png"),
     webPreferences: {
-      enableRemoteModule: true,
       nodeIntegration: true,
       contextIsolation: false,
     },
   });
+
+  require("@electron/remote/main").enable(mainWindow.webContents);
 
   mainWindow.loadURL(`file://${__dirname}/index.html`);
 
