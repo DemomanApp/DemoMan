@@ -1,11 +1,11 @@
-import React, { PureComponent } from "react";
+import React from "react";
 import { shell } from "electron";
+import cfg from "electron-cfg";
 
 import DataTable, {
   createTheme as createTableTheme,
   defaultThemes,
 } from "react-data-table-component";
-import cfg from "electron-cfg";
 import merge from "deepmerge";
 
 import ArrowDownward from "@mui/icons-material/ArrowDownward";
@@ -25,43 +25,10 @@ import Divider from "@mui/material/Divider";
 
 import loading from "../assets/loading.gif";
 
-import { Demo, getDemosInDirectory } from "./Demos";
+import { Demo } from "./Demos";
 import { formatFileSize, formatPlaybackTime } from "./util";
 import { getPreferredTheme } from "./theme";
-import { DemoListInfo } from "./InfoDialog";
-import convertPrecEvents from "./ConvertPrecEvents";
-
-// Fixes an ESLint false positive
-/* eslint-disable react/no-unused-prop-types */
-interface DemoListEntry {
-  filename: string;
-  map: string;
-  playbackTime: number;
-  player: string;
-  server: string;
-  numEvents: number;
-  numTicks: number;
-  birthtime: number;
-  filesize: number;
-  demo: Demo;
-}
-/* eslint-enable react/no-unused-prop-types */
-
-function getDemoListEntry(demo: Demo): DemoListEntry {
-  const { header, events } = demo;
-  return {
-    filename: demo.getShortName(),
-    map: header.mapName,
-    playbackTime: header.playbackTime,
-    player: header.clientName,
-    server: header.serverName,
-    numEvents: events.length,
-    numTicks: header.numTicks,
-    birthtime: demo.birthtime,
-    filesize: demo.filesize,
-    demo,
-  };
-}
+import { DemoListEntry } from "./DemoListEntry";
 
 function CustomTimeCell({ playbackTime }: DemoListEntry) {
   return <div>{formatPlaybackTime(playbackTime)}</div>;
@@ -166,255 +133,180 @@ createTableTheme("light_alt", {
 });
 
 type DemoTableProps = {
-  viewDemo: (demo: Demo) => void;
-  viewSettings: () => void;
-  viewInfoDialog: (info: DemoListInfo) => void;
-  viewAutoDeleteDialog: () => void;
-};
-
-type DemoTableState = {
   data: DemoListEntry[];
-  filteredData: DemoListEntry[];
-  quickFilterQuery: string;
+  viewDemo: (demo: Demo) => void;
   progressPending: boolean;
-  moreMenuAnchor: Element | null;
+  quickFilterQuery: string;
+  quickFilterChanged: (
+    e: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>
+  ) => void;
+  updateQuickFilter: (query: string) => void;
+  refreshDemoList: () => void;
+  viewInfoDialog: () => void;
+  viewSettings: () => void;
+  viewAutoDeleteDialog: () => void;
+  convertPrecEvents: () => void;
 };
 
-export default class DemoTable extends PureComponent<
-  DemoTableProps,
-  DemoTableState
-> {
-  constructor(props: DemoTableProps) {
-    super(props);
-    this.state = {
-      data: [],
-      filteredData: [],
-      quickFilterQuery: "",
-      progressPending: false,
-      moreMenuAnchor: null,
-    };
-  }
+export default function DemoTable(props: DemoTableProps) {
+  const [moreMenuAnchor, setMoreMenuAnchor] =
+    React.useState<Element | null>(null);
 
-  componentDidMount() {
-    if (cfg.has("demo_path")) {
-      this.RefreshDemoList();
-    }
-  }
+  const {
+    data,
+    progressPending,
+    viewDemo,
+    quickFilterChanged,
+    quickFilterQuery,
+    updateQuickFilter,
+    refreshDemoList,
+    viewInfoDialog,
+    viewSettings,
+    viewAutoDeleteDialog,
+    convertPrecEvents,
+  } = props;
 
-  RefreshDemoList = async () => {
-    this.setState({
-      data: [],
-      filteredData: [],
-      progressPending: true,
-    });
-    const newDemos = await getDemosInDirectory(cfg.get("demo_path"));
-    const newData = newDemos.map(getDemoListEntry);
-    this.setState({
-      data: newData,
-      progressPending: false,
-    });
-    this.updateQuickFilter("");
+  const openMoreMenu = (event: React.MouseEvent<HTMLButtonElement>) => {
+    setMoreMenuAnchor(event.currentTarget);
   };
 
-  viewInfo = () => {
-    const { viewInfoDialog: openInfoDialog } = this.props;
-    const { data } = this.state;
-    let totalFilesize = 0;
-    data.forEach((element) => {
-      totalFilesize += element.filesize;
-    });
-    openInfoDialog({
-      totalDemos: data.length,
-      totalFilesize,
-    });
+  const closeMoreMenu = () => {
+    setMoreMenuAnchor(null);
   };
 
-  openMoreMenu = (event: React.MouseEvent<HTMLButtonElement>) => {
-    this.setState({ moreMenuAnchor: event.currentTarget });
-  };
-
-  closeMoreMenu = () => {
-    this.setState({ moreMenuAnchor: null });
-  };
-
-  quickFilterChanged = (
-    e: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>
-  ) => {
-    this.updateQuickFilter(e.target.value);
-  };
-
-  updateQuickFilter = (query: string) => {
-    const { data } = this.state;
-    this.setState({
-      quickFilterQuery: query,
-    });
-    if (query === "") {
-      this.setState({
-        filteredData: data,
-      });
-    } else {
-      const lowerCaseQuery = query.toLowerCase();
-      setTimeout(() => {
-        this.setState({
-          filteredData: data.filter((value: DemoListEntry) =>
-            [value.filename, value.map, value.player, value.server].some(
-              (attribute: string) =>
-                attribute.toLowerCase().includes(lowerCaseQuery)
-            )
-          ),
-        });
-      }, 0);
-    }
-  };
-
-  render() {
-    const { filteredData, quickFilterQuery, progressPending, moreMenuAnchor } =
-      this.state;
-    const { viewDemo, viewSettings, viewAutoDeleteDialog } = this.props;
-
-    return (
-      <>
-        <DataTable
-          title="Demos"
-          columns={columns}
-          defaultSortField="birthtime"
-          defaultSortAsc={false}
-          keyField="filename"
-          highlightOnHover
-          actions={
-            <>
-              <Paper
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                }}
-              >
-                <InputBase
-                  placeholder="Quick filter"
-                  style={{ paddingLeft: "12px", width: "300px" }}
-                  onChange={this.quickFilterChanged}
-                  value={quickFilterQuery}
-                  spellCheck={false}
-                />
-                <Divider orientation="vertical" style={{ height: "28px" }} />
-                <Tooltip title="Clear filter">
-                  <IconButton
-                    onClick={() => {
-                      this.updateQuickFilter("");
-                    }}
-                    size="large"
-                  >
-                    <ClearIcon />
-                  </IconButton>
-                </Tooltip>
-              </Paper>
-              <Tooltip title="Reload demos">
-                <IconButton
-                  color="default"
-                  onClick={this.RefreshDemoList}
-                  size="large"
-                >
-                  <RefreshIcon />
-                </IconButton>
-              </Tooltip>
-              <Tooltip title="Info">
-                <IconButton
-                  color="default"
-                  onClick={this.viewInfo}
-                  size="large"
-                >
-                  <InfoIcon />
-                </IconButton>
-              </Tooltip>
-              <Tooltip title="Settings">
-                <IconButton color="default" onClick={viewSettings} size="large">
-                  <SettingsIcon />
-                </IconButton>
-              </Tooltip>
-              <Tooltip title="More...">
-                <IconButton
-                  color="default"
-                  onClick={this.openMoreMenu}
-                  size="large"
-                >
-                  <MoreHorizIcon />
-                </IconButton>
-              </Tooltip>
-
-              <Menu
-                anchorEl={moreMenuAnchor}
-                keepMounted
-                open={moreMenuAnchor !== null}
-                onClose={this.closeMoreMenu}
-                anchorOrigin={{
-                  vertical: "bottom",
-                  horizontal: "center",
-                }}
-                transformOrigin={{
-                  vertical: "top",
-                  horizontal: "right",
-                }}
-              >
-                <MenuItem
-                  onClick={() => {
-                    viewAutoDeleteDialog();
-                    this.closeMoreMenu();
-                  }}
-                >
-                  Auto-delete demos and events...
-                </MenuItem>
-                <MenuItem
-                  onClick={() => {
-                    shell.openPath(cfg.get("demo_path"));
-                    this.closeMoreMenu();
-                  }}
-                >
-                  Open demos folder
-                </MenuItem>
-                <MenuItem
-                  onClick={() => {
-                    convertPrecEvents();
-                    this.closeMoreMenu();
-                    this.RefreshDemoList();
-                  }}
-                >
-                  Convert P-REC bookmarks
-                </MenuItem>
-              </Menu>
-            </>
-          }
-          data={filteredData}
-          noDataComponent={
-            <div>
-              No demos found. Make sure you&apos;ve set the correct file path.
-            </div>
-          }
-          sortIcon={<ArrowDownward />}
-          pointerOnHover
-          onRowClicked={(row: DemoListEntry) => {
-            viewDemo(row.demo);
-          }}
-          fixedHeader
-          // 56px is the height of the table title, 57px is the height of the header.
-          fixedHeaderScrollHeight="calc(100vh - (56px + 57px))"
-          progressPending={progressPending}
-          progressComponent={
-            <div
+  return (
+    <>
+      <DataTable
+        title="Demos"
+        columns={columns}
+        defaultSortField="birthtime"
+        defaultSortAsc={false}
+        keyField="filename"
+        highlightOnHover
+        actions={
+          <>
+            <Paper
               style={{
                 display: "flex",
-                flexDirection: "column",
                 alignItems: "center",
               }}
             >
-              <img src={loading} alt="loading..." width="128px" />
-              <span style={{ fontSize: "20px", margin: "1rem" }}>
-                Loading...
-              </span>
-            </div>
-          }
-          theme={`${getPreferredTheme()}_alt`}
-        />
-      </>
-    );
-  }
+              <InputBase
+                placeholder="Quick filter"
+                style={{ paddingLeft: "12px", width: "300px" }}
+                onChange={quickFilterChanged}
+                value={quickFilterQuery}
+                spellCheck={false}
+              />
+              <Divider orientation="vertical" style={{ height: "28px" }} />
+              <Tooltip title="Clear filter">
+                <IconButton
+                  onClick={() => {
+                    updateQuickFilter("");
+                  }}
+                  size="large"
+                  disableRipple
+                >
+                  <ClearIcon />
+                </IconButton>
+              </Tooltip>
+            </Paper>
+            <Tooltip title="Reload demos">
+              <IconButton
+                color="default"
+                onClick={refreshDemoList}
+                size="large"
+              >
+                <RefreshIcon />
+              </IconButton>
+            </Tooltip>
+            <Tooltip title="Info">
+              <IconButton color="default" onClick={viewInfoDialog} size="large">
+                <InfoIcon />
+              </IconButton>
+            </Tooltip>
+            <Tooltip title="Settings">
+              <IconButton color="default" onClick={viewSettings} size="large">
+                <SettingsIcon />
+              </IconButton>
+            </Tooltip>
+            <Tooltip title="More...">
+              <IconButton color="default" onClick={openMoreMenu} size="large">
+                <MoreHorizIcon />
+              </IconButton>
+            </Tooltip>
+
+            <Menu
+              anchorEl={moreMenuAnchor}
+              keepMounted
+              open={moreMenuAnchor !== null}
+              onClose={closeMoreMenu}
+              anchorOrigin={{
+                vertical: "bottom",
+                horizontal: "center",
+              }}
+              transformOrigin={{
+                vertical: "top",
+                horizontal: "right",
+              }}
+            >
+              <MenuItem
+                onClick={() => {
+                  viewAutoDeleteDialog();
+                  closeMoreMenu();
+                }}
+              >
+                Auto-delete demos and events...
+              </MenuItem>
+              <MenuItem
+                onClick={() => {
+                  shell.openPath(cfg.get("demo_path"));
+                  closeMoreMenu();
+                }}
+              >
+                Open demos folder
+              </MenuItem>
+              <MenuItem
+                onClick={() => {
+                  convertPrecEvents();
+                  closeMoreMenu();
+                  refreshDemoList();
+                }}
+              >
+                Convert P-REC bookmarks
+              </MenuItem>
+            </Menu>
+          </>
+        }
+        data={data}
+        noDataComponent={
+          <div>
+            No demos found. Make sure you&apos;ve set the correct file path.
+          </div>
+        }
+        sortIcon={<ArrowDownward />}
+        pointerOnHover
+        onRowClicked={(row: DemoListEntry) => {
+          viewDemo(row.demo);
+        }}
+        fixedHeader
+        // 56px is the height of the table title, 57px is the height of the header.
+        fixedHeaderScrollHeight="calc(100vh - (56px + 57px))"
+        progressPending={progressPending}
+        progressComponent={
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+            }}
+          >
+            <img src={loading} alt="loading..." width="128px" />
+            <span style={{ fontSize: "20px", margin: "1rem" }}>Loading...</span>
+          </div>
+        }
+        theme={`${getPreferredTheme()}_alt`}
+      />
+    </>
+  );
 }
