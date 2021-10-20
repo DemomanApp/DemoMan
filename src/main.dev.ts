@@ -103,6 +103,7 @@ const createWindow = async () => {
     width: 1536,
     height: 728,
     minWidth: 1225,
+    minHeight: 695,
     useContentSize: true,
     backgroundColor: nativeTheme.shouldUseDarkColors ? "#303030" : "#fafafa",
     icon: getAssetPath("icon.png"),
