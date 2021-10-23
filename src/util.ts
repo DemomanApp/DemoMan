@@ -29,3 +29,7 @@ export function formatFileSize(bytes: number): string {
   }
   return `${size.toFixed(1)} ${units[i]}`;
 }
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const isNodeError = (error: any): error is NodeJS.ErrnoException =>
+  error instanceof Error && "code" in error;

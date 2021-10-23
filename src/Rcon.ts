@@ -2,6 +2,8 @@ import net from "net";
 
 import log from "electron-log";
 
+import { isNodeError } from "./util";
+
 // See the RCON protocol documentation at
 // https://developer.valvesoftware.com/wiki/Source_RCON_Protocol
 
@@ -98,8 +100,11 @@ class RconConnection {
       });
     } catch (e) {
       log.debug("[RCON]\tConnection error", e);
-      onError(e.code);
-      return;
+      if (isNodeError(e) && e.code !== undefined) {
+        onError(e.code);
+        return;
+      }
+      throw e;
     }
     log.debug("[RCON]\tSocket created");
     this.socket.on("data", this.handleData);

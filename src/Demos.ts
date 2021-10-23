@@ -5,6 +5,7 @@ import log from "electron-log";
 import StreamReader from "./StreamReader";
 import { DemoHeader, InvalidDemoFileError } from "./DemoHeader";
 import DemoEvent from "./DemoEvent";
+import { isNodeError } from "./util";
 
 const HEADER_SIZE = 8 + 4 + 4 + 260 + 260 + 260 + 260 + 4 + 4 + 4 + 4;
 
@@ -24,7 +25,7 @@ export function writeEventsAndTagsFile(
   try {
     fd = fs.openSync(jsonPath, overwrite ? "w" : "wx");
   } catch (e) {
-    if (e.code === "EEXIST") {
+    if (isNodeError(e) && e.code === "EEXIST") {
       log.debug(`Events/tags file at ${jsonPath} already exists, skipping.`);
       return;
     }
@@ -134,7 +135,7 @@ export class Demo {
     try {
       content = fs.readFileSync(jsonPath);
     } catch (e) {
-      if (e.code === "ENOENT") {
+      if (isNodeError(e) && e.code === "ENOENT") {
         return [[], []];
       }
       throw e;
@@ -172,7 +173,7 @@ export class Demo {
         path.join(dir, `${newName}.json`)
       );
     } catch (e) {
-      if (e.code === "ENOENT") {
+      if (isNodeError(e) && e.code === "ENOENT") {
         // This demo has no events file, ignore the error
       } else {
         throw e;
@@ -189,7 +190,7 @@ export class Demo {
     try {
       fs.rmSync(Demo.getJSONPath(this.filename));
     } catch (e) {
-      if (e.code === "ENOENT") {
+      if (isNodeError(e) && e.code === "ENOENT") {
         // This demo has no events file, ignore the error
       } else {
         throw e;
