@@ -3,7 +3,7 @@
   "productName": "DemoMan",
   "description": "A TF2 demo file manager",
   "author": "Narcha",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "main": "./main.prod.js",
   "scripts": {
     "electron-rebuild": "node -r ../.erb/scripts/BabelRegister.js ../.erb/scripts/ElectronRebuild.js",
