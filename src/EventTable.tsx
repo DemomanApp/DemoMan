@@ -69,6 +69,12 @@ export default function EventTable(props: EventTableProps) {
       // 57px: table header.
       fixedHeaderScrollHeight="calc(100vh - 64px - 1px - 2 * 24px - 2 * 5px - 56px - 57px)"
       theme={getPreferredTheme()}
+      customStyles={{
+        header: { style: { backgroundColor: "transparent" } },
+        table: { style: { backgroundColor: "transparent" } },
+        headRow: { style: { backgroundColor: "transparent" } },
+        rows: { style: { backgroundColor: "transparent" } },
+      }}
     />
   );
 }
