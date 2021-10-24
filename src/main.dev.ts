@@ -29,7 +29,7 @@ require("@electron/remote/main").initialize();
 
 cfg.logger(log);
 
-ipcMain.on("update-theme", (event, newTheme) => {
+ipcMain.on("update-theme", (_, newTheme) => {
   nativeTheme.themeSource = newTheme;
 });
 
