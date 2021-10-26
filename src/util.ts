@@ -17,15 +17,16 @@ export function formatPlaybackTime(seconds: number): string {
 }
 
 export function formatFileSize(bytes: number): string {
-  const units = ["B", "kB", "MB", "GB"];
+  const units = ["B", "kB", "MB", "GB", "TB"];
   let size = bytes;
   let i = 0;
-  while (size > 1000) {
+  while (size >= 1000 && i < units.length - 1) {
     size /= 1000;
     i += 1;
   }
-  if (i > 3) {
-    i = 3;
-  }
   return `${size.toFixed(1)} ${units[i]}`;
 }
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const isNodeError = (error: any): error is NodeJS.ErrnoException =>
+  error instanceof Error && "code" in error;

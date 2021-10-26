@@ -29,7 +29,7 @@ require("@electron/remote/main").initialize();
 
 cfg.logger(log);
 
-ipcMain.on("update-theme", (event, newTheme) => {
+ipcMain.on("update-theme", (_, newTheme) => {
   nativeTheme.themeSource = newTheme;
 });
 
@@ -103,15 +103,17 @@ const createWindow = async () => {
     width: 1536,
     height: 728,
     minWidth: 1225,
+    minHeight: 695,
     useContentSize: true,
     backgroundColor: nativeTheme.shouldUseDarkColors ? "#303030" : "#fafafa",
     icon: getAssetPath("icon.png"),
     webPreferences: {
-      enableRemoteModule: true,
       nodeIntegration: true,
       contextIsolation: false,
     },
   });
+
+  require("@electron/remote/main").enable(mainWindow.webContents);
 
   mainWindow.loadURL(`file://${__dirname}/index.html`);
 

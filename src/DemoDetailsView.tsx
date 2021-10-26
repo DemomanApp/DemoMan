@@ -19,6 +19,7 @@ import EditEventDialog from "./EditEventDialog";
 import EventTableEntry from "./EventTableEntry";
 import DeleteDialog from "./DeleteDialog";
 import RenameDialog from "./RenameDialog";
+import MapThumbnail from "./MapThumbnail";
 
 type DemoDetailsProps = {
   demo: Demo | null;
@@ -213,17 +214,7 @@ export default class DemoDetails extends React.Component<
               spacing={2}
             >
               <Grid item>
-                <div
-                  style={{
-                    width: "320px",
-                    height: "200px",
-                    backgroundColor: "#666",
-                    textAlign: "center",
-                  }}
-                >
-                  <h2 style={{ margin: "0px" }}>{demoHeader.mapName}</h2> <br />
-                  (Map thumbnail coming soon&trade;)
-                </div>
+                <MapThumbnail mapName={demoHeader.mapName} />
               </Grid>
               <Grid item>
                 <DemoDetailsList demo={demo} demoHeader={demoHeader} />
