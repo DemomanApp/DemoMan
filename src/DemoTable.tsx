@@ -149,8 +149,9 @@ type DemoTableProps = {
 };
 
 export default function DemoTable(props: DemoTableProps) {
-  const [moreMenuAnchor, setMoreMenuAnchor] =
-    React.useState<Element | null>(null);
+  const [moreMenuAnchor, setMoreMenuAnchor] = React.useState<Element | null>(
+    null
+  );
 
   const {
     data,
