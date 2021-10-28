@@ -9,11 +9,12 @@ import SmallDialog from "./SmallDialog";
 type RenameDialogProps = {
   onClose: () => void;
   onConfirm: (newName: string) => void;
+  oldName: string;
   ref: React.RefObject<RenameDialog>;
 };
 
 type RenameDialogState = {
-  newName: string | null;
+  newName: string;
   newNameValid: boolean;
   open: boolean;
 };
@@ -24,7 +25,8 @@ export default class RenameDialog extends React.Component<
 > {
   constructor(props: RenameDialogProps) {
     super(props);
-    this.state = { newName: null, newNameValid: true, open: false };
+    const { oldName } = props;
+    this.state = { newName: oldName, newNameValid: true, open: false };
   }
 
   close = () => {
@@ -52,7 +54,7 @@ export default class RenameDialog extends React.Component<
   };
 
   render() {
-    const { onClose, onConfirm } = this.props;
+    const { onClose, onConfirm, oldName } = this.props;
     const { open, newName, newNameValid } = this.state;
 
     return (
@@ -69,10 +71,9 @@ export default class RenameDialog extends React.Component<
               variant="contained"
               color="primary"
               onClick={() => {
-                if (newName !== null) {
-                  onConfirm(newName);
-                }
+                onConfirm(newName);
               }}
+              disabled={!newNameValid}
             >
               Confirm
             </Button>
@@ -86,11 +87,11 @@ export default class RenameDialog extends React.Component<
             endAdornment: <InputAdornment position="end">.dem</InputAdornment>,
           }}
           variant="outlined"
-          value={newName}
           error={!newNameValid}
           onChange={this.validateNewName}
           fullWidth
           margin="dense"
+          defaultValue={oldName}
         />
       </SmallDialog>
     );

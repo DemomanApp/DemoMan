@@ -272,6 +272,7 @@ export default class DemoDetails extends React.Component<
           ref={this.renameDialog}
           onClose={this.renameDialogClose}
           onConfirm={this.renameDialogConfirm}
+          oldName={demo.getShortName()}
         />
       </>
     );
