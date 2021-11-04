@@ -2,6 +2,8 @@ import React from "react";
 import cfg from "electron-cfg";
 import log from "electron-log";
 
+import debounce from "@mui/utils/debounce";
+
 import { Demo, getDemosInDirectory } from "./Demos";
 import DemoTable from "./DemoTable";
 import SelectDemoPathDialog from "./SelectDemoPathDialog";
@@ -75,13 +77,13 @@ export default class MainView extends React.Component<
     this.setState({
       quickFilterQuery: query,
     });
-    if (query === "") {
-      this.setState({
-        filteredData: data,
-      });
-    } else {
-      const lowerCaseQuery = query.toLowerCase();
-      setTimeout(() => {
+    debounce(() => {
+      if (query === "") {
+        this.setState({
+          filteredData: data,
+        });
+      } else {
+        const lowerCaseQuery = query.toLowerCase();
         this.setState({
           filteredData: data.filter((value: DemoListEntry) =>
             [value.filename, value.map, value.player, value.server].some(
@@ -90,8 +92,8 @@ export default class MainView extends React.Component<
             )
           ),
         });
-      }, 0);
-    }
+      }
+    }, 500)();
   };
 
   viewDemo = (demo: Demo) => {
