@@ -27,5 +27,22 @@
     "test/**/__snapshots__": true,
     "yarn.lock": true,
     "*.{css,sass,scss}.d.ts": true
-  }
+  },
+  "files.exclude": {
+    "**/.git": true,
+    "**/.svn": true,
+    "**/.hg": true,
+    "**/CVS": true,
+    "**/.DS_Store": true,
+    "**/Thumbs.db": true,
+    "node_modules": true,
+    "githubassets": true,
+    ".erb": true,
+    ".github": true,
+    "release": true,
+    "src/dist": true,
+    "src/node_modules": true,
+    "src/main.prod.js*": true
+  },
+  "editor.suggest.preview": true
 }
