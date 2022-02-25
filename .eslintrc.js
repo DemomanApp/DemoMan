@@ -4,9 +4,13 @@ module.exports = {
     // A temporary hack related to IDE not resolving correct package.json
     "import/no-extraneous-dependencies": "off",
     "react/display-name": "off",
-    "@typescript-eslint/lines-between-class-members": {
-      exceptAfterSingleLine: true,
-    },
+    "lines-between-class-members": "off",
+    "@typescript-eslint/lines-between-class-members": [
+      "error",
+      {
+        exceptAfterSingleLine: true,
+      },
+    ],
   },
   parserOptions: {
     ecmaVersion: 2020,
