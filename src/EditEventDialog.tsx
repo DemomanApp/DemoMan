@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 
 import Grid from "@mui/material/Grid";
 import Button from "@mui/material/Button";
@@ -6,188 +6,113 @@ import TextField from "@mui/material/TextField";
 import InputAdornment from "@mui/material/InputAdornment";
 
 import SmallDialog from "./SmallDialog";
-import EventTableEntry from "./EventTableEntry";
+
+export enum EditDialogMode {
+  closed,
+  edit,
+  add,
+}
 
 type EditEventDialogProps = {
-  addCallback: (event: EventTableEntry) => void;
-  editCallback: (event: EventTableEntry) => void;
-  deleteCallback: (event: EventTableEntry) => void;
-  ref: React.RefObject<EditEventDialog>;
+  tickInput: string;
+  valueInput: string;
+  onTickChanged: (newTick: string) => void;
+  onValueChanged: (newValue: string) => void;
+  mode: EditDialogMode;
+  onClose: () => void;
+  onDelete: () => void;
+  onConfirm: () => void;
 };
 
-type EditEventDialogState = {
-  open: boolean;
-  event: EventTableEntry | null;
-  isEditing: boolean;
-  tickError: boolean;
-  valueError: boolean;
-  hasUnsavedChanges: boolean;
-};
+export default (props: EditEventDialogProps) => {
+  const {
+    tickInput,
+    valueInput,
+    onTickChanged,
+    onValueChanged,
+    mode,
+    onClose,
+    onDelete,
+    onConfirm,
+  } = props;
 
-export default class EditEventDialog extends React.Component<
-  EditEventDialogProps,
-  EditEventDialogState
-> {
-  constructor(props: EditEventDialogProps) {
-    super(props);
-    this.state = {
-      open: false,
-      event: null,
-      isEditing: true,
-      tickError: false,
-      valueError: false,
-      hasUnsavedChanges: false,
-    };
-  }
+  const [tickError, setTickError] = useState(false);
+  const [valueError, setValueError] = useState(false);
 
-  setEvent(value: EventTableEntry) {
-    // spreading creates a shallow copy of the event
-    this.setState({
-      event: { id: value.id, event: { ...value.event } },
-      tickError: false,
-      valueError: false,
-    });
-  }
-
-  setEditing(value: boolean) {
-    this.setState({ isEditing: value, hasUnsavedChanges: !value });
-  }
-
-  open = () => {
-    this.setState({ open: true });
-  };
-
-  save = () => {
-    const { event, isEditing, tickError, valueError } = this.state;
-    const { editCallback, addCallback } = this.props;
-    if (event === null) {
-      return;
-    }
-    if (tickError || valueError) {
-      return;
-    }
-    this.setState({ open: false });
-    if (event !== null) {
-      (isEditing ? editCallback : addCallback)(event);
-    }
-  };
-
-  cancel = () => {
-    this.setState({ open: false });
-  };
-
-  delete = () => {
-    const { event } = this.state;
-    const { deleteCallback } = this.props;
-    if (event === null) {
-      return;
-    }
-    this.setState({ open: false });
-    if (event !== null) {
-      deleteCallback(event);
-    }
-  };
-
-  validateTickInput = (
+  const validateTickInput = (
     e: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>
   ) => {
-    const { event } = this.state;
-    if (event === null) {
-      return;
-    }
-    event.event.tick = parseInt(e.target.value, 10);
-    this.setState({
-      tickError: Number.isNaN(event.event.tick),
-      event,
-      hasUnsavedChanges: true,
-    });
+    const parsedInt = parseInt(e.target.value, 10);
+    setTickError(Number.isNaN(parsedInt) || parsedInt < 0);
+    onTickChanged(e.target.value);
   };
 
-  validateValueInput = (
+  const validateValueInput = (
     e: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>
   ) => {
-    const { event } = this.state;
-    if (event === null) {
-      return;
-    }
-    event.event.value = e.target.value;
-    this.setState({
-      valueError: event.event.value.length === 0,
-      event,
-      hasUnsavedChanges: true,
-    });
+    setValueError(e.target.value.length === 0);
+    onValueChanged(e.target.value);
   };
 
-  render() {
-    const { open, event, isEditing, tickError, valueError, hasUnsavedChanges } =
-      this.state;
-
-    if (event === null) {
-      return null;
-    }
-    return (
-      <SmallDialog
-        title={isEditing ? "Edit Event" : "Create Event"}
-        open={open}
-        onClose={this.cancel}
-        actions={
-          <>
-            {isEditing && (
-              <Button
-                variant="contained"
-                color="secondary"
-                onClick={this.delete}
-              >
-                Delete Event
-              </Button>
-            )}
-            <Button variant="contained" onClick={this.cancel}>
-              Cancel
+  return (
+    <SmallDialog
+      title={mode === EditDialogMode.edit ? "Edit Event" : "Add Event"}
+      open={mode !== EditDialogMode.closed}
+      onClose={onClose}
+      actions={
+        <>
+          {/* Only include the "delete" button on existing events */}
+          {mode === EditDialogMode.edit && (
+            <Button variant="contained" color="secondary" onClick={onDelete}>
+              Delete Event
             </Button>
-            <Button
-              variant="contained"
-              color="primary"
-              onClick={this.save}
-              disabled={!hasUnsavedChanges}
-            >
-              {isEditing ? "Save changes" : "Done"}
-            </Button>
-          </>
-        }
-        maxWidth="sm"
-      >
-        <Grid container direction="row" spacing={2}>
-          <Grid item xs={4}>
-            <TextField
-              required
-              label="Tick"
-              value={event.event.tick}
-              type="number"
-              onChange={this.validateTickInput}
-              variant="outlined"
-              error={tickError}
-              InputProps={{
-                startAdornment: (
-                  <InputAdornment position="start">Tick</InputAdornment>
-                ),
-              }}
-              margin="dense"
-            />
-          </Grid>
-          <Grid item xs={8}>
-            <TextField
-              required
-              label="Value"
-              value={event.event.value}
-              onChange={this.validateValueInput}
-              variant="outlined"
-              error={valueError}
-              fullWidth
-              margin="dense"
-            />
-          </Grid>
+          )}
+          <Button variant="contained" onClick={onClose}>
+            Cancel
+          </Button>
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={onConfirm}
+            disabled={tickError || valueError}
+          >
+            {mode === EditDialogMode.edit ? "Save Changes" : "Create Event"}
+          </Button>
+        </>
+      }
+      maxWidth="sm"
+    >
+      <Grid container direction="row" spacing={2}>
+        <Grid item xs={4}>
+          <TextField
+            required
+            label="Tick"
+            value={tickInput}
+            type="number"
+            onChange={validateTickInput}
+            variant="outlined"
+            error={tickError}
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">Tick</InputAdornment>
+              ),
+            }}
+            margin="dense"
+          />
         </Grid>
-      </SmallDialog>
-    );
-  }
-}
+        <Grid item xs={8}>
+          <TextField
+            required
+            label="Value"
+            value={valueInput}
+            onChange={validateValueInput}
+            variant="outlined"
+            error={valueError}
+            fullWidth
+            margin="dense"
+          />
+        </Grid>
+      </Grid>
+    </SmallDialog>
+  );
+};

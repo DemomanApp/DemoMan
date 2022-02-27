@@ -7,32 +7,32 @@ import AddIcon from "@mui/icons-material/Add";
 import Tooltip from "@mui/material/Tooltip";
 
 import { getPreferredTheme } from "./theme";
-import EventTableEntry from "./EventTableEntry";
+import DemoEvent from "./DemoEvent";
 
 const columns = [
   {
     name: "Tick",
-    selector: "event.tick",
+    selector: "tick",
     sortable: true,
     grow: 1,
   },
   {
     name: "Type",
-    selector: "event.name",
-    sortable: true,
+    selector: "name",
+    sortable: false,
     grow: 1,
   },
   {
     name: "Value",
-    selector: "event.value",
-    sortable: true,
+    selector: "value",
+    sortable: false,
     grow: 4,
   },
 ];
 
 type EventTableProps = {
-  data: EventTableEntry[];
-  editEvent: (event: EventTableEntry) => void;
+  data: DemoEvent[];
+  editEvent: (event: DemoEvent) => void;
   addEvent: () => void;
 };
 

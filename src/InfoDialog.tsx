@@ -5,63 +5,43 @@ import DialogContentText from "@mui/material/DialogContentText";
 
 import { formatFileSize } from "./util";
 import SmallDialog from "./SmallDialog";
+import DemosContext from "./DemosContext";
 
-export type DemoListInfo = {
-  totalFilesize: number;
-  totalDemos: number;
-};
-
-type InfoDialogState = {
+type InfoDialogProps = {
   open: boolean;
-  info: DemoListInfo | null;
+  onClose: () => void;
 };
 
-export class InfoDialog extends React.Component<
-  Readonly<unknown>,
-  InfoDialogState
-> {
-  constructor(props: Readonly<unknown>) {
-    super(props);
-    this.state = { open: false, info: null };
-  }
+export default function InfoDialog(props: InfoDialogProps) {
+  const { open, onClose } = props;
 
-  setOpen(value: boolean) {
-    this.setState({ open: value });
-  }
+  // TODO: only recompute stats when opening the dialog (not when closing)
+  const { demos } = React.useContext(DemosContext);
 
-  setInfo(value: DemoListInfo) {
-    this.setState({ info: value });
-  }
+  const demoList = Object.values(demos);
 
-  render() {
-    const { open, info } = this.state;
-    if (info === null) {
-      return null;
-    }
-    return (
-      <SmallDialog
-        title="Statistics"
-        open={open}
-        onClose={() => {
-          this.setOpen(false);
-        }}
-        actions={
-          <Button
-            variant="contained"
-            onClick={() => {
-              this.setOpen(false);
-            }}
-          >
-            Close
-          </Button>
-        }
-      >
-        <DialogContentText>
-          Number of demos: <b>{info.totalDemos}</b>
-          <br />
-          Total filesize: <b>{formatFileSize(info.totalFilesize)}</b>
-        </DialogContentText>
-      </SmallDialog>
-    );
-  }
+  const totalFilesize = demoList.reduce(
+    (total, demo) => total + demo.filesize,
+    0
+  );
+  const totalDemos = demoList.length;
+
+  return (
+    <SmallDialog
+      title="Statistics"
+      open={open}
+      onClose={onClose}
+      actions={
+        <Button variant="contained" onClick={onClose}>
+          Close
+        </Button>
+      }
+    >
+      <DialogContentText>
+        Number of demos: <b>{totalDemos}</b>
+        <br />
+        Total filesize: <b>{formatFileSize(totalFilesize)}</b>
+      </DialogContentText>
+    </SmallDialog>
+  );
 }

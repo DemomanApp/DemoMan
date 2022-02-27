@@ -23,8 +23,6 @@ import { autoUpdater } from "electron-updater";
 import log from "electron-log";
 import cfg from "electron-cfg";
 
-import { loadPreferredTheme } from "./theme";
-
 require("@electron/remote/main").initialize();
 
 cfg.logger(log);
@@ -69,7 +67,13 @@ const installExtensions = async () => {
 };
 
 const createWindow = async () => {
-  loadPreferredTheme();
+  let theme = cfg.get("theme", undefined);
+  if (theme === undefined || (theme !== "dark" && theme !== "light")) {
+    cfg.set("theme", "dark");
+    theme = "dark";
+  }
+  nativeTheme.themeSource = theme;
+
   if (
     process.env.NODE_ENV === "development" ||
     process.env.DEBUG_PROD === "true"

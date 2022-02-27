@@ -1,5 +1,5 @@
 export default interface DemoEvent {
-  name: string;
+  name: "Bookmark" | "Killstreak";
   value: string;
   tick: number;
 }

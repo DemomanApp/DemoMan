@@ -1,6 +1,4 @@
 import React from "react";
-import { shell } from "electron";
-import cfg from "electron-cfg";
 
 import DataTable, {
   createTheme as createTableTheme,
@@ -9,32 +7,19 @@ import DataTable, {
 import merge from "deepmerge";
 
 import ArrowDownward from "@mui/icons-material/ArrowDownward";
-import IconButton from "@mui/material/IconButton";
-import RefreshIcon from "@mui/icons-material/Refresh";
-import SettingsIcon from "@mui/icons-material/Settings";
-import InfoIcon from "@mui/icons-material/InfoOutlined";
-import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
-import Tooltip from "@mui/material/Tooltip";
-import Menu from "@mui/material/Menu";
-import MenuItem from "@mui/material/MenuItem";
 import blue from "@mui/material/colors/blue";
-import Paper from "@mui/material/Paper";
-import InputBase from "@mui/material/InputBase";
-import ClearIcon from "@mui/icons-material/Clear";
-import Divider from "@mui/material/Divider";
 
 import loading from "../assets/loading.gif";
 
-import { Demo } from "./Demo";
+import Demo from "./Demo";
 import { formatFileSize, formatPlaybackTime } from "./util";
 import { getPreferredTheme } from "./theme";
-import { DemoListEntry } from "./DemoListEntry";
 
-function CustomTimeCell({ playbackTime }: DemoListEntry) {
+function CustomTimeCell({ playbackTime }: Demo) {
   return <div>{formatPlaybackTime(playbackTime)}</div>;
 }
 
-function CustomBirthtimeCell({ birthtime }: DemoListEntry) {
+function CustomBirthtimeCell({ birthtime }: Demo) {
   const date = new Date(birthtime);
   return (
     // "whiteSpace: nowrap" should prevent stuff like "PM"
@@ -47,20 +32,20 @@ function CustomBirthtimeCell({ birthtime }: DemoListEntry) {
   );
 }
 
-function CustomFilesizeCell({ filesize }: DemoListEntry) {
+function CustomFilesizeCell({ filesize }: Demo) {
   return <div>{formatFileSize(filesize)}</div>;
 }
 
 const columns = [
   {
-    name: "Filename",
-    selector: "filename",
+    name: "Name",
+    selector: "name",
     sortable: true,
     grow: 1.3,
   },
   {
     name: "Map",
-    selector: "map",
+    selector: "mapName",
     sortable: true,
   },
   {
@@ -73,19 +58,19 @@ const columns = [
   },
   {
     name: "Player",
-    selector: "player",
+    selector: "clientName",
     sortable: true,
     grow: 0.5,
   },
   {
     name: "Server",
-    selector: "server",
+    selector: "serverName",
     sortable: true,
     grow: 1.2,
   },
   {
     name: "Events",
-    selector: "numEvents",
+    selector: "events.length",
     sortable: true,
     grow: 0.1,
     right: true,
@@ -133,47 +118,12 @@ createTableTheme("light_alt", {
 });
 
 type DemoTableProps = {
-  data: DemoListEntry[];
+  data: Demo[];
   viewDemo: (demo: Demo) => void;
-  progressPending: boolean;
-  quickFilterQuery: string;
-  quickFilterChanged: (
-    e: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>
-  ) => void;
-  updateQuickFilter: (query: string) => void;
-  refreshDemoList: () => void;
-  viewInfoDialog: () => void;
-  viewSettings: () => void;
-  viewAutoDeleteDialog: () => void;
-  convertPrecEvents: () => void;
 };
 
 export default function DemoTable(props: DemoTableProps) {
-  const [moreMenuAnchor, setMoreMenuAnchor] = React.useState<Element | null>(
-    null
-  );
-
-  const {
-    data,
-    progressPending,
-    viewDemo,
-    quickFilterChanged,
-    quickFilterQuery,
-    updateQuickFilter,
-    refreshDemoList,
-    viewInfoDialog,
-    viewSettings,
-    viewAutoDeleteDialog,
-    convertPrecEvents,
-  } = props;
-
-  const openMoreMenu = (event: React.MouseEvent<HTMLButtonElement>) => {
-    setMoreMenuAnchor(event.currentTarget);
-  };
-
-  const closeMoreMenu = () => {
-    setMoreMenuAnchor(null);
-  };
+  const { data, viewDemo } = props;
 
   return (
     <>
@@ -182,103 +132,8 @@ export default function DemoTable(props: DemoTableProps) {
         columns={columns}
         defaultSortField="birthtime"
         defaultSortAsc={false}
-        keyField="filename"
+        keyField="name"
         highlightOnHover
-        actions={
-          <>
-            <Paper
-              style={{
-                display: "flex",
-                alignItems: "center",
-              }}
-            >
-              <InputBase
-                placeholder="Quick filter"
-                style={{ paddingLeft: "12px", width: "300px" }}
-                onChange={quickFilterChanged}
-                value={quickFilterQuery}
-                spellCheck={false}
-              />
-              <Divider orientation="vertical" style={{ height: "28px" }} />
-              <Tooltip title="Clear filter">
-                <IconButton
-                  onClick={() => {
-                    updateQuickFilter("");
-                  }}
-                  size="large"
-                  disableRipple
-                >
-                  <ClearIcon />
-                </IconButton>
-              </Tooltip>
-            </Paper>
-            <Tooltip title="Reload demos">
-              <IconButton
-                color="default"
-                onClick={refreshDemoList}
-                size="large"
-              >
-                <RefreshIcon />
-              </IconButton>
-            </Tooltip>
-            <Tooltip title="Info">
-              <IconButton color="default" onClick={viewInfoDialog} size="large">
-                <InfoIcon />
-              </IconButton>
-            </Tooltip>
-            <Tooltip title="Settings">
-              <IconButton color="default" onClick={viewSettings} size="large">
-                <SettingsIcon />
-              </IconButton>
-            </Tooltip>
-            <Tooltip title="More...">
-              <IconButton color="default" onClick={openMoreMenu} size="large">
-                <MoreHorizIcon />
-              </IconButton>
-            </Tooltip>
-
-            <Menu
-              anchorEl={moreMenuAnchor}
-              keepMounted
-              open={moreMenuAnchor !== null}
-              onClose={closeMoreMenu}
-              anchorOrigin={{
-                vertical: "bottom",
-                horizontal: "center",
-              }}
-              transformOrigin={{
-                vertical: "top",
-                horizontal: "right",
-              }}
-            >
-              <MenuItem
-                onClick={() => {
-                  viewAutoDeleteDialog();
-                  closeMoreMenu();
-                }}
-              >
-                Auto-delete demos and events...
-              </MenuItem>
-              <MenuItem
-                onClick={() => {
-                  shell.openPath(cfg.get("demo_path"));
-                  closeMoreMenu();
-                }}
-              >
-                Open demos folder
-              </MenuItem>
-              <MenuItem
-                onClick={() => {
-                  convertPrecEvents();
-                  closeMoreMenu();
-                  refreshDemoList();
-                }}
-              >
-                Convert P-REC bookmarks
-              </MenuItem>
-            </Menu>
-          </>
-        }
         data={data}
         noDataComponent={
           <div>
@@ -287,13 +142,10 @@ export default function DemoTable(props: DemoTableProps) {
         }
         sortIcon={<ArrowDownward />}
         pointerOnHover
-        onRowClicked={(row: DemoListEntry) => {
-          viewDemo(row.demo);
-        }}
+        onRowClicked={viewDemo}
         fixedHeader
-        // 56px is the height of the table title, 57px is the height of the header.
-        fixedHeaderScrollHeight="calc(100vh - (56px + 57px))"
-        progressPending={progressPending}
+        // 64px is the height of the app bar, 57px is the height of the header.
+        fixedHeaderScrollHeight="calc(100vh - (64px + 57px))"
         progressComponent={
           <div
             style={{
@@ -307,6 +159,7 @@ export default function DemoTable(props: DemoTableProps) {
           </div>
         }
         theme={`${getPreferredTheme()}_alt`}
+        noHeader
       />
     </>
   );

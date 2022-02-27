@@ -9,80 +9,143 @@ import { isNodeError } from "./util";
 
 const HEADER_SIZE = 8 + 4 + 4 + 260 + 260 + 260 + 260 + 4 + 4 + 4 + 4;
 
-export function writeEventsAndTagsFile(
-  events: DemoEvent[],
-  tags: string[],
-  jsonPath: string,
-  overwrite: boolean
-) {
-  if (events.length === 0) {
-    log.debug(`Deleting events/tags file at ${jsonPath}`);
-    fs.rmSync(jsonPath, { force: true });
-    return;
-  }
-  log.debug(`Writing to events/tags file at ${jsonPath}`);
-  let fd;
-  try {
-    fd = fs.openSync(jsonPath, overwrite ? "w" : "wx");
-  } catch (e) {
-    if (isNodeError(e) && e.code === "EEXIST") {
-      log.debug(`Events/tags file at ${jsonPath} already exists, skipping.`);
-      return;
-    }
-    throw e;
-  }
-  fs.writeSync(fd, JSON.stringify({ events, tags }, null, "\t"));
-  fs.closeSync(fd);
+export type DemoDict = Record<string, Demo>;
+
+export function getJSONPath(filename: string) {
+  return filename.replace(/\.dem$/gi, ".json");
 }
 
-export class Demo {
-  filename: string;
-
+export default class Demo {
+  path: string;
+  name: string;
   birthtime: number;
-
   filesize: number;
-
-  header: DemoHeader;
-
+  demoVersion: number;
+  netVersion: number;
+  serverName: string;
+  clientName: string;
+  mapName: string;
+  gameDir: string;
+  playbackTime: number;
+  numTicks: number;
   events: DemoEvent[];
-
   tags: string[];
-
-  private static demoCache: Record<string, Demo> = {};
 
   private constructor(
     filename: string,
+    shortName: string,
     header: DemoHeader,
     events: DemoEvent[],
     tags: string[],
     birthtime: number,
     filesize: number
   ) {
-    this.filename = filename;
-    this.header = header;
-    this.events = events;
-    this.tags = tags;
+    const {
+      demoVersion,
+      netVersion,
+      serverName,
+      clientName,
+      mapName,
+      gameDir,
+      playbackTime,
+      numTicks,
+    } = header;
+    this.path = filename;
+    this.name = shortName;
     this.birthtime = birthtime;
     this.filesize = filesize;
+    this.demoVersion = demoVersion;
+    this.netVersion = netVersion;
+    this.serverName = serverName;
+    this.clientName = clientName;
+    this.mapName = mapName;
+    this.gameDir = gameDir;
+    this.playbackTime = playbackTime;
+    this.numTicks = numTicks;
+    this.events = events;
+    this.tags = tags;
   }
 
-  static getDemo(filename: string): Demo {
-    const realPath = fs.realpathSync(filename);
-    if (Demo.demoCache[realPath] !== undefined) {
-      return Demo.demoCache[realPath];
+  writeEventsAndTags() {
+    Demo.writeEventsAndTagsFile(
+      this.events,
+      this.tags,
+      getJSONPath(this.path),
+      true
+    );
+  }
+
+  static writeEventsAndTagsFile(
+    events: DemoEvent[],
+    tags: string[],
+    jsonPath: string,
+    overwrite: boolean
+  ) {
+    if (events.length === 0) {
+      log.debug(`Deleting events/tags file at ${jsonPath}`);
+      fs.rmSync(jsonPath, { force: true });
+      return;
     }
-    const stats = fs.statSync(realPath);
-    const [events, tags] = this.readEventsAndTags(this.getJSONPath(realPath));
+    log.debug(`Writing to events/tags file at ${jsonPath}`);
+    let fd: number;
+    try {
+      fd = fs.openSync(jsonPath, overwrite ? "w" : "wx");
+    } catch (e) {
+      if (isNodeError(e) && e.code === "EEXIST") {
+        log.debug(`Events/tags file at ${jsonPath} already exists, skipping.`);
+        return;
+      }
+      throw e;
+    }
+    fs.writeSync(fd, JSON.stringify({ events, tags }, null, "\t"));
+    fs.closeSync(fd);
+  }
+
+  static getDemosInDirectory(dirPath: string) {
+    log.debug(`Finding demo files in ${dirPath}`);
+
+    let files;
+    try {
+      files = fs.readdirSync(dirPath);
+    } catch (e) {
+      log.error(`Error reading path ${dirPath}: ${e}`);
+      return [];
+    }
+
+    const demoList: Demo[] = [];
+    files.forEach((file) => {
+      const { ext } = path.parse(file);
+      if (ext === ".dem") {
+        log.debug(`Found demo file ${file}`);
+        try {
+          demoList.push(this.getDemoByPath(path.join(dirPath, file)));
+        } catch (error) {
+          // ignore this file if it throws errors
+        }
+      } else {
+        log.debug(`Found non-demo file ${file}, skipping.`);
+      }
+    });
+    return demoList;
+  }
+
+  private static loadDemo(filePath: string): Demo {
+    const stats = fs.statSync(filePath);
+    const [events, tags] = this.readEventsAndTags(getJSONPath(filePath));
     const newDemo = new Demo(
-      realPath,
-      this.readFileHeader(realPath),
+      filePath,
+      path.parse(filePath).name,
+      this.readFileHeader(filePath),
       events,
       tags,
       stats.birthtimeMs,
       stats.size
     );
-    Demo.demoCache[realPath] = newDemo;
     return newDemo;
+  }
+
+  static getDemoByPath(filePath: string): Demo {
+    return Demo.loadDemo(filePath);
   }
 
   static readFileHeader(filename: string): DemoHeader {
@@ -106,7 +169,7 @@ export class Demo {
       throw new InvalidDemoFileError();
     }
 
-    const header: DemoHeader = {
+    return {
       demoVersion: sr.readInt(),
       netVersion: sr.readInt(),
       serverName: sr.readString(260),
@@ -118,15 +181,6 @@ export class Demo {
       numFrames: sr.readInt(),
       signonLength: sr.readInt(),
     };
-    return header;
-  }
-
-  static getJSONPath(filename: string) {
-    return filename.replace(/\.dem$/gi, ".json");
-  }
-
-  getShortName() {
-    return path.basename(this.filename, ".dem");
   }
 
   static readEventsAndTags(jsonPath: string): [DemoEvent[], string[]] {
@@ -148,30 +202,13 @@ export class Demo {
     }
   }
 
-  writeEvents(events: DemoEvent[]) {
-    this.events = events;
-    Demo.demoCache[this.filename].events = events;
-    const jsonPath = Demo.getJSONPath(this.filename);
-    writeEventsAndTagsFile(events, this.tags, jsonPath, true);
-  }
-
-  writeTags(tags: string[]) {
-    this.tags = tags;
-    Demo.demoCache[this.filename].tags = tags;
-    const jsonPath = Demo.getJSONPath(this.filename);
-    writeEventsAndTagsFile(this.events, tags, jsonPath, true);
-  }
-
   rename(newName: string) {
-    log.info(`Renaming demo ${this.getShortName()} to ${newName}`);
-    const dir = path.dirname(this.filename);
+    log.info(`Renaming demo ${this.name} to ${newName}`);
+    const dir = path.dirname(this.path);
     const newNameFull = path.join(dir, `${newName}.dem`);
-    fs.renameSync(this.filename, newNameFull);
+    fs.renameSync(this.path, newNameFull);
     try {
-      fs.renameSync(
-        Demo.getJSONPath(this.filename),
-        path.join(dir, `${newName}.json`)
-      );
+      fs.renameSync(getJSONPath(this.path), path.join(dir, `${newName}.json`));
     } catch (e) {
       if (isNodeError(e) && e.code === "ENOENT") {
         // This demo has no events file, ignore the error
@@ -179,16 +216,15 @@ export class Demo {
         throw e;
       }
     }
-    Demo.demoCache[newNameFull] = this;
-    delete Demo.demoCache[this.filename];
-    this.filename = newNameFull;
+    this.path = newNameFull;
+    this.name = newName;
   }
 
   delete() {
-    log.info(`Deleting demo ${this.filename}`);
-    fs.rmSync(this.filename);
+    log.info(`Deleting demo ${this.path}`);
+    fs.rmSync(this.path);
     try {
-      fs.rmSync(Demo.getJSONPath(this.filename));
+      fs.rmSync(getJSONPath(this.path));
     } catch (e) {
       if (isNodeError(e) && e.code === "ENOENT") {
         // This demo has no events file, ignore the error
@@ -196,33 +232,5 @@ export class Demo {
         throw e;
       }
     }
-    delete Demo.demoCache[this.filename];
   }
-}
-
-export async function getDemosInDirectory(dirPath: string) {
-  log.debug(`Finding demo files in ${dirPath}`);
-
-  let files;
-  try {
-    files = await fs.promises.readdir(dirPath);
-  } catch (e) {
-    log.error(`Error reading path ${dirPath}: ${e}`);
-    return [];
-  }
-
-  const demoList: Demo[] = [];
-  files.forEach((file) => {
-    if (file.endsWith(".dem")) {
-      log.debug(`Found demo file ${file}`);
-      try {
-        demoList.push(Demo.getDemo(path.join(dirPath, file)));
-      } catch (error) {
-        // ignore this file if it throws errors
-      }
-    } else {
-      log.debug(`Found non-demo file ${file}, skipping.`);
-    }
-  });
-  return demoList;
 }

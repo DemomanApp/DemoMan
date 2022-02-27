@@ -1,6 +1,6 @@
-import React from "react";
+import React, { useContext, useState } from "react";
 import { shell } from "electron";
-
+import log from "electron-log";
 import Paper from "@mui/material/Paper";
 import Grid from "@mui/material/Grid";
 import Tooltip from "@mui/material/Tooltip";
@@ -8,196 +8,119 @@ import EditIcon from "@mui/icons-material/Edit";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 import FolderOpenIcon from "@mui/icons-material/FolderOpen";
 import IconButton from "@mui/material/IconButton";
+import Container from "@mui/material/Container";
+import ArrowBackIcon from "@mui/icons-material/ArrowBackIosNew";
+import Typography from "@mui/material/Typography";
+import { Navigate, useNavigate, useParams } from "react-router-dom";
 
-import { Demo } from "./Demo";
-import { DemoHeader } from "./DemoHeader";
 import DemoEvent from "./DemoEvent";
 import EventTable from "./EventTable";
-import DemoDetailsList from "./DemoDetailsList";
-import FullscreenDialog from "./FullscreenDialog";
-import EditEventDialog from "./EditEventDialog";
-import EventTableEntry from "./EventTableEntry";
+import DemoMetadataList from "./DemoMetadataList";
+import EditEventDialog, { EditDialogMode } from "./EditEventDialog";
 import DeleteDialog from "./DeleteDialog";
 import RenameDialog from "./RenameDialog";
 import MapThumbnail from "./MapThumbnail";
+import PageLayout from "./PageLayout";
+import DemosContext from "./DemosContext";
 
-type DemoDetailsProps = {
-  demo: Demo | null;
-  onClose: () => void;
+type DemoDetailsRouteParams = {
+  name: string;
 };
 
-type DemoDetailsState = {
-  open: boolean;
-  demo: Demo | null;
-  demoHeader: DemoHeader | null;
-  events: EventTableEntry[];
-  nextAvailableID: number;
-  deleteDialogOpen: boolean;
-};
+export default function DemoDetailsView() {
+  const { getDemoByName, deleteDemo, renameDemo } = useContext(DemosContext);
+  const navigate = useNavigate();
 
-export default class DemoDetails extends React.Component<
-  DemoDetailsProps,
-  DemoDetailsState
-> {
-  private editEventDialog: React.RefObject<EditEventDialog>;
+  const demoName = (useParams() as DemoDetailsRouteParams).name;
+  const demo = getDemoByName(atob(demoName));
 
-  private renameDialog: React.RefObject<RenameDialog>;
+  const [renameDialogOpen, setRenameDialogOpen] = useState(false);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
 
-  constructor(props: DemoDetailsProps) {
-    super(props);
-    this.state = {
-      open: false,
-      demo: props.demo,
-      demoHeader: null,
-      events: [],
-      nextAvailableID: 0,
-      deleteDialogOpen: false,
-    };
-    this.editEventDialog = React.createRef();
-    this.renameDialog = React.createRef();
+  const [editDialogMode, setEditDialogMode] = useState(EditDialogMode.closed);
+  const [tickInput, setTickInput] = useState("");
+  const [valueInput, setValueInput] = useState("");
+
+  const [editedEvent, setEditedEvent] = useState<DemoEvent | null>(null);
+
+  const [demoEvents, setDemoEventsState] = useState(demo.events);
+
+  const setDemoEvents = (newEvents: DemoEvent[]) => {
+    setDemoEventsState(newEvents);
+    demo.events = newEvents;
+    demo.writeEventsAndTags();
+  };
+
+  if (demo === undefined) {
+    // should never happen.
+    alert("demo was undefined!");
+    return <Navigate to="/demos" />;
   }
 
-  close = () => {
-    const { onClose } = this.props;
-    this.setState({ open: false });
-    onClose();
+  const editEvent = (event: DemoEvent) => {
+    setEditedEvent(event);
+    setTickInput(event.tick.toString());
+    setValueInput(event.value);
+    setEditDialogMode(EditDialogMode.edit);
   };
 
-  viewDemo = (demo: Demo) => {
-    this.setState({ demo, nextAvailableID: 0 });
-    const { events, header } = demo;
-    const entries: EventTableEntry[] = [];
-    let i = 0;
-    for (; i < events.length; i += 1) {
-      entries.push({ id: i, event: events[i] });
-    }
-    this.setState({
-      events: entries,
-      demoHeader: header,
-      open: true,
-      nextAvailableID: i,
-    });
+  const addEvent = () => {
+    setEditedEvent(null);
+    setTickInput("0");
+    setValueInput("New Bookmark");
+    setEditDialogMode(EditDialogMode.add);
   };
 
-  writeEvents = () => {
-    const { events, demo } = this.state;
-    if (demo === null) {
-      return;
-    }
-    const newEvents: DemoEvent[] = [];
-    for (let i = 0; i < events.length; i += 1) {
-      newEvents.push(events[i].event);
-    }
-    demo.writeEvents(newEvents);
-  };
-
-  editCallback = (event: EventTableEntry) => {
-    const { events } = this.state;
-    const index = events.findIndex((value: EventTableEntry) => {
-      return value.id === event.id;
-    });
-    events[index] = event;
-    this.setState({
-      events,
-    });
-    this.writeEvents();
-  };
-
-  addCallback = (event: EventTableEntry) => {
-    const { events, nextAvailableID } = this.state;
-    event.id = nextAvailableID;
-    events.push(event);
-    this.setState({
-      events,
-      nextAvailableID: nextAvailableID + 1,
-    });
-    this.writeEvents();
-  };
-
-  deleteCallback = (event: EventTableEntry) => {
-    const { events } = this.state;
-    const index = events.findIndex((value: EventTableEntry) => {
-      return value.id === event.id;
-    });
-    events.splice(index, 1);
-    this.setState({
-      events,
-    });
-    this.writeEvents();
-  };
-
-  editEvent = (event: EventTableEntry) => {
-    this.editOrAddEvent(event, true);
-  };
-
-  addEvent = () => {
-    this.editOrAddEvent(
-      {
-        id: -1,
-        event: {
-          tick: 0,
-          name: "Bookmark",
-          value: "New Bookmark",
-        },
-      },
-      false
-    );
-  };
-
-  editOrAddEvent = (event: EventTableEntry, edit: boolean) => {
-    if (this.editEventDialog.current) {
-      this.editEventDialog.current.setEvent(event);
-      this.editEventDialog.current.setEditing(edit);
-      this.editEventDialog.current.open();
-    }
-  };
-
-  deleteDialogClose = () => {
-    this.setState({ deleteDialogOpen: false });
-  };
-
-  deleteDialogConfirm = () => {
-    const { demo } = this.state;
-    demo?.delete();
-    this.setState({
-      deleteDialogOpen: false,
-      demo: null,
-    });
-    this.close();
-  };
-
-  renameDialogOpen = () => {
-    const { demo } = this.state;
-    if (this.renameDialog.current !== null && demo !== null) {
-      this.renameDialog.current.open(demo.getShortName());
-    }
-  };
-
-  renameDialogClose = () => {
-    if (this.renameDialog.current !== null) {
-      this.renameDialog.current.close();
-    }
-  };
-
-  renameDialogConfirm = (newName: string) => {
-    const { demo } = this.state;
-    demo?.rename(newName);
-    this.setState({ demo });
-    this.renameDialogClose();
-  };
-
-  render() {
-    const { demo, demoHeader, open, events, deleteDialogOpen } = this.state;
-    if (demo === null || demoHeader === null) {
-      return null;
-    }
-    return (
-      <>
-        <FullscreenDialog
-          title={demo.getShortName()}
-          open={open}
-          onClose={this.close}
-        >
+  return (
+    <>
+      <PageLayout
+        left={
+          <IconButton
+            onClick={() => {
+              navigate(-1);
+            }}
+            size="large"
+          >
+            <ArrowBackIcon />
+          </IconButton>
+        }
+        center={
+          <Typography variant="h5" noWrap component="div">
+            {demo.name}
+          </Typography>
+        }
+        right={
+          <>
+            <Tooltip title="Rename">
+              <IconButton
+                onClick={() => setRenameDialogOpen(true)}
+                size="large"
+              >
+                <EditIcon />
+              </IconButton>
+            </Tooltip>
+            <Tooltip title="Delete">
+              <IconButton
+                onClick={() => setDeleteDialogOpen(true)}
+                size="large"
+              >
+                <DeleteOutlineIcon />
+              </IconButton>
+            </Tooltip>
+            <Tooltip title="Show in explorer">
+              <IconButton
+                onClick={() => {
+                  shell.showItemInFolder(demo.path);
+                }}
+                size="large"
+              >
+                <FolderOpenIcon />
+              </IconButton>
+            </Tooltip>
+          </>
+        }
+      >
+        <Container>
           <Grid
             item
             container
@@ -214,67 +137,87 @@ export default class DemoDetails extends React.Component<
               spacing={2}
             >
               <Grid item>
-                <MapThumbnail mapName={demoHeader.mapName} />
+                <MapThumbnail mapName={demo.mapName} />
               </Grid>
               <Grid item>
-                <DemoDetailsList demo={demo} demoHeader={demoHeader} />
-              </Grid>
-              <Grid item>
-                <Tooltip title="Rename">
-                  <IconButton onClick={this.renameDialogOpen}>
-                    <EditIcon />
-                  </IconButton>
-                </Tooltip>
-                <Tooltip title="Delete">
-                  <IconButton
-                    onClick={() => {
-                      this.setState({ deleteDialogOpen: true });
-                    }}
-                  >
-                    <DeleteOutlineIcon />
-                  </IconButton>
-                </Tooltip>
-                <Tooltip title="Show in explorer">
-                  <IconButton
-                    onClick={() => {
-                      shell.showItemInFolder(demo.filename);
-                    }}
-                  >
-                    <FolderOpenIcon />
-                  </IconButton>
-                </Tooltip>
+                <DemoMetadataList demo={demo} />
               </Grid>
             </Grid>
             <Grid item xs={6}>
               <Paper elevation={3} style={{ padding: "5px" }}>
                 <EventTable
-                  data={events}
-                  editEvent={this.editEvent}
-                  addEvent={this.addEvent}
+                  data={demoEvents}
+                  editEvent={editEvent}
+                  addEvent={addEvent}
                 />
               </Paper>
             </Grid>
           </Grid>
-        </FullscreenDialog>
-        <EditEventDialog
-          ref={this.editEventDialog}
-          addCallback={this.addCallback}
-          editCallback={this.editCallback}
-          deleteCallback={this.deleteCallback}
-        />
-        <DeleteDialog
-          open={deleteDialogOpen}
-          demoName={demo.getShortName()}
-          onClose={this.deleteDialogClose}
-          onConfirm={this.deleteDialogConfirm}
-        />
-        <RenameDialog
-          ref={this.renameDialog}
-          onClose={this.renameDialogClose}
-          onConfirm={this.renameDialogConfirm}
-          oldName={demo.getShortName()}
-        />
-      </>
-    );
-  }
+        </Container>
+      </PageLayout>
+      <EditEventDialog
+        mode={editDialogMode}
+        onClose={() => {
+          setEditDialogMode(EditDialogMode.closed);
+        }}
+        tickInput={tickInput}
+        valueInput={valueInput}
+        onTickChanged={setTickInput}
+        onValueChanged={setValueInput}
+        onConfirm={() => {
+          let newDemoEvents = [...demoEvents]; // shallow copy
+          if (editDialogMode === EditDialogMode.add) {
+            const newEvent: DemoEvent = {
+              name: "Bookmark",
+              value: valueInput,
+              tick: parseInt(tickInput, 10),
+            };
+            newDemoEvents = demoEvents.concat([newEvent]);
+          } else if (editedEvent === null) {
+            // Should never happen
+            log.error("editedEvent was null!");
+          } else {
+            editedEvent.value = valueInput;
+            editedEvent.tick = parseInt(tickInput, 10);
+          }
+          setEditDialogMode(EditDialogMode.closed);
+          setDemoEvents(newDemoEvents);
+        }}
+        onDelete={() => {
+          if (editedEvent === null) {
+            // Should never happen
+            log.error("editedEvent was null!");
+          } else {
+            const newDemoEvents = [...demo.events]; // shallow copy
+            const idx = newDemoEvents.indexOf(editedEvent);
+            if (idx !== -1) {
+              newDemoEvents.splice(idx, 1);
+            }
+            setDemoEvents(newDemoEvents);
+          }
+          setEditDialogMode(EditDialogMode.closed);
+        }}
+      />
+      <DeleteDialog
+        open={deleteDialogOpen}
+        demoName={demo.name}
+        onClose={() => setDeleteDialogOpen(false)}
+        onConfirm={() => {
+          setDeleteDialogOpen(false);
+          deleteDemo(demo.name);
+          navigate("/demos");
+        }}
+      />
+      <RenameDialog
+        open={renameDialogOpen}
+        onClose={() => setRenameDialogOpen(false)}
+        onConfirm={(newName) => {
+          setRenameDialogOpen(false);
+          renameDemo(demo.name, newName);
+          navigate(`/demos/${btoa(newName)}`, { replace: true });
+        }}
+        oldName={demo.name}
+      />
+    </>
+  );
 }

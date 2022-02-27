@@ -4,7 +4,8 @@ import cfg from "electron-cfg";
 import log from "electron-log";
 
 import DemoEvent from "./DemoEvent";
-import { writeEventsAndTagsFile } from "./Demo";
+import Demo from "./Demo";
+import { isNodeError } from "./util";
 
 const regex = /\[[\d/ :]+\] (.*) \("(\w+)" at (\d+)\)/;
 
@@ -18,7 +19,7 @@ export default function convertPrecEvents() {
   try {
     fd = fs.openSync(path.join(demoDir, "KillStreaks.txt"), "r");
   } catch (e) {
-    if (e.code === "ENOENT") {
+    if (isNodeError(e) && e.code === "ENOENT") {
       // No PREC events file exists, ignore
       log.debug(`No PREC events file found`);
       return;
@@ -39,7 +40,7 @@ export default function convertPrecEvents() {
       const desc = matches[1];
       const demoName = matches[2];
       const tick = parseInt(matches[3], 10);
-      let name;
+      let name: "Killstreak" | "Bookmark";
       let value;
       const ksRegexResult = /Kill Streak:(\d+)/.exec(desc);
       if (ksRegexResult !== null) {
@@ -69,14 +70,14 @@ export default function convertPrecEvents() {
     try {
       fs.statSync(path.join(demoDir, `${demo}.dem`));
     } catch (e) {
-      if (e.code === "ENOENT") {
+      if (isNodeError(e) && e.code === "ENOENT") {
         demoExists = false;
       } else {
         throw e;
       }
     }
     if (demoExists) {
-      writeEventsAndTagsFile(
+      Demo.writeEventsAndTagsFile(
         events[demo],
         [],
         path.join(demoDir, `${demo}.json`),

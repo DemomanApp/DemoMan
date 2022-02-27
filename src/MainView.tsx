@@ -1,184 +1,159 @@
-import React from "react";
+import React, { useCallback, useContext, useEffect, useState } from "react";
 import cfg from "electron-cfg";
-import log from "electron-log";
+import { shell } from "electron";
+import { useNavigate } from "react-router";
 
 import debounce from "@mui/utils/debounce";
+import ClearIcon from "@mui/icons-material/Clear";
+import Paper from "@mui/material/Paper";
+import InputBase from "@mui/material/InputBase";
+import Divider from "@mui/material/Divider";
+import IconButton from "@mui/material/IconButton";
+import SettingsIcon from "@mui/icons-material/Settings";
+import InfoIcon from "@mui/icons-material/InfoOutlined";
+import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
+import Tooltip from "@mui/material/Tooltip";
 
-import { Demo, getDemosInDirectory } from "./Demo";
+import Demo from "./Demo";
 import DemoTable from "./DemoTable";
-import SelectDemoPathDialog from "./SelectDemoPathDialog";
-import DemoDetails from "./DemoDetailsView";
-import SettingsDialog from "./SettingsDialog";
-import { InfoDialog } from "./InfoDialog";
+import InfoDialog from "./InfoDialog";
 import AutoDeleteDialog from "./AutoDeleteDialog";
 import convertPrecEvents from "./ConvertPrecEvents";
-import { DemoListEntry, getDemoListEntry } from "./DemoListEntry";
+import DemosContext from "./DemosContext";
+import PageLayout from "./PageLayout";
+import AppBarButton from "./AppBarButton";
+import AppBarMenu from "./AppBarMenu";
 
-type MainViewState = {
-  selectDemoPathDialogOpen: boolean;
-  demoDetails: React.RefObject<DemoDetails>;
-  settings: React.RefObject<SettingsDialog>;
-  info: React.RefObject<InfoDialog>;
-  autoDeleteDialog: React.RefObject<AutoDeleteDialog>;
-  data: DemoListEntry[];
-  filteredData: DemoListEntry[];
-  quickFilterQuery: string;
-  progressPending: boolean;
-};
+export default function MainView() {
+  const { demos, reloadEvents, reloadEverything } = useContext(DemosContext);
+  const navigate = useNavigate();
 
-export default class MainView extends React.Component<
-  Readonly<unknown>,
-  MainViewState
-> {
-  constructor(props: Readonly<unknown>) {
-    super(props);
-    this.state = {
-      demoDetails: React.createRef(),
-      settings: React.createRef(),
-      info: React.createRef(),
-      autoDeleteDialog: React.createRef(),
-      selectDemoPathDialogOpen: !cfg.has("demo_path"),
-      data: [],
-      filteredData: [],
-      quickFilterQuery: "",
-      progressPending: true,
-    };
-  }
+  const [filteredDemos, setFilteredDemos] = useState<Demo[]>([]);
+  const [quickFilterQuery, setQuickFilterQuery] = useState("");
+  const [infoDialogOpen, setInfoDialogOpen] = useState(false);
+  const [autoDeleteDialogOpen, setAutoDeleteDialogOpen] = useState(false);
 
-  componentDidMount() {
-    if (cfg.has("demo_path")) {
-      this.refreshDemoList();
-    }
-  }
+  const applyQuickFilter = useCallback(
+    (query: string) => {
+      const demoList = Object.values(demos);
 
-  refreshDemoList = async () => {
-    this.setState({
-      data: [],
-      filteredData: [],
-      progressPending: true,
-    });
-    const newDemos = await getDemosInDirectory(cfg.get("demo_path"));
-    const newData = newDemos.map(getDemoListEntry);
-    this.setState({
-      data: newData,
-      progressPending: false,
-    });
-    this.updateQuickFilter("");
-  };
-
-  quickFilterChanged = (
-    e: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>
-  ) => {
-    this.updateQuickFilter(e.target.value);
-  };
-
-  updateQuickFilter = (query: string) => {
-    const { data } = this.state;
-    this.setState({
-      quickFilterQuery: query,
-    });
-    debounce(() => {
       if (query === "") {
-        this.setState({
-          filteredData: data,
-        });
+        setFilteredDemos(demoList);
       } else {
         const lowerCaseQuery = query.toLowerCase();
-        this.setState({
-          filteredData: data.filter((value: DemoListEntry) =>
-            [value.filename, value.map, value.player, value.server].some(
+        setFilteredDemos(
+          demoList.filter((demo: Demo) =>
+            [demo.name, demo.mapName, demo.clientName, demo.serverName].some(
               (attribute: string) =>
                 attribute.toLowerCase().includes(lowerCaseQuery)
             )
-          ),
-        });
+          )
+        );
       }
-    }, 500)();
+    },
+    [demos]
+  );
+
+  // eslint-disable-next-line react/sort-comp
+  const applyQuickFilterDebounced = debounce(applyQuickFilter, 300);
+
+  useEffect(() => {
+    applyQuickFilter("");
+  }, [applyQuickFilter]);
+
+  const setQuickFilter = (query: string) => {
+    setQuickFilterQuery(query);
+    applyQuickFilterDebounced(query);
   };
 
-  viewDemo = (demo: Demo) => {
-    const { demoDetails } = this.state;
-    log.debug(`Viewing demo ${demo.filename}`);
-    if (demoDetails.current) {
-      demoDetails.current.viewDemo(demo);
-    }
+  const quickFilterChanged = (
+    e: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>
+  ) => {
+    setQuickFilter(e.target.value);
   };
 
-  viewSettings = () => {
-    const { settings } = this.state;
-    if (settings.current) {
-      settings.current.open();
-    }
+  const viewDemo = (demo: Demo) => {
+    navigate(`${btoa(demo.name)}`);
   };
 
-  viewInfoDialog = () => {
-    const { info, data } = this.state;
-    let totalFilesize = 0;
-    data.forEach((element) => {
-      totalFilesize += element.filesize;
-    });
-
-    if (info.current) {
-      info.current.setInfo({
-        totalDemos: data.length,
-        totalFilesize,
-      });
-      info.current.setOpen(true);
-    }
-  };
-
-  viewAutoDeleteDialog = () => {
-    const { autoDeleteDialog } = this.state;
-    autoDeleteDialog.current?.open();
-  };
-
-  render() {
-    const {
-      selectDemoPathDialogOpen,
-      demoDetails,
-      settings,
-      autoDeleteDialog,
-      info,
-      filteredData,
-      quickFilterQuery,
-      progressPending,
-    } = this.state;
-    return (
-      <>
-        <DemoTable
-          data={filteredData}
-          viewDemo={this.viewDemo}
-          progressPending={progressPending}
-          viewInfoDialog={this.viewInfoDialog}
-          viewSettings={this.viewSettings}
-          viewAutoDeleteDialog={this.viewAutoDeleteDialog}
-          convertPrecEvents={convertPrecEvents}
-          quickFilterChanged={this.quickFilterChanged}
-          refreshDemoList={this.refreshDemoList}
-          quickFilterQuery={quickFilterQuery}
-          updateQuickFilter={this.updateQuickFilter}
-        />
-        <SelectDemoPathDialog
-          open={selectDemoPathDialogOpen}
-          onComplete={() => {
-            this.setState({
-              selectDemoPathDialogOpen: false,
-            });
-            this.refreshDemoList();
-          }}
-        />
-        <DemoDetails
-          ref={demoDetails}
-          demo={null}
-          onClose={this.refreshDemoList}
-        />
-        <SettingsDialog ref={settings} />
-        <InfoDialog ref={info} />
-        <AutoDeleteDialog
-          ref={autoDeleteDialog}
-          onClose={this.refreshDemoList}
-        />
-      </>
-    );
-  }
+  return (
+    <>
+      <PageLayout
+        center={
+          <Paper
+            style={{
+              display: "flex",
+              alignItems: "center",
+            }}
+          >
+            <InputBase
+              placeholder="Quick filter"
+              style={{ paddingLeft: "12px", width: "300px" }}
+              onChange={quickFilterChanged}
+              value={quickFilterQuery}
+              spellCheck={false}
+            />
+            <Divider orientation="vertical" style={{ height: "28px" }} />
+            <Tooltip title="Clear filter">
+              <IconButton
+                onClick={() => {
+                  setQuickFilter("");
+                }}
+                size="large"
+                disableRipple
+              >
+                <ClearIcon />
+              </IconButton>
+            </Tooltip>
+          </Paper>
+        }
+        right={
+          <>
+            <AppBarButton
+              icon={<InfoIcon />}
+              tooltip="Info"
+              onClick={() => setInfoDialogOpen(true)}
+            />
+            <AppBarButton
+              icon={<SettingsIcon />}
+              tooltip="Settings"
+              onClick={() => navigate("/settings")}
+            />
+            <AppBarMenu icon={<MoreHorizIcon />} tooltip="More...">
+              {[
+                {
+                  text: "Auto-delete demos and events...",
+                  onClick: () => setAutoDeleteDialogOpen(true),
+                },
+                {
+                  text: "Open demos folder",
+                  onClick: () => shell.openPath(cfg.get("demo_path")),
+                },
+                {
+                  text: "Convert P-REC bookmarks",
+                  onClick: () => {
+                    convertPrecEvents();
+                    reloadEvents();
+                  },
+                },
+              ]}
+            </AppBarMenu>
+          </>
+        }
+      >
+        <DemoTable data={filteredDemos} viewDemo={viewDemo} />
+      </PageLayout>
+      <InfoDialog
+        open={infoDialogOpen}
+        onClose={() => setInfoDialogOpen(false)}
+      />
+      <AutoDeleteDialog
+        open={autoDeleteDialogOpen}
+        onClose={() => {
+          setAutoDeleteDialogOpen(false);
+          reloadEverything();
+        }}
+      />
+    </>
+  );
 }

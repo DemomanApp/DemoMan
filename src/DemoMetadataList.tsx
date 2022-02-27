@@ -12,17 +12,15 @@ import PersonIcon from "@mui/icons-material/Person";
 import StorageIcon from "@mui/icons-material/Storage";
 import InsertDriveFileIcon from "@mui/icons-material/InsertDriveFile";
 
-import { Demo } from "./Demo";
-import { DemoHeader } from "./DemoHeader";
+import Demo from "./Demo";
 import { formatFileSize, formatPlaybackTime } from "./util";
 
-type DemoDetailsListProps = {
+type DemoMetadataListProps = {
   demo: Demo;
-  demoHeader: DemoHeader;
 };
 
-export default function DemoDetailsList(props: DemoDetailsListProps) {
-  const { demo, demoHeader } = props;
+export default function DemoMetadataList(props: DemoMetadataListProps) {
+  const { demo } = props;
   return (
     <List>
       <Tooltip title="Playback time" placement="left" arrow>
@@ -31,7 +29,7 @@ export default function DemoDetailsList(props: DemoDetailsListProps) {
             <AccessTimeIcon />
           </ListItemIcon>
           <ListItemText>
-            {formatPlaybackTime(demoHeader.playbackTime)} ({demoHeader.numTicks}
+            {formatPlaybackTime(demo.playbackTime)} ({demo.numTicks}
             &nbsp;Ticks)
           </ListItemText>
         </ListItem>
@@ -51,7 +49,7 @@ export default function DemoDetailsList(props: DemoDetailsListProps) {
           <ListItemIcon>
             <MapIcon />
           </ListItemIcon>
-          <ListItemText>{demoHeader.mapName}</ListItemText>
+          <ListItemText>{demo.mapName}</ListItemText>
         </ListItem>
       </Tooltip>
       <Tooltip title="Player" placement="left" arrow>
@@ -59,7 +57,7 @@ export default function DemoDetailsList(props: DemoDetailsListProps) {
           <ListItemIcon>
             <PersonIcon />
           </ListItemIcon>
-          <ListItemText>{demoHeader.clientName}</ListItemText>
+          <ListItemText>{demo.clientName}</ListItemText>
         </ListItem>
       </Tooltip>
       <Tooltip title="Server" placement="left" arrow>
@@ -67,7 +65,7 @@ export default function DemoDetailsList(props: DemoDetailsListProps) {
           <ListItemIcon>
             <StorageIcon />
           </ListItemIcon>
-          <ListItemText>{demoHeader.serverName}</ListItemText>
+          <ListItemText>{demo.serverName}</ListItemText>
         </ListItem>
       </Tooltip>
       <Tooltip title="File size" placement="left" arrow>

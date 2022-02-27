@@ -1,99 +1,88 @@
-import React from "react";
+import React, { useContext, useState } from "react";
 
 import Button from "@mui/material/Button";
 import TextField from "@mui/material/TextField";
 import InputAdornment from "@mui/material/InputAdornment";
 
 import SmallDialog from "./SmallDialog";
+import DemosContext from "./DemosContext";
 
 type RenameDialogProps = {
   onClose: () => void;
   onConfirm: (newName: string) => void;
   oldName: string;
-  ref: React.RefObject<RenameDialog>;
-};
-
-type RenameDialogState = {
-  newName: string;
-  newNameValid: boolean;
   open: boolean;
 };
 
-export default class RenameDialog extends React.Component<
-  RenameDialogProps,
-  RenameDialogState
-> {
-  constructor(props: RenameDialogProps) {
-    super(props);
-    const { oldName } = props;
-    this.state = { newName: oldName, newNameValid: true, open: false };
-  }
+export default function RenameDialog(props: RenameDialogProps) {
+  const { onClose, onConfirm, oldName, open } = props;
 
-  close = () => {
-    this.setState({
-      open: false,
-    });
+  const { getDemoByName } = useContext(DemosContext);
+
+  const [newName, setNewName] = useState(oldName);
+  const [newNameValid, setNewNameValid] = useState(true);
+
+  const close = () => {
+    // reset state in case the user opens the dialog again
+    setNewName(oldName);
+    setNewNameValid(true);
+    onClose();
   };
 
-  open = (demoName: string) => {
-    this.setState({
-      newName: demoName,
-      open: true,
-    });
-  };
-
-  validateNewName = (
+  const validateNewName = (
     e: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>
   ) => {
-    // Only allow filenames with legal characters and reasonable length
-    if (/^[a-zA-Z0-9\-_ [\]().]{1,50}$/.test(e.target.value)) {
-      this.setState({ newName: e.target.value, newNameValid: true });
+    if (
+      // Only allow filenames with legal characters and reasonable length
+      /^[a-zA-Z0-9\-_ [\]().]{1,50}$/.test(e.target.value) &&
+      // Check if this name is available, but allow the old name
+      (getDemoByName(e.target.value) === undefined ||
+        e.target.value === oldName)
+    ) {
+      setNewName(e.target.value);
+      setNewNameValid(true);
     } else {
-      this.setState({ newNameValid: false });
+      // TODO Add error message to let the user know what's wrong
+      setNewNameValid(false);
     }
   };
 
-  render() {
-    const { onClose, onConfirm, oldName } = this.props;
-    const { open, newName, newNameValid } = this.state;
-
-    return (
-      <SmallDialog
-        title="Rename"
-        open={open}
-        onClose={onClose}
-        actions={
-          <>
-            <Button variant="contained" onClick={onClose}>
-              Cancel
-            </Button>
-            <Button
-              variant="contained"
-              color="primary"
-              onClick={() => {
-                onConfirm(newName);
-              }}
-              disabled={!newNameValid}
-            >
-              Confirm
-            </Button>
-          </>
-        }
-      >
-        <TextField
-          required
-          label="New name"
-          InputProps={{
-            endAdornment: <InputAdornment position="end">.dem</InputAdornment>,
-          }}
-          variant="outlined"
-          error={!newNameValid}
-          onChange={this.validateNewName}
-          fullWidth
-          margin="dense"
-          defaultValue={oldName}
-        />
-      </SmallDialog>
-    );
-  }
+  return (
+    <SmallDialog
+      title="Rename"
+      open={open}
+      onClose={close}
+      actions={
+        <>
+          <Button variant="contained" onClick={close}>
+            Cancel
+          </Button>
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={() => {
+              onConfirm(newName);
+            }}
+            disabled={!newNameValid}
+          >
+            Confirm
+          </Button>
+        </>
+      }
+    >
+      <TextField
+        required
+        label="New name"
+        InputProps={{
+          endAdornment: <InputAdornment position="end">.dem</InputAdornment>,
+        }}
+        variant="outlined"
+        error={!newNameValid}
+        onChange={validateNewName}
+        fullWidth
+        margin="dense"
+        defaultValue={oldName}
+      />
+    </SmallDialog>
+  );
 }
