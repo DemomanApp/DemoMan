@@ -25,7 +25,7 @@ import Divider from "@mui/material/Divider";
 
 import loading from "../assets/loading.gif";
 
-import { Demo } from "./Demos";
+import { Demo } from "./Demo";
 import { formatFileSize, formatPlaybackTime } from "./util";
 import { getPreferredTheme } from "./theme";
 import { DemoListEntry } from "./DemoListEntry";

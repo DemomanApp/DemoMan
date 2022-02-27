@@ -12,7 +12,7 @@ import PersonIcon from "@mui/icons-material/Person";
 import StorageIcon from "@mui/icons-material/Storage";
 import InsertDriveFileIcon from "@mui/icons-material/InsertDriveFile";
 
-import { Demo } from "./Demos";
+import { Demo } from "./Demo";
 import { DemoHeader } from "./DemoHeader";
 import { formatFileSize, formatPlaybackTime } from "./util";
 

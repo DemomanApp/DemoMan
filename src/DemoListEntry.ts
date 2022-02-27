@@ -1,4 +1,4 @@
-import { Demo } from "./Demos";
+import { Demo } from "./Demo";
 
 export interface DemoListEntry {
   filename: string;

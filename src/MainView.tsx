@@ -4,7 +4,7 @@ import log from "electron-log";
 
 import debounce from "@mui/utils/debounce";
 
-import { Demo, getDemosInDirectory } from "./Demos";
+import { Demo, getDemosInDirectory } from "./Demo";
 import DemoTable from "./DemoTable";
 import SelectDemoPathDialog from "./SelectDemoPathDialog";
 import DemoDetails from "./DemoDetailsView";

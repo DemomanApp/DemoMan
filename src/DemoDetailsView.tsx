@@ -9,7 +9,7 @@ import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 import FolderOpenIcon from "@mui/icons-material/FolderOpen";
 import IconButton from "@mui/material/IconButton";
 
-import { Demo } from "./Demos";
+import { Demo } from "./Demo";
 import { DemoHeader } from "./DemoHeader";
 import DemoEvent from "./DemoEvent";
 import EventTable from "./EventTable";

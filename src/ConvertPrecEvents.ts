@@ -4,7 +4,7 @@ import cfg from "electron-cfg";
 import log from "electron-log";
 
 import DemoEvent from "./DemoEvent";
-import { writeEventsAndTagsFile } from "./Demos";
+import { writeEventsAndTagsFile } from "./Demo";
 
 const regex = /\[[\d/ :]+\] (.*) \("(\w+)" at (\d+)\)/;
 
