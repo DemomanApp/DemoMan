@@ -178,8 +178,14 @@ export default function DemoDetailsView() {
             // Should never happen
             log.error("editedEvent was null!");
           } else {
-            editedEvent.value = valueInput;
-            editedEvent.tick = parseInt(tickInput, 10);
+            const idx = newDemoEvents.indexOf(editedEvent);
+            if (idx !== -1) {
+              newDemoEvents[idx] = {
+                name: editedEvent.name,
+                value: valueInput,
+                tick: parseInt(tickInput, 10),
+              };
+            }
           }
           setEditDialogMode(EditDialogMode.closed);
           setDemoEvents(newDemoEvents);
