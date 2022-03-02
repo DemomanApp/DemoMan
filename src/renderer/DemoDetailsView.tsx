@@ -195,7 +195,7 @@ export default function DemoDetailsView() {
             // Should never happen
             log.error("editedEvent was null!");
           } else {
-            const newDemoEvents = [...demo.events]; // shallow copy
+            const newDemoEvents = [...demoEvents]; // shallow copy
             const idx = newDemoEvents.indexOf(editedEvent);
             if (idx !== -1) {
               newDemoEvents.splice(idx, 1);
