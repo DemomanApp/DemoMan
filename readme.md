@@ -11,13 +11,13 @@ Grab the latest prebuilt version [here](https://github.com/Narcha/DemoMan/releas
 
 ## Developing
 
-Prerequisites: install [git](https://git-scm.com/downloads), [node.js](https://nodejs.org/en/download/) and [yarn](https://yarnpkg.com/getting-started/install/).
+Prerequisites: [node.js](https://nodejs.org/en/download/) and npm (included in node.js).
 
-Then, run `git clone https://github.com/Narcha/DemoMan.git && cd DemoMan && yarn`
+Then, clone the repository and run `npm install`.
 
-Start the program by running `yarn start`.
+Start the program by running `npm start`.
 
-Create a packaged executable by running `yarn package`.
+Create a packaged executable by running `npm run package`.
 
 ## License
 
