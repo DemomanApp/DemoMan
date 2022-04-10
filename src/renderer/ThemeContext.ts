@@ -1,8 +1,10 @@
 import React from "react";
 
+import { ThemeType } from "./theme";
+
 type ThemeContextType = {
-  theme: string;
-  setTheme: (theme: string) => void;
+  theme: ThemeType;
+  setTheme: (theme: ThemeType) => void;
 };
 
 export default React.createContext<ThemeContextType>({} as ThemeContextType);

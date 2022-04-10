@@ -2,6 +2,8 @@ import { createTheme } from "@mui/material/styles";
 import blue from "@mui/material/colors/blue";
 import red from "@mui/material/colors/red";
 
+export type ThemeType = "dark" | "light";
+
 export function getPreferredTheme() {
   return window.matchMedia("(prefers-color-scheme: dark)").matches
     ? "dark"
