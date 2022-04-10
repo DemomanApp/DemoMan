@@ -5,8 +5,8 @@ import DemoDetailsView from "./DemoDetailsView";
 import SetupView from "./SetupView";
 import SettingsView from "./SettingsView";
 import DemosProvider from "./DemosProvider";
-import DemosContext from "./DemosContext";
 import Theming from "./Theming";
+import store from "../common/store";
 
 export default function App() {
   return (
@@ -17,15 +17,11 @@ export default function App() {
             <Route
               index
               element={
-                <DemosContext.Consumer>
-                  {(value) => {
-                    return value.setupNeeded ? (
-                      <Navigate to="setup" />
-                    ) : (
-                      <Navigate to="demos" />
-                    );
-                  }}
-                </DemosContext.Consumer>
+                store.get("setup_completed") ? (
+                  <Navigate to="demos" />
+                ) : (
+                  <Navigate to="setup" />
+                )
               }
             />
             <Route path="setup" element={<SetupView />} />

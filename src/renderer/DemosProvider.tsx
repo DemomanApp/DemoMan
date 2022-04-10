@@ -1,52 +1,32 @@
-import React from "react";
+import React, { useCallback, useEffect, useState } from "react";
 
-import store from "../common/store";
 import Demo, { DemoDict } from "./Demo";
 import getDemosInDirectory from "./getDemosInDirectory";
 import DemosContext from "./DemosContext";
+import useStore from "./hooks/useStore";
 
 type DemosProviderProps = {
   children: React.ReactNode;
 };
 
-type DemosProviderState = {
-  demos: DemoDict;
-  demosPath?: string;
-};
+export default function DemosProvider(props: DemosProviderProps) {
+  const { children } = props;
 
-export default class DemosProvider extends React.Component<
-  DemosProviderProps,
-  DemosProviderState
-> {
-  constructor(props: DemosProviderProps) {
-    super(props);
-    const demosPath = store.get("demo_path");
-    const demos =
-      demosPath !== undefined
-        ? getDemosInDirectory(store.get("demo_path"))
-        : {};
-    this.state = {
-      demos,
-      demosPath,
-    };
-  }
+  const [demosPath] = useStore("demo_path");
+  // const [demos, setDemos] = useState<DemoDict>(
+  //   demosPath !== undefined ? getDemosInDirectory(demosPath) : {}
+  // );
+  const [demos, setDemos] = useState<DemoDict>({});
 
-  reloadEverything = () => {
-    let demos: DemoDict;
-    const demosPath = store.get("demo_path");
+  const reloadEverything = useCallback(() => {
     if (demosPath !== undefined) {
-      demos = getDemosInDirectory(store.get("demo_path"));
+      setDemos(getDemosInDirectory(demosPath));
     } else {
-      demos = {};
+      setDemos({});
     }
-    this.setState({
-      demos,
-      demosPath,
-    });
-  };
+  }, [demosPath]);
 
-  reloadEvents = () => {
-    const { demos } = this.state;
+  const reloadEvents = () => {
     Object.values(demos).forEach((demo) => {
       const [events, tags] = Demo.readEventsAndTags(demo.path);
       demo.events = events;
@@ -54,14 +34,12 @@ export default class DemosProvider extends React.Component<
     });
   };
 
-  getDemoByName = (name: string) => {
-    const { demos } = this.state;
+  const getDemoByName = (name: string) => {
     return demos[name];
   };
 
-  renameDemo = (name: string, newName: string) => {
+  const renameDemo = (name: string, newName: string) => {
     if (name !== newName) {
-      const { demos } = this.state;
       const demo = demos[name];
 
       demo.rename(newName);
@@ -70,38 +48,29 @@ export default class DemosProvider extends React.Component<
     }
   };
 
-  deleteDemo = (name: string) => {
-    const { demos } = this.state;
+  const deleteDemo = (name: string) => {
     const demo = demos[name];
 
     delete demos[name];
     demo.delete();
   };
 
-  setDemoPath = (newPath: string) => {
-    store.set("demo_path", newPath);
-    this.setState({ demosPath: newPath });
-  };
+  useEffect(() => {
+    reloadEverything();
+  }, [demosPath, reloadEverything]);
 
-  render() {
-    const { children } = this.props;
-    const { demos, demosPath } = this.state;
-    return (
-      <DemosContext.Provider
-        value={{
-          demos,
-          demosPath: demosPath === undefined ? "" : demosPath,
-          setupNeeded: demosPath === undefined,
-          reloadEverything: this.reloadEverything,
-          reloadEvents: this.reloadEvents,
-          getDemoByName: this.getDemoByName,
-          renameDemo: this.renameDemo,
-          deleteDemo: this.deleteDemo,
-          setDemoPath: this.setDemoPath,
-        }}
-      >
-        {children}
-      </DemosContext.Provider>
-    );
-  }
+  return (
+    <DemosContext.Provider
+      value={{
+        demos,
+        reloadEverything,
+        reloadEvents,
+        getDemoByName,
+        renameDemo,
+        deleteDemo,
+      }}
+    >
+      {children}
+    </DemosContext.Provider>
+  );
 }

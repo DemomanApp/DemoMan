@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import fs from "fs";
 import path from "path";
 
@@ -15,7 +15,7 @@ import styled from "@mui/material/styles/styled";
 
 import { formatFileSize } from "./util";
 import SmallDialog from "./SmallDialog";
-import DemosContext from "./DemosContext";
+import useStore from "./hooks/useStore";
 
 type AutoDeleteDialogProps = {
   open: boolean;
@@ -66,7 +66,7 @@ const ScrollList = styled(List)({
 
 export default function AutoDeleteDialog(props: AutoDeleteDialogProps) {
   const { open, onClose } = props;
-  const { demosPath } = useContext(DemosContext);
+  const [demosPath] = useStore("demo_path");
 
   const [files, setFiles] = useState<AutoDeleteDialogFileListEntry[]>([]);
   const [numberSelected, setNumberSelected] = useState(0);

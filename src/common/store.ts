@@ -1,17 +1,31 @@
-import Store from "electron-store";
+import Store, { Schema } from "electron-store";
 
-type SchemaType = { theme: "dark" | "light"; demo_path: string };
+import { ThemeType } from "../renderer/theme";
 
-const store = new Store<SchemaType>({
-  schema: {
-    theme: {
-      enum: ["dark", "light"],
-      default: "dark",
-    },
-    demo_path: {
-      type: "string",
-    },
+// To achieve type safety, each property in the schema
+// must either be optional or have a default value set.
+
+export type SchemaType = {
+  theme: ThemeType;
+  demo_path?: string;
+  setup_completed: boolean;
+};
+
+const schema: Schema<SchemaType> = {
+  theme: {
+    enum: ["dark", "light"],
+    default: "dark",
   },
-});
+  demo_path: {
+    type: "string",
+  },
+  setup_completed: {
+    type: "boolean",
+    default: false,
+  },
+};
 
-export default store;
+export default new Store<SchemaType>({
+  schema,
+  watch: true,
+});

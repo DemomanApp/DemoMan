@@ -18,8 +18,9 @@ import Container from "@mui/material/Container";
 import getDemoPath from "./GetDemoPath";
 import PageLayout from "./PageLayout";
 import AppBarButton from "./AppBarButton";
-import DemosContext from "./DemosContext";
 import ThemeContext from "./ThemeContext";
+import useStore from "./hooks/useStore";
+import { ThemeType } from "./theme";
 
 const capitalize = (str: string) => {
   return str.charAt(0).toUpperCase() + str.slice(1);
@@ -27,15 +28,15 @@ const capitalize = (str: string) => {
 
 export default function SettingsView() {
   const navigate = useNavigate();
-  const { demosPath, setDemoPath, reloadEverything } = useContext(DemosContext);
   const { theme, setTheme } = useContext(ThemeContext);
+
+  const [demoPath, setDemoPath] = useStore("demo_path");
 
   const savePath = (newPath: string) => {
     setDemoPath(newPath);
-    reloadEverything();
   };
 
-  const saveTheme = (newTheme: string) => {
+  const saveTheme = (newTheme: ThemeType) => {
     setTheme(newTheme);
     ipcRenderer.send("update-theme", newTheme);
   };
@@ -74,7 +75,7 @@ export default function SettingsView() {
             <ListItem
               button
               onClick={async () => {
-                const { canceled, filePaths } = await getDemoPath(demosPath);
+                const { canceled, filePaths } = await getDemoPath(demoPath);
                 if (!canceled) {
                   savePath(filePaths[0]);
                 }
@@ -83,7 +84,7 @@ export default function SettingsView() {
               <ListItemIcon>
                 <FolderIcon />
               </ListItemIcon>
-              <ListItemText primary="Demo path" secondary={demosPath} />
+              <ListItemText primary="Demo path" secondary={demoPath} />
             </ListItem>
           </List>
         </Container>

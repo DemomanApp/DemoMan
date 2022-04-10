@@ -127,7 +127,12 @@ export default function MainView() {
                 },
                 {
                   text: "Open demos folder",
-                  onClick: () => shell.openPath(store.get("demo_path")),
+                  onClick: () => {
+                    const demoPath = store.get("demo_path");
+                    if (demoPath !== undefined) {
+                      shell.openPath(demoPath);
+                    }
+                  },
                 },
                 {
                   text: "Convert P-REC bookmarks",

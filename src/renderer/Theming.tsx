@@ -7,18 +7,13 @@ import CssBaseline from "@mui/material/CssBaseline";
 
 import ThemeContext from "./ThemeContext";
 import { darkTheme, getPreferredTheme, lightTheme } from "./theme";
-import store from "../common/store";
+import useStore from "./hooks/useStore";
 
 export default ({ children }: { children: React.ReactNode }) => {
-  const [theme, setTheme] = React.useState(getPreferredTheme());
-
-  const setAndSaveTheme = (newTheme: string) => {
-    setTheme(newTheme);
-    store.set("theme", newTheme);
-  };
+  const [theme, setTheme] = useStore("theme", getPreferredTheme());
 
   return (
-    <ThemeContext.Provider value={{ theme, setTheme: setAndSaveTheme }}>
+    <ThemeContext.Provider value={{ theme, setTheme }}>
       <StyledEngineProvider injectFirst>
         <ThemeProvider theme={theme === "dark" ? darkTheme : lightTheme}>
           <CssBaseline />
