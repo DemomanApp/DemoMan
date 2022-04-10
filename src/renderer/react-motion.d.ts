@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable react/prefer-stateless-function */
 /* eslint-disable max-classes-per-file */
 

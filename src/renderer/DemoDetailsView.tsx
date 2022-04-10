@@ -54,7 +54,6 @@ export default function DemoDetailsView() {
 
   if (demo === undefined) {
     // should never happen.
-    alert("demo was undefined!");
     return <Navigate to="/demos" />;
   }
 

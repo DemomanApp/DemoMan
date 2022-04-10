@@ -12,6 +12,7 @@ module.exports = {
         exceptAfterSingleLine: true,
       },
     ],
+    "@typescript-eslint/no-unused-vars": ["warn", { argsIgnorePattern: "^_" }],
   },
   parserOptions: {
     ecmaVersion: 2020,
