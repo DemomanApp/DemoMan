@@ -82,7 +82,8 @@ const createWindow = async () => {
     return path.join(RESOURCES_PATH, ...paths);
   };
 
-  if (app.commandLine.hasSwitch("debug")) {
+  // --debug switch increases verbosity in production
+  if (app.commandLine.hasSwitch("debug") && !isDevelopment) {
     log.transports.console.level = "debug";
     log.transports.file.level = "debug";
     // electron-log disables IPC transport (needed for logging from the renderer)
@@ -92,7 +93,6 @@ const createWindow = async () => {
   } else {
     log.transports.console.level = "info";
     log.transports.file.level = "info";
-    log.info("Debug mode disabled");
   }
 
   mainWindow = new BrowserWindow({
