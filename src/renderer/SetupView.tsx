@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useContext } from "react";
 
 import Container from "@mui/material/Container";
 import Typography from "@mui/material/Typography";
@@ -8,11 +8,23 @@ import StepLabel from "@mui/material/StepLabel";
 import Stack from "@mui/material/Stack";
 import ForwardIcon from "@mui/icons-material/ArrowForwardIos";
 import BackIcon from "@mui/icons-material/ArrowBackIosNew";
+import FolderIcon from "@mui/icons-material/FolderOpen";
+import DarkThemeIcon from "@mui/icons-material/Brightness3";
+import LightThemeIcon from "@mui/icons-material/Brightness7";
+import DoneIcon from "@mui/icons-material/Done";
 import Button from "@mui/material/Button";
-import Box from "@mui/system/Box";
-import Card from "@mui/material/Card";
+import Box from "@mui/material/Box";
+import ToggleButtonGroup from "@mui/material/ToggleButtonGroup";
+import ToggleButton from "@mui/material/ToggleButton";
+import { useNavigate } from "react-router-dom";
 
 import PageLayout from "./PageLayout";
+import AppIcon from "../../assets/icons/1024x1024.png";
+import getDemoPath from "./GetDemoPath";
+import ThemeContext from "./ThemeContext";
+
+import useStore from "./hooks/useStore";
+import store from "../common/store";
 
 type StepType = {
   key: number;
@@ -20,71 +32,113 @@ type StepType = {
   element: JSX.Element;
 };
 
-const steps: StepType[] = [
-  {
-    key: 0,
-    name: "Welcome",
-    element: (
-      <Card
-        sx={{
-          width: "700px",
-          height: "500px",
-        }}
-      >
-        <Stack alignItems="center">
-          <Typography variant="h4" component="span">
-            Thank you for installing DemoMan!
-          </Typography>
-        </Stack>
-      </Card>
-    ),
-  },
-  {
-    key: 1,
-    name: "Select your demo location",
-    element: (
-      <Card
-        sx={{
-          width: "300px",
-          height: "500px",
-        }}
-      >
-        2
-      </Card>
-    ),
-  },
-  {
-    key: 2,
-    name: "Choose a theme",
-    element: (
-      <Card
-        sx={{
-          width: "300px",
-          height: "500px",
-        }}
-      >
-        3
-      </Card>
-    ),
-  },
-  {
-    key: 3,
-    name: "Done",
-    element: (
-      <Card
-        sx={{
-          width: "300px",
-          height: "500px",
-        }}
-      >
-        4
-      </Card>
-    ),
-  },
-];
-
 export default function SetupView() {
   const [step, setStep] = React.useState(0);
+  const { theme, setTheme } = useContext(ThemeContext);
+  const [demoPath, setDemoPath] = useStore("demo_path");
+  const navigate = useNavigate();
+
+  const steps: StepType[] = [
+    {
+      key: 0,
+      name: "Welcome",
+      element: (
+        <Box>
+          <Stack alignItems="center" spacing={2} height="100%">
+            <img src={AppIcon} alt="logo" width="300px" />
+            <Typography variant="h4">
+              Thank you for installing DemoMan!
+            </Typography>
+            <Typography variant="body1">
+              Just a few things before you get started...
+            </Typography>
+          </Stack>
+        </Box>
+      ),
+    },
+    {
+      key: 1,
+      name: "Select your demo location",
+      element: (
+        <Box>
+          <Stack alignItems="center" spacing={2} height="100%">
+            <Typography variant="h5">
+              Where do you keep your demo files?
+            </Typography>
+            <Button
+              onClick={async () => {
+                const { canceled, filePaths } = await getDemoPath();
+                if (!canceled) {
+                  setDemoPath(filePaths[0]);
+                }
+              }}
+              variant="contained"
+              endIcon={<FolderIcon />}
+            >
+              Choose
+            </Button>
+            {demoPath !== undefined && (
+              <Typography variant="body2" color="GrayText">
+                {demoPath}
+              </Typography>
+            )}
+          </Stack>
+        </Box>
+      ),
+    },
+    {
+      key: 2,
+      name: "Choose a theme",
+      element: (
+        <Box>
+          <Stack
+            alignItems="center"
+            justifyContent="space-around"
+            spacing={2}
+            height="100%"
+          >
+            <Typography variant="h5">Choose your preferred theme.</Typography>
+            <ToggleButtonGroup
+              value={theme}
+              exclusive
+              size="large"
+              color="primary"
+              onChange={(_, value) => {
+                if (value !== null) {
+                  setTheme(value);
+                }
+              }}
+            >
+              <ToggleButton value="dark">
+                <DarkThemeIcon sx={{ width: "32px", height: "32px" }} />
+              </ToggleButton>
+              <ToggleButton value="light">
+                <LightThemeIcon sx={{ width: "32px", height: "32px" }} />
+              </ToggleButton>
+            </ToggleButtonGroup>
+          </Stack>
+        </Box>
+      ),
+    },
+    {
+      key: 3,
+      name: "Done",
+      element: (
+        <Box>
+          <Stack
+            alignItems="center"
+            justifyContent="space-around"
+            spacing={2}
+            height="100%"
+          >
+            <Typography variant="h5">You&apos;re all set.</Typography>
+            Have fun using DemoMan. Please report any bugs you come across and
+            submit feedback on the GitHub page.
+          </Stack>
+        </Box>
+      ),
+    },
+  ];
 
   return (
     <>
@@ -132,15 +186,17 @@ export default function SetupView() {
                   }}
                   disabled={step === 0}
                   variant="outlined"
+                  fullWidth
+                  startIcon={<BackIcon />}
                 >
-                  <BackIcon /> Previous
+                  Previous
                 </Button>
               </Box>
               <Stepper
                 alternativeLabel
                 activeStep={step}
                 sx={{
-                  flexGrow: 5,
+                  flexGrow: 7,
                   flexBasis: 0,
                   userSelect: "none",
                   paddingTop: "6px",
@@ -154,7 +210,15 @@ export default function SetupView() {
               </Stepper>
               <Box sx={{ flexGrow: 1, flexBasis: 0 }}>
                 {step === steps.length - 1 ? (
-                  <Button onClick={() => {}} variant="contained">
+                  <Button
+                    onClick={() => {
+                      store.set("setup_completed", true);
+                      navigate("/demos");
+                    }}
+                    variant="contained"
+                    fullWidth
+                    endIcon={<DoneIcon />}
+                  >
                     Finish
                   </Button>
                 ) : (
@@ -163,8 +227,11 @@ export default function SetupView() {
                       setStep(step + 1);
                     }}
                     variant="contained"
+                    disabled={step === 1 && demoPath === undefined}
+                    fullWidth
+                    endIcon={<ForwardIcon />}
                   >
-                    Next <ForwardIcon />
+                    Next
                   </Button>
                 )}
               </Box>
