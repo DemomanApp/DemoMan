@@ -27,7 +27,8 @@
     "node_modules": true,
     "githubassets": true,
     ".erb": true,
-    ".github": true
+    ".github": true,
+    ".husky": true,
   },
   "editor.suggest.preview": true
 }
