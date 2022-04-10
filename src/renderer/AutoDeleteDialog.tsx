@@ -74,6 +74,9 @@ export default function AutoDeleteDialog(props: AutoDeleteDialogProps) {
   const [numberSelected, setNumberSelected] = useState(0);
 
   useEffect(() => {
+    if (demosPath === undefined) {
+      return;
+    }
     const newFiles = findFilesWithoutCounterpart(demosPath);
     const fileListEntries = newFiles.map<AutoDeleteDialogFileListEntry>(
       (file) => {
@@ -86,6 +89,10 @@ export default function AutoDeleteDialog(props: AutoDeleteDialogProps) {
   }, [open, demosPath, files.length]);
 
   const confirm = () => {
+    if (demosPath === undefined) {
+      onClose();
+      return;
+    }
     files
       .filter((listEntry: AutoDeleteDialogFileListEntry) => listEntry.selected)
       .map((listEntry: AutoDeleteDialogFileListEntry) =>
