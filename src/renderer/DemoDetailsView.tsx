@@ -2,16 +2,20 @@ import { useContext, useState } from "react";
 import { shell } from "electron";
 import log from "electron-log";
 
-import Paper from "@mui/material/Paper";
-import Grid from "@mui/material/Grid";
-import Tooltip from "@mui/material/Tooltip";
-import EditIcon from "@mui/icons-material/Edit";
-import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
-import FolderOpenIcon from "@mui/icons-material/FolderOpen";
-import IconButton from "@mui/material/IconButton";
-import Container from "@mui/material/Container";
-import ArrowBackIcon from "@mui/icons-material/ArrowBackIosNew";
-import Typography from "@mui/material/Typography";
+import {
+  Paper,
+  Grid,
+  Tooltip,
+  IconButton,
+  Container,
+  Typography,
+} from "@mui/material";
+import {
+  Edit as EditIcon,
+  DeleteOutline as DeleteOutlineIcon,
+  FolderOpen as FolderOpenIcon,
+  ArrowBackIosNew as ArrowBackIcon,
+} from "@mui/icons-material";
 import { Navigate, useNavigate, useParams } from "react-router-dom";
 
 import DemoEvent from "./DemoEvent";

@@ -1,9 +1,6 @@
-import React, { useState } from "react";
+import { ChangeEvent, useState } from "react";
 
-import Grid from "@mui/material/Grid";
-import Button from "@mui/material/Button";
-import TextField from "@mui/material/TextField";
-import InputAdornment from "@mui/material/InputAdornment";
+import { Grid, Button, TextField, InputAdornment } from "@mui/material";
 
 import SmallDialog from "./SmallDialog";
 
@@ -40,7 +37,7 @@ export default (props: EditEventDialogProps) => {
   const [valueError, setValueError] = useState(false);
 
   const validateTickInput = (
-    e: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>
+    e: ChangeEvent<HTMLTextAreaElement | HTMLInputElement>
   ) => {
     const parsedInt = parseInt(e.target.value, 10);
     setTickError(Number.isNaN(parsedInt) || parsedInt < 0);
@@ -48,7 +45,7 @@ export default (props: EditEventDialogProps) => {
   };
 
   const validateValueInput = (
-    e: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>
+    e: ChangeEvent<HTMLTextAreaElement | HTMLInputElement>
   ) => {
     setValueError(e.target.value.length === 0);
     onValueChanged(e.target.value);

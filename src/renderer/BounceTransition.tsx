@@ -1,9 +1,9 @@
-import React from "react";
+import { ReactNode, CSSProperties } from "react";
 import { Motion, spring, PlainStyle } from "@serprex/react-motion";
 
 type BounceTransitionProps = {
-  children: React.ReactNode;
-  otherStyles?: React.CSSProperties;
+  children: ReactNode;
+  otherStyles?: CSSProperties;
 };
 
 function bounce(val: number) {
@@ -13,7 +13,7 @@ function bounce(val: number) {
   });
 }
 
-const mapStyles = (styles: PlainStyle): React.CSSProperties => ({
+const mapStyles = (styles: PlainStyle): CSSProperties => ({
   opacity: styles.opacity,
   transform: `scale(${styles.scale})`,
 });

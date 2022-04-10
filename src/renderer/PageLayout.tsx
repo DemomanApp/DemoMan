@@ -1,5 +1,5 @@
 import { ReactNode } from "react";
-import Box from "@mui/system/Box";
+
 import AppBar, { AppBarProps } from "./AppBar";
 import BounceTransition from "./BounceTransition";
 
@@ -10,11 +10,11 @@ export default function AppContentContainer(props: PageLayoutProps) {
   return (
     <>
       <AppBar left={left} center={center} right={right} />
-      <Box sx={{ paddingTop: "64px", height: "100%" }}>
+      <div style={{ paddingTop: "64px", height: "100%" }}>
         <BounceTransition otherStyles={{ height: "100%" }}>
           {children}
         </BounceTransition>
-      </Box>
+      </div>
     </>
   );
 }

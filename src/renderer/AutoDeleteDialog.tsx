@@ -2,15 +2,17 @@ import { useEffect, useState } from "react";
 import fs from "fs";
 import path from "path";
 
-import Button from "@mui/material/Button";
-import List from "@mui/material/List";
-import ListItem from "@mui/material/ListItem";
-import ListItemIcon from "@mui/material/ListItemIcon";
-import ListItemText from "@mui/material/ListItemText";
-import Checkbox from "@mui/material/Checkbox";
-import DialogContentText from "@mui/material/DialogContentText";
-import Paper from "@mui/material/Paper";
-import Divider from "@mui/material/Divider";
+import {
+  Button,
+  List,
+  ListItem,
+  ListItemIcon,
+  ListItemText,
+  Checkbox,
+  DialogContentText,
+  Paper,
+  Divider,
+} from "@mui/material";
 import styled from "@mui/material/styles/styled";
 
 import { formatFileSize } from "./util";

@@ -1,5 +1,4 @@
-import Button from "@mui/material/Button";
-import DialogContentText from "@mui/material/DialogContentText";
+import { Button, DialogContentText } from "@mui/material";
 
 import SmallDialog from "./SmallDialog";
 

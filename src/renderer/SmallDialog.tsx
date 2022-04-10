@@ -1,10 +1,12 @@
 import { ReactNode } from "react";
 
-import Dialog from "@mui/material/Dialog";
-import DialogTitle from "@mui/material/DialogTitle";
-import DialogActions from "@mui/material/DialogActions";
-import DialogContent from "@mui/material/DialogContent";
-import Zoom from "@mui/material/Zoom";
+import {
+  Dialog,
+  DialogTitle,
+  DialogActions,
+  DialogContent,
+  Zoom,
+} from "@mui/material";
 
 type SmallDialogProps = {
   title: string;

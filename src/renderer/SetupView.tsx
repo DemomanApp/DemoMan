@@ -1,22 +1,26 @@
-import React, { useContext } from "react";
-
-import Container from "@mui/material/Container";
-import Typography from "@mui/material/Typography";
-import Stepper from "@mui/material/Stepper";
-import Step from "@mui/material/Step";
-import StepLabel from "@mui/material/StepLabel";
-import Stack from "@mui/material/Stack";
-import ForwardIcon from "@mui/icons-material/ArrowForwardIos";
-import BackIcon from "@mui/icons-material/ArrowBackIosNew";
-import FolderIcon from "@mui/icons-material/FolderOpen";
-import DarkThemeIcon from "@mui/icons-material/Brightness3";
-import LightThemeIcon from "@mui/icons-material/Brightness7";
-import DoneIcon from "@mui/icons-material/Done";
-import Button from "@mui/material/Button";
-import Box from "@mui/material/Box";
-import ToggleButtonGroup from "@mui/material/ToggleButtonGroup";
-import ToggleButton from "@mui/material/ToggleButton";
+import { useContext, useState } from "react";
 import { useNavigate } from "react-router-dom";
+
+import {
+  Container,
+  Typography,
+  Stepper,
+  Step,
+  StepLabel,
+  Stack,
+  Button,
+  Box,
+  ToggleButtonGroup,
+  ToggleButton,
+} from "@mui/material";
+import {
+  ArrowForwardIos as ForwardIcon,
+  ArrowBackIosNew as BackIcon,
+  FolderOpen as FolderIcon,
+  Brightness3 as DarkThemeIcon,
+  Brightness7 as LightThemeIcon,
+  Done as DoneIcon,
+} from "@mui/icons-material";
 
 import PageLayout from "./PageLayout";
 import AppIcon from "../../assets/icons/1024x1024.png";
@@ -33,7 +37,7 @@ type StepType = {
 };
 
 export default function SetupView() {
-  const [step, setStep] = React.useState(0);
+  const [step, setStep] = useState(0);
   const { theme, setTheme } = useContext(ThemeContext);
   const [demoPath, setDemoPath] = useStore("demo_path");
   const navigate = useNavigate();

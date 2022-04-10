@@ -1,17 +1,21 @@
-import React, { useCallback, useContext, useEffect, useState } from "react";
+import {
+  ChangeEvent,
+  useCallback,
+  useContext,
+  useEffect,
+  useState,
+} from "react";
 import { shell } from "electron";
 import { useNavigate } from "react-router";
 
 import debounce from "@mui/utils/debounce";
-import ClearIcon from "@mui/icons-material/Clear";
-import Paper from "@mui/material/Paper";
-import InputBase from "@mui/material/InputBase";
-import Divider from "@mui/material/Divider";
-import IconButton from "@mui/material/IconButton";
-import SettingsIcon from "@mui/icons-material/Settings";
-import InfoIcon from "@mui/icons-material/InfoOutlined";
-import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
-import Tooltip from "@mui/material/Tooltip";
+import { Paper, InputBase, Divider, IconButton, Tooltip } from "@mui/material";
+import {
+  Clear as ClearIcon,
+  Settings as SettingsIcon,
+  InfoOutlined as InfoIcon,
+  MoreHoriz as MoreHorizIcon,
+} from "@mui/icons-material";
 
 import Demo from "./Demo";
 import DemoTable from "./DemoTable";
@@ -67,7 +71,7 @@ export default function MainView() {
   };
 
   const quickFilterChanged = (
-    e: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>
+    e: ChangeEvent<HTMLTextAreaElement | HTMLInputElement>
   ) => {
     setQuickFilter(e.target.value);
   };

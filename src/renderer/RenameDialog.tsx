@@ -1,8 +1,6 @@
-import React, { useContext, useState } from "react";
+import { ChangeEvent, useContext, useState } from "react";
 
-import Button from "@mui/material/Button";
-import TextField from "@mui/material/TextField";
-import InputAdornment from "@mui/material/InputAdornment";
+import { Button, TextField, InputAdornment } from "@mui/material";
 
 import SmallDialog from "./SmallDialog";
 import DemosContext from "./DemosContext";
@@ -30,7 +28,7 @@ export default function RenameDialog(props: RenameDialogProps) {
   };
 
   const validateNewName = (
-    e: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>
+    e: ChangeEvent<HTMLTextAreaElement | HTMLInputElement>
   ) => {
     if (
       // Only allow filenames with legal characters and reasonable length

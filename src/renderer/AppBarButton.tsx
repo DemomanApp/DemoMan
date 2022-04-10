@@ -1,11 +1,11 @@
-import React from "react";
+import { MouseEvent } from "react";
 
 import { Tooltip, IconButton } from "@mui/material";
 
 export type AppBarButtonProps = {
   icon: JSX.Element;
   tooltip: string;
-  onClick: (event: React.MouseEvent<HTMLElement>) => void;
+  onClick: (event: MouseEvent<HTMLElement>) => void;
 };
 
 export default function AppBarButton(props: AppBarButtonProps) {

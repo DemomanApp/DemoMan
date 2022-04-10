@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState, ReactNode } from "react";
 
 import Demo, { DemoDict } from "./Demo";
 import getDemosInDirectory from "./getDemosInDirectory";
@@ -6,7 +6,7 @@ import DemosContext from "./DemosContext";
 import useStore from "./hooks/useStore";
 
 type DemosProviderProps = {
-  children: React.ReactNode;
+  children: ReactNode;
 };
 
 export default function DemosProvider(props: DemosProviderProps) {

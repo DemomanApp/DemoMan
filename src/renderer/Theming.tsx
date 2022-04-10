@@ -1,15 +1,15 @@
-import React from "react";
+import { ReactNode } from "react";
 
 import "@fontsource/nunito";
 
 import { ThemeProvider, StyledEngineProvider } from "@mui/material/styles";
-import CssBaseline from "@mui/material/CssBaseline";
+import { CssBaseline } from "@mui/material";
 
 import ThemeContext from "./ThemeContext";
 import { darkTheme, getPreferredTheme, lightTheme } from "./theme";
 import useStore from "./hooks/useStore";
 
-export default ({ children }: { children: React.ReactNode }) => {
+export default ({ children }: { children: ReactNode }) => {
   const [theme, setTheme] = useStore("theme", getPreferredTheme());
 
   return (

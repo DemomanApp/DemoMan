@@ -1,9 +1,7 @@
 import DataTable from "react-data-table-component";
 
-import ArrowDownward from "@mui/icons-material/ArrowDownward";
-import IconButton from "@mui/material/IconButton";
-import AddIcon from "@mui/icons-material/Add";
-import Tooltip from "@mui/material/Tooltip";
+import { IconButton, Tooltip } from "@mui/material";
+import { ArrowDownward, Add as AddIcon } from "@mui/icons-material";
 
 import { getPreferredTheme } from "./theme";
 import DemoEvent from "./DemoEvent";

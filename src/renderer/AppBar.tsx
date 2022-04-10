@@ -1,13 +1,12 @@
-import React from "react";
+import { ReactNode } from "react";
 
-import Box from "@mui/system/Box";
-import MuiAppBar from "@mui/material/AppBar";
-import Toolbar from "@mui/material/Toolbar";
+import { Box } from "@mui/system";
+import { AppBar as MuiAppBar, Toolbar } from "@mui/material";
 
 export type AppBarProps = {
-  left?: React.ReactNode;
-  center?: React.ReactNode;
-  right?: React.ReactNode;
+  left?: ReactNode;
+  center?: ReactNode;
+  right?: ReactNode;
 };
 
 export default function AppBar(props: AppBarProps) {

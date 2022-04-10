@@ -1,6 +1,5 @@
 import { createTheme } from "@mui/material/styles";
-import blue from "@mui/material/colors/blue";
-import red from "@mui/material/colors/red";
+import { blue, red } from "@mui/material/colors";
 
 export type ThemeType = "dark" | "light";
 

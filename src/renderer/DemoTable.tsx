@@ -4,12 +4,11 @@ import DataTable, {
 } from "react-data-table-component";
 import merge from "deepmerge";
 
-import ArrowDownward from "@mui/icons-material/ArrowDownward";
-import blue from "@mui/material/colors/blue";
-
-import loading from "../../assets/loading.gif";
+import { ArrowDownward } from "@mui/icons-material";
+import { blue } from "@mui/material/colors";
 
 import Demo from "./Demo";
+import loading from "../../assets/loading.gif";
 import { formatFileSize, formatPlaybackTime } from "./util";
 import { getPreferredTheme } from "./theme";
 

@@ -1,7 +1,6 @@
-import React, { useState } from "react";
+import { useState, MouseEvent } from "react";
 
-import Menu from "@mui/material/Menu";
-import MenuItem from "@mui/material/MenuItem";
+import { Menu, MenuItem } from "@mui/material";
 
 import AppBarButton from "./AppBarButton";
 
@@ -25,7 +24,7 @@ export default function AppBarMenu(props: AppBarMenuProps) {
       <AppBarButton
         icon={icon}
         tooltip={tooltip}
-        onClick={(event: React.MouseEvent<HTMLElement>) => {
+        onClick={(event: MouseEvent<HTMLElement>) => {
           setAnchorEl(event.currentTarget);
         }}
       />

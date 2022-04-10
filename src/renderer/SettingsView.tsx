@@ -2,18 +2,22 @@ import { useContext } from "react";
 import { ipcRenderer } from "electron";
 import { useNavigate } from "react-router-dom";
 
-import List from "@mui/material/List";
-import ListItem from "@mui/material/ListItem";
-import ListItemText from "@mui/material/ListItemText";
-import ListItemIcon from "@mui/material/ListItemIcon";
-import FolderIcon from "@mui/icons-material/Folder";
-import PaletteIcon from "@mui/icons-material/Palette";
-import DarkThemeIcon from "@mui/icons-material/Brightness3";
-import LightThemeIcon from "@mui/icons-material/Brightness7";
-import ArrowBackIcon from "@mui/icons-material/ArrowBackIosNew";
-import Switch from "@mui/material/Switch";
-import Typography from "@mui/material/Typography";
-import Container from "@mui/material/Container";
+import {
+  List,
+  ListItem,
+  ListItemText,
+  ListItemIcon,
+  Switch,
+  Typography,
+  Container,
+} from "@mui/material";
+import {
+  Folder as FolderIcon,
+  Palette as PaletteIcon,
+  Brightness3 as DarkThemeIcon,
+  Brightness7 as LightThemeIcon,
+  ArrowBackIosNew as ArrowBackIcon,
+} from "@mui/icons-material";
 
 import getDemoPath from "./GetDemoPath";
 import PageLayout from "./PageLayout";

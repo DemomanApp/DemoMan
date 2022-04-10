@@ -1,7 +1,6 @@
-import React from "react";
+import { useContext } from "react";
 
-import Button from "@mui/material/Button";
-import DialogContentText from "@mui/material/DialogContentText";
+import { Button, DialogContentText } from "@mui/material";
 
 import { formatFileSize } from "./util";
 import SmallDialog from "./SmallDialog";
@@ -16,7 +15,7 @@ export default function InfoDialog(props: InfoDialogProps) {
   const { open, onClose } = props;
 
   // TODO: only recompute stats when opening the dialog (not when closing)
-  const { demos } = React.useContext(DemosContext);
+  const { demos } = useContext(DemosContext);
 
   const demoList = Object.values(demos);
 

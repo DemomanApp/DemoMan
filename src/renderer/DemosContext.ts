@@ -1,4 +1,4 @@
-import React from "react";
+import { createContext } from "react";
 
 import Demo, { DemoDict } from "./Demo";
 
@@ -11,4 +11,4 @@ type DemosContextType = {
   deleteDemo: (name: string) => void;
 };
 
-export default React.createContext<DemosContextType>({} as DemosContextType);
+export default createContext<DemosContextType>({} as DemosContextType);
