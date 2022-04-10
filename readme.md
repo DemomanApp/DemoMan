@@ -13,7 +13,7 @@ Grab the latest prebuilt version [here](https://github.com/Narcha/DemoMan/releas
 
 Prerequisites: [node.js](https://nodejs.org/en/download/) and npm (included in node.js).
 
-Then, clone the repository and run `npm install`.
+Clone the repository and run `npm install`.
 
 Start the program by running `npm start`.
 
@@ -21,4 +21,4 @@ Create a packaged executable by running `npm run package`.
 
 ## License
 
-This software is released under the [GNU GPLv3](LICENSE) license.
+DemoMan is [free software](https://www.gnu.org/philosophy/free-sw.html) released under the [GNU GPLv3](LICENSE) license.
