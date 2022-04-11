@@ -169,6 +169,7 @@ export default function SetupView() {
                       transform: `translateX(${200 * offset}px) scale(${
                         offset === 0 ? 1 : 0.8
                       })`,
+                      zIndex: offset === 0 ? 10 : -10,
                     }}
                   >
                     {e.element}
