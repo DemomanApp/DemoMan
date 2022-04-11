@@ -135,9 +135,9 @@ export default function SetupView() {
             spacing={2}
             height="100%"
           >
-            <Typography variant="h5">You&apos;re all set.</Typography>
-            Have fun using DemoMan. Please report any bugs you come across and
-            submit feedback on the GitHub page.
+            <Typography variant="h5">You&apos;re all set. Have fun!</Typography>
+            Please report any bugs you come across and submit feedback on the
+            GitHub page.
           </Stack>
         </Box>
       ),
