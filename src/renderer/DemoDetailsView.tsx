@@ -37,7 +37,7 @@ export default function DemoDetailsView() {
   const navigate = useNavigate();
 
   const demoName = (useParams() as DemoDetailsRouteParams).name;
-  const demo = getDemoByName(atob(demoName));
+  const demo = getDemoByName(decodeURIComponent(demoName));
 
   const [renameDialogOpen, setRenameDialogOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
@@ -224,7 +224,7 @@ export default function DemoDetailsView() {
         onConfirm={(newName) => {
           setRenameDialogOpen(false);
           renameDemo(demo.name, newName);
-          navigate(`/demos/${btoa(newName)}`, { replace: true });
+          navigate(`/demos/${encodeURIComponent(newName)}`, { replace: true });
         }}
         oldName={demo.name}
       />

@@ -77,7 +77,7 @@ export default function MainView() {
   };
 
   const viewDemo = (demo: Demo) => {
-    navigate(`${btoa(demo.name)}`);
+    navigate(`${encodeURIComponent(demo.name)}`);
   };
 
   return (
