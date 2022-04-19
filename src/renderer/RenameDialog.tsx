@@ -2,6 +2,8 @@ import { ChangeEvent, useContext, useState } from "react";
 
 import { Button, TextField, InputAdornment } from "@mui/material";
 
+import isValidFilename from "valid-filename";
+
 import SmallDialog from "./SmallDialog";
 import DemosContext from "./DemosContext";
 
@@ -31,8 +33,8 @@ export default function RenameDialog(props: RenameDialogProps) {
     e: ChangeEvent<HTMLTextAreaElement | HTMLInputElement>
   ) => {
     if (
-      // Only allow filenames with legal characters and reasonable length
-      /^[a-zA-Z0-9\-_ [\]().]{1,50}$/.test(e.target.value) &&
+      // Only allow valid filenames
+      isValidFilename(e.target.value) &&
       // Check if this name is available, but allow the old name
       (getDemoByName(e.target.value) === undefined ||
         e.target.value === oldName)
