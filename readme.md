@@ -1,6 +1,22 @@
-![Logo](githubassets/Banner.png)
+<p align="center">
+  <img src="https://raw.githubusercontent.com/narcha/demoman/main/githubassets/Banner.png"
+       height="200">
+</p>
+<p align="center">
+  <a href="https://www.codefactor.io/repository/github/narcha/demoman" alt="CodeFactor">
+    <img alt="CodeFactor" src="https://img.shields.io/codefactor/grade/github/narcha/demoman?style=for-the-badge">
+  </a>
+  <a href="https://discord.gg/GduKxhYFhR">
+    <img alt="Discord" src="https://img.shields.io/discord/966262251944292372?style=for-the-badge">
+  </a>
+  <a href="https://github.com/Narcha/DemoMan/blob/main/LICENSE.txt">
+    <img alt="GitHub" src="https://img.shields.io/github/license/Narcha/Demoman?style=for-the-badge">
+  </a>
+  <a href="https://github.com/Narcha/DemoMan/releases/latest">
+    <img alt="GitHub release" src="https://img.shields.io/github/v/release/narcha/demoman?include_prereleases&style=for-the-badge">
+  </a>
+</p>
 
-[![CodeFactor](https://www.codefactor.io/repository/github/narcha/demoman/badge)](https://www.codefactor.io/repository/github/narcha/demoman)
 # DemoMan
 
 A TF2 demo manager for Linux, Windows and MacOS built with [Electron](https://www.electronjs.org/)
