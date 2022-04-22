@@ -2,14 +2,7 @@ import { useContext, useState } from "react";
 import { shell } from "electron";
 import log from "electron-log";
 
-import {
-  Paper,
-  Grid,
-  Tooltip,
-  IconButton,
-  Container,
-  Typography,
-} from "@mui/material";
+import { Paper, Grid, Container, Typography } from "@mui/material";
 import {
   Edit as EditIcon,
   DeleteOutline as DeleteOutlineIcon,
@@ -27,6 +20,7 @@ import RenameDialog from "./RenameDialog";
 import MapThumbnail from "./MapThumbnail";
 import PageLayout from "./PageLayout";
 import DemosContext from "./DemosContext";
+import AppBarButton from "./AppBarButton";
 
 type DemoDetailsRouteParams = {
   name: string;
@@ -79,14 +73,13 @@ export default function DemoDetailsView() {
     <>
       <PageLayout
         left={
-          <IconButton
+          <AppBarButton
+            tooltip="Go back"
+            icon={<ArrowBackIcon />}
             onClick={() => {
               navigate(-1);
             }}
-            size="large"
-          >
-            <ArrowBackIcon />
-          </IconButton>
+          />
         }
         center={
           <Typography variant="h5" noWrap component="div">
@@ -95,32 +88,21 @@ export default function DemoDetailsView() {
         }
         right={
           <>
-            <Tooltip title="Rename">
-              <IconButton
-                onClick={() => setRenameDialogOpen(true)}
-                size="large"
-              >
-                <EditIcon />
-              </IconButton>
-            </Tooltip>
-            <Tooltip title="Delete">
-              <IconButton
-                onClick={() => setDeleteDialogOpen(true)}
-                size="large"
-              >
-                <DeleteOutlineIcon />
-              </IconButton>
-            </Tooltip>
-            <Tooltip title="Show in explorer">
-              <IconButton
-                onClick={() => {
-                  shell.showItemInFolder(demo.path);
-                }}
-                size="large"
-              >
-                <FolderOpenIcon />
-              </IconButton>
-            </Tooltip>
+            <AppBarButton
+              tooltip="Rename"
+              icon={<EditIcon />}
+              onClick={() => setRenameDialogOpen(true)}
+            />
+            <AppBarButton
+              tooltip="Delete"
+              icon={<DeleteOutlineIcon />}
+              onClick={() => setDeleteDialogOpen(true)}
+            />
+            <AppBarButton
+              tooltip="Show in explorer"
+              icon={<FolderOpenIcon />}
+              onClick={() => shell.showItemInFolder(demo.path)}
+            />
           </>
         }
       >
