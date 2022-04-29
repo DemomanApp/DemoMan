@@ -39,7 +39,7 @@ export default function EventTable(props: EventTableProps) {
     <DataTable
       title="Events"
       columns={columns}
-      defaultSortField="event.tick"
+      defaultSortField="tick"
       defaultSortAsc
       highlightOnHover
       noDataComponent={
