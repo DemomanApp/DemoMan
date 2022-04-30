@@ -49,23 +49,6 @@ function findFilesWithoutCounterpart(dirPath: string) {
   return filesWithoutCounterpart;
 }
 
-const ScrollList = styled(List)({
-  overflow: "overlay",
-  "&::-webkit-scrollbar-thumb": {
-    backgroundColor: "#ccc",
-    borderRadius: "8px",
-    border: "4px solid transparent",
-    backgroundClip: "content-box",
-    minHeight: "64px",
-  },
-  "&::-webkit-scrollbar": {
-    width: "16px",
-  },
-  "&::-webkit-scrollbar-thumb:hover": {
-    backgroundColor: "#999",
-  },
-});
-
 export default function AutoDeleteDialog(props: AutoDeleteDialogProps) {
   const { open, onClose } = props;
   const [demosPath] = useStore("demo_path");
@@ -204,7 +187,7 @@ export default function AutoDeleteDialog(props: AutoDeleteDialogProps) {
           </ListItem>
         </List>
         <Divider />
-        <ScrollList style={{ maxHeight: "200px" }} dense>
+        <List style={{ maxHeight: "200px" }} dense>
           {files.map((file, index) => (
             <ListItem
               button
@@ -219,7 +202,7 @@ export default function AutoDeleteDialog(props: AutoDeleteDialogProps) {
               <ListItemText primary={file.fileName} />
             </ListItem>
           ))}
-        </ScrollList>
+        </List>
       </Paper>
     </SmallDialog>
   );
