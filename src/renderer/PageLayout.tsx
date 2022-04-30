@@ -10,7 +10,14 @@ export default function AppContentContainer(props: PageLayoutProps) {
   return (
     <>
       <AppBar left={left} center={center} right={right} />
-      <div style={{ paddingTop: "64px", height: "100%" }}>
+      <div
+        style={{
+          position: "absolute",
+          height: "100vh",
+          width: "100vw",
+          paddingTop: "64px",
+        }}
+      >
         <BounceTransition otherStyles={{ height: "100%" }}>
           {children}
         </BounceTransition>
