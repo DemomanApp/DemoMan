@@ -17,21 +17,53 @@ export default function DemosProvider(props: DemosProviderProps) {
   //   demosPath !== undefined ? getDemosInDirectory(demosPath) : {}
   // );
   const [demos, setDemos] = useState<DemoDict>({});
+  const [knownTags, setKnownTags] = useState<Set<string>>(new Set());
+  const [knownMaps, setKnownMaps] = useState<Set<string>>(new Set());
+  const [knownPlayers, setKnownPlayers] = useState<Set<string>>(new Set());
 
   const reloadEverything = useCallback(() => {
     if (demosPath !== undefined) {
-      setDemos(getDemosInDirectory(demosPath));
+      const newDemos = getDemosInDirectory(demosPath);
+      const newKnownTags: Set<string> = new Set();
+      const newKnownMaps: Set<string> = new Set();
+      const newKnownPlayers: Set<string> = new Set();
+      Object.values(newDemos).forEach((demo) => {
+        demo.tags.forEach((tag) => {
+          newKnownTags.add(tag);
+        });
+        newKnownMaps.add(demo.mapName);
+        newKnownPlayers.add(demo.clientName);
+      });
+      setDemos(newDemos);
+      setKnownTags(newKnownTags);
+      setKnownMaps(newKnownMaps);
+      setKnownPlayers(newKnownPlayers);
     } else {
       setDemos({});
     }
   }, [demosPath]);
 
-  const reloadEvents = () => {
+  const reloadEvents = useCallback(() => {
     Object.values(demos).forEach((demo) => {
       const [events, tags] = Demo.readEventsAndTags(demo.path);
       demo.events = events;
       demo.tags = tags;
+      const newKnownTags: Set<string> = new Set(knownTags);
+      tags.forEach((tag) => {
+        if (!knownTags.has(tag)) {
+          newKnownTags.add(tag);
+        }
+      });
+      if (newKnownTags !== knownTags) {
+        setKnownTags(newKnownTags);
+      }
     });
+  }, [demos, knownTags]);
+
+  const addKnownTag = (tag: string) => {
+    const newKnownTags = new Set(knownTags);
+    newKnownTags.add(tag);
+    setKnownTags(newKnownTags);
   };
 
   const getDemoByName = (name: string) => {
@@ -68,6 +100,10 @@ export default function DemosProvider(props: DemosProviderProps) {
         getDemoByName,
         renameDemo,
         deleteDemo,
+        knownTags,
+        knownMaps,
+        knownPlayers,
+        addKnownTag,
       }}
     >
       {children}

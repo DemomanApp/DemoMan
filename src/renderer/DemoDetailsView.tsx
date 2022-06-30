@@ -4,17 +4,18 @@ import log from "electron-log";
 
 import {
   Paper,
-  Grid,
-  Tooltip,
-  IconButton,
   Container,
   Typography,
+  Autocomplete,
+  TextField,
+  Stack,
 } from "@mui/material";
 import {
   Edit as EditIcon,
   DeleteOutline as DeleteOutlineIcon,
   FolderOpen as FolderOpenIcon,
   ArrowBackIosNew as ArrowBackIcon,
+  Check as CheckIcon,
 } from "@mui/icons-material";
 import { Navigate, useNavigate, useParams } from "react-router-dom";
 
@@ -27,13 +28,15 @@ import RenameDialog from "./RenameDialog";
 import MapThumbnail from "./MapThumbnail";
 import PageLayout from "./PageLayout";
 import DemosContext from "./DemosContext";
+import AppBarButton from "./AppBarButton";
 
 type DemoDetailsRouteParams = {
   name: string;
 };
 
 export default function DemoDetailsView() {
-  const { getDemoByName, deleteDemo, renameDemo } = useContext(DemosContext);
+  const { getDemoByName, deleteDemo, renameDemo, knownTags, addKnownTag } =
+    useContext(DemosContext);
   const navigate = useNavigate();
 
   const demoName = (useParams() as DemoDetailsRouteParams).name;
@@ -50,9 +53,17 @@ export default function DemoDetailsView() {
 
   const [demoEvents, setDemoEventsState] = useState(demo.events);
 
+  const [demoTags, setDemoTagsState] = useState(demo.tags);
+
   const setDemoEvents = (newEvents: DemoEvent[]) => {
     setDemoEventsState(newEvents);
     demo.events = newEvents;
+    demo.writeEventsAndTags();
+  };
+
+  const setDemoTags = (newTags: string[]) => {
+    setDemoTagsState(newTags);
+    demo.tags = newTags;
     demo.writeEventsAndTags();
   };
 
@@ -79,14 +90,13 @@ export default function DemoDetailsView() {
     <>
       <PageLayout
         left={
-          <IconButton
+          <AppBarButton
+            tooltip="Go back"
+            icon={<ArrowBackIcon />}
             onClick={() => {
               navigate(-1);
             }}
-            size="large"
-          >
-            <ArrowBackIcon />
-          </IconButton>
+          />
         }
         center={
           <Typography variant="h5" noWrap component="div">
@@ -95,68 +105,84 @@ export default function DemoDetailsView() {
         }
         right={
           <>
-            <Tooltip title="Rename">
-              <IconButton
-                onClick={() => setRenameDialogOpen(true)}
-                size="large"
-              >
-                <EditIcon />
-              </IconButton>
-            </Tooltip>
-            <Tooltip title="Delete">
-              <IconButton
-                onClick={() => setDeleteDialogOpen(true)}
-                size="large"
-              >
-                <DeleteOutlineIcon />
-              </IconButton>
-            </Tooltip>
-            <Tooltip title="Show in explorer">
-              <IconButton
-                onClick={() => {
-                  shell.showItemInFolder(demo.path);
-                }}
-                size="large"
-              >
-                <FolderOpenIcon />
-              </IconButton>
-            </Tooltip>
+            <AppBarButton
+              tooltip="Rename"
+              icon={<EditIcon />}
+              onClick={() => setRenameDialogOpen(true)}
+            />
+            <AppBarButton
+              tooltip="Delete"
+              icon={<DeleteOutlineIcon />}
+              onClick={() => setDeleteDialogOpen(true)}
+            />
+            <AppBarButton
+              tooltip="Show in explorer"
+              icon={<FolderOpenIcon />}
+              onClick={() => shell.showItemInFolder(demo.path)}
+            />
           </>
         }
       >
         <Container>
-          <Grid
-            item
-            container
+          <Stack
+            direction="row"
+            justifyContent="center"
             alignItems="stretch"
-            justifyContent="space-around"
-            style={{ padding: "24px" }}
+            spacing={2}
+            pt="24px"
           >
-            <Grid
-              item
-              container
-              direction="column"
-              xs={6}
-              alignItems="center"
+            <Stack
+              alignItems="stretch"
               spacing={2}
+              justifyContent="space-between"
             >
-              <Grid item>
-                <MapThumbnail mapName={demo.mapName} />
-              </Grid>
-              <Grid item>
-                <DemoMetadataList demo={demo} />
-              </Grid>
-            </Grid>
-            <Grid item xs={6}>
-              <Paper elevation={3} style={{ padding: "5px" }}>
-                <EventTable
-                  data={demoEvents}
-                  editEvent={editEvent}
-                  addEvent={addEvent}
-                />
-              </Paper>
-            </Grid>
-          </Grid>
+              <MapThumbnail mapName={demo.mapName} />
+              <DemoMetadataList demo={demo} />
+              <Autocomplete
+                multiple
+                disableCloseOnSelect
+                size="small"
+                options={[...knownTags]}
+                fullWidth
+                limitTags={3}
+                freeSolo
+                value={demoTags}
+                renderInput={(params) => (
+                  <TextField
+                    // eslint-disable-next-line react/jsx-props-no-spreading
+                    {...params}
+                    label="Tags"
+                  />
+                )}
+                renderOption={(props, option, { selected }) => (
+                  // eslint-disable-next-line react/jsx-props-no-spreading
+                  <li {...props}>
+                    {option}
+                    {selected && <CheckIcon sx={{ marginLeft: "auto" }} />}
+                  </li>
+                )}
+                sx={{
+                  maxWidth: "320px",
+                }}
+                onChange={(_e, tags: string[]) => {
+                  if (tags.length !== 0) {
+                    const newTag = tags[tags.length - 1];
+                    if (!knownTags.has(newTag)) {
+                      addKnownTag(newTag);
+                    }
+                  }
+                  setDemoTags(tags);
+                }}
+              />
+            </Stack>
+            <Paper elevation={3} style={{ padding: "5px", minWidth: "640px" }}>
+              <EventTable
+                data={demoEvents}
+                editEvent={editEvent}
+                addEvent={addEvent}
+              />
+            </Paper>
+          </Stack>
         </Container>
       </PageLayout>
       <EditEventDialog
