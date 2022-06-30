@@ -18,18 +18,26 @@ export default function DemosProvider(props: DemosProviderProps) {
   // );
   const [demos, setDemos] = useState<DemoDict>({});
   const [knownTags, setKnownTags] = useState<Set<string>>(new Set());
+  const [knownMaps, setKnownMaps] = useState<Set<string>>(new Set());
+  const [knownPlayers, setKnownPlayers] = useState<Set<string>>(new Set());
 
   const reloadEverything = useCallback(() => {
     if (demosPath !== undefined) {
       const newDemos = getDemosInDirectory(demosPath);
       const newKnownTags: Set<string> = new Set();
+      const newKnownMaps: Set<string> = new Set();
+      const newKnownPlayers: Set<string> = new Set();
       Object.values(newDemos).forEach((demo) => {
         demo.tags.forEach((tag) => {
           newKnownTags.add(tag);
         });
+        newKnownMaps.add(demo.mapName);
+        newKnownPlayers.add(demo.clientName);
       });
       setDemos(newDemos);
       setKnownTags(newKnownTags);
+      setKnownMaps(newKnownMaps);
+      setKnownPlayers(newKnownPlayers);
     } else {
       setDemos({});
     }
@@ -93,6 +101,8 @@ export default function DemosProvider(props: DemosProviderProps) {
         renameDemo,
         deleteDemo,
         knownTags,
+        knownMaps,
+        knownPlayers,
         addKnownTag,
       }}
     >
