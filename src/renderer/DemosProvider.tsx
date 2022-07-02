@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState, ReactNode } from "react";
 
-import Demo, { DemoDict } from "./Demo";
+import Demo, { DemoDict, getJSONPath } from "./Demo";
 import getDemosInDirectory from "./getDemosInDirectory";
 import DemosContext from "./DemosContext";
 import useStore from "./hooks/useStore";
@@ -45,7 +45,7 @@ export default function DemosProvider(props: DemosProviderProps) {
 
   const reloadEvents = useCallback(() => {
     Object.values(demos).forEach((demo) => {
-      const [events, tags] = Demo.readEventsAndTags(demo.path);
+      const [events, tags] = Demo.readEventsAndTags(getJSONPath(demo.path));
       demo.events = events;
       demo.tags = tags;
       const newKnownTags: Set<string> = new Set(knownTags);
