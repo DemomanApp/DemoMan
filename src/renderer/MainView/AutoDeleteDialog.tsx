@@ -13,7 +13,6 @@ import {
   Paper,
   Divider,
 } from "@mui/material";
-import styled from "@mui/material/styles/styled";
 
 import { formatFileSize } from "../util";
 import SmallDialog from "../SmallDialog";
