@@ -1,6 +1,6 @@
 import { Button, DialogContentText } from "@mui/material";
 
-import SmallDialog from "./SmallDialog";
+import SmallDialog from "../SmallDialog";
 
 type DeleteDialogProps = {
   open: boolean;

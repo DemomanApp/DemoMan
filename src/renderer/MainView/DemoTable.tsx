@@ -7,10 +7,10 @@ import merge from "deepmerge";
 import { ArrowDownward } from "@mui/icons-material";
 import { blue } from "@mui/material/colors";
 
-import Demo from "./Demo";
-import loading from "../../assets/loading.gif";
-import { formatFileSize, formatPlaybackTime } from "./util";
-import { getPreferredTheme } from "./theme";
+import Demo from "../Demo";
+import loading from "../../../assets/loading.gif";
+import { formatFileSize, formatPlaybackTime } from "../util";
+import { getPreferredTheme } from "../theme";
 
 function CustomTimeCell({ playbackTime }: Demo) {
   return <div>{formatPlaybackTime(playbackTime)}</div>;

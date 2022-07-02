@@ -1,7 +1,7 @@
 import { ReactNode, useEffect, useRef } from "react";
 
 import { ListItemButton, ListItemText } from "@mui/material";
-import Kbd from "../Kbd";
+import Kbd from "../../Kbd";
 
 type Props = {
   onClick: () => void;

@@ -2,7 +2,7 @@ import { ChangeEvent, useState } from "react";
 
 import { Grid, Button, TextField, InputAdornment } from "@mui/material";
 
-import SmallDialog from "./SmallDialog";
+import SmallDialog from "../SmallDialog";
 
 export enum EditDialogMode {
   closed,

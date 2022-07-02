@@ -15,7 +15,7 @@ import {
   VolunteerActivism as DonationIcon,
 } from "@mui/icons-material";
 
-import SmallDialog from "./SmallDialog";
+import SmallDialog from "../SmallDialog";
 
 const DiscordIcon = () => (
   <SvgIcon>

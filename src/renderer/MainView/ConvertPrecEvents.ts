@@ -2,10 +2,10 @@ import fs from "fs";
 import path from "path";
 import log from "electron-log";
 
-import DemoEvent from "./DemoEvent";
-import Demo from "./Demo";
-import { isNodeError } from "./util";
-import store from "../common/store";
+import DemoEvent from "../DemoEvent";
+import Demo from "../Demo";
+import { isNodeError } from "../util";
+import store from "../../common/store";
 
 const regex = /\[[\d/ :]+\] (.*) \("(\w+)" at (\d+)\)/;
 

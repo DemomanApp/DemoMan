@@ -3,8 +3,8 @@ import DataTable from "react-data-table-component";
 import { IconButton, Tooltip } from "@mui/material";
 import { ArrowDownward, Add as AddIcon } from "@mui/icons-material";
 
-import { getPreferredTheme } from "./theme";
-import DemoEvent from "./DemoEvent";
+import { getPreferredTheme } from "../theme";
+import DemoEvent from "../DemoEvent";
 
 const columns = [
   {

@@ -2,9 +2,9 @@ import { useContext } from "react";
 
 import { Button, DialogContentText } from "@mui/material";
 
-import { formatFileSize } from "./util";
-import SmallDialog from "./SmallDialog";
-import DemosContext from "./DemosContext";
+import { formatFileSize } from "../util";
+import SmallDialog from "../SmallDialog";
+import DemosContext from "../DemosContext";
 
 type InfoDialogProps = {
   open: boolean;

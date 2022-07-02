@@ -7,17 +7,17 @@ import {
   MoreHoriz as MoreHorizIcon,
 } from "@mui/icons-material";
 
-import Demo from "./Demo";
+import Demo from "../Demo";
 import DemoTable from "./DemoTable";
 import InfoDialog from "./InfoDialog";
 import AboutDialog from "./AboutDialog";
 import AutoDeleteDialog from "./AutoDeleteDialog";
 import convertPrecEvents from "./ConvertPrecEvents";
-import DemosContext from "./DemosContext";
-import PageLayout from "./PageLayout";
-import AppBarButton from "./AppBarButton";
-import AppBarMenu from "./AppBarMenu";
-import store from "../common/store";
+import DemosContext from "../DemosContext";
+import PageLayout from "../PageLayout";
+import AppBarButton from "../AppBarButton";
+import AppBarMenu from "../AppBarMenu";
+import store from "../../common/store";
 import AdvancedSearchInput, {
   Query,
   AdvancedFilterKeys,

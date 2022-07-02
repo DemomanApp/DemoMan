@@ -15,9 +15,9 @@ import {
 } from "@mui/material";
 import styled from "@mui/material/styles/styled";
 
-import { formatFileSize } from "./util";
-import SmallDialog from "./SmallDialog";
-import useStore from "./hooks/useStore";
+import { formatFileSize } from "../util";
+import SmallDialog from "../SmallDialog";
+import useStore from "../hooks/useStore";
 
 type AutoDeleteDialogProps = {
   open: boolean;

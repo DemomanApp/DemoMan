@@ -14,8 +14,8 @@ import {
   InsertDriveFile as InsertDriveFileIcon,
 } from "@mui/icons-material";
 
-import Demo from "./Demo";
-import { formatFileSize, formatPlaybackTime } from "./util";
+import Demo from "../Demo";
+import { formatFileSize, formatPlaybackTime } from "../util";
 
 type DemoMetadataListProps = {
   demo: Demo;

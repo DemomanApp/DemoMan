@@ -4,8 +4,8 @@ import { Button, TextField, InputAdornment } from "@mui/material";
 
 import isValidFilename from "valid-filename";
 
-import SmallDialog from "./SmallDialog";
-import DemosContext from "./DemosContext";
+import SmallDialog from "../SmallDialog";
+import DemosContext from "../DemosContext";
 
 type RenameDialogProps = {
   onClose: () => void;

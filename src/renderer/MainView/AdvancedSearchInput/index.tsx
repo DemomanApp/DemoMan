@@ -18,7 +18,7 @@ import {
   AdvancedFilterFilter,
 } from "./types";
 import QueryItemChips from "./QueryItemChips";
-import Kbd from "../Kbd";
+import Kbd from "../../Kbd";
 
 type AdvancedSearchProps = {
   placeholder: string;

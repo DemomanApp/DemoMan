@@ -19,16 +19,16 @@ import {
 } from "@mui/icons-material";
 import { Navigate, useNavigate, useParams } from "react-router-dom";
 
-import DemoEvent from "./DemoEvent";
+import DemoEvent from "../DemoEvent";
 import EventTable from "./EventTable";
 import DemoMetadataList from "./DemoMetadataList";
 import EditEventDialog, { EditDialogMode } from "./EditEventDialog";
 import DeleteDialog from "./DeleteDialog";
 import RenameDialog from "./RenameDialog";
 import MapThumbnail from "./MapThumbnail";
-import PageLayout from "./PageLayout";
-import DemosContext from "./DemosContext";
-import AppBarButton from "./AppBarButton";
+import PageLayout from "../PageLayout";
+import DemosContext from "../DemosContext";
+import AppBarButton from "../AppBarButton";
 
 type DemoDetailsRouteParams = {
   name: string;
