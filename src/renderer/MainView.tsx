@@ -10,6 +10,7 @@ import {
 import Demo from "./Demo";
 import DemoTable from "./DemoTable";
 import InfoDialog from "./InfoDialog";
+import AboutDialog from "./AboutDialog";
 import AutoDeleteDialog from "./AutoDeleteDialog";
 import convertPrecEvents from "./ConvertPrecEvents";
 import DemosContext from "./DemosContext";
@@ -35,6 +36,7 @@ export default function MainView() {
 
   const [filteredDemos, setFilteredDemos] = useState<Demo[]>([]);
   const [infoDialogOpen, setInfoDialogOpen] = useState(false);
+  const [aboutDialogOpen, setAboutDialogOpen] = useState(false);
   const [autoDeleteDialogOpen, setAutoDeleteDialogOpen] = useState(false);
 
   const advancedFilterKeys: AdvancedFilterKeys = {
@@ -164,6 +166,12 @@ export default function MainView() {
                     reloadEvents();
                   },
                 },
+                {
+                  text: "About DemoMan...",
+                  onClick: () => {
+                    setAboutDialogOpen(true);
+                  },
+                },
               ]}
             </AppBarMenu>
           </>
@@ -174,6 +182,10 @@ export default function MainView() {
       <InfoDialog
         open={infoDialogOpen}
         onClose={() => setInfoDialogOpen(false)}
+      />
+      <AboutDialog
+        open={aboutDialogOpen}
+        onClose={() => setAboutDialogOpen(false)}
       />
       <AutoDeleteDialog
         open={autoDeleteDialogOpen}
