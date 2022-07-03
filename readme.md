@@ -17,6 +17,15 @@
 
 A TF2 demo manager for Linux, Windows and MacOS built with [Electron](https://www.electronjs.org/)
 
+## P-REC compatibility
+
+DemoMan primarily uses the event format used by the demo support commands in vanilla TF2.
+This format stores each demo's events in a JSON file with the same name as the demo.
+P-REC uses a different format: it records all events in a single text file.
+DemoMan can convert the P-REC file to the "standard format", and there is also
+limited optional support for loading a P-REC file directly. If you don't absolutely rely on P-REC,
+you are encouraged to use the standard format.
+
 ## Installing
 
 Grab the latest prebuilt version [here](https://github.com/Narcha/DemoMan/releases) or [build it yourself](#Developing).
