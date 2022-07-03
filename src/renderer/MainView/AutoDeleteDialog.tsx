@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useContext } from "react";
 import fs from "fs";
 import path from "path";
 
@@ -17,6 +17,7 @@ import {
 import { formatFileSize } from "../util";
 import SmallDialog from "../SmallDialog";
 import useStore from "../hooks/useStore";
+import DemosContext from "../DemosContext";
 
 type AutoDeleteDialogProps = {
   open: boolean;
@@ -29,46 +30,35 @@ type AutoDeleteDialogFileListEntry = {
   filesize: number;
 };
 
-function findFilesWithoutCounterpart(dirPath: string) {
-  const files = fs.readdirSync(dirPath);
-  const filesWithoutCounterpart: string[] = [];
-
-  files.forEach((file) => {
-    let counterpart: string;
-    if (file.endsWith(".dem")) {
-      counterpart = file.replace(/\.dem$/, ".json");
-    } else if (file.endsWith(".json")) {
-      counterpart = file.replace(/\.json$/, ".dem");
-    } else return;
-    const counterpartIndex = files.indexOf(counterpart);
-    if (counterpartIndex === -1) {
-      filesWithoutCounterpart.push(file);
-    }
-  });
-  return filesWithoutCounterpart;
-}
-
 export default function AutoDeleteDialog(props: AutoDeleteDialogProps) {
   const { open, onClose } = props;
   const [demosPath] = useStore("demo_path");
+
+  const { demos } = useContext(DemosContext);
 
   const [files, setFiles] = useState<AutoDeleteDialogFileListEntry[]>([]);
   const [numberSelected, setNumberSelected] = useState(0);
 
   useEffect(() => {
+    const findDemosWithoutEventsOrTags = (): string[] =>
+      Object.values(demos)
+        .filter((demo) => demo.events.length === 0 && demo.tags.length === 0)
+        .map((demo) => demo.name);
+
     if (demosPath === undefined) {
       return;
     }
-    const newFiles = findFilesWithoutCounterpart(demosPath);
-    const fileListEntries = newFiles.map<AutoDeleteDialogFileListEntry>(
-      (file) => {
-        const filesize = fs.statSync(path.join(demosPath, file)).size;
-        return { fileName: file, selected: true, filesize };
+    const newDemosToDelete = findDemosWithoutEventsOrTags();
+    const fileListEntries = newDemosToDelete.map<AutoDeleteDialogFileListEntry>(
+      (demoName) => {
+        const fileName = `${demoName}.dem`;
+        const filesize = fs.statSync(path.join(demosPath, fileName)).size;
+        return { fileName, selected: true, filesize };
       }
     );
     setFiles(fileListEntries);
     setNumberSelected(files.length);
-  }, [open, demosPath, files.length]);
+  }, [open, demosPath, files.length, demos]);
 
   const confirm = () => {
     if (demosPath === undefined) {
@@ -121,7 +111,7 @@ export default function AutoDeleteDialog(props: AutoDeleteDialogProps) {
   if (files.length === 0) {
     return (
       <SmallDialog
-        title="Auto-delete files"
+        title="Auto-delete demos"
         open={open}
         onClose={onClose}
         actions={
@@ -138,7 +128,7 @@ export default function AutoDeleteDialog(props: AutoDeleteDialogProps) {
   }
   return (
     <SmallDialog
-      title="Auto-delete files"
+      title="Auto-delete demos"
       open={open}
       onClose={onClose}
       actions={
@@ -158,8 +148,7 @@ export default function AutoDeleteDialog(props: AutoDeleteDialogProps) {
       }
     >
       <DialogContentText>
-        These are demo files without events or event files without an associated
-        demo file.
+        These are demo files with no events and no tags.
         <br />
         Deselect the ones you want to keep.
       </DialogContentText>
@@ -179,14 +168,14 @@ export default function AutoDeleteDialog(props: AutoDeleteDialogProps) {
               />
             </ListItemIcon>
             <ListItemText
-              primary={`${numberSelected} files selected (${formatFileSize(
-                selectedFilesize()
-              )})`}
+              primary={`${numberSelected} file${
+                numberSelected === 1 ? "" : "s"
+              } selected (${formatFileSize(selectedFilesize())})`}
             />
           </ListItem>
         </List>
         <Divider />
-        <List style={{ maxHeight: "200px" }} dense>
+        <List style={{ maxHeight: "200px", overflow: "overlay" }} dense>
           {files.map((file, index) => (
             <ListItem
               button
