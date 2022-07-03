@@ -2,32 +2,25 @@ import fs from "fs";
 import path from "path";
 import log from "electron-log";
 
-import DemoEvent from "../DemoEvent";
-import Demo from "../Demo";
-import { isNodeError } from "../util";
-import store from "../../common/store";
+import DemoEvent from "./DemoEvent";
+import Demo from "./Demo";
+import { isNodeError } from "./util";
+import store from "../common/store";
 
 const regex = /\[[\d/ :]+\] (.*) \("(\w+)" at (\d+)\)/;
 
-export default function convertPrecEvents() {
-  const demoDir = store.get("demo_path");
-  log.debug(`Looking for PREC events file in ${demoDir}`);
-  if (demoDir === undefined) {
-    return;
-  }
-  let fd;
+export function readPrecFile(filePath: string): Record<string, DemoEvent[]> {
+  let fileContent;
   try {
-    fd = fs.openSync(path.join(demoDir, "KillStreaks.txt"), "r");
+    fileContent = fs.readFileSync(filePath);
   } catch (e) {
     if (isNodeError(e) && e.code === "ENOENT") {
-      // No PREC events file exists, ignore
+      // No P-REC events file exists
       log.debug(`No PREC events file found`);
-      return;
+      return {};
     }
     throw e;
   }
-  log.debug(`Found PREC events file`);
-  const fileContent = fs.readFileSync(fd);
 
   const lines = fileContent.toString().split("\n");
 
@@ -63,12 +56,23 @@ export default function convertPrecEvents() {
     }
   }
 
+  return events;
+}
+
+export function convertPrecEvents() {
+  const demoDir = store.get("demo_path");
+  log.debug(`Looking for P-REC events file in ${demoDir}`);
+  if (demoDir === undefined) {
+    return;
+  }
+  const events = readPrecFile(path.join(demoDir, "KillStreaks.txt"));
+
   for (let i = 0; i < Object.keys(events).length; i += 1) {
-    const demo = Object.keys(events)[i];
+    const demoName = Object.keys(events)[i];
     // only write events for demos that still exist
     let demoExists = true;
     try {
-      fs.statSync(path.join(demoDir, `${demo}.dem`));
+      fs.statSync(path.join(demoDir, `${demoName}.dem`));
     } catch (e) {
       if (isNodeError(e) && e.code === "ENOENT") {
         demoExists = false;
@@ -78,9 +82,9 @@ export default function convertPrecEvents() {
     }
     if (demoExists) {
       Demo.writeEventsAndTagsFile(
-        events[demo],
+        events[demoName],
         [],
-        path.join(demoDir, `${demo}.json`),
+        path.join(demoDir, `${demoName}.json`),
         false
       );
     }

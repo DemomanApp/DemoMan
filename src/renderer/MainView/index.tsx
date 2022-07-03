@@ -12,7 +12,7 @@ import DemoTable from "./DemoTable";
 import InfoDialog from "./InfoDialog";
 import AboutDialog from "./AboutDialog";
 import AutoDeleteDialog from "./AutoDeleteDialog";
-import convertPrecEvents from "./ConvertPrecEvents";
+import { convertPrecEvents } from "../PrecConversion";
 import DemosContext from "../DemosContext";
 import PageLayout from "../PageLayout";
 import AppBarButton from "../AppBarButton";
