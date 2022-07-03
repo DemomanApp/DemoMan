@@ -1,9 +1,11 @@
 import { useCallback, useEffect, useState, ReactNode } from "react";
+import path from "path";
 
 import Demo, { DemoDict, getJSONPath } from "./Demo";
 import getDemosInDirectory from "./getDemosInDirectory";
 import DemosContext from "./DemosContext";
 import useStore from "./hooks/useStore";
+import { readPrecFile } from "./PrecConversion";
 
 type DemosProviderProps = {
   children: ReactNode;
@@ -13,13 +15,20 @@ export default function DemosProvider(props: DemosProviderProps) {
   const { children } = props;
 
   const [demosPath] = useStore("demo_path");
-  // const [demos, setDemos] = useState<DemoDict>(
-  //   demosPath !== undefined ? getDemosInDirectory(demosPath) : {}
-  // );
+  const [autoPrec] = useStore("auto_prec");
+
   const [demos, setDemos] = useState<DemoDict>({});
   const [knownTags, setKnownTags] = useState<Set<string>>(new Set());
   const [knownMaps, setKnownMaps] = useState<Set<string>>(new Set());
   const [knownPlayers, setKnownPlayers] = useState<Set<string>>(new Set());
+
+  const addKnownTag = useCallback((tag: string) => {
+    setKnownTags((oldKnownTags) => {
+      const newKnownTags = new Set(oldKnownTags);
+      newKnownTags.add(tag);
+      return newKnownTags;
+    });
+  }, []);
 
   const reloadEverything = useCallback(() => {
     if (demosPath !== undefined) {
@@ -44,27 +53,29 @@ export default function DemosProvider(props: DemosProviderProps) {
   }, [demosPath]);
 
   const reloadEvents = useCallback(() => {
-    Object.values(demos).forEach((demo) => {
-      const [events, tags] = Demo.readEventsAndTags(getJSONPath(demo.path));
-      demo.events = events;
-      demo.tags = tags;
-      const newKnownTags: Set<string> = new Set(knownTags);
-      tags.forEach((tag) => {
-        if (!knownTags.has(tag)) {
-          newKnownTags.add(tag);
-        }
-      });
-      if (newKnownTags !== knownTags) {
-        setKnownTags(newKnownTags);
+    setDemos((oldDemos) => {
+      if (demosPath === undefined) {
+        return {};
       }
+      const newDemos = { ...oldDemos }; // Shallow copy
+      const precEvents = autoPrec
+        ? readPrecFile(path.join(demosPath, "KillStreaks.txt"))
+        : {};
+      Object.values(newDemos).forEach((demo) => {
+        const [events, tags] = Demo.readEventsAndTags(getJSONPath(demo.path));
+        demo.events = events;
+        demo.tags = tags;
+        const precDemoEvents = precEvents[demo.name];
+        // Only load events from P-REC file if a demo with the specified
+        // name exists and it has no events already
+        if (precDemoEvents !== undefined && events.length === 0) {
+          demo.events = precDemoEvents;
+        }
+        tags.forEach(addKnownTag);
+      });
+      return newDemos;
     });
-  }, [demos, knownTags]);
-
-  const addKnownTag = (tag: string) => {
-    const newKnownTags = new Set(knownTags);
-    newKnownTags.add(tag);
-    setKnownTags(newKnownTags);
-  };
+  }, [addKnownTag, autoPrec, demosPath]);
 
   const getDemoByName = (name: string) => {
     return demos[name];
@@ -90,6 +101,10 @@ export default function DemosProvider(props: DemosProviderProps) {
   useEffect(() => {
     reloadEverything();
   }, [demosPath, reloadEverything]);
+
+  useEffect(() => {
+    reloadEvents();
+  }, [autoPrec, reloadEvents]);
 
   return (
     <DemosContext.Provider

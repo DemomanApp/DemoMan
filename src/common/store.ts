@@ -9,6 +9,7 @@ export type SchemaType = {
   theme: ThemeType;
   demo_path?: string;
   setup_completed: boolean;
+  auto_prec: boolean;
 };
 
 const schema: Schema<SchemaType> = {
@@ -20,6 +21,10 @@ const schema: Schema<SchemaType> = {
     type: "string",
   },
   setup_completed: {
+    type: "boolean",
+    default: false,
+  },
+  auto_prec: {
     type: "boolean",
     default: false,
   },

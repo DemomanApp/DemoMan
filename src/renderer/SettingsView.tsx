@@ -35,6 +35,7 @@ export default function SettingsView() {
   const { theme, setTheme } = useContext(ThemeContext);
 
   const [demoPath, setDemoPath] = useStore("demo_path");
+  const [autoPrec, setAutoPrec] = useStore("auto_prec");
 
   const savePath = (newPath: string) => {
     setDemoPath(newPath);
@@ -78,6 +79,7 @@ export default function SettingsView() {
             </ListItem>
             <ListItem
               button
+              divider
               onClick={async () => {
                 const { canceled, filePaths } = await getDemoPath(demoPath);
                 if (!canceled) {
@@ -89,6 +91,19 @@ export default function SettingsView() {
                 <FolderIcon />
               </ListItemIcon>
               <ListItemText primary="Demo path" secondary={demoPath} />
+            </ListItem>
+            <ListItem button onClick={() => setAutoPrec(!autoPrec)}>
+              <ListItemIcon>
+                <PaletteIcon />
+              </ListItemIcon>
+              <ListItemText
+                primary="Automatic P-REC event loading"
+                secondary={autoPrec ? "on" : "off"}
+              />
+              <Switch
+                onChange={() => setAutoPrec(!autoPrec)}
+                checked={autoPrec}
+              />
             </ListItem>
           </List>
         </Container>
