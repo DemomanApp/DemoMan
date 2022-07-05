@@ -14,8 +14,6 @@ import {
 import {
   Folder as FolderIcon,
   Palette as PaletteIcon,
-  Brightness3 as DarkThemeIcon,
-  Brightness7 as LightThemeIcon,
   ArrowBackIosNew as ArrowBackIcon,
   UploadFile as UploadFileIcon,
 } from "@mui/icons-material";
@@ -75,9 +73,6 @@ export default function SettingsView() {
                 <PaletteIcon />
               </ListItemIcon>
               <ListItemText primary="Theme" secondary={capitalize(theme)} />
-              <LightThemeIcon />
-              <Switch onChange={toggleTheme} checked={theme === "dark"} />
-              <DarkThemeIcon />
             </ListItem>
             <ListItem
               button
