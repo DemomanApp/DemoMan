@@ -17,6 +17,7 @@ import {
   Brightness3 as DarkThemeIcon,
   Brightness7 as LightThemeIcon,
   ArrowBackIosNew as ArrowBackIcon,
+  UploadFile as UploadFileIcon,
 } from "@mui/icons-material";
 
 import getDemoPath from "./GetDemoPath";
@@ -25,6 +26,7 @@ import AppBarButton from "./AppBarButton";
 import ThemeContext from "./ThemeContext";
 import useStore from "./hooks/useStore";
 import { ThemeType } from "./theme";
+import HelpButton from "./HelpButton";
 
 const capitalize = (str: string) => {
   return str.charAt(0).toUpperCase() + str.slice(1);
@@ -94,11 +96,20 @@ export default function SettingsView() {
             </ListItem>
             <ListItem button onClick={() => setAutoPrec(!autoPrec)}>
               <ListItemIcon>
-                <PaletteIcon />
+                <UploadFileIcon />
               </ListItemIcon>
               <ListItemText
                 primary="Automatic P-REC event loading"
                 secondary={autoPrec ? "on" : "off"}
+              />
+              <HelpButton
+                helpText={
+                  'With this option enabled, DemoMan will automatically \
+                  search your demo directory for a file called "KillStreaks.txt" \
+                  and attempt to load bookmarks from it. \
+                  This is useful if you use P-REC. \
+                  The file will never be altered.'
+                }
               />
               <Switch
                 onChange={() => setAutoPrec(!autoPrec)}
