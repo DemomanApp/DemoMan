@@ -71,6 +71,7 @@ export default function EventTable(props: EventTableProps) {
         table: { style: { backgroundColor: "transparent" } },
         headRow: { style: { backgroundColor: "transparent" } },
         rows: { style: { backgroundColor: "transparent" } },
+        noData: { style: { backgroundColor: "transparent" } },
       }}
     />
   );
