@@ -13,7 +13,9 @@ import { formatFileSize, formatPlaybackTime } from "../util";
 import { getPreferredTheme } from "../theme";
 
 function CustomTimeCell({ playbackTime }: Demo) {
-  return <div>{formatPlaybackTime(playbackTime)}</div>;
+  return (
+    <div data-tag="allowRowEvents">{formatPlaybackTime(playbackTime)}</div>
+  );
 }
 
 function CustomBirthtimeCell({ birthtime }: Demo) {
@@ -21,7 +23,7 @@ function CustomBirthtimeCell({ birthtime }: Demo) {
   return (
     // "whiteSpace: nowrap" should prevent stuff like "PM"
     // from the time string being pushed to a new line.
-    <div style={{ whiteSpace: "nowrap" }}>
+    <div style={{ whiteSpace: "nowrap" }} data-tag="allowRowEvents">
       {date.toLocaleDateString()}
       <br />
       {date.toLocaleTimeString()}
@@ -30,7 +32,7 @@ function CustomBirthtimeCell({ birthtime }: Demo) {
 }
 
 function CustomFilesizeCell({ filesize }: Demo) {
-  return <div>{formatFileSize(filesize)}</div>;
+  return <div data-tag="allowRowEvents">{formatFileSize(filesize)}</div>;
 }
 
 const columns = [
