@@ -22,6 +22,7 @@ import AdvancedSearchInput, {
   Query,
   AdvancedFilterKeys,
 } from "./AdvancedSearchInput";
+import UpdateIndicator from "./UpdateIndicator";
 
 export default function MainView() {
   const {
@@ -134,6 +135,7 @@ export default function MainView() {
         }
         right={
           <>
+            <UpdateIndicator />
             <AppBarButton
               icon={<InfoIcon />}
               tooltip="Info"

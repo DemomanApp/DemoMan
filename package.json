@@ -206,6 +206,7 @@
     "react": "^17.0.2",
     "react-data-table-component": "^6.11.8",
     "react-dom": "^17.0.2",
+    "react-markdown": "^8.0.3",
     "react-router-dom": "^6.2.1",
     "regenerator-runtime": "^0.13.9",
     "styled-components": "^5.3.3",
