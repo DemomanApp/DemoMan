@@ -79,4 +79,4 @@ Create a packaged executable by running `npm run package`.
 
 ## License
 
-DemoMan is [free software](https://www.gnu.org/philosophy/free-sw.html) released under the [GNU GPLv3](LICENSE) license.
+DemoMan is [free software](https://www.gnu.org/philosophy/free-sw.html) released under the [GNU GPLv3](LICENSE.txt) license.
