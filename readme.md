@@ -17,14 +17,51 @@
 
 A TF2 demo manager for Linux, Windows and MacOS built with [Electron](https://www.electronjs.org/)
 
+## Features
+
+- Detailed demo list
+  - Filter by name/map/player/tags/type (stv or pov)
+- Demo details page
+  - Rename/delete demos
+  - Edit/delete/add bookmarks
+  - Add tags to a demo
+- Automatically delete demos without bookmarks
+- Convert P-REC events to the standard format
+
+## Screenshots
+
+### Main view
+
+![Main view](/githubassets/screenshots/main.png)
+
+### Smart filtering
+
+![Smart filtering](/githubassets/screenshots/filter.png)
+
+### Demo details view
+
+![Demo details view](/githubassets/screenshots/details.png)
+
+## Roadmap
+
+- Support for multiple demo folders
+- Ability to control TF2 from the app
+  - "play demo" button
+  - "skip to event" button
+- Full demo parsing
+  - Chat log
+  - Kill log
+  - Scoreboard
+
 ## P-REC compatibility
 
 DemoMan primarily uses the event format used by the demo support commands in vanilla TF2.
 This format stores each demo's events in a JSON file with the same name as the demo.
 P-REC uses a different format: it records all events in a single text file.
 DemoMan can convert the P-REC file to the "standard format", and there is also
-limited optional support for loading a P-REC file directly. If you don't absolutely rely on P-REC,
-you are encouraged to use the standard format.
+limited optional support for loading a P-REC file directly. If you don't absolutely need P-REC,
+you are encouraged to use the built-in demo recording feature.
+See [this wiki page](https://github.com/Narcha/DemoMan/wiki/Setting-up-demo-recording) to learn how to use it.
 
 ## Installing
 
