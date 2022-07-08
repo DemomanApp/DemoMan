@@ -44,19 +44,19 @@ export default function MainView() {
 
   const advancedFilterKeys: AdvancedFilterKeys = {
     map: {
-      possibleValues: [...knownMaps],
+      possibleValues: [...knownMaps].sort(),
       freeInput: true,
     },
     tag: {
-      possibleValues: [...knownTags],
+      possibleValues: [...knownTags].sort(),
       freeInput: false,
     },
     player: {
-      possibleValues: [...knownPlayers],
+      possibleValues: [...knownPlayers].sort(),
       freeInput: false,
     },
     type: {
-      possibleValues: ["stv", "pov"],
+      possibleValues: ["pov", "stv"],
       freeInput: false,
     },
   };
