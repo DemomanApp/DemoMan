@@ -11,8 +11,8 @@ import Demo from "../Demo";
 import DemoTable from "./DemoTable";
 import InfoDialog from "./InfoDialog";
 import AboutDialog from "./AboutDialog";
+import ConvertPrecFileDialog from "./ConvertPrecFileDialog";
 import AutoDeleteDialog from "./AutoDeleteDialog";
-import { convertPrecEvents } from "../PrecConversion";
 import DemosContext from "../DemosContext";
 import PageLayout from "../PageLayout";
 import AppBarButton from "../AppBarButton";
@@ -38,6 +38,8 @@ export default function MainView() {
   const [filteredDemos, setFilteredDemos] = useState<Demo[]>([]);
   const [infoDialogOpen, setInfoDialogOpen] = useState(false);
   const [aboutDialogOpen, setAboutDialogOpen] = useState(false);
+  const [convertPrecFileDialogOpen, setConvertPrecFileDialogOpen] =
+    useState(false);
   const [autoDeleteDialogOpen, setAutoDeleteDialogOpen] = useState(false);
 
   const advancedFilterKeys: AdvancedFilterKeys = {
@@ -162,10 +164,9 @@ export default function MainView() {
                   },
                 },
                 {
-                  text: "Convert P-REC bookmarks",
+                  text: "Convert P-REC bookmarks...",
                   onClick: () => {
-                    convertPrecEvents();
-                    reloadEvents();
+                    setConvertPrecFileDialogOpen(true);
                   },
                 },
                 {
@@ -195,6 +196,10 @@ export default function MainView() {
           setAutoDeleteDialogOpen(false);
           reloadEverything();
         }}
+      />
+      <ConvertPrecFileDialog
+        open={convertPrecFileDialogOpen}
+        onClose={() => setConvertPrecFileDialogOpen(false)}
       />
     </>
   );
