@@ -137,7 +137,7 @@ export default function SetupView() {
           >
             <Typography variant="h5">You&apos;re all set. Have fun!</Typography>
             Please report any bugs you come across and submit feedback on the
-            GitHub page.
+            GitHub page or on the Discord server.
           </Stack>
         </Box>
       ),
