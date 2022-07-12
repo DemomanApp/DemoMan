@@ -7,7 +7,7 @@ import Demo from "./Demo";
 import { isNodeError } from "./util";
 import store from "../common/store";
 
-const regex = /\[[\d/ :]+\] (.*) \("(\w+)" at (\d+)\)/;
+const regex = /\[[\d/ :]+\] (.*) \("(.+)" at (\d+)\)/;
 
 export function readPrecFile(filePath: string): Record<string, DemoEvent[]> {
   let fileContent;
