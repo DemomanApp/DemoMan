@@ -18,6 +18,7 @@ import { formatFileSize } from "../util";
 import SmallDialog from "../SmallDialog";
 import useStore from "../hooks/useStore";
 import DemosContext from "../DemosContext";
+import SplitButton from "../SplitButton";
 
 type AutoDeleteDialogProps = {
   open: boolean;
@@ -25,7 +26,7 @@ type AutoDeleteDialogProps = {
 };
 
 type AutoDeleteDialogFileListEntry = {
-  fileName: string;
+  demoName: string;
   selected: boolean;
   filesize: number;
 };
@@ -34,7 +35,7 @@ export default function AutoDeleteDialog(props: AutoDeleteDialogProps) {
   const { open, onClose } = props;
   const [demosPath] = useStore("demo_path");
 
-  const { demos } = useContext(DemosContext);
+  const { demos, deleteDemos } = useContext(DemosContext);
 
   const [files, setFiles] = useState<AutoDeleteDialogFileListEntry[]>([]);
   const [numberSelected, setNumberSelected] = useState(0);
@@ -51,25 +52,29 @@ export default function AutoDeleteDialog(props: AutoDeleteDialogProps) {
     const newDemosToDelete = findDemosWithoutEventsOrTags();
     const fileListEntries = newDemosToDelete.map<AutoDeleteDialogFileListEntry>(
       (demoName) => {
-        const fileName = `${demoName}.dem`;
-        const filesize = fs.statSync(path.join(demosPath, fileName)).size;
-        return { fileName, selected: true, filesize };
+        const filesize = fs.statSync(
+          path.join(demosPath, `${demoName}.dem`)
+        ).size;
+        return { demoName, selected: true, filesize };
       }
     );
     setFiles(fileListEntries);
     setNumberSelected(files.length);
   }, [open, demosPath, files.length, demos]);
 
-  const confirm = () => {
+  const confirm = (trash: boolean) => {
     if (demosPath === undefined) {
       onClose();
       return;
     }
-    files
-      .filter((listEntry: AutoDeleteDialogFileListEntry) => listEntry.selected)
-      .map((listEntry: AutoDeleteDialogFileListEntry) =>
-        fs.rmSync(path.join(demosPath, listEntry.fileName))
-      );
+    deleteDemos(
+      files
+        .filter(
+          (listEntry: AutoDeleteDialogFileListEntry) => listEntry.selected
+        )
+        .map((listEntry) => listEntry.demoName),
+      trash
+    );
     onClose();
   };
 
@@ -136,14 +141,24 @@ export default function AutoDeleteDialog(props: AutoDeleteDialogProps) {
           <Button variant="contained" onClick={onClose}>
             Cancel
           </Button>
-          <Button
+          <SplitButton
+            options={[
+              {
+                label: "Move to trash",
+                onClick: () => confirm(true),
+              },
+              {
+                label: "Delete permanently",
+                onClick: () => confirm(false),
+              },
+            ]}
             variant="contained"
             color="secondary"
-            onClick={confirm}
             disabled={numberSelected === 0}
-          >
-            Delete selected
-          </Button>
+            sx={{
+              marginLeft: "8px",
+            }}
+          />
         </>
       }
     >
@@ -182,12 +197,12 @@ export default function AutoDeleteDialog(props: AutoDeleteDialogProps) {
               onClick={() => {
                 (file.selected ? handleDeselect : handleSelect)(index);
               }}
-              key={file.fileName}
+              key={file.demoName}
             >
               <ListItemIcon>
                 <Checkbox checked={file.selected} disableRipple />
               </ListItemIcon>
-              <ListItemText primary={file.fileName} />
+              <ListItemText primary={file.demoName} />
             </ListItem>
           ))}
         </List>

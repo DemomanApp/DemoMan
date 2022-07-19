@@ -238,9 +238,9 @@ export default function DemoDetailsView() {
         open={deleteDialogOpen}
         demoName={demo.name}
         onClose={() => setDeleteDialogOpen(false)}
-        onConfirm={() => {
+        onConfirm={(trash: boolean) => {
           setDeleteDialogOpen(false);
-          deleteDemo(demo.name);
+          deleteDemo(demo.name, trash);
           navigate("/demos");
         }}
       />

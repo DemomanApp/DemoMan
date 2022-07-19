@@ -1,5 +1,6 @@
 import fs from "fs";
 import path from "path";
+import { shell } from "electron";
 import log from "electron-log";
 
 import StreamReader from "./StreamReader";
@@ -220,17 +221,14 @@ export default class Demo {
     this.name = newName;
   }
 
-  delete() {
-    log.info(`Deleting demo ${this.path}`);
-    fs.rmSync(this.path);
-    try {
-      fs.rmSync(getJSONPath(this.path));
-    } catch (e) {
-      if (isNodeError(e) && e.code === "ENOENT") {
-        // This demo has no events file, ignore the error
-      } else {
-        throw e;
-      }
-    }
+  delete(trash: boolean) {
+    const rmFunc: (path: string) => Promise<void> = trash
+      ? shell.trashItem
+      : fs.promises.rm;
+    log.info(`${trash ? "Trashing" : "Deleting"} demo ${this.path}`);
+
+    rmFunc(this.path);
+    // If this demo has no events file, ignore the error
+    rmFunc(getJSONPath(this.path)).catch(() => {});
   }
 }

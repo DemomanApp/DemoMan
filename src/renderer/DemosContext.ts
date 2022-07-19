@@ -8,7 +8,8 @@ type DemosContextType = {
   reloadEvents: () => void;
   getDemoByName: (name: string) => Demo;
   renameDemo: (name: string, newName: string) => void;
-  deleteDemo: (name: string) => void;
+  deleteDemo: (name: string, trash: boolean) => void;
+  deleteDemos: (names: string[], trash: boolean) => void;
   knownTags: Set<string>;
   knownMaps: Set<string>;
   knownPlayers: Set<string>;

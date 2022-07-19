@@ -91,11 +91,33 @@ export default function DemosProvider(props: DemosProviderProps) {
     }
   };
 
-  const deleteDemo = (name: string) => {
+  const deleteDemo = (name: string, trash: boolean) => {
+    // Delete the actual demo file and associated .json file
     const demo = demos[name];
+    demo.delete(trash);
 
-    delete demos[name];
-    demo.delete();
+    // Update the demo list
+    const newDemos = { ...demos };
+    delete newDemos[name];
+    setDemos(newDemos);
+  };
+
+  const deleteDemos = (names: string[], trash: boolean) => {
+    // This function is needed to delete multiple demos at once,
+    // since calling `deleteDemo` multiple times would not produce
+    // the correct result due to react's delayed state updates.
+
+    const newDemos = { ...demos };
+    names.forEach((name) => {
+      // Delete the actual demo file and associated .json file
+      const demo = demos[name];
+      demo.delete(trash);
+
+      // Update the demo list
+      delete newDemos[name];
+    });
+
+    setDemos(newDemos);
   };
 
   useEffect(() => {
@@ -115,6 +137,7 @@ export default function DemosProvider(props: DemosProviderProps) {
         getDemoByName,
         renameDemo,
         deleteDemo,
+        deleteDemos,
         knownTags,
         knownMaps,
         knownPlayers,

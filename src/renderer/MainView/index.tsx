@@ -25,14 +25,8 @@ import AdvancedSearchInput, {
 import UpdateIndicator from "./UpdateIndicator";
 
 export default function MainView() {
-  const {
-    demos,
-    reloadEvents,
-    reloadEverything,
-    knownTags,
-    knownMaps,
-    knownPlayers,
-  } = useContext(DemosContext);
+  const { demos, knownTags, knownMaps, knownPlayers } =
+    useContext(DemosContext);
   const navigate = useNavigate();
 
   const [filteredDemos, setFilteredDemos] = useState<Demo[]>([]);
@@ -192,10 +186,7 @@ export default function MainView() {
       />
       <AutoDeleteDialog
         open={autoDeleteDialogOpen}
-        onClose={() => {
-          setAutoDeleteDialogOpen(false);
-          reloadEverything();
-        }}
+        onClose={() => setAutoDeleteDialogOpen(false)}
       />
       <ConvertPrecFileDialog
         open={convertPrecFileDialogOpen}

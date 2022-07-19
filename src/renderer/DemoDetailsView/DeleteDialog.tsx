@@ -1,12 +1,13 @@
 import { Button, DialogContentText } from "@mui/material";
 
 import SmallDialog from "../SmallDialog";
+import SplitButton from "../SplitButton";
 
 type DeleteDialogProps = {
   open: boolean;
   demoName: string;
   onClose: () => void;
-  onConfirm: () => void;
+  onConfirm: (trash: boolean) => void;
 };
 
 export default function DeleteDialog(props: DeleteDialogProps) {
@@ -22,15 +23,29 @@ export default function DeleteDialog(props: DeleteDialogProps) {
           <Button variant="contained" onClick={onClose}>
             Cancel
           </Button>
-          <Button variant="contained" color="secondary" onClick={onConfirm}>
-            Delete
-          </Button>
+          <SplitButton
+            options={[
+              {
+                label: "Move to trash",
+                onClick: () => onConfirm(true),
+              },
+              {
+                label: "Delete permanently",
+                onClick: () => onConfirm(false),
+              },
+            ]}
+            variant="contained"
+            color="secondary"
+            sx={{
+              marginLeft: "8px",
+            }}
+          />
         </>
       }
     >
       <DialogContentText>
         Are you sure you want to permanently delete <b>{demoName}</b> and all
-        associated events? This cannot be undone.
+        associated events and tags?
       </DialogContentText>
     </SmallDialog>
   );
