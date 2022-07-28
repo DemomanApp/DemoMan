@@ -1,11 +1,11 @@
 [package]
-name = "app"
+name = "demoman"
 version = "0.1.0"
-description = "A Tauri App"
-authors = ["you"]
-license = ""
-repository = ""
-default-run = "app"
+description = "The TF2 Demo Manager"
+authors = ["Narcha"]
+license = "GPL-3.0-only"
+repository = "https://github.com/Narcha/DemoMan-tauri"
+default-run = "demoman"
 edition = "2021"
 rust-version = "1.57"
 
