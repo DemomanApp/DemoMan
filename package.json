@@ -6,7 +6,9 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
-    "lint": "eslint . --cache",
+    "lint:rust": "cd src-tauri && cargo clippy",
+    "lint:js": "eslint . --cache",
+    "lint": "npm run lint:js && npm run lint:rust",
     "preview": "vite preview",
     "tauri": "tauri"
   },
