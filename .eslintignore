@@ -1,0 +1,8 @@
+
+node_modules
+
+# Contains no js code
+src-tauri
+
+# Compilation output
+dist
