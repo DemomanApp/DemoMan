@@ -1,0 +1,12 @@
+{
+	"events": [
+		{
+			"name": "Bookmark",
+			"value": "New Bookmark",
+			"tick": 0
+		}
+	],
+	"tags": [
+		"test"
+	]
+}

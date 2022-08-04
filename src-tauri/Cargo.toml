@@ -15,21 +15,27 @@ rust-version = "1.57"
 tauri-build = { version = "1.0.4", features = [] }
 
 [dependencies]
-serde_json = "1.0"
-serde = { version = "1.0", features = ["derive"] }
-tauri = { version = "1.0.5", features = ["api-all"] }
-simple_logger = "2.2.0"
-log = "0.4.17"
+serde_json = "^1.0"
+serde = { version = "^1.0", features = ["derive"] }
+tauri = { version = "^1.0", features = ["api-all"] }
+log = "^0.4"
+tf-demo-parser = "0.4.0"
+bitbuffer = "0.10.7"
 
 [dependencies.tauri-plugin-store]
 # To be replaced by a proper package when it becomes available
 git = "https://github.com/tauri-apps/tauri-plugin-store"
 branch = "dev"
 
+[dependencies.tauri-plugin-log]
+# To be replaced by a proper package when it becomes available
+git = "https://github.com/tauri-apps/tauri-plugin-log"
+branch = "dev"
+
 [features]
 # by default Tauri runs in production mode
 # when `tauri dev` runs it is executed with `cargo run --no-default-features` if `devPath` is an URL
-default = [ "custom-protocol" ]
+default = ["custom-protocol"]
 # this feature is used used for production builds where `devPath` points to the filesystem
 # DO NOT remove this
-custom-protocol = [ "tauri/custom-protocol" ]
+custom-protocol = ["tauri/custom-protocol"]
