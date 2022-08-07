@@ -573,6 +573,7 @@ dependencies = [
  "tauri-plugin-log",
  "tauri-plugin-store",
  "tf-demo-parser",
+ "trash",
 ]
 
 [[package]]
@@ -3100,7 +3101,7 @@ dependencies = [
 [[package]]
 name = "tauri-plugin-store"
 version = "0.0.0"
-source = "git+https://github.com/tauri-apps/tauri-plugin-store?branch=dev#9e3732e0cf53b72ced6903583660cd7c5f756781"
+source = "git+https://github.com/tauri-apps/tauri-plugin-store?branch=dev#ce109ff53b43f036ea39cdc3f7c44d582f910270"
 dependencies = [
  "log",
  "serde",
@@ -3379,6 +3380,22 @@ dependencies = [
  "tracing",
  "tracing-core",
  "tracing-log",
+]
+
+[[package]]
+name = "trash"
+version = "2.1.5"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "fe090367848cd40c4230ff3ce4e2ff6a2fd511c1e14ae047a4a4c37ef7965236"
+dependencies = [
+ "chrono",
+ "libc",
+ "log",
+ "objc",
+ "once_cell",
+ "scopeguard",
+ "url",
+ "windows 0.37.0",
 ]
 
 [[package]]

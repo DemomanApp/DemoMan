@@ -3,7 +3,7 @@
     windows_subsystem = "windows"
 )]
 
-use std::{collections::HashMap, path::PathBuf, str::FromStr, sync::Mutex};
+use std::{collections::{HashMap, HashSet}, path::PathBuf, str::FromStr, sync::Mutex};
 
 use tauri_plugin_log::{LoggerBuilder as LogPluginBuilder, LogTarget};
 use tauri_plugin_store::{PluginBuilder as StorePluginBuilder, StoreBuilder};
@@ -17,9 +17,14 @@ mod demo;
 mod tests;
 
 #[derive(Default)]
+pub struct DemoCache {
+    pub demos: HashMap<String, Demo>,
+    pub cached_directory: Option<PathBuf>,
+}
+
+#[derive(Default)]
 pub struct AppState {
-    pub demo_cache: Mutex<HashMap<String, Demo>>,
-    pub cached_directory: Mutex<Option<PathBuf>>,
+    pub demo_cache: Mutex<DemoCache>,
 }
 
 fn main() {
@@ -36,7 +41,10 @@ fn main() {
         )
         .manage(state)
         .invoke_handler(tauri::generate_handler![
+            commands::demos::delete_demo,
+            commands::demos::get_demo_by_name,
             commands::demos::get_demos_in_directory,
+            commands::demos::rename_demo,
             commands::demos::set_demo_events,
             commands::demos::set_demo_tags,
         ])

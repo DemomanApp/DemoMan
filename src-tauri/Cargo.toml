@@ -21,6 +21,7 @@ tauri = { version = "^1.0", features = ["api-all"] }
 log = "^0.4"
 tf-demo-parser = "0.4.0"
 bitbuffer = "0.10.7"
+trash = "2.1.5"
 
 [dependencies.tauri-plugin-store]
 # To be replaced by a proper package when it becomes available

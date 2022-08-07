@@ -13,11 +13,11 @@ export type Demo = {
   filesize: number;
   events: DemoEvent[];
   tags: string[];
-  server_name: string;
-  client_name: string;
-  map_name: string;
-  playback_time: number;
-  num_ticks: number;
+  serverName: string;
+  clientName: string;
+  mapName: string;
+  playbackTime: number;
+  numTicks: number;
 };
 
 export async function getDemosInDirectory(dirPath: string) {
@@ -37,5 +37,25 @@ export async function setDemoTags(demoName: string, newTags: string[]) {
   return invoke<void>("set_demo_tags", {
     demoName,
     newTags,
+  });
+}
+
+export async function deleteDemo(demoName: string, trash: boolean) {
+  return invoke<void>("delete_demo", {
+    demoName,
+    trash
+  });
+}
+
+export async function renameDemo(demoName: string, newName: string) {
+  return invoke<void>("rename_demo", {
+    demoName,
+    newName,
+  });
+}
+
+export async function getDemoByName(demoName: string) {
+  return invoke<Demo>("get_demo_by_name", {
+    demoName,
   });
 }

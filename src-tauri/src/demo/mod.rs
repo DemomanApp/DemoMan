@@ -40,10 +40,15 @@ pub struct Demo {
     pub filesize: u64,
     pub events: Vec<DemoEvent>,
     pub tags: Vec<String>,
+    #[serde(rename = "serverName")]
     pub server_name: String,
+    #[serde(rename = "clientName")]
     pub client_name: String,
+    #[serde(rename = "mapName")]
     pub map_name: String,
+    #[serde(rename = "playbackTime")]
     pub playback_time: f32,
+    #[serde(rename = "numTicks")]
     pub num_ticks: u32,
 }
 
@@ -97,10 +102,13 @@ pub struct DemoJsonFileDe {
 }
 
 #[derive(Debug, Serialize)]
-pub enum DemoJsonFileWriteError {
+pub enum DemoCommandError {
     DemoNotFound,
+    FileDeleteFailed,
     FileOpenFailed,
+    FileRenameFailed,
     FileWriteFailed,
+    OtherIOError,
     SerializationFailed,
 }
 
@@ -207,9 +215,9 @@ pub fn write_events_and_tags(
     json_path: &Path,
     events: &Vec<DemoEvent>,
     tags: &Vec<String>,
-) -> Result<(), DemoJsonFileWriteError> {
+) -> Result<(), DemoCommandError> {
     if events.is_empty() && tags.is_empty() {
-        std::fs::remove_file(json_path).or(Err(DemoJsonFileWriteError::FileWriteFailed))?;
+        std::fs::remove_file(json_path).or(Err(DemoCommandError::FileWriteFailed))?;
         return Ok(());
     }
 
@@ -218,17 +226,17 @@ pub fn write_events_and_tags(
         .truncate(true)
         .create(true)
         .open(json_path)
-        .or(Err(DemoJsonFileWriteError::FileOpenFailed))?;
+        .or(Err(DemoCommandError::FileOpenFailed))?;
 
     // Use tabs for indentation to reproduce the style TF2 produces
     let formatter = serde_json::ser::PrettyFormatter::with_indent(b"\t");
     let mut serializer = serde_json::Serializer::with_formatter(Vec::new(), formatter);
     let new_content = DemoJsonFileSer { events, tags };
     if new_content.serialize(&mut serializer).is_err() {
-        return Err(DemoJsonFileWriteError::SerializationFailed);
+        return Err(DemoCommandError::SerializationFailed);
     }
 
     file.write_all(&serializer.into_inner())
-        .or(Err(DemoJsonFileWriteError::FileWriteFailed))?;
+        .or(Err(DemoCommandError::FileWriteFailed))?;
     Ok(())
 }
