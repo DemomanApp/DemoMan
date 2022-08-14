@@ -1,7 +1,7 @@
 use std::{
     collections::HashMap,
     ffi::OsStr,
-    fs::{read_dir, File},
+    fs::{self, read_dir, File},
     io::{Read, Write},
     path::{Path, PathBuf},
     time::UNIX_EPOCH,
@@ -33,6 +33,7 @@ pub struct DemoEvent {
 }
 
 #[derive(Clone, Debug, Serialize)]
+#[serde(rename_all = "camelCase")]
 pub struct Demo {
     pub name: String,
     pub path: PathBuf,
@@ -40,15 +41,10 @@ pub struct Demo {
     pub filesize: u64,
     pub events: Vec<DemoEvent>,
     pub tags: Vec<String>,
-    #[serde(rename = "serverName")]
     pub server_name: String,
-    #[serde(rename = "clientName")]
     pub client_name: String,
-    #[serde(rename = "mapName")]
     pub map_name: String,
-    #[serde(rename = "playbackTime")]
     pub playback_time: f32,
-    #[serde(rename = "numTicks")]
     pub num_ticks: u32,
 }
 
@@ -59,13 +55,13 @@ impl Demo {
         header: tf_demo_parser::demo::header::Header,
         events: Vec<DemoEvent>,
         tags: Vec<String>,
-        metadata: std::fs::Metadata,
+        metadata: fs::Metadata,
     ) -> Self {
         Self {
             name,
             path,
             birthtime: metadata
-                .created()
+                .modified()
                 .unwrap_or(UNIX_EPOCH)
                 .duration_since(UNIX_EPOCH)
                 .unwrap_or_default()
@@ -106,6 +102,7 @@ pub enum DemoCommandError {
     DemoNotFound,
     FileDeleteFailed,
     FileOpenFailed,
+    FileReadFailed,
     FileRenameFailed,
     FileWriteFailed,
     OtherIOError,
@@ -144,7 +141,7 @@ pub fn read_demo_header(
 /// If no JSON file exists or it is invalid, empty lists will be returned.
 pub fn read_events_and_tags(json_path: &Path) -> (Vec<DemoEvent>, Vec<String>) {
     // This fails if the file does not exist or is not readable
-    if let Ok(bytes) = std::fs::read(&json_path) {
+    if let Ok(bytes) = fs::read(&json_path) {
         // This fails if the file does not contain valid JSON matching the `DemoJsonFile` type.
         if let Ok(deserialized) = serde_json::from_slice::<DemoJsonFileDe>(&bytes) {
             return (
@@ -217,11 +214,11 @@ pub fn write_events_and_tags(
     tags: &Vec<String>,
 ) -> Result<(), DemoCommandError> {
     if events.is_empty() && tags.is_empty() {
-        std::fs::remove_file(json_path).or(Err(DemoCommandError::FileWriteFailed))?;
+        fs::remove_file(json_path).or(Err(DemoCommandError::FileWriteFailed))?;
         return Ok(());
     }
 
-    let mut file = std::fs::OpenOptions::new()
+    let mut file = fs::OpenOptions::new()
         .write(true)
         .truncate(true)
         .create(true)
@@ -239,4 +236,15 @@ pub fn write_events_and_tags(
     file.write_all(&serializer.into_inner())
         .or(Err(DemoCommandError::FileWriteFailed))?;
     Ok(())
+}
+
+pub fn parse_demo_body<P>(path: P) -> Result<tf_demo_parser::MatchState, DemoReadError>
+where
+    P: AsRef<Path>,
+{
+    let file = fs::read(path).or(Err(DemoReadError::FileNotReadable))?;
+    let demo = tf_demo_parser::Demo::new(&file);
+    let parser = tf_demo_parser::DemoParser::new(demo.get_stream());
+    let (_, state) = parser.parse().or(Err(DemoReadError::FileNotReadable))?;
+    Ok(state)
 }

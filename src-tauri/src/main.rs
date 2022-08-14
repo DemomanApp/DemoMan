@@ -3,9 +3,9 @@
     windows_subsystem = "windows"
 )]
 
-use std::{collections::{HashMap, HashSet}, path::PathBuf, str::FromStr, sync::Mutex};
+use std::{collections::HashMap, path::PathBuf, str::FromStr, sync::Mutex};
 
-use tauri_plugin_log::{LoggerBuilder as LogPluginBuilder, LogTarget};
+use tauri_plugin_log::{LogTarget, LoggerBuilder as LogPluginBuilder};
 use tauri_plugin_store::{PluginBuilder as StorePluginBuilder, StoreBuilder};
 
 use demo::Demo;
@@ -43,6 +43,7 @@ fn main() {
         .invoke_handler(tauri::generate_handler![
             commands::demos::delete_demo,
             commands::demos::get_demo_by_name,
+            commands::demos::get_demo_details,
             commands::demos::get_demos_in_directory,
             commands::demos::rename_demo,
             commands::demos::set_demo_events,

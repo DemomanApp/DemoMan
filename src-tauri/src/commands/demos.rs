@@ -1,3 +1,4 @@
+use std::collections::{BTreeMap, HashMap};
 use std::path::Path;
 use std::vec::Vec;
 
@@ -7,7 +8,8 @@ use tauri::State;
 
 use crate::demo::errors::DemoReadError;
 use crate::demo::{
-    read_demos_in_directory, write_events_and_tags, Demo, DemoCommandError, DemoEvent,
+    parse_demo_body, read_demos_in_directory, write_events_and_tags, Demo, DemoCommandError,
+    DemoEvent,
 };
 use crate::AppState;
 
@@ -161,3 +163,18 @@ pub fn get_demo_by_name(
         .ok_or(DemoCommandError::DemoNotFound)?
         .clone())
 }
+
+#[tauri::command]
+pub async fn get_demo_details(
+    demo_name: String,
+    state: State<'_, AppState>,
+) -> Result<tf_demo_parser::MatchState, DemoCommandError> {
+    let demos_cache = state.demo_cache.lock().expect("Failed to lock mutex");
+    let path = &demos_cache
+        .demos
+        .get(&demo_name)
+        .ok_or(DemoCommandError::DemoNotFound)?
+        .path;
+    parse_demo_body(path).or(Err(DemoCommandError::FileReadFailed))
+}
+
