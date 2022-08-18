@@ -10,7 +10,11 @@ import App from "./App";
 // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
 createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
-    <MantineProvider theme={{ colorScheme: "dark" }}>
+    <MantineProvider
+      theme={{ colorScheme: "dark" }}
+      withNormalizeCSS
+      withGlobalStyles
+    >
       <BrowserRouter>
         <App />
       </BrowserRouter>
