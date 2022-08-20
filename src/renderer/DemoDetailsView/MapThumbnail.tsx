@@ -3,6 +3,7 @@ import { shell } from "electron";
 import { Button, Paper, Stack } from "@mui/material";
 
 import MapThumbnailSources from "./MapThumbnailSources";
+import { normalizeMapName } from "../util";
 
 type MapThumbnailProps = {
   mapName: string;
@@ -10,7 +11,7 @@ type MapThumbnailProps = {
 
 export default function MapThumbnail(props: MapThumbnailProps) {
   const { mapName } = props;
-  const mapThumbnailSource = MapThumbnailSources[mapName];
+  const mapThumbnailSource = MapThumbnailSources[normalizeMapName(mapName)];
   return (
     <Paper
       style={{

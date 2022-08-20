@@ -30,3 +30,38 @@ export function formatFileSize(bytes: number): string {
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const isNodeError = (error: any): error is NodeJS.ErrnoException =>
   error instanceof Error && "code" in error;
+
+// Explanation:
+// final\d*       : final, final1
+// rc\d+[a-z]*    : rc1, rc3a
+// rcx            : rcx
+// [a-z]\d+[a-z]* : a2, b12x, v3b
+// [a-z]          : single letters, for maps like koth_lakeside_r
+// beta\d*[a-z]*  : beta, beta1b
+// fix            : _fix suffix
+//
+// See https://www.debuggex.com/r/XLrzcrBkDPUeDx0j
+// for a visualization of this regex along with a few test cases
+// extracted from real map names
+const mapSuffixRegex =
+  /^(final\d*|rc\d+[a-z]*|rcx|[a-z]\d+[a-z]*|[a-z]|beta\d+[a-z]*|fix)$/;
+
+/**
+ * Normalize a map name by removing suffixes such as _rc1, _final, _v3 and so on.
+ * This is used to show the same map thumbnail for every version of the map.
+ *
+ * @param mapName The full name of the map
+ */
+export function normalizeMapName(mapName: string) {
+  const mapNameParts = mapName.toLowerCase().split("_");
+  return mapNameParts
+    .filter(
+      (part, i) =>
+        !(
+          // Only filter out parts after the second part, just in case a map has
+          // a name that matches the suffix regex
+          (i > 1 && mapSuffixRegex.test(part))
+        )
+    )
+    .join("_");
+}

@@ -4,7 +4,7 @@ import arena_granary from "../../../assets/map_thumbnails/arena_granary.png";
 import arena_lumberyard_event from "../../../assets/map_thumbnails/arena_lumberyard_event.png";
 import arena_lumberyard from "../../../assets/map_thumbnails/arena_lumberyard.png";
 import arena_nucleus from "../../../assets/map_thumbnails/arena_nucleus.png";
-import arena_offblast_final from "../../../assets/map_thumbnails/arena_offblast_final.png";
+import arena_offblast from "../../../assets/map_thumbnails/arena_offblast.png";
 import arena_ravine from "../../../assets/map_thumbnails/arena_ravine.png";
 import arena_sawmill from "../../../assets/map_thumbnails/arena_sawmill.png";
 import arena_watchtower from "../../../assets/map_thumbnails/arena_watchtower.png";
@@ -16,32 +16,32 @@ import cp_cloak from "../../../assets/map_thumbnails/cp_cloak.png";
 import cp_coldfront from "../../../assets/map_thumbnails/cp_coldfront.png";
 import cp_degrootkeep from "../../../assets/map_thumbnails/cp_degrootkeep.png";
 import cp_dustbowl from "../../../assets/map_thumbnails/cp_dustbowl.png";
-import cp_egypt_final from "../../../assets/map_thumbnails/cp_egypt_final.png";
+import cp_egypt from "../../../assets/map_thumbnails/cp_egypt.png";
 import cp_fastlane from "../../../assets/map_thumbnails/cp_fastlane.png";
 import cp_foundry from "../../../assets/map_thumbnails/cp_foundry.png";
-import cp_freight_final1 from "../../../assets/map_thumbnails/cp_freight_final1.png";
+import cp_freight from "../../../assets/map_thumbnails/cp_freight.png";
 import cp_gorge_event from "../../../assets/map_thumbnails/cp_gorge_event.png";
 import cp_gorge from "../../../assets/map_thumbnails/cp_gorge.png";
 import cp_granary from "../../../assets/map_thumbnails/cp_granary.png";
 import cp_gravelpit from "../../../assets/map_thumbnails/cp_gravelpit.png";
-import cp_gullywash_final1 from "../../../assets/map_thumbnails/cp_gullywash_final1.png";
-import cp_junction_final from "../../../assets/map_thumbnails/cp_junction_final.png";
+import cp_gullywash from "../../../assets/map_thumbnails/cp_gullywash.png";
+import cp_junction from "../../../assets/map_thumbnails/cp_junction.png";
 import cp_manor_event from "../../../assets/map_thumbnails/cp_manor_event.png";
 import cp_mercenarypark from "../../../assets/map_thumbnails/cp_mercenarypark.png";
 import cp_metalworks from "../../../assets/map_thumbnails/cp_metalworks.png";
 import cp_mossrock from "../../../assets/map_thumbnails/cp_mossrock.png";
 import cp_mountainlab from "../../../assets/map_thumbnails/cp_mountainlab.png";
 import cp_powerhouse from "../../../assets/map_thumbnails/cp_powerhouse.png";
-import cp_process_final from "../../../assets/map_thumbnails/cp_process_final.png";
-import cp_snakewater_final1 from "../../../assets/map_thumbnails/cp_snakewater_final1.png";
+import cp_process from "../../../assets/map_thumbnails/cp_process.png";
+import cp_snakewater from "../../../assets/map_thumbnails/cp_snakewater.png";
 import cp_snowplow from "../../../assets/map_thumbnails/cp_snowplow.png";
-import cp_standin_final from "../../../assets/map_thumbnails/cp_standin_final.png";
+import cp_standin from "../../../assets/map_thumbnails/cp_standin.png";
 import cp_steel from "../../../assets/map_thumbnails/cp_steel.png";
 import cp_sunshine_event from "../../../assets/map_thumbnails/cp_sunshine_event.png";
 import cp_sunshine from "../../../assets/map_thumbnails/cp_sunshine.png";
 import cp_vanguard from "../../../assets/map_thumbnails/cp_vanguard.png";
 import cp_well from "../../../assets/map_thumbnails/cp_well.png";
-import cp_yukon_final from "../../../assets/map_thumbnails/cp_yukon_final.png";
+import cp_yukon from "../../../assets/map_thumbnails/cp_yukon.png";
 import ctf_2fort_invasion from "../../../assets/map_thumbnails/ctf_2fort_invasion.png";
 import ctf_2fort from "../../../assets/map_thumbnails/ctf_2fort.png";
 import ctf_doublecross from "../../../assets/map_thumbnails/ctf_doublecross.png";
@@ -50,7 +50,7 @@ import ctf_gorge from "../../../assets/map_thumbnails/ctf_gorge.png";
 import ctf_hellfire from "../../../assets/map_thumbnails/ctf_hellfire.png";
 import ctf_landfall from "../../../assets/map_thumbnails/ctf_landfall.png";
 import ctf_sawmill from "../../../assets/map_thumbnails/ctf_sawmill.png";
-import ctf_snowfall_final from "../../../assets/map_thumbnails/ctf_snowfall_final.png";
+import ctf_snowfall from "../../../assets/map_thumbnails/ctf_snowfall.png";
 import ctf_thundermountain from "../../../assets/map_thumbnails/ctf_thundermountain.png";
 import ctf_turbine from "../../../assets/map_thumbnails/ctf_turbine.png";
 import ctf_well from "../../../assets/map_thumbnails/ctf_well.png";
@@ -59,11 +59,11 @@ import koth_badlands from "../../../assets/map_thumbnails/koth_badlands.png";
 import koth_bagel_event from "../../../assets/map_thumbnails/koth_bagel_event.png";
 import koth_brazil from "../../../assets/map_thumbnails/koth_brazil.png";
 import koth_harvest_event from "../../../assets/map_thumbnails/koth_harvest_event.png";
-import koth_harvest_final from "../../../assets/map_thumbnails/koth_harvest_final.png";
+import koth_harvest from "../../../assets/map_thumbnails/koth_harvest.png";
 import koth_highpass from "../../../assets/map_thumbnails/koth_highpass.png";
 import koth_king from "../../../assets/map_thumbnails/koth_king.png";
 import koth_lakeside_event from "../../../assets/map_thumbnails/koth_lakeside_event.png";
-import koth_lakeside_final from "../../../assets/map_thumbnails/koth_lakeside_final.png";
+import koth_lakeside from "../../../assets/map_thumbnails/koth_lakeside.png";
 import koth_lazarus from "../../../assets/map_thumbnails/koth_lazarus.png";
 import koth_los_muertos from "../../../assets/map_thumbnails/koth_los_muertos.png";
 import koth_maple_ridge_event from "../../../assets/map_thumbnails/koth_maple_ridge_event.png";
@@ -71,7 +71,7 @@ import koth_megalo from "../../../assets/map_thumbnails/koth_megalo.png";
 import koth_moonshine_event from "../../../assets/map_thumbnails/koth_moonshine_event.png";
 import koth_nucleus from "../../../assets/map_thumbnails/koth_nucleus.png";
 import koth_probed from "../../../assets/map_thumbnails/koth_probed.png";
-import koth_product_rcx from "../../../assets/map_thumbnails/koth_product_rcx.png";
+import koth_product from "../../../assets/map_thumbnails/koth_product.png";
 import koth_sawmill from "../../../assets/map_thumbnails/koth_sawmill.png";
 import koth_slasher from "../../../assets/map_thumbnails/koth_slasher.png";
 import koth_slaughter_event from "../../../assets/map_thumbnails/koth_slaughter_event.png";
@@ -102,23 +102,23 @@ import pl_barnblitz from "../../../assets/map_thumbnails/pl_barnblitz.png";
 import pl_bloodwater from "../../../assets/map_thumbnails/pl_bloodwater.png";
 import pl_borneo from "../../../assets/map_thumbnails/pl_borneo.png";
 import pl_cactuscanyon from "../../../assets/map_thumbnails/pl_cactuscanyon.png";
-import pl_enclosure_final from "../../../assets/map_thumbnails/pl_enclosure_final.png";
+import pl_enclosure from "../../../assets/map_thumbnails/pl_enclosure.png";
 import pl_fifthcurve_event from "../../../assets/map_thumbnails/pl_fifthcurve_event.png";
-import pl_frontier_final from "../../../assets/map_thumbnails/pl_frontier_final.png";
+import pl_frontier from "../../../assets/map_thumbnails/pl_frontier.png";
 import pl_goldrush from "../../../assets/map_thumbnails/pl_goldrush.png";
 import pl_hasslecastle from "../../../assets/map_thumbnails/pl_hasslecastle.png";
-import pl_hoodoo_final from "../../../assets/map_thumbnails/pl_hoodoo_final.png";
+import pl_hoodoo from "../../../assets/map_thumbnails/pl_hoodoo.png";
 import pl_millstone_event from "../../../assets/map_thumbnails/pl_millstone_event.png";
 import pl_pier from "../../../assets/map_thumbnails/pl_pier.png";
-import pl_precipice_event_final from "../../../assets/map_thumbnails/pl_precipice_event_final.png";
+import pl_precipice_event from "../../../assets/map_thumbnails/pl_precipice_event.png";
 import plr_bananabay from "../../../assets/map_thumbnails/plr_bananabay.png";
 import plr_hightower_event from "../../../assets/map_thumbnails/plr_hightower_event.png";
 import plr_hightower from "../../../assets/map_thumbnails/plr_hightower.png";
-import plr_nightfall_final from "../../../assets/map_thumbnails/plr_nightfall_final.png";
+import plr_nightfall from "../../../assets/map_thumbnails/plr_nightfall.png";
 import plr_pipeline from "../../../assets/map_thumbnails/plr_pipeline.png";
 import pl_rumble_event from "../../../assets/map_thumbnails/pl_rumble_event.png";
 import pl_snowycoast from "../../../assets/map_thumbnails/pl_snowycoast.png";
-import pl_swiftwater_final1 from "../../../assets/map_thumbnails/pl_swiftwater_final1.png";
+import pl_swiftwater from "../../../assets/map_thumbnails/pl_swiftwater.png";
 import pl_terror_event from "../../../assets/map_thumbnails/pl_terror_event.png";
 import pl_thundermountain from "../../../assets/map_thumbnails/pl_thundermountain.png";
 import pl_upward from "../../../assets/map_thumbnails/pl_upward.png";
@@ -137,7 +137,7 @@ const maps: Record<string, string> = {
   arena_lumberyard_event,
   arena_lumberyard,
   arena_nucleus,
-  arena_offblast_final,
+  arena_offblast,
   arena_ravine,
   arena_sawmill,
   arena_watchtower,
@@ -149,32 +149,32 @@ const maps: Record<string, string> = {
   cp_coldfront,
   cp_degrootkeep,
   cp_dustbowl,
-  cp_egypt_final,
+  cp_egypt,
   cp_fastlane,
   cp_foundry,
-  cp_freight_final1,
+  cp_freight,
   cp_gorge_event,
   cp_gorge,
   cp_granary,
   cp_gravelpit,
-  cp_gullywash_final1,
-  cp_junction_final,
+  cp_gullywash,
+  cp_junction,
   cp_manor_event,
   cp_mercenarypark,
   cp_metalworks,
   cp_mossrock,
   cp_mountainlab,
   cp_powerhouse,
-  cp_process_final,
-  cp_snakewater_final1,
+  cp_process,
+  cp_snakewater,
   cp_snowplow,
-  cp_standin_final,
+  cp_standin,
   cp_steel,
   cp_sunshine_event,
   cp_sunshine,
   cp_vanguard,
   cp_well,
-  cp_yukon_final,
+  cp_yukon,
   ctf_2fort_invasion,
   ctf_2fort,
   ctf_doublecross,
@@ -183,7 +183,7 @@ const maps: Record<string, string> = {
   ctf_hellfire,
   ctf_landfall,
   ctf_sawmill,
-  ctf_snowfall_final,
+  ctf_snowfall,
   ctf_thundermountain,
   ctf_turbine,
   ctf_well,
@@ -192,11 +192,11 @@ const maps: Record<string, string> = {
   koth_bagel_event,
   koth_brazil,
   koth_harvest_event,
-  koth_harvest_final,
+  koth_harvest,
   koth_highpass,
   koth_king,
   koth_lakeside_event,
-  koth_lakeside_final,
+  koth_lakeside,
   koth_lazarus,
   koth_los_muertos,
   koth_maple_ridge_event,
@@ -204,7 +204,7 @@ const maps: Record<string, string> = {
   koth_moonshine_event,
   koth_nucleus,
   koth_probed,
-  koth_product_rcx,
+  koth_product,
   koth_sawmill,
   koth_slasher,
   koth_slaughter_event,
@@ -235,23 +235,23 @@ const maps: Record<string, string> = {
   pl_bloodwater,
   pl_borneo,
   pl_cactuscanyon,
-  pl_enclosure_final,
+  pl_enclosure,
   pl_fifthcurve_event,
-  pl_frontier_final,
+  pl_frontier,
   pl_goldrush,
   pl_hasslecastle,
-  pl_hoodoo_final,
+  pl_hoodoo,
   pl_millstone_event,
   pl_pier,
-  pl_precipice_event_final,
+  pl_precipice_event,
   plr_bananabay,
   plr_hightower_event,
   plr_hightower,
-  plr_nightfall_final,
+  plr_nightfall,
   plr_pipeline,
   pl_rumble_event,
   pl_snowycoast,
-  pl_swiftwater_final1,
+  pl_swiftwater,
   pl_terror_event,
   pl_thundermountain,
   pl_upward,
