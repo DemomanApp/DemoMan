@@ -34,6 +34,8 @@ import cp_mossrock from "../../../assets/map_thumbnails/cp_mossrock.png";
 import cp_mountainlab from "../../../assets/map_thumbnails/cp_mountainlab.png";
 import cp_powerhouse from "../../../assets/map_thumbnails/cp_powerhouse.png";
 import cp_process from "../../../assets/map_thumbnails/cp_process.png";
+import cp_prolands from "../../../assets/map_thumbnails/cp_prolands.png";
+import cp_reckoner from "../../../assets/map_thumbnails/cp_reckoner.png";
 import cp_snakewater from "../../../assets/map_thumbnails/cp_snakewater.png";
 import cp_snowplow from "../../../assets/map_thumbnails/cp_snowplow.png";
 import cp_standin from "../../../assets/map_thumbnails/cp_standin.png";
@@ -41,6 +43,7 @@ import cp_steel from "../../../assets/map_thumbnails/cp_steel.png";
 import cp_sunshine_event from "../../../assets/map_thumbnails/cp_sunshine_event.png";
 import cp_sunshine from "../../../assets/map_thumbnails/cp_sunshine.png";
 import cp_vanguard from "../../../assets/map_thumbnails/cp_vanguard.png";
+import cp_villa from "../../../assets/map_thumbnails/cp_villa.png";
 import cp_well from "../../../assets/map_thumbnails/cp_well.png";
 import cp_yukon from "../../../assets/map_thumbnails/cp_yukon.png";
 import ctf_2fort_invasion from "../../../assets/map_thumbnails/ctf_2fort_invasion.png";
@@ -59,7 +62,10 @@ import itemtest from "../../../assets/map_thumbnails/itemtest.png";
 import koth_ashville from "../../../assets/map_thumbnails/koth_ashville.png";
 import koth_badlands from "../../../assets/map_thumbnails/koth_badlands.png";
 import koth_bagel_event from "../../../assets/map_thumbnails/koth_bagel_event.png";
+import koth_bagel from "../../../assets/map_thumbnails/koth_bagel.png";
 import koth_brazil from "../../../assets/map_thumbnails/koth_brazil.png";
+import koth_clearcut from "../../../assets/map_thumbnails/koth_clearcut.png";
+import koth_coalplant from "../../../assets/map_thumbnails/koth_coalplant.png";
 import koth_harvest_event from "../../../assets/map_thumbnails/koth_harvest_event.png";
 import koth_harvest from "../../../assets/map_thumbnails/koth_harvest.png";
 import koth_highpass from "../../../assets/map_thumbnails/koth_highpass.png";
@@ -75,14 +81,17 @@ import koth_nucleus from "../../../assets/map_thumbnails/koth_nucleus.png";
 import koth_probed from "../../../assets/map_thumbnails/koth_probed.png";
 import koth_product from "../../../assets/map_thumbnails/koth_product.png";
 import koth_proplant from "../../../assets/map_thumbnails/koth_proplant.png";
+import koth_proside from "../../../assets/map_thumbnails/koth_proside.png";
 import koth_sawmill from "../../../assets/map_thumbnails/koth_sawmill.png";
 import koth_slasher from "../../../assets/map_thumbnails/koth_slasher.png";
 import koth_slaughter_event from "../../../assets/map_thumbnails/koth_slaughter_event.png";
 import koth_suijin from "../../../assets/map_thumbnails/koth_suijin.png";
 import koth_synthetic_event from "../../../assets/map_thumbnails/koth_synthetic_event.png";
+import koth_synthetic from "../../../assets/map_thumbnails/koth_synthetic.png";
 import koth_undergrove_event from "../../../assets/map_thumbnails/koth_undergrove_event.png";
 import koth_viaduct_event from "../../../assets/map_thumbnails/koth_viaduct_event.png";
 import koth_viaduct from "../../../assets/map_thumbnails/koth_viaduct.png";
+import koth_warmtic from "../../../assets/map_thumbnails/koth_warmtic.png";
 import mvm_bigrock from "../../../assets/map_thumbnails/mvm_bigrock.png";
 import mvm_coaltown from "../../../assets/map_thumbnails/mvm_coaltown.png";
 import mvm_decoy from "../../../assets/map_thumbnails/mvm_decoy.png";
@@ -174,6 +183,8 @@ const maps: Record<string, string> = {
   cp_mountainlab,
   cp_powerhouse,
   cp_process,
+  cp_prolands,
+  cp_reckoner,
   cp_snakewater,
   cp_snowplow,
   cp_standin,
@@ -181,6 +192,7 @@ const maps: Record<string, string> = {
   cp_sunshine_event,
   cp_sunshine,
   cp_vanguard,
+  cp_villa,
   cp_well,
   cp_yukon,
   ctf_2fort_invasion,
@@ -199,7 +211,10 @@ const maps: Record<string, string> = {
   koth_ashville,
   koth_badlands,
   koth_bagel_event,
+  koth_bagel,
   koth_brazil,
+  koth_clearcut,
+  koth_coalplant,
   koth_harvest_event,
   koth_harvest,
   koth_highpass,
@@ -215,14 +230,17 @@ const maps: Record<string, string> = {
   koth_probed,
   koth_product,
   koth_proplant,
+  koth_proside,
   koth_sawmill,
   koth_slasher,
   koth_slaughter_event,
   koth_suijin,
   koth_synthetic_event,
+  koth_synthetic,
   koth_undergrove_event,
   koth_viaduct_event,
   koth_viaduct,
+  koth_warmtic,
   mvm_bigrock,
   mvm_coaltown,
   mvm_decoy,
