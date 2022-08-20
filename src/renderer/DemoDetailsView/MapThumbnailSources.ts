@@ -23,6 +23,7 @@ import cp_freight from "../../../assets/map_thumbnails/cp_freight.png";
 import cp_gorge_event from "../../../assets/map_thumbnails/cp_gorge_event.png";
 import cp_gorge from "../../../assets/map_thumbnails/cp_gorge.png";
 import cp_granary from "../../../assets/map_thumbnails/cp_granary.png";
+import cp_granary_pro from "../../../assets/map_thumbnails/cp_granary_pro.png";
 import cp_gravelpit from "../../../assets/map_thumbnails/cp_gravelpit.png";
 import cp_gullywash from "../../../assets/map_thumbnails/cp_gullywash.png";
 import cp_junction from "../../../assets/map_thumbnails/cp_junction.png";
@@ -55,6 +56,7 @@ import ctf_thundermountain from "../../../assets/map_thumbnails/ctf_thundermount
 import ctf_turbine from "../../../assets/map_thumbnails/ctf_turbine.png";
 import ctf_well from "../../../assets/map_thumbnails/ctf_well.png";
 import itemtest from "../../../assets/map_thumbnails/itemtest.png";
+import koth_ashville from "../../../assets/map_thumbnails/koth_ashville.png";
 import koth_badlands from "../../../assets/map_thumbnails/koth_badlands.png";
 import koth_bagel_event from "../../../assets/map_thumbnails/koth_bagel_event.png";
 import koth_brazil from "../../../assets/map_thumbnails/koth_brazil.png";
@@ -72,6 +74,7 @@ import koth_moonshine_event from "../../../assets/map_thumbnails/koth_moonshine_
 import koth_nucleus from "../../../assets/map_thumbnails/koth_nucleus.png";
 import koth_probed from "../../../assets/map_thumbnails/koth_probed.png";
 import koth_product from "../../../assets/map_thumbnails/koth_product.png";
+import koth_proplant from "../../../assets/map_thumbnails/koth_proplant.png";
 import koth_sawmill from "../../../assets/map_thumbnails/koth_sawmill.png";
 import koth_slasher from "../../../assets/map_thumbnails/koth_slasher.png";
 import koth_slaughter_event from "../../../assets/map_thumbnails/koth_slaughter_event.png";
@@ -98,10 +101,12 @@ import pd_pit_of_death_event from "../../../assets/map_thumbnails/pd_pit_of_deat
 import pd_snowville_event from "../../../assets/map_thumbnails/pd_snowville_event.png";
 import pd_watergate from "../../../assets/map_thumbnails/pd_watergate.png";
 import pl_badwater from "../../../assets/map_thumbnails/pl_badwater.png";
+import pl_badwater_pro from "../../../assets/map_thumbnails/pl_badwater_pro.png";
 import pl_barnblitz from "../../../assets/map_thumbnails/pl_barnblitz.png";
 import pl_bloodwater from "../../../assets/map_thumbnails/pl_bloodwater.png";
 import pl_borneo from "../../../assets/map_thumbnails/pl_borneo.png";
 import pl_cactuscanyon from "../../../assets/map_thumbnails/pl_cactuscanyon.png";
+import pl_cornwater from "../../../assets/map_thumbnails/pl_cornwater.png";
 import pl_enclosure from "../../../assets/map_thumbnails/pl_enclosure.png";
 import pl_fifthcurve_event from "../../../assets/map_thumbnails/pl_fifthcurve_event.png";
 import pl_frontier from "../../../assets/map_thumbnails/pl_frontier.png";
@@ -111,6 +116,7 @@ import pl_hoodoo from "../../../assets/map_thumbnails/pl_hoodoo.png";
 import pl_millstone_event from "../../../assets/map_thumbnails/pl_millstone_event.png";
 import pl_pier from "../../../assets/map_thumbnails/pl_pier.png";
 import pl_precipice_event from "../../../assets/map_thumbnails/pl_precipice_event.png";
+import pl_vigil from "../../../assets/map_thumbnails/pl_vigil.png";
 import plr_bananabay from "../../../assets/map_thumbnails/plr_bananabay.png";
 import plr_hightower_event from "../../../assets/map_thumbnails/plr_hightower_event.png";
 import plr_hightower from "../../../assets/map_thumbnails/plr_hightower.png";
@@ -129,6 +135,7 @@ import sd_doomsday from "../../../assets/map_thumbnails/sd_doomsday.png";
 import tc_hydro from "../../../assets/map_thumbnails/tc_hydro.png";
 import tr_dustbowl from "../../../assets/map_thumbnails/tr_dustbowl.png";
 import tr_target from "../../../assets/map_thumbnails/tr_target.png";
+import ultiduo_baloo from "../../../assets/map_thumbnails/ultiduo_baloo.png";
 
 const maps: Record<string, string> = {
   arena_badlands,
@@ -156,6 +163,7 @@ const maps: Record<string, string> = {
   cp_gorge_event,
   cp_gorge,
   cp_granary,
+  cp_granary_pro,
   cp_gravelpit,
   cp_gullywash,
   cp_junction,
@@ -188,6 +196,7 @@ const maps: Record<string, string> = {
   ctf_turbine,
   ctf_well,
   itemtest,
+  koth_ashville,
   koth_badlands,
   koth_bagel_event,
   koth_brazil,
@@ -205,6 +214,7 @@ const maps: Record<string, string> = {
   koth_nucleus,
   koth_probed,
   koth_product,
+  koth_proplant,
   koth_sawmill,
   koth_slasher,
   koth_slaughter_event,
@@ -231,10 +241,12 @@ const maps: Record<string, string> = {
   pd_snowville_event,
   pd_watergate,
   pl_badwater,
+  pl_badwater_pro,
   pl_barnblitz,
   pl_bloodwater,
   pl_borneo,
   pl_cactuscanyon,
+  pl_cornwater,
   pl_enclosure,
   pl_fifthcurve_event,
   pl_frontier,
@@ -244,6 +256,7 @@ const maps: Record<string, string> = {
   pl_millstone_event,
   pl_pier,
   pl_precipice_event,
+  pl_vigil,
   plr_bananabay,
   plr_hightower_event,
   plr_hightower,
@@ -262,6 +275,7 @@ const maps: Record<string, string> = {
   tc_hydro,
   tr_dustbowl,
   tr_target,
+  ultiduo_baloo,
 };
 
 export default maps;
