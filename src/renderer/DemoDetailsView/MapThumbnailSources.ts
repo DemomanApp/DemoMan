@@ -71,6 +71,7 @@ import koth_megalo from "../../../assets/map_thumbnails/koth_megalo.png";
 import koth_moonshine_event from "../../../assets/map_thumbnails/koth_moonshine_event.png";
 import koth_nucleus from "../../../assets/map_thumbnails/koth_nucleus.png";
 import koth_probed from "../../../assets/map_thumbnails/koth_probed.png";
+import koth_product_rcx from "../../../assets/map_thumbnails/koth_product_rcx.png";
 import koth_sawmill from "../../../assets/map_thumbnails/koth_sawmill.png";
 import koth_slasher from "../../../assets/map_thumbnails/koth_slasher.png";
 import koth_slaughter_event from "../../../assets/map_thumbnails/koth_slaughter_event.png";
@@ -203,6 +204,7 @@ const maps: Record<string, string> = {
   koth_moonshine_event,
   koth_nucleus,
   koth_probed,
+  koth_product_rcx,
   koth_sawmill,
   koth_slasher,
   koth_slaughter_event,
