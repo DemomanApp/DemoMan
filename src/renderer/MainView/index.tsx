@@ -5,6 +5,7 @@ import {
   Settings as SettingsIcon,
   InfoOutlined as InfoIcon,
   MoreHoriz as MoreHorizIcon,
+  Refresh as RefreshIcon,
 } from "@mui/icons-material";
 
 import Demo from "../Demo";
@@ -25,7 +26,7 @@ import AdvancedSearchInput, {
 import UpdateIndicator from "./UpdateIndicator";
 
 export default function MainView() {
-  const { demos, knownTags, knownMaps, knownPlayers } =
+  const { demos, knownTags, knownMaps, knownPlayers, reloadEverything } =
     useContext(DemosContext);
   const navigate = useNavigate();
 
@@ -132,6 +133,11 @@ export default function MainView() {
         right={
           <>
             <UpdateIndicator />
+            <AppBarButton
+              icon={<RefreshIcon />}
+              tooltip="Refresh demos"
+              onClick={reloadEverything}
+            />
             <AppBarButton
               icon={<InfoIcon />}
               tooltip="Info"
