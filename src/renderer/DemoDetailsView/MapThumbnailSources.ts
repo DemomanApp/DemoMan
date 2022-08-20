@@ -204,7 +204,7 @@ const maps: Record<string, string> = {
   koth_moonshine_event,
   koth_nucleus,
   koth_probed,
-  koth_product_rcx
+  koth_product_rcx,
   koth_sawmill,
   koth_slasher,
   koth_slaughter_event,
