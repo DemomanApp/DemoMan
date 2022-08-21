@@ -44,7 +44,7 @@ import cp_sunshine_event from "../../../assets/map_thumbnails/cp_sunshine_event.
 import cp_sunshine from "../../../assets/map_thumbnails/cp_sunshine.png";
 import cp_vanguard from "../../../assets/map_thumbnails/cp_vanguard.png";
 import cp_villa from "../../../assets/map_thumbnails/cp_villa.png";
-import cp_warmfrost from "../../../assets/map_thumbnails/cp_warmfros.png";
+import cp_warmfrost from "../../../assets/map_thumbnails/cp_warmfrost.png";
 import cp_well from "../../../assets/map_thumbnails/cp_well.png";
 import cp_yukon from "../../../assets/map_thumbnails/cp_yukon.png";
 import ctf_2fort_invasion from "../../../assets/map_thumbnails/ctf_2fort_invasion.png";
