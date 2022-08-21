@@ -44,10 +44,14 @@ import cp_sunshine_event from "../../../assets/map_thumbnails/cp_sunshine_event.
 import cp_sunshine from "../../../assets/map_thumbnails/cp_sunshine.png";
 import cp_vanguard from "../../../assets/map_thumbnails/cp_vanguard.png";
 import cp_villa from "../../../assets/map_thumbnails/cp_villa.png";
+import cp_warmfrost from "../../../assets/map_thumbnails/cp_warmfrost.png";
 import cp_well from "../../../assets/map_thumbnails/cp_well.png";
 import cp_yukon from "../../../assets/map_thumbnails/cp_yukon.png";
 import ctf_2fort_invasion from "../../../assets/map_thumbnails/ctf_2fort_invasion.png";
 import ctf_2fort from "../../../assets/map_thumbnails/ctf_2fort.png";
+import ctf_ballin from "../../../assets/map_thumbnails/ctf_ballin.png";
+import ctf_ballin_sky from "../../../assets/map_thumbnails/ctf_ballin_sky.png";
+import ctf_bball_comptf from "../../../assets/map_thumbnails/ctf_bball_comptf.png";
 import ctf_doublecross from "../../../assets/map_thumbnails/ctf_doublecross.png";
 import ctf_foundry from "../../../assets/map_thumbnails/ctf_foundry.png";
 import ctf_gorge from "../../../assets/map_thumbnails/ctf_gorge.png";
@@ -59,6 +63,7 @@ import ctf_thundermountain from "../../../assets/map_thumbnails/ctf_thundermount
 import ctf_turbine from "../../../assets/map_thumbnails/ctf_turbine.png";
 import ctf_well from "../../../assets/map_thumbnails/ctf_well.png";
 import itemtest from "../../../assets/map_thumbnails/itemtest.png";
+import koth_airfield from "../../../assets/map_thumbnails/koth_airfield.png";
 import koth_ashville from "../../../assets/map_thumbnails/koth_ashville.png";
 import koth_badlands from "../../../assets/map_thumbnails/koth_badlands.png";
 import koth_bagel_event from "../../../assets/map_thumbnails/koth_bagel_event.png";
@@ -75,6 +80,7 @@ import koth_lakeside from "../../../assets/map_thumbnails/koth_lakeside.png";
 import koth_lazarus from "../../../assets/map_thumbnails/koth_lazarus.png";
 import koth_los_muertos from "../../../assets/map_thumbnails/koth_los_muertos.png";
 import koth_maple_ridge_event from "../../../assets/map_thumbnails/koth_maple_ridge_event.png";
+import koth_maple_ridge from "../../../assets/map_thumbnails/koth_maple_ridge.png";
 import koth_megalo from "../../../assets/map_thumbnails/koth_megalo.png";
 import koth_moonshine_event from "../../../assets/map_thumbnails/koth_moonshine_event.png";
 import koth_nucleus from "../../../assets/map_thumbnails/koth_nucleus.png";
@@ -85,10 +91,13 @@ import koth_proside from "../../../assets/map_thumbnails/koth_proside.png";
 import koth_sawmill from "../../../assets/map_thumbnails/koth_sawmill.png";
 import koth_slasher from "../../../assets/map_thumbnails/koth_slasher.png";
 import koth_slaughter_event from "../../../assets/map_thumbnails/koth_slaughter_event.png";
+import koth_stallone from "../../../assets/map_thumbnails/koth_stallone.png";
 import koth_suijin from "../../../assets/map_thumbnails/koth_suijin.png";
 import koth_synthetic_event from "../../../assets/map_thumbnails/koth_synthetic_event.png";
 import koth_synthetic from "../../../assets/map_thumbnails/koth_synthetic.png";
+import koth_ultiduo from "../../../assets/map_thumbnails/koth_ultiduo.png";
 import koth_undergrove_event from "../../../assets/map_thumbnails/koth_undergrove_event.png";
+import koth_undergrove from "../../../assets/map_thumbnails/koth_undergrove.png";
 import koth_viaduct_event from "../../../assets/map_thumbnails/koth_viaduct_event.png";
 import koth_viaduct from "../../../assets/map_thumbnails/koth_viaduct.png";
 import koth_warmtic from "../../../assets/map_thumbnails/koth_warmtic.png";
@@ -144,7 +153,18 @@ import sd_doomsday from "../../../assets/map_thumbnails/sd_doomsday.png";
 import tc_hydro from "../../../assets/map_thumbnails/tc_hydro.png";
 import tr_dustbowl from "../../../assets/map_thumbnails/tr_dustbowl.png";
 import tr_target from "../../../assets/map_thumbnails/tr_target.png";
+import ulti_fira from "../../../assets/map_thumbnails/ulti_fira.png";
+import ultiduo_badlands from "../../../assets/map_thumbnails/ultiduo_badlands.png";
 import ultiduo_baloo from "../../../assets/map_thumbnails/ultiduo_baloo.png";
+import ultiduo_champions from "../../../assets/map_thumbnails/ultiduo_champions.png";
+import ultiduo_grove from "../../../assets/map_thumbnails/ultiduo_grove.png";
+import ultiduo_gullywash from "../../../assets/map_thumbnails/ultiduo_gullywash.png";
+import ultiduo_lookout from "../../../assets/map_thumbnails/ultiduo_lookout.png";
+import ultiduo_nature from "../../../assets/map_thumbnails/ultiduo_nature.png";
+import ultiduo_nicecicles from "../../../assets/map_thumbnails/ultiduo_nicecicles.png";
+import ultiduo_noodle from "../../../assets/map_thumbnails/ultiduo_noodle.png";
+import ultiduo_obsidiian from "../../../assets/map_thumbnails/ultiduo_obsidiian.png";
+import ultiduo_seclusion from "../../../assets/map_thumbnails/ultiduo_seclusion.png";
 
 const maps: Record<string, string> = {
   arena_badlands,
@@ -193,10 +213,14 @@ const maps: Record<string, string> = {
   cp_sunshine,
   cp_vanguard,
   cp_villa,
+  cp_warmfrost,
   cp_well,
   cp_yukon,
   ctf_2fort_invasion,
   ctf_2fort,
+  ctf_ballin,
+  ctf_ballin_sky,
+  ctf_bball_comptf,
   ctf_doublecross,
   ctf_foundry,
   ctf_gorge,
@@ -208,6 +232,7 @@ const maps: Record<string, string> = {
   ctf_turbine,
   ctf_well,
   itemtest,
+  koth_airfield,
   koth_ashville,
   koth_badlands,
   koth_bagel_event,
@@ -224,6 +249,7 @@ const maps: Record<string, string> = {
   koth_lazarus,
   koth_los_muertos,
   koth_maple_ridge_event,
+  koth_maple_ridge,
   koth_megalo,
   koth_moonshine_event,
   koth_nucleus,
@@ -234,10 +260,13 @@ const maps: Record<string, string> = {
   koth_sawmill,
   koth_slasher,
   koth_slaughter_event,
+  koth_stallone,
   koth_suijin,
   koth_synthetic_event,
   koth_synthetic,
+  koth_ultiduo,
   koth_undergrove_event,
+  koth_undergrove,
   koth_viaduct_event,
   koth_viaduct,
   koth_warmtic,
@@ -293,7 +322,18 @@ const maps: Record<string, string> = {
   tc_hydro,
   tr_dustbowl,
   tr_target,
+  ulti_fira,
+  ultiduo_badlands,
   ultiduo_baloo,
+  ultiduo_champions,
+  ultiduo_grove,
+  ultiduo_gullywash,
+  ultiduo_lookout,
+  ultiduo_nature,
+  ultiduo_nicecicles,
+  ultiduo_noodle,
+  ultiduo_obsidiian,
+  ultiduo_seclusion,
 };
 
 export default maps;
