@@ -5,8 +5,9 @@ import { useAsync } from "react-async-hook";
 import AutoSizer from "react-virtualized-auto-sizer";
 import { FixedSizeList } from "react-window";
 
-import { Demo, getDemosInDirectory } from "../../api";
+import { getDemosInDirectory } from "../../api";
 import { HeaderPortal, NavbarButton, NavbarPortal } from "../../AppShell";
+import { Demo } from "../../demo";
 import DemoListRow from "./DemoListRow";
 
 export default function HomeView() {
@@ -35,7 +36,14 @@ export default function HomeView() {
   return (
     <>
       <HeaderPortal>
-        <Text align="center" size={"xl"}>
+        <Text
+          align="center"
+          weight={700}
+          size="xl"
+          inline
+          data-tauri-drag-region
+          style={{ cursor: "default" }}
+        >
           DemoMan
         </Text>
       </HeaderPortal>

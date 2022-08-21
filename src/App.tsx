@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useNavigate, Routes, Route } from "react-router-dom";
 
 import { appWindow } from "@tauri-apps/api/window";
@@ -56,7 +56,14 @@ export default function App() {
 
   const [isMaximized, setIsMaximized] = useState(false);
 
-  appWindow.onResized(() => appWindow.isMaximized().then(setIsMaximized));
+  useEffect(() => {
+    const unlistenFnPromise = appWindow.onResized(() =>
+      appWindow.isMaximized().then(setIsMaximized)
+    );
+    return () => {
+      unlistenFnPromise.then((unlistenFn) => unlistenFn()).catch(console.error);
+    };
+  }, []);
 
   return (
     <AppShellProvider value={{ headerRef, navbarRef }}>
@@ -92,7 +99,15 @@ export default function App() {
             <HeaderIcon icon={<IconArrowLeft />} onClick={() => navigate(-1)} />
             <HeaderIcon icon={<IconArrowRight />} onClick={() => navigate(1)} />
             <div
-              style={{ flexGrow: 1, display: "flex", justifyContent: "center" }}
+              style={{
+                flexGrow: 1,
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                // Because there are two buttons on the left and three on the right,
+                // this is needed for centering
+                marginLeft: "40px",
+              }}
               data-tauri-drag-region
               ref={headerRef}
             />

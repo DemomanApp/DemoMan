@@ -177,4 +177,3 @@ pub async fn get_demo_details(
         .path;
     parse_demo_body(path).or(Err(DemoCommandError::FileReadFailed))
 }
-

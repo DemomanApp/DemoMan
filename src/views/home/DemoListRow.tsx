@@ -1,40 +1,58 @@
-import { Badge, createStyles, Group, Paper, Text, Title } from "@mantine/core";
+import { useState } from "react";
+import { Link } from "react-router-dom";
+
+import {
+  Badge,
+  Box,
+  createStyles,
+  Group,
+  Paper,
+  Text,
+  Title,
+} from "@mantine/core";
 import {
   IconBookmarks,
   IconCalendarEvent,
-  IconFileAnalytics,
+  IconDeviceTv,
   IconTags,
+  IconUser,
 } from "@tabler/icons";
-import { useState } from "react";
-import { Link } from "react-router-dom";
-import { Demo } from "../../api";
-import { formatFileSize, normalizeMapName } from "../../util";
+
+import { normalizeMapName } from "../../util";
+import { Demo, DemoEvent, isStvDemo } from "../../demo";
+import { IconKillstreak } from "../../icons";
 
 type DemoListRowProps = {
   demo: Demo;
 };
 
 function Badges({ items, max }: { items: string[]; max: number }) {
+  if (items.length === 0) {
+    return null;
+  }
   const overflowAmount = items.length - max;
   const shownItems = items.slice(0, max);
   return (
-    <>
-      {shownItems.map((item) => (
-        <Badge
-          key={item}
-          variant="filled"
-          size="sm"
-          style={{ maxWidth: "100px" }}
-        >
-          {item}
-        </Badge>
-      ))}
-      {overflowAmount > 0 && (
-        <Badge variant="outline" size="sm">
-          +{overflowAmount}
-        </Badge>
-      )}
-    </>
+    <div style={{ display: "flex" }}>
+      <Group spacing={4}>
+        <IconTags color="gray" />
+        {shownItems.map((item) => (
+          <Badge
+            key={item}
+            variant="filled"
+            size="sm"
+            style={{ maxWidth: "100px" }}
+          >
+            {item}
+          </Badge>
+        ))}
+        {overflowAmount > 0 && (
+          <Text size="sm" color="dimmed">
+            +{overflowAmount} more
+          </Text>
+        )}
+      </Group>
+    </div>
   );
 }
 
@@ -94,7 +112,12 @@ function MapBox({ mapName }: { mapName: string }) {
         />
       )}
       <div className={classes.textBox}>
-        <Text color="dimmed" align="center" className={classes.text}>
+        <Text
+          color="dimmed"
+          align="center"
+          className={classes.text}
+          weight={600}
+        >
           {mapName}
         </Text>
       </div>
@@ -102,7 +125,49 @@ function MapBox({ mapName }: { mapName: string }) {
   );
 }
 
+function EventsBox({ events }: { events: DemoEvent[] }) {
+  if (events.length === 0) {
+    return null;
+  }
+
+  const maxDisplayedEvents = 3;
+  const displayedEvents = events.slice(0, maxDisplayedEvents);
+  const overflowAmount = events.length - maxDisplayedEvents;
+
+  return (
+    <Box
+      sx={(theme) => ({
+        display: "flex",
+        marginLeft: "auto",
+        flexDirection: "column",
+        padding: "8px",
+        width: "180px",
+        borderLeft: `1px solid ${
+          theme.colorScheme === "dark"
+            ? theme.colors.dark[4]
+            : theme.colors.gray[3]
+        }`,
+      })}
+    >
+      {displayedEvents.map((event, i) => (
+        <div key={i} style={{ display: "flex", alignItems: "center" }}>
+          {event.name === "Killstreak" ? (
+            <IconKillstreak color="gray" />
+          ) : (
+            <IconBookmarks color="gray" />
+          )}
+          <Text inline color="dimmed">
+            {event.value}
+          </Text>
+        </div>
+      ))}
+      {overflowAmount > 0 && <div>+{overflowAmount} more</div>}
+    </Box>
+  );
+}
+
 export default function DemoListRow({ demo }: DemoListRowProps) {
+  const birthtime = new Date(demo.birthtime * 1000);
   return (
     <Paper
       sx={(theme) => ({
@@ -129,44 +194,30 @@ export default function DemoListRow({ demo }: DemoListRowProps) {
         style={{
           display: "flex",
           flexDirection: "column",
-          justifyContent: "space-between",
+          justifyContent: "start",
           padding: "8px",
           flexGrow: 1,
         }}
       >
-        <Title order={3} style={{ marginBottom: "auto" }}>
-          {demo.name}
-        </Title>
         <Group spacing="xs">
-          <IconBookmarks />
-          <Text color="dimmed">{demo.events.length}</Text>
+          <Title order={3} inline>
+            {demo.name}
+          </Title>
+          {isStvDemo(demo) && <IconDeviceTv />}
         </Group>
-        <Group spacing="xs">
-          <IconTags />
-          <Badges items={demo.tags} max={3} />
-        </Group>
-      </div>
-      <div
-        style={{
-          display: "flex",
-          marginLeft: "auto",
-          flexDirection: "column",
-          padding: "8px",
-          width: "200px",
-          minWidth: "200px",
-        }}
-      >
-        <Group spacing="xs">
-          <IconCalendarEvent />
-          <Text color="dimmed">
-            {new Date(demo.birthtime * 1000).toLocaleDateString()}
-          </Text>
-        </Group>
-        <Group spacing="xs">
-          <IconFileAnalytics />
-          <Text color="dimmed">{formatFileSize(demo.filesize)}</Text>
+        <Badges items={demo.tags} max={3} />
+        {!isStvDemo(demo) && (
+          <Group spacing={4}>
+            <IconUser color="grey" />
+            <Text color="dimmed">{demo.clientName}</Text>
+          </Group>
+        )}
+        <Group spacing={4}>
+          <IconCalendarEvent color="gray" />
+          <Text color="dimmed">{birthtime.toLocaleString()}</Text>
         </Group>
       </div>
+      <EventsBox events={demo.events} />
     </Paper>
   );
 }
