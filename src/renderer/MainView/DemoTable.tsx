@@ -75,13 +75,6 @@ const columns = [
     right: true,
   },
   {
-    name: "Ticks",
-    selector: "numTicks",
-    sortable: true,
-    grow: 0.1,
-    right: true,
-  },
-  {
     name: "Created",
     selector: "birthtime",
     sortable: true,
