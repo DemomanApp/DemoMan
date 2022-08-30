@@ -15,12 +15,12 @@ import {
   IconSettings,
   IconDots,
   IconFolder,
-  IconArrowLeft,
-  IconArrowRight,
   IconMaximize,
   IconMinimize,
   IconX,
   IconLetterI,
+  IconChevronLeft,
+  IconChevronRight,
 } from "@tabler/icons";
 
 import { AppShellProvider, NavbarButton } from "./AppShell";
@@ -70,7 +70,16 @@ export default function App() {
       <AppShell
         padding={0}
         navbar={
-          <Navbar width={{ base: 80 }} p="md">
+          <Navbar
+            width={{ base: 80 }}
+            p="md"
+            sx={(theme) => ({
+              backgroundColor:
+                theme.colorScheme === "dark"
+                  ? theme.colors.dark[8]
+                  : theme.white,
+            })}
+          >
             <Navbar.Section grow>
               <Stack ref={navbarRef} spacing="sm" />
             </Navbar.Section>
@@ -95,9 +104,21 @@ export default function App() {
           </Navbar>
         }
         header={
-          <Header height={40} style={{ display: "flex" }}>
-            <HeaderIcon icon={<IconArrowLeft />} onClick={() => navigate(-1)} />
-            <HeaderIcon icon={<IconArrowRight />} onClick={() => navigate(1)} />
+          <Header
+            height={40}
+            sx={(theme) => ({
+              display: "flex",
+              backgroundColor: theme.colors.dark[9],
+            })}
+          >
+            <HeaderIcon
+              icon={<IconChevronLeft />}
+              onClick={() => navigate(-1)}
+            />
+            <HeaderIcon
+              icon={<IconChevronRight />}
+              onClick={() => navigate(1)}
+            />
             <div
               style={{
                 flexGrow: 1,
@@ -127,8 +148,8 @@ export default function App() {
           main: {
             backgroundColor:
               theme.colorScheme === "dark"
-                ? theme.colors.dark[8]
-                : theme.colors.gray[0],
+                ? theme.colors.dark[9]
+                : theme.colors.gray[2],
           },
         })}
       >
