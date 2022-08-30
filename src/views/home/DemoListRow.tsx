@@ -1,5 +1,4 @@
-import { useState } from "react";
-import { Link } from "react-router-dom";
+import { memo, useState } from "react";
 
 import {
   Badge,
@@ -13,6 +12,7 @@ import {
 import {
   IconBookmarks,
   IconCalendarEvent,
+  IconCheck,
   IconDeviceTv,
   IconTags,
   IconUser,
@@ -21,9 +21,13 @@ import {
 import { normalizeMapName } from "../../util";
 import { Demo, DemoEvent, isStvDemo } from "../../demo";
 import { IconKillstreak } from "../../icons";
+import { areEqual } from "react-window";
 
 type DemoListRowProps = {
   demo: Demo;
+  selected: boolean;
+  selectionMode: boolean;
+  onClick(): void;
 };
 
 function Badges({ items, max }: { items: string[]; max: number }) {
@@ -166,12 +170,16 @@ function EventsBox({ events }: { events: DemoEvent[] }) {
   );
 }
 
-export default function DemoListRow({ demo }: DemoListRowProps) {
+function DemoListRow({
+  demo,
+  selected,
+  selectionMode,
+  onClick,
+}: DemoListRowProps) {
   const birthtime = new Date(demo.birthtime * 1000);
   return (
     <Paper
       sx={(theme) => ({
-        margin: "16px",
         height: "120px",
         display: "flex",
         alignItems: "stretch",
@@ -183,12 +191,34 @@ export default function DemoListRow({ demo }: DemoListRowProps) {
               ? theme.colors.dark[5]
               : theme.colors.gray[1],
         },
+        boxShadow: selectionMode
+          ? `0 0 0 3px ${
+            selected ? theme.colors.blue[8] : theme.colors.gray[8]
+          }`
+          : "none",
       })}
       radius="md"
-      shadow="lg"
-      component={Link}
-      to={`/demo/${encodeURIComponent(demo.name)}`}
+      shadow="xl"
+      onClick={onClick}
     >
+      {selectionMode && selected && (
+        <Box
+          sx={(theme) => ({
+            position: "absolute",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            top: 0,
+            left: 0,
+            height: "40px",
+            width: "40px",
+            backgroundColor: theme.colors.blue[8],
+            borderBottomRightRadius: "8px",
+          })}
+        >
+          <IconCheck color="white" />
+        </Box>
+      )}
       <MapBox mapName={demo.mapName} />
       <div
         style={{
@@ -221,3 +251,5 @@ export default function DemoListRow({ demo }: DemoListRowProps) {
     </Paper>
   );
 }
+
+export default memo(DemoListRow, areEqual);
