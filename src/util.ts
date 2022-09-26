@@ -1,19 +1,16 @@
-function leftPadTwo(val: string) {
-  return `00${val}`.slice(-Math.max(val.length, 2));
-}
-
 export function formatPlaybackTime(seconds: number): string {
   const fSeconds = Math.floor(seconds % 60);
   const tMinutes = Math.floor(seconds / 60);
   const fMinutes = tMinutes % 60;
   const fHours = Math.floor(tMinutes / 60);
-  /* eslint-disable */
-  // prettier-ignore
-  return `${
-	  leftPadTwo(fHours.toString())}:${
-	  leftPadTwo(fMinutes.toString())}:${
-	  leftPadTwo(fSeconds.toString())}`;
-  /* eslint-enable */
+
+  if (fHours !== 0) {
+    return `${fHours} hour, ${fMinutes} minutes`;
+  }
+  if (fMinutes !== 0) {
+    return `${fMinutes} minutes`;
+  }
+  return `${fSeconds} seconds`;
 }
 
 export function formatFileSize(bytes: number): string {
@@ -64,4 +61,3 @@ export function normalizeMapName(mapName: string) {
     )
     .join("_");
 }
-
