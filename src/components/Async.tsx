@@ -4,7 +4,7 @@ import { useAsync } from "react-async-hook";
 export type AsyncProps<R, Args extends any[]> = {
   promiseFn: (...args: Args) => Promise<R>;
   args: Args;
-  loading: JSX.Element;
+  loading?: JSX.Element;
   error(e: Error): JSX.Element;
   success(result: R): JSX.Element;
 };
@@ -19,7 +19,7 @@ export default function Async<R = unknown, Args extends any[] = any[]>({
   const asyncState = useAsync(promiseFn, args);
 
   if (asyncState.loading) {
-    return loading;
+    return loading ?? null;
   } else if (asyncState.error !== undefined) {
     return error(asyncState.error);
   } else if (asyncState.result !== undefined) {
