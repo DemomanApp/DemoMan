@@ -10,6 +10,7 @@ export type SchemaType = {
   demo_path?: string;
   setup_completed: boolean;
   auto_prec: boolean;
+  pagination: boolean;
 };
 
 const schema: Schema<SchemaType> = {
@@ -25,6 +26,10 @@ const schema: Schema<SchemaType> = {
     default: false,
   },
   auto_prec: {
+    type: "boolean",
+    default: false,
+  },
+  pagination: {
     type: "boolean",
     default: false,
   },
