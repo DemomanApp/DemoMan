@@ -16,6 +16,7 @@ import {
   Palette as PaletteIcon,
   ArrowBackIosNew as ArrowBackIcon,
   UploadFile as UploadFileIcon,
+  MenuBook,
 } from "@mui/icons-material";
 
 import getDemoPath from "./GetDemoPath";
@@ -36,6 +37,7 @@ export default function SettingsView() {
 
   const [demoPath, setDemoPath] = useStore("demo_path");
   const [autoPrec, setAutoPrec] = useStore("auto_prec");
+  const [pagination, setPagination] = useStore("pagination");
 
   const savePath = (newPath: string) => {
     setDemoPath(newPath);
@@ -109,6 +111,19 @@ export default function SettingsView() {
               <Switch
                 onChange={() => setAutoPrec(!autoPrec)}
                 checked={autoPrec}
+              />
+            </ListItem>
+            <ListItem button onClick={() => setPagination(!pagination)}>
+              <ListItemIcon>
+                <MenuBook />
+              </ListItemIcon>
+              <ListItemText
+                primary="Pagination"
+                secondary={pagination ? "on" : "off"}
+              />
+              <Switch
+                onChange={() => setPagination(!pagination)}
+                checked={pagination}
               />
             </ListItem>
           </List>

@@ -7,6 +7,7 @@ import merge from "deepmerge";
 import { ArrowDownward } from "@mui/icons-material";
 import { blue } from "@mui/material/colors";
 
+import useStore from "../hooks/useStore";
 import Demo from "../Demo";
 import loading from "../../../assets/loading.gif";
 import { formatFileSize, formatPlaybackTime } from "../util";
@@ -116,6 +117,7 @@ type DemoTableProps = {
 
 export default function DemoTable(props: DemoTableProps) {
   const { data, viewDemo } = props;
+  const [pagination] = useStore("pagination");
 
   return (
     <>
@@ -133,11 +135,21 @@ export default function DemoTable(props: DemoTableProps) {
           </div>
         }
         sortIcon={<ArrowDownward />}
+        pagination={pagination}
+        paginationPerPage={50}
+        paginationRowsPerPageOptions={[10, 20, 50, 100]}
+        paginationResetDefaultPage
         pointerOnHover
         onRowClicked={viewDemo}
         fixedHeader
-        // 64px is the height of the app bar, 57px is the height of the header.
-        fixedHeaderScrollHeight="calc(100vh - (64px + 57px))"
+        // 64px: height of the app bar
+        // 57px: height of the header
+        // 56px: height of pagination options
+        fixedHeaderScrollHeight={
+          pagination
+            ? "calc(100vh - (64px + 57px + 56px))"
+            : "calc(100vh - (64px + 57px))"
+        }
         progressComponent={
           <div
             style={{
