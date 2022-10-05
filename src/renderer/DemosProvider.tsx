@@ -21,6 +21,7 @@ export default function DemosProvider(props: DemosProviderProps) {
   const [knownTags, setKnownTags] = useState<Set<string>>(new Set());
   const [knownMaps, setKnownMaps] = useState<Set<string>>(new Set());
   const [knownPlayers, setKnownPlayers] = useState<Set<string>>(new Set());
+  const [knownBookmarks, setKnownBookmarks] = useState<Set<string>>(new Set());
 
   const addKnownTag = useCallback((tag: string) => {
     setKnownTags((oldKnownTags) => {
@@ -30,23 +31,38 @@ export default function DemosProvider(props: DemosProviderProps) {
     });
   }, []);
 
+  const addKnownBookmark = useCallback((event: string) => {
+    setKnownBookmarks((oldKnownBookmarks) => {
+      const newKnownBookmarks = new Set(oldKnownBookmarks);
+      newKnownBookmarks.add(event);
+      return newKnownBookmarks;
+    });
+  }, []);
+
   const reloadEverything = useCallback(() => {
     if (demosPath !== undefined) {
       const newDemos = getDemosInDirectory(demosPath);
       const newKnownTags: Set<string> = new Set();
       const newKnownMaps: Set<string> = new Set();
       const newKnownPlayers: Set<string> = new Set();
+      const newKnownBookmarks: Set<string> = new Set();
       Object.values(newDemos).forEach((demo) => {
         demo.tags.forEach((tag) => {
           newKnownTags.add(tag);
         });
         newKnownMaps.add(demo.mapName);
         newKnownPlayers.add(demo.clientName);
+        demo.events.forEach((event) => {
+          if (event.name === "Bookmark") {
+            newKnownBookmarks.add(event.value);
+          }
+        });
       });
       setDemos(newDemos);
       setKnownTags(newKnownTags);
       setKnownMaps(newKnownMaps);
       setKnownPlayers(newKnownPlayers);
+      setKnownBookmarks(newKnownBookmarks);
     } else {
       setDemos({});
     }
@@ -72,10 +88,15 @@ export default function DemosProvider(props: DemosProviderProps) {
           demo.events = precDemoEvents;
         }
         tags.forEach(addKnownTag);
+        events.forEach((event) => {
+          if (event.name === "Bookmark") {
+            addKnownBookmark(event.value);
+          }
+        });
       });
       return newDemos;
     });
-  }, [addKnownTag, autoPrec, demosPath]);
+  }, [addKnownTag, addKnownBookmark, autoPrec, demosPath]);
 
   const getDemoByName = (name: string) => {
     return demos[name];
@@ -141,6 +162,8 @@ export default function DemosProvider(props: DemosProviderProps) {
         knownTags,
         knownMaps,
         knownPlayers,
+        knownBookmarks,
+        addKnownBookmark,
         addKnownTag,
       }}
     >

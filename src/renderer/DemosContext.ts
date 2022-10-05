@@ -13,6 +13,8 @@ type DemosContextType = {
   knownTags: Set<string>;
   knownMaps: Set<string>;
   knownPlayers: Set<string>;
+  knownBookmarks: Set<string>;
+  addKnownBookmark: (event: string) => void;
   addKnownTag: (tag: string) => void;
 };
 

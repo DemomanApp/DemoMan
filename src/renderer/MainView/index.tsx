@@ -26,8 +26,14 @@ import AdvancedSearchInput, {
 import UpdateIndicator from "./UpdateIndicator";
 
 export default function MainView() {
-  const { demos, knownTags, knownMaps, knownPlayers, reloadEverything } =
-    useContext(DemosContext);
+  const {
+    demos,
+    knownTags,
+    knownMaps,
+    knownPlayers,
+    knownBookmarks,
+    reloadEverything,
+  } = useContext(DemosContext);
   const navigate = useNavigate();
 
   const [filteredDemos, setFilteredDemos] = useState<Demo[]>([]);
@@ -53,6 +59,14 @@ export default function MainView() {
     type: {
       possibleValues: ["pov", "stv"],
       freeInput: false,
+    },
+    bookmark: {
+      possibleValues: [...knownBookmarks].sort(),
+      freeInput: true,
+    },
+    killstreak: {
+      possibleValues: [],
+      freeInput: true,
     },
   };
 
@@ -90,6 +104,19 @@ export default function MainView() {
                   // Should never occur
                   return false;
               }
+            case "bookmark":
+              return demo.events.some(
+                (event) =>
+                  event.name === "Bookmark" && event.value.includes(value)
+              );
+            case "killstreak":
+              return demo.events.some((event) => {
+                const eventStreak = parseInt(event.value, 10) ?? 0;
+                const targetStreak = parseInt(value, 10) ?? 0;
+                return (
+                  event.name === "Killstreak" && eventStreak >= targetStreak
+                );
+              });
             default:
               // Should never occur
               return false;

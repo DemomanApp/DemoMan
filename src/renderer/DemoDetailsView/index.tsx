@@ -35,8 +35,14 @@ type DemoDetailsRouteParams = {
 };
 
 export default function DemoDetailsView() {
-  const { getDemoByName, deleteDemo, renameDemo, knownTags, addKnownTag } =
-    useContext(DemosContext);
+  const {
+    getDemoByName,
+    deleteDemo,
+    renameDemo,
+    knownTags,
+    addKnownTag,
+    addKnownBookmark,
+  } = useContext(DemosContext);
   const navigate = useNavigate();
 
   const demoName = (useParams() as DemoDetailsRouteParams).name;
@@ -203,6 +209,7 @@ export default function DemoDetailsView() {
               tick: parseInt(tickInput, 10),
             };
             newDemoEvents = demoEvents.concat([newEvent]);
+            addKnownBookmark(valueInput);
           } else if (editedEvent === null) {
             // Should never happen
             log.error("editedEvent was null!");
@@ -214,6 +221,9 @@ export default function DemoDetailsView() {
                 value: valueInput,
                 tick: parseInt(tickInput, 10),
               };
+            }
+            if (editedEvent.name === "Bookmark") {
+              addKnownBookmark(valueInput);
             }
           }
           setEditDialogMode(EditDialogMode.closed);
