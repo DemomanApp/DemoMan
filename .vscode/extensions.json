@@ -14,6 +14,10 @@
     "meganrogge.template-string-converter",
 
     // Eslint integration
-    "dbaeumer.vscode-eslint"
+    "dbaeumer.vscode-eslint",
+
+    // Prettier for js and rust
+    "esbenp.prettier-vscode",
+    "jinxdash.prettier-rust",
   ]
 }
