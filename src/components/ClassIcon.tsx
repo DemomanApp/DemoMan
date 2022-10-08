@@ -26,7 +26,6 @@ import { createStyles } from "@mantine/core";
 */
 
 const classIconMap = [
-  undefined,
   ScoutIcon,
   SniperIcon,
   SoldierIcon,

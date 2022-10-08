@@ -1,27 +1,18 @@
-import { memo, useState } from "react";
+import { memo } from "react";
 
+import { Box, Group, Paper, Text, Title } from "@mantine/core";
 import {
-  Badge,
-  Box,
-  createStyles,
-  Group,
-  Paper,
-  Text,
-  Title,
-} from "@mantine/core";
-import {
-  IconBookmarks,
   IconCalendarEvent,
   IconCheck,
   IconDeviceTv,
-  IconTags,
   IconUser,
 } from "@tabler/icons";
 
-import { normalizeMapName } from "../../util";
-import { Demo, DemoEvent, isStvDemo } from "../../demo";
-import { IconKillstreak } from "../../icons";
+import { Demo, isStvDemo } from "../../demo";
 import { areEqual } from "react-window";
+import EventsBox from "./EventsBox";
+import MapBox from "./MapBox";
+import Badges from "./Badges";
 
 type DemoListRowProps = {
   demo: Demo;
@@ -29,146 +20,6 @@ type DemoListRowProps = {
   selectionMode: boolean;
   onClick(): void;
 };
-
-function Badges({ items, max }: { items: string[]; max: number }) {
-  if (items.length === 0) {
-    return null;
-  }
-  const overflowAmount = items.length - max;
-  const shownItems = items.slice(0, max);
-  return (
-    <div style={{ display: "flex" }}>
-      <Group spacing={4}>
-        <IconTags color="gray" />
-        {shownItems.map((item) => (
-          <Badge
-            key={item}
-            variant="filled"
-            size="sm"
-            style={{ maxWidth: "100px" }}
-          >
-            {item}
-          </Badge>
-        ))}
-        {overflowAmount > 0 && (
-          <Text size="sm" color="dimmed">
-            +{overflowAmount} more
-          </Text>
-        )}
-      </Group>
-    </div>
-  );
-}
-
-const useMapBoxStyles = createStyles((theme) => {
-  const totalHeight = 120;
-  const textBoxHeight = 24;
-  const imageAspectRatio = 16 / 9;
-  const width = (totalHeight - textBoxHeight) * imageAspectRatio;
-  const border = `1px solid ${
-    theme.colorScheme === "dark" ? theme.colors.dark[4] : theme.colors.gray[3]
-  }`;
-  return {
-    wrapper: {
-      height: "100%",
-      display: "flex",
-      flexDirection: "column",
-    },
-    img: {
-      height: totalHeight - textBoxHeight,
-      width: width,
-    },
-    imgFallback: {
-      height: totalHeight - textBoxHeight,
-      width: width,
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "center",
-      borderRight: border,
-      borderBottom: border,
-    },
-    textBox: {
-      height: textBoxHeight,
-      borderRight: border,
-    },
-    text: { overflow: "hidden", textOverflow: "ellipsis", maxWidth: width },
-  };
-});
-
-function MapBox({ mapName }: { mapName: string }) {
-  const [loadFailed, setLoadFailed] = useState(false);
-  const { classes } = useMapBoxStyles();
-  return (
-    <div className={classes.wrapper}>
-      {loadFailed ? (
-        <div className={classes.imgFallback}>
-          <Text color="dimmed" align="center">
-            No thumbnail
-            <br />
-            available.
-          </Text>
-        </div>
-      ) : (
-        <img
-          src={`/map_thumbnails/${normalizeMapName(mapName)}.png`}
-          className={classes.img}
-          onError={() => setLoadFailed(true)}
-        />
-      )}
-      <div className={classes.textBox}>
-        <Text
-          color="dimmed"
-          align="center"
-          className={classes.text}
-          weight={600}
-        >
-          {mapName}
-        </Text>
-      </div>
-    </div>
-  );
-}
-
-function EventsBox({ events }: { events: DemoEvent[] }) {
-  if (events.length === 0) {
-    return null;
-  }
-
-  const maxDisplayedEvents = 3;
-  const displayedEvents = events.slice(0, maxDisplayedEvents);
-  const overflowAmount = events.length - maxDisplayedEvents;
-
-  return (
-    <Box
-      sx={(theme) => ({
-        display: "flex",
-        marginLeft: "auto",
-        flexDirection: "column",
-        padding: "8px",
-        width: "180px",
-        borderLeft: `1px solid ${
-          theme.colorScheme === "dark"
-            ? theme.colors.dark[4]
-            : theme.colors.gray[3]
-        }`,
-      })}
-    >
-      {displayedEvents.map((event, i) => (
-        <div key={i} style={{ display: "flex", alignItems: "center" }}>
-          {event.name === "Killstreak" ? (
-            <IconKillstreak color="gray" />
-          ) : (
-            <IconBookmarks color="gray" />
-          )}
-          <Text inline color="dimmed">
-            {event.value}
-          </Text>
-        </div>
-      ))}
-      {overflowAmount > 0 && <div>+{overflowAmount} more</div>}
-    </Box>
-  );
-}
 
 function DemoListRow({
   demo,
@@ -193,9 +44,10 @@ function DemoListRow({
         },
         boxShadow: selectionMode
           ? `0 0 0 3px ${
-            selected ? theme.colors.blue[8] : theme.colors.gray[8]
-          }`
+              selected ? theme.colors.blue[8] : theme.colors.gray[8]
+            }`
           : "none",
+        cursor: "pointer",
       })}
       radius="md"
       shadow="xl"

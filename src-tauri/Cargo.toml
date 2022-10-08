@@ -9,7 +9,6 @@ default-run = "demoman"
 edition = "2021"
 rust-version = "1.57"
 
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [build-dependencies]
 tauri-build = { version = "1.0.4", features = [] }
@@ -19,9 +18,15 @@ serde_json = "^1.0"
 serde = { version = "^1.0", features = ["derive"] }
 tauri = { version = "^1.0", features = ["api-all"] }
 log = "^0.4"
-tf-demo-parser = "0.4.0"
-bitbuffer = "0.10.7"
+bitbuffer = "0.10.8"
 trash = "2.1.5"
+steamid-ng = "1.0.0"
+num-traits = "0.2.15"
+num-derive = "0.3.3"
+
+[dependencies.tf-demo-parser]
+git = "https://github.com/demostf/parser"
+rev = "9e3f008e510a0b69cefd48e606adccb7669e700c"
 
 [dependencies.tauri-plugin-store]
 # To be replaced by a proper package when it becomes available

@@ -11,23 +11,15 @@ import AutoSizer from "react-virtualized-auto-sizer";
 import { FixedSizeList, ListChildComponentProps } from "react-window";
 import memoize from "memoize-one";
 
-import {
-  Alert,
-  Popover,
-  ScrollArea,
-  SegmentedControl,
-  Text,
-  Loader,
-} from "@mantine/core";
+import { Alert, ScrollArea, Loader } from "@mantine/core";
 import { IconFilter, IconSearch, IconArrowsSort } from "@tabler/icons";
 
 import { Demo } from "../../demo";
 import DemoListRow from "./DemoListRow";
 import BottomBar from "./BottomBar";
-import { HeaderPortal, NavbarPortal, NavbarButton } from "../../AppShell";
+import { NavbarPortal, NavbarButton } from "../../AppShell";
 import { getDemosInDirectory } from "../../api";
-import Fill from "../../Fill";
-import Async from "../../Async";
+import { Async, Fill } from "../../components";
 
 const PADDING_SIZE = 16;
 
@@ -96,7 +88,9 @@ function MainView({ demos }: { demos: Demo[] }) {
           return newSelectedIndices;
         });
       } else {
-        navigate(`/demo/${encodeURIComponent(sortedDemos[index].name)}`);
+        navigate(
+          `/demo/${encodeURIComponent(sortedDemos[index].name)}/players`
+        );
       }
     },
     [navigate, selectionMode, sortedDemos]
@@ -126,33 +120,10 @@ function MainView({ demos }: { demos: Demo[] }) {
 
   return (
     <>
-      <HeaderPortal>
-        <Text
-          align="center"
-          weight={700}
-          size="xl"
-          inline
-          data-tauri-drag-region
-          style={{ cursor: "default" }}
-        >
-          DemoMan
-        </Text>
-      </HeaderPortal>
       <NavbarPortal>
         <NavbarButton icon={IconFilter} />
         <NavbarButton icon={IconSearch} />
-        <Popover position="right" withArrow>
-          <Popover.Target>
-            <NavbarButton icon={IconArrowsSort} />
-          </Popover.Target>
-          <Popover.Dropdown>
-            <Text align="center">Sort by</Text>
-            <SegmentedControl
-              orientation="vertical"
-              data={["Date", "Name", "Length"]}
-            />
-          </Popover.Dropdown>
-        </Popover>
+        <NavbarButton icon={IconArrowsSort} />
       </NavbarPortal>
       <div
         style={{

@@ -1,6 +1,6 @@
 import { invoke } from "@tauri-apps/api/tauri";
 
-import { Demo, DemoEvent, MatchState } from "./demo";
+import { Demo, DemoEvent, GameSummary } from "./demo";
 
 export async function getDemosInDirectory(dirPath: string) {
   return invoke<Demo[]>("get_demos_in_directory", {
@@ -42,8 +42,8 @@ export async function getDemoByName(demoName: string) {
   });
 }
 
-export async function getDemoDetails(demoName: string) {
-  return invoke<MatchState>("get_demo_details", {
-    demoName,
+export async function getDemoDetails(demoPath: string) {
+  return invoke<GameSummary>("get_demo_details", {
+    demoPath,
   });
 }

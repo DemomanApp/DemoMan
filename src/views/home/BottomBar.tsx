@@ -21,7 +21,7 @@ const useStyles = createStyles(
       backgroundColor: selectionMode
         ? theme.colors.blue
         : theme.colorScheme === "dark"
-          ? theme.colors.dark[7]
+          ? theme.colors.dark[8]
           : theme.white,
       color: theme.white,
     },
@@ -48,11 +48,11 @@ export default function BottomBar({
         <IconListCheck />
       </ActionIcon>
       <Text inline ml="sm">
-        Demos: {totalDemoCount} ({formatFileSize(totalFileSize)})
+        {totalDemoCount} Demos ({formatFileSize(totalFileSize)})
       </Text>
       {selectionMode && (
         <Text inline ml="sm">
-          Selected: {selectedDemoCount} ({formatFileSize(selectedFileSize)})
+          {selectedDemoCount} Selected ({formatFileSize(selectedFileSize)})
         </Text>
       )}
     </div>

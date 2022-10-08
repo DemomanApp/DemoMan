@@ -1,18 +1,19 @@
 use std::{
     collections::HashMap,
     ffi::OsStr,
-    fs::{self, read_dir, File},
-    io::{Read, Write},
-    path::{Path, PathBuf},
+    fs::{ self, read_dir, File },
+    io::{ Read, Write },
+    path::{ Path, PathBuf },
     time::UNIX_EPOCH,
 };
 
 use bitbuffer::BitRead;
 use log::warn;
-use serde::{Deserialize, Serialize};
+use serde::{ Deserialize, Serialize };
 
 use self::errors::DemoReadError;
 
+pub mod analyser;
 pub mod errors;
 
 pub const HEADER_SIZE: usize = 8 + 4 + 4 + 260 + 260 + 260 + 260 + 4 + 4 + 4 + 4;
@@ -55,7 +56,7 @@ impl Demo {
         header: tf_demo_parser::demo::header::Header,
         events: Vec<DemoEvent>,
         tags: Vec<String>,
-        metadata: fs::Metadata,
+        metadata: fs::Metadata
     ) -> Self {
         Self {
             name,
@@ -106,6 +107,7 @@ pub enum DemoCommandError {
     FileRenameFailed,
     FileWriteFailed,
     OtherIOError,
+    ParsingFailed,
     SerializationFailed,
 }
 
@@ -117,7 +119,7 @@ pub enum DemoCommandError {
 /// - The file is incomplete or has an invalid header
 /// - The file header indicates that this demo was recorded for a game that is not TF2
 pub fn read_demo_header(
-    path: &Path,
+    path: &Path
 ) -> Result<tf_demo_parser::demo::header::Header, DemoReadError> {
     let mut file = File::open(path)?;
 
@@ -127,7 +129,8 @@ pub fn read_demo_header(
     let demo = tf_demo_parser::Demo::new(&buf);
 
     let mut stream = demo.get_stream();
-    let header = tf_demo_parser::demo::header::Header::read(&mut stream)
+    let header = tf_demo_parser::demo::header::Header
+        ::read(&mut stream)
         .or(Err(DemoReadError::InvalidHeader))?;
 
     if header.game != *"tf" {
@@ -144,10 +147,7 @@ pub fn read_events_and_tags(json_path: &Path) -> (Vec<DemoEvent>, Vec<String>) {
     if let Ok(bytes) = fs::read(&json_path) {
         // This fails if the file does not contain valid JSON matching the `DemoJsonFile` type.
         if let Ok(deserialized) = serde_json::from_slice::<DemoJsonFileDe>(&bytes) {
-            return (
-                deserialized.events.unwrap_or_default(),
-                deserialized.tags.unwrap_or_default(),
-            );
+            return (deserialized.events.unwrap_or_default(), deserialized.tags.unwrap_or_default());
         } else {
             warn!("Invalid JSON file at {}", &json_path.display());
         }
@@ -173,14 +173,7 @@ pub fn read_demo(path: &Path) -> Result<Demo, DemoReadError> {
     }
     let header = read_demo_header(path)?;
     let (events, tags) = read_events_and_tags(&path.with_extension("json"));
-    Ok(Demo::new(
-        name,
-        path.to_path_buf(),
-        header,
-        events,
-        tags,
-        metadata,
-    ))
+    Ok(Demo::new(name, path.to_path_buf(), header, events, tags, metadata))
 }
 
 /// Find all demos in the directory at `dir_path` and collect them in a `HashMap`.
@@ -211,14 +204,15 @@ pub fn read_demos_in_directory(dir_path: &Path) -> Result<HashMap<String, Demo>,
 pub fn write_events_and_tags(
     json_path: &Path,
     events: &Vec<DemoEvent>,
-    tags: &Vec<String>,
+    tags: &Vec<String>
 ) -> Result<(), DemoCommandError> {
     if events.is_empty() && tags.is_empty() {
         fs::remove_file(json_path).or(Err(DemoCommandError::FileWriteFailed))?;
         return Ok(());
     }
 
-    let mut file = fs::OpenOptions::new()
+    let mut file = fs::OpenOptions
+        ::new()
         .write(true)
         .truncate(true)
         .create(true)
@@ -233,18 +227,6 @@ pub fn write_events_and_tags(
         return Err(DemoCommandError::SerializationFailed);
     }
 
-    file.write_all(&serializer.into_inner())
-        .or(Err(DemoCommandError::FileWriteFailed))?;
+    file.write_all(&serializer.into_inner()).or(Err(DemoCommandError::FileWriteFailed))?;
     Ok(())
-}
-
-pub fn parse_demo_body<P>(path: P) -> Result<tf_demo_parser::MatchState, DemoReadError>
-where
-    P: AsRef<Path>,
-{
-    let file = fs::read(path).or(Err(DemoReadError::FileNotReadable))?;
-    let demo = tf_demo_parser::Demo::new(&file);
-    let parser = tf_demo_parser::DemoParser::new(demo.get_stream());
-    let (_, state) = parser.parse().or(Err(DemoReadError::FileNotReadable))?;
-    Ok(state)
 }

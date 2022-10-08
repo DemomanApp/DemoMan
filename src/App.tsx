@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { useNavigate, Routes, Route } from "react-router-dom";
+import { useNavigate, Routes, Route, useLocation } from "react-router-dom";
 
 import { appWindow } from "@tauri-apps/api/window";
 
@@ -7,20 +7,20 @@ import {
   AppShell,
   Navbar,
   Header,
-  Stack,
-  Menu,
   ActionIcon,
+  Menu,
+  Stack,
 } from "@mantine/core";
 import {
-  IconSettings,
-  IconDots,
-  IconFolder,
   IconMaximize,
   IconMinimize,
   IconX,
   IconLetterI,
   IconChevronLeft,
   IconChevronRight,
+  IconDots,
+  IconFolder,
+  IconSettings,
 } from "@tabler/icons";
 
 import { AppShellProvider, NavbarButton } from "./AppShell";
@@ -50,6 +50,7 @@ const HeaderIcon = ({ icon, onClick }: HeaderIconProps) => {
 
 export default function App() {
   const navigate = useNavigate();
+  const location = useLocation();
 
   const navbarRef = useRef<HTMLDivElement>(null);
   const headerRef = useRef<HTMLDivElement>(null);
@@ -81,9 +82,18 @@ export default function App() {
             })}
           >
             <Navbar.Section grow>
-              <Stack ref={navbarRef} spacing="sm" />
+              <Stack spacing="sm" ref={navbarRef}></Stack>
             </Navbar.Section>
             <Navbar.Section>
+              <NavbarButton
+                icon={IconSettings}
+                onClick={() =>
+                  location.pathname === "/settings"
+                    ? navigate(-1)
+                    : navigate("/settings")
+                }
+                active={location.pathname === "/settings"}
+              />
               <Menu shadow="md" width={200} position="right-end">
                 <Menu.Target>
                   <NavbarButton icon={IconDots} />
@@ -91,12 +101,6 @@ export default function App() {
                 <Menu.Dropdown>
                   <Menu.Item icon={<IconFolder size={14} />}>
                     Open demos folder
-                  </Menu.Item>
-                  <Menu.Item
-                    icon={<IconSettings size={14} />}
-                    onClick={() => navigate("/settings")}
-                  >
-                    Settings
                   </Menu.Item>
                 </Menu.Dropdown>
               </Menu>
@@ -155,7 +159,10 @@ export default function App() {
       >
         <Routes>
           <Route path="/" element={<HomeView />} />
-          <Route path="/demo/:demoName" element={<DemoDetailsView />} />
+          <Route
+            path="/demo/:demoName/:activeTab"
+            element={<DemoDetailsView />}
+          />
           <Route path="/settings" element={<SettingsView />} />
         </Routes>
       </AppShell>
