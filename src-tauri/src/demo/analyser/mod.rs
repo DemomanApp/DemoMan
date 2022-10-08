@@ -17,15 +17,17 @@ use tf_demo_parser::{
         data::DemoTick,
         gameevent_gen::{
             CrossbowHealEvent,
+            PlayerChargeDeployedEvent,
             PlayerConnectClientEvent,
             PlayerDeathEvent,
             PlayerDisconnectEvent,
+            PlayerHealedEvent,
             PlayerHurtEvent,
             PlayerSpawnEvent,
+            TeamPlayPointCapturedEvent,
             TeamPlayRoundStalemateEvent,
             TeamPlayRoundStartEvent,
             TeamPlayRoundWinEvent,
-            TeamPlayPointCapturedEvent,
         },
         gamevent::GameEvent,
         message::{
@@ -110,8 +112,7 @@ pub enum Highlight {
     Pause,
     Unpause,
     // TODO:
-    // Multikill
-    // crusader's healing airshots
+    // Multikill?
     // Midair kills?
     // Flicks?
 }
@@ -243,17 +244,16 @@ impl From<PlayerState> for PlayerSummary {
             .collect();
         // Sort by playtime, in descending order
         classes.sort_by_key(|a| Reverse(a.1));
-        let classes = classes
-            .into_iter()
-            .map(|(i, _v)| i)
-            .collect();
 
         Self {
             name,
             steam_id,
             user_id,
             team,
-            classes,
+            classes: classes
+                .into_iter()
+                .map(|(i, _v)| i)
+                .collect(),
             damage,
             kills,
             deaths,
@@ -428,6 +428,12 @@ impl GameDetailsAnalyser {
             GameEvent::CrossbowHeal(event) => {
                 self.handle_crossbow_heal_event(event, tick);
             }
+            GameEvent::PlayerHealed(event) => {
+                self.handle_player_healed_event(event, tick);
+            }
+            GameEvent::PlayerChargeDeployed(event) => {
+                self.handle_uber_used_event(event, tick);
+            }
             _ => {}
         }
     }
@@ -519,26 +525,6 @@ impl GameDetailsAnalyser {
                 "_condition_bits"
             );
 
-            // Scoring data
-            const KILLS_PROP: SendPropIdentifier = SendPropIdentifier::new(
-                "DT_TFPlayerScoringDataExclusive",
-                "m_iKills"
-            );
-            const DEATHS_PROP: SendPropIdentifier = SendPropIdentifier::new(
-                "DT_TFPlayerScoringDataExclusive",
-                "m_iDeaths"
-            );
-            const ASSISTS_PROP: SendPropIdentifier = SendPropIdentifier::new(
-                "DT_TFPlayerScoringDataExclusive",
-                "m_iKillAssists"
-            );
-            const DAMAGE_PROP: SendPropIdentifier = SendPropIdentifier::new(
-                "DT_TFPlayerScoringDataExclusive",
-                "m_iDamageDone"
-            );
-            // Also interesting / TODO:
-            // m_iDominations, m_iHeadshots, m_iBackstabs, m_iHealPoints, m_iInvulns, m_iPoints
-
             for prop in entity.props(parser_state) {
                 match prop.identifier {
                     LIFE_STATE_PROP => {
@@ -593,18 +579,6 @@ impl GameDetailsAnalyser {
                         player.condition_bits = i64
                             ::try_from(&prop.value)
                             .unwrap_or_default() as u32;
-                    }
-                    KILLS_PROP => {
-                        player.kills = i64::try_from(&prop.value).unwrap_or_default() as usize;
-                    }
-                    DEATHS_PROP => {
-                        player.deaths = i64::try_from(&prop.value).unwrap_or_default() as usize;
-                    }
-                    ASSISTS_PROP => {
-                        player.assists = i64::try_from(&prop.value).unwrap_or_default() as usize;
-                    }
-                    DAMAGE_PROP => {
-                        player.damage = i64::try_from(&prop.value).unwrap_or_default() as usize;
                     }
                     _ => {}
                 }
@@ -712,9 +686,15 @@ impl GameDetailsAnalyser {
         const AIRSHOT_AIRTIME_THRESHOLD_SECONDS: f32 = 1.0;
 
         let victim_id = UserId::from(event.user_id);
-        let victim = self.players.get(&victim_id).expect("failed to find victim");
 
         let attacker_id = UserId::from(event.attacker);
+        if attacker_id != victim_id {
+            if let Some(attacker) = self.players.get_mut(&attacker_id) {
+                attacker.damage += event.damage_amount as usize;
+            }
+        }
+
+        let victim = self.players.get(&victim_id).expect("failed to find victim");
 
         let weapon = WeaponClass::from_u16(event.weapon_id).unwrap_or_default();
         if let Some(in_air_since) = victim.in_air_since {
@@ -748,6 +728,21 @@ impl GameDetailsAnalyser {
             Some(UserId::from(event.assister))
         };
         let victim_id = UserId::from(event.user_id);
+
+        if let Some(killer) = self.players.get_mut(&killer_id) {
+            killer.kills += 1;
+        }
+        if
+            let Some(assister) = maybe_assister_id.and_then(|assister_id|
+                self.players.get_mut(&assister_id)
+            )
+        {
+            assister.assists += 1;
+        }
+        if let Some(victim) = self.players.get_mut(&victim_id) {
+            victim.deaths += 1;
+        }
+
         let victim = self.players.get(&victim_id);
 
         let weapon = event.weapon.to_string();
@@ -795,7 +790,7 @@ impl GameDetailsAnalyser {
 
     fn handle_player_spawn_event(&mut self, event: &PlayerSpawnEvent, _tick: DemoTick) {
         if let Some(player) = self.players.get_mut(&UserId::from(event.user_id)) {
-            if event.class as usize > 0 {
+            if (event.class as usize) > 0 {
                 player.time_on_class[(event.class as usize) - 1] += 1; // TODO use time, not spawns
             }
         }
@@ -842,7 +837,31 @@ impl GameDetailsAnalyser {
                 capturing_team: event.team,
             },
             tick
-        )
+        );
+
+        for capper_entity_id in event.cappers.as_bytes().iter() {
+            if
+                let Some(capper_user_id) = self.player_entities.get(
+                    &EntityId::from(*capper_entity_id as usize)
+                )
+            {
+                if let Some(capper) = self.players.get_mut(capper_user_id) {
+                    capper.captures += 1;
+                }
+            }
+        }
+    }
+
+    fn handle_player_healed_event(&mut self, event: &PlayerHealedEvent, tick: DemoTick) {
+        if let Some(healer) = self.players.get_mut(&UserId::from(event.healer)) {
+            healer.healing += event.amount as usize;
+        }
+    }
+
+    fn handle_uber_used_event(&mut self, event: &PlayerChargeDeployedEvent, tick: DemoTick) {
+        if let Some(healer) = self.players.get_mut(&UserId::from(event.user_id)) {
+            healer.invulns += 1;
+        }
     }
 }
 
