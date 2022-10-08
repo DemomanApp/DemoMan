@@ -795,7 +795,9 @@ impl GameDetailsAnalyser {
 
     fn handle_player_spawn_event(&mut self, event: &PlayerSpawnEvent, _tick: DemoTick) {
         if let Some(player) = self.players.get_mut(&UserId::from(event.user_id)) {
-            player.time_on_class[(event.class as usize) - 1] += 1; // TODO use time, not spawns
+            if event.class as usize > 0 {
+                player.time_on_class[(event.class as usize) - 1] += 1; // TODO use time, not spawns
+            }
         }
     }
 
