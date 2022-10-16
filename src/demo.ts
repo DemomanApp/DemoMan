@@ -68,7 +68,7 @@ export type CrossbowAirshotHighlight = {
 export type PointCapturedHighlight = {
   point_name: string;
   capturing_team: number;
-  // TODO: Cappers
+  cappers: UserId[];
 };
 
 export type RoundWinHighlight = {
