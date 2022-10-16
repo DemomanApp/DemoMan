@@ -445,8 +445,10 @@ impl GameDetailsAnalyser {
         if let UserMessage::SayText2(message) = message {
             self.add_highlight(
                 Highlight::ChatMessage {
-                    sender: message.client,
-                    text: message.text.to_string(),
+                    sender: *self.player_entities
+                        .get(&EntityId::from(u32::from(message.client)))
+                        .unwrap_or(&UserId::from(0u32)),
+                    text: message.plain_text(),
                 },
                 tick
             );
