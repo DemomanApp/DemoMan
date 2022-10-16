@@ -90,7 +90,6 @@ pub enum Highlight {
     Airshot {
         attacker_id: UserId,
         victim_id: UserId,
-        airtime_s: f32,
     },
     CrossbowAirshot {
         healer_id: UserId,
@@ -163,7 +162,6 @@ pub struct PlayerState {
     // in this variable (bit 11), everything else is in player_cond.
     condition_bits: u32,
 
-    in_air_since: Option<DemoTick>,
     time_on_class: [usize; 9],
 }
 
@@ -502,12 +500,6 @@ impl GameDetailsAnalyser {
                 "m_lifeState"
             );
 
-            // Player flags
-            const FLAGS_PROP: SendPropIdentifier = SendPropIdentifier::new(
-                "DT_BasePlayer",
-                "m_fFlags"
-            );
-
             // Player conditions
             const PLAYER_COND_PROP: SendPropIdentifier = SendPropIdentifier::new(
                 "DT_TFPlayerShared",
@@ -536,31 +528,6 @@ impl GameDetailsAnalyser {
                         player.life_state = PlayerLifeState::from_i64(
                             i64::try_from(&prop.value).unwrap_or_default()
                         ).unwrap_or_default();
-                    }
-                    FLAGS_PROP => {
-                        if let Ok(flag_bits) = i64::try_from(&prop.value) {
-                            let flag_bits = flag_bits as u32;
-
-                            let on_ground_before = player.in_air_since.is_none();
-
-                            // Only count an airshot if the player is
-                            // 1) not on ground
-                            // 2) also not in water
-                            // both bits have to be zero in order for this to be true.
-                            let in_air_now =
-                                (flag_bits &
-                                    (PlayerFlag::FL_ONGROUND.bitmask() |
-                                        PlayerFlag::FL_INWATER.bitmask())) == 0;
-                            if in_air_now {
-                                if on_ground_before {
-                                    player.in_air_since = Some(tick);
-                                }
-                            } else {
-                                player.in_air_since = None;
-                            }
-                        } else {
-                            player.in_air_since = None;
-                        }
                     }
                     PLAYER_COND_PROP => {
                         player.player_cond = i64::try_from(&prop.value).unwrap_or_default() as u32;
@@ -688,8 +655,6 @@ impl GameDetailsAnalyser {
     }
 
     fn handle_player_hurt_event(&mut self, event: &PlayerHurtEvent, tick: DemoTick) {
-        const AIRSHOT_AIRTIME_THRESHOLD_SECONDS: f32 = 1.0;
-
         let victim_id = UserId::from(event.user_id);
 
         let attacker_id = UserId::from(event.attacker);
@@ -702,26 +667,22 @@ impl GameDetailsAnalyser {
         let victim = self.players.get(&victim_id).expect("failed to find victim");
 
         let weapon = WeaponClass::from_u16(event.weapon_id).unwrap_or_default();
-        if let Some(in_air_since) = victim.in_air_since {
-            use WeaponClass::*;
-            let airtime = u32::from(tick) - u32::from(in_air_since);
-            let airtime_s = (airtime as f32) * self.interval_per_tick;
 
-            if
-                airtime_s >= AIRSHOT_AIRTIME_THRESHOLD_SECONDS &&
-                victim_id != attacker_id &&
-                matches!(
-                    weapon,
-                    TF_WEAPON_ROCKETLAUNCHER |
-                        TF_WEAPON_ROCKETLAUNCHER_DIRECTHIT |
-                        TF_WEAPON_PARTICLE_CANNON | // Cow mangler
-                        TF_WEAPON_GRENADELAUNCHER |
-                        TF_WEAPON_CANNON | // Loose cannon
-                        TF_WEAPON_CROSSBOW
-                )
-            {
-                self.add_highlight(Highlight::Airshot { attacker_id, victim_id, airtime_s }, tick);
-            }
+        use WeaponClass::*;
+        if
+            victim.has_cond(&PlayerCondition::TF_COND_BLASTJUMPING) &&
+            victim_id != attacker_id &&
+            matches!(
+                weapon,
+                TF_WEAPON_ROCKETLAUNCHER |
+                    TF_WEAPON_ROCKETLAUNCHER_DIRECTHIT |
+                    TF_WEAPON_PARTICLE_CANNON | // Cow mangler
+                    TF_WEAPON_GRENADELAUNCHER |
+                    TF_WEAPON_CANNON | // Loose cannon
+                    TF_WEAPON_CROSSBOW
+            )
+        {
+            self.add_highlight(Highlight::Airshot { attacker_id, victim_id }, tick);
         }
     }
 

@@ -59,7 +59,6 @@ export type ChatMessageHighlight = {
 export type AirshotHighlight = {
   attacker_id: UserId;
   victim_id: UserId;
-  airtime_s: number;
 };
 
 export type CrossbowAirshotHighlight = {
