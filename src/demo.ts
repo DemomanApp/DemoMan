@@ -45,6 +45,8 @@ export type KillHighlight = {
   assister_id: UserId | null;
   victim_id: UserId;
   weapon: string;
+  kill_icon: string;
+  streak: number;
   drop: boolean;
   airshot: boolean;
 };

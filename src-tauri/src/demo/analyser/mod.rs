@@ -1,7 +1,8 @@
-mod player_condition;
-mod weapon_class;
-mod player_flag;
 mod custom_damage;
+mod damage_flag;
+mod player_condition;
+mod player_flag;
+mod weapon_class;
 
 use std::cmp::Reverse;
 use std::{ convert::TryFrom, collections::HashMap };
@@ -48,10 +49,11 @@ use tf_demo_parser::{
     Stream,
 };
 
-pub use player_condition::PlayerCondition;
-pub use weapon_class::WeaponClass;
-pub use player_flag::PlayerFlag;
 pub use custom_damage::CustomDamage;
+pub use damage_flag::DamageFlag;
+pub use player_condition::PlayerCondition;
+pub use player_flag::PlayerFlag;
+pub use weapon_class::WeaponClass;
 
 #[derive(Debug, Default, Clone, Copy, Serialize, Deserialize, PartialEq, FromPrimitive)]
 pub enum PlayerLifeState {
@@ -76,6 +78,8 @@ pub enum Highlight {
         assister_id: Option<UserId>,
         victim_id: UserId,
         weapon: String,
+        kill_icon: String,
+        streak: usize,
         drop: bool,
         airshot: bool,
     },
@@ -729,6 +733,7 @@ impl GameDetailsAnalyser {
         };
         let victim_id = UserId::from(event.user_id);
 
+        // Increment stats
         if let Some(killer) = self.players.get_mut(&killer_id) {
             killer.kills += 1;
         }
@@ -745,8 +750,6 @@ impl GameDetailsAnalyser {
 
         let victim = self.players.get(&victim_id);
 
-        let weapon = event.weapon.to_string();
-
         let drop: bool;
         let airshot: bool;
 
@@ -758,12 +761,108 @@ impl GameDetailsAnalyser {
             airshot = false;
         }
 
+        let mut kill_icon = event.weapon.as_ref();
+
+        // Substitute the kill icon according to the kill flags, if necessary.
+        if let Some(custom_kill) = CustomDamage::from_u16(event.custom_kill) {
+            use CustomDamage::*;
+            match custom_kill {
+                TF_DMG_CUSTOM_BACKSTAB => {
+                    if kill_icon == "sharp_dresser" {
+                        kill_icon = "sharp_dresser_backstab";
+                    } else {
+                        kill_icon = "backstab";
+                    }
+                }
+                TF_DMG_CUSTOM_HEADSHOT | TF_DMG_CUSTOM_HEADSHOT_DECAPITATION => {
+                    if kill_icon == "ambassador" {
+                        kill_icon = "ambassador_headshot";
+                    } else if kill_icon == "huntsman" {
+                        kill_icon = "huntsman_headshot";
+                    } else if event.player_penetrate_count > 0 {
+                        kill_icon = "headshot_player_penetration";
+                    } else {
+                        kill_icon = "headshot";
+                    }
+                }
+                TF_DMG_CUSTOM_BURNING => {
+                    if killer_id == victim_id {
+                        kill_icon = "firedeath";
+                    }
+                }
+                TF_DMG_CUSTOM_BURNING_ARROW => {
+                    kill_icon = "huntsman_burning";
+                }
+                TF_DMG_CUSTOM_FLYINGBURN => {
+                    kill_icon = "huntsman_flyingburn";
+                }
+                TF_DMG_CUSTOM_PUMPKIN_BOMB => {
+                    kill_icon = "pumpkindeath";
+                }
+                // This value is only given to custom_kill if
+                // 1) The player uses a killbind to suicide or
+                // 2) The player kills himself, with another
+                //    player being awarded the kill because of
+                //    recent damage.
+                TF_DMG_CUSTOM_SUICIDE => {
+                    if killer_id == victim_id {
+                        kill_icon = "#suicide";
+                    } else {
+                        kill_icon = "#assisted_suicide";
+                    }
+                }
+                TF_DMG_CUSTOM_EYEBALL_ROCKET => {
+                    if killer_id == 0 {
+                        // TODO
+                        // Set the killer name to "MONOCULUS!"
+                    }
+                }
+                | TF_DMG_CUSTOM_MERASMUS_ZAP
+                | TF_DMG_CUSTOM_MERASMUS_GRENADE
+                | TF_DMG_CUSTOM_MERASMUS_DECAPITATION => {
+                    if killer_id == 0 {
+                        // TODO
+                        // Set the killer name to "MERASMUS!"
+                    }
+                }
+                TF_DMG_CUSTOM_SPELL_SKELETON => {
+                    if killer_id == 0 {
+                        // TODO
+                        // Set the killer name to "SKELETON"
+                    }
+                }
+                TF_DMG_CUSTOM_KART => {
+                    kill_icon = "bumper_kart";
+                }
+                TF_DMG_CUSTOM_GIANT_HAMMER => {
+                    kill_icon = "necro_smasher";
+                }
+                _ => {}
+            }
+        }
+
+        // Special cases of suicides
+        if killer_id == 0 || killer_id == victim_id {
+            if (event.damage_bits & DamageFlag::DMG_FALL.bitmask()) != 0 {
+                kill_icon = "#fall";
+            }
+            // Don't ask.
+            if (event.damage_bits & DamageFlag::DMG_NERVEGAS.bitmask()) != 0 {
+                kill_icon = "saw_kill";
+            }
+            if (event.damage_bits & DamageFlag::DMG_VEHICLE.bitmask()) != 0 {
+                kill_icon = "vehicle";
+            }
+        }
+
         self.add_highlight(
             Highlight::Kill {
                 killer_id,
                 assister_id: maybe_assister_id,
                 victim_id,
-                weapon,
+                weapon: event.weapon.to_string(),
+                kill_icon: kill_icon.to_string(),
+                streak: event.kill_streak_total as usize,
                 drop,
                 airshot,
             },
@@ -864,13 +963,13 @@ impl GameDetailsAnalyser {
         }
     }
 
-    fn handle_player_healed_event(&mut self, event: &PlayerHealedEvent, tick: DemoTick) {
+    fn handle_player_healed_event(&mut self, event: &PlayerHealedEvent, _tick: DemoTick) {
         if let Some(healer) = self.players.get_mut(&UserId::from(event.healer)) {
             healer.healing += event.amount as usize;
         }
     }
 
-    fn handle_uber_used_event(&mut self, event: &PlayerChargeDeployedEvent, tick: DemoTick) {
+    fn handle_uber_used_event(&mut self, event: &PlayerChargeDeployedEvent, _tick: DemoTick) {
         if let Some(healer) = self.players.get_mut(&UserId::from(event.user_id)) {
             healer.invulns += 1;
         }
