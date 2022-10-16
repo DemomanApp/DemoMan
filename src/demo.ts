@@ -84,6 +84,7 @@ export type PlayerConnectedHighlight = {
 
 export type PlayerDisconnectedHighlight = {
   user_id: UserId;
+  reason: string;
 };
 
 export type Highlight =

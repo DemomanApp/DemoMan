@@ -112,6 +112,7 @@ pub enum Highlight {
     },
     PlayerDisconnected {
         user_id: UserId,
+        reason: String,
     },
     Pause,
     Unpause,
@@ -924,6 +925,7 @@ impl GameDetailsAnalyser {
         self.add_highlight(
             Highlight::PlayerDisconnected {
                 user_id: UserId::from(event.user_id),
+                reason: event.reason.to_string(),
             },
             tick
         );
