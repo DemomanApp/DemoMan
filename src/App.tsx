@@ -150,6 +150,9 @@ export default function App() {
         }
         styles={(theme) => ({
           main: {
+            width: "100vw",
+            height: "100vh",
+            overflow: "hidden",
             backgroundColor:
               theme.colorScheme === "dark"
                 ? theme.colors.dark[9]
