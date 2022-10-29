@@ -106,20 +106,20 @@ export type HighlightEvent = {
 };
 
 export type PlayerSummary = {
-  name: string,
-  steam_id: SteamID,
-  user_id: UserId,
+  name: string;
+  steam_id: SteamID;
+  user_id: UserId;
 
-  team: Team,
-  classes: number[],
+  team: Team;
+  classes: number[];
 
-  damage: number,
-  kills: number,
-  deaths: number,
-  assists: number,
-  healing: number,
-  invulns: number,
-  captures: number,
+  damage: number;
+  kills: number;
+  deaths: number;
+  assists: number;
+  healing: number;
+  invulns: number;
+  captures: number;
 };
 
 export type GameSummary = {
