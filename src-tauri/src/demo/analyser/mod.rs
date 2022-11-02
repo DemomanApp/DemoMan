@@ -13,6 +13,7 @@ use num_derive::{ FromPrimitive };
 use num_traits::{ FromPrimitive };
 
 use steamid_ng::SteamID;
+use tf_demo_parser::demo::header::Header;
 use tf_demo_parser::{
     demo::{
         data::DemoTick,
@@ -272,6 +273,7 @@ impl From<PlayerState> for PlayerSummary {
 pub struct GameDetailsAnalyser {
     highlights: Vec<HighlightEvent>,
     interval_per_tick: f32,
+    is_stv: bool,
     players: HashMap<UserId, PlayerState>,
     /// indexed by `ClassId`
     class_names: Vec<ServerClassName>,
@@ -351,6 +353,11 @@ impl MessageHandler for GameDetailsAnalyser {
             .map(|class| &class.name)
             .cloned()
             .collect();
+    }
+
+    fn handle_header(&mut self, header: &Header) {
+        // STV demos have an empty server field in their header
+        self.is_stv = header.server.is_empty();
     }
 
     fn into_output(self, _state: &ParserState) -> Self::Output {
@@ -672,8 +679,13 @@ impl GameDetailsAnalyser {
 
         use WeaponClass::*;
         if
+            // In POV demos, only record airshots performed by the local player.
+            (self.is_stv ||
+                self.player_entities.get(&self.local_entity_id) == Some(&attacker_id)) &&
+            // Victim is currently blastjumping
             victim.has_cond(&PlayerCondition::TF_COND_BLASTJUMPING) &&
             victim_id != attacker_id &&
+            // Only count hits with certain weapons
             matches!(
                 weapon,
                 TF_WEAPON_ROCKETLAUNCHER |
