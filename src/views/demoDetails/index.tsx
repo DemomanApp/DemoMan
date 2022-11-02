@@ -27,15 +27,16 @@ import {
   IconFileAnalytics,
   IconFileInfo,
   IconPencil,
+  IconPlayerPlay,
   IconServer,
   IconTimeline,
   IconUser,
   IconUsers,
 } from "@tabler/icons";
 
-import { getDemoByName, getDemoDetails } from "../../api";
+import { getDemoByName, getDemoDetails, sendCommand } from "../../api";
 import { HeaderPortal } from "../../AppShell";
-import { Async, Fill, MapThumbnail } from "../../components";
+import { Async, AsyncButton, Fill, MapThumbnail } from "../../components";
 import { formatFileSize, formatPlaybackTime } from "../../util";
 import PlayerList from "./PlayerList";
 import { Demo } from "../../demo";
@@ -102,7 +103,7 @@ function DemoDetailsView({ demo }: { demo: Demo }) {
         </Tooltip>
       </HeaderPortal>
       <Container className={classes.container}>
-        <Stack>
+        <Stack style={{ height: "100%" }}>
           <Group>
             <Paper radius="md" withBorder style={{ overflow: "hidden" }}>
               <MapThumbnail
@@ -124,23 +125,31 @@ function DemoDetailsView({ demo }: { demo: Demo }) {
                 {demo.mapName}
               </Text>
             </Paper>
-            <List>
-              <List.Item icon={<IconUser />}>{demo.clientName}</List.Item>
-              <List.Item icon={<IconServer />}>
-                <span style={{ fontFamily: "monospace, monospace" }}>
-                  {demo.serverName}
-                </span>
-              </List.Item>
-              <List.Item icon={<IconCalendarEvent />}>
-                {new Date(demo.birthtime * 1000).toLocaleString()}
-              </List.Item>
-              <List.Item icon={<IconFileAnalytics />}>
-                {formatFileSize(demo.filesize)}
-              </List.Item>
-              <List.Item icon={<IconClock />}>
-                {formatPlaybackTime(demo.playbackTime)}
-              </List.Item>
-            </List>
+            <Stack align="flex-start">
+              <List>
+                <List.Item icon={<IconUser />}>{demo.clientName}</List.Item>
+                <List.Item icon={<IconServer />}>
+                  <span style={{ fontFamily: "monospace, monospace" }}>
+                    {demo.serverName}
+                  </span>
+                </List.Item>
+                <List.Item icon={<IconCalendarEvent />}>
+                  {new Date(demo.birthtime * 1000).toLocaleString()}
+                </List.Item>
+                <List.Item icon={<IconFileAnalytics />}>
+                  {formatFileSize(demo.filesize)}
+                </List.Item>
+                <List.Item icon={<IconClock />}>
+                  {formatPlaybackTime(demo.playbackTime)}
+                </List.Item>
+              </List>
+              <AsyncButton
+                rightIcon={<IconPlayerPlay />}
+                onClick={() => sendCommand(`playdemo "${demo.path}"`)}
+              >
+                Play demo
+              </AsyncButton>
+            </Stack>
           </Group>
           <div style={{ flexGrow: 1 }}>
             <Async
