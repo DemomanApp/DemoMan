@@ -47,3 +47,11 @@ export async function getDemoDetails(demoPath: string) {
     demoPath,
   });
 }
+
+export async function initRcon(password: string) {
+  return invoke<void>("init_rcon", { password });
+}
+
+export async function sendCommand(command: string) {
+  return invoke<string>("send_command", { command });
+}

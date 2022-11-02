@@ -5,8 +5,12 @@
 
 use std::{collections::HashMap, path::PathBuf, str::FromStr, sync::Mutex};
 
+use tauri::async_runtime::Mutex as AsyncMutex;
 use tauri_plugin_log::{LogTarget, LoggerBuilder as LogPluginBuilder};
 use tauri_plugin_store::{PluginBuilder as StorePluginBuilder, StoreBuilder};
+
+use tokio::net::TcpStream;
+use rcon::Connection;
 
 use demo::Demo;
 
@@ -25,6 +29,11 @@ pub struct DemoCache {
 #[derive(Default)]
 pub struct AppState {
     pub demo_cache: Mutex<DemoCache>,
+
+    // We use the Mutex type provided by the tauri async runtime here
+    // because we need to hold its content across an .await point.
+    // The Mutex in std::sync will not work in this situation.
+    pub rcon_connection: AsyncMutex<Option<Connection<TcpStream>>>,
 }
 
 fn main() {
@@ -48,6 +57,8 @@ fn main() {
             commands::demos::rename_demo,
             commands::demos::set_demo_events,
             commands::demos::set_demo_tags,
+            commands::rcon::init_rcon,
+            commands::rcon::send_command,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
