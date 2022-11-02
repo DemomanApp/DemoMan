@@ -20,6 +20,8 @@ export type Demo = {
 
 export type Team = "red" | "blue" | "spectator" | "other";
 
+export const TEAM_NAMES = ["UNASSIGNED", "SPECTATOR", "RED", "BLU"] as const;
+
 export enum Class {
   Scout,
   Sniper,

@@ -18,11 +18,11 @@ const useStyles = createStyles((theme) => {
     },
     img: {
       height: totalHeight - textBoxHeight,
-      width: width,
+      width,
     },
     imgFallback: {
       height: totalHeight - textBoxHeight,
-      width: width,
+      width,
       display: "flex",
       alignItems: "center",
       justifyContent: "center",

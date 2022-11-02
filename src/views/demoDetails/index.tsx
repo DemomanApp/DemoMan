@@ -40,7 +40,7 @@ import { Async, AsyncButton, Fill, MapThumbnail } from "../../components";
 import { formatFileSize, formatPlaybackTime } from "../../util";
 import PlayerList from "./PlayerList";
 import { Demo } from "../../demo";
-import Timeline from "./Timeline";
+import Highlights from "./Highlights";
 
 const useStyles = createStyles(() => ({
   container: {
@@ -169,7 +169,23 @@ function DemoDetailsView({ demo }: { demo: Demo }) {
               )}
               success={(gameSummary) => (
                 <>
-                  <Tabs defaultValue="players">
+                  <Tabs
+                    defaultValue="players"
+                    // These styles prevent tall tab panels (mainly the timeline tab)
+                    // from overflowing. I want the panel to take up exactly
+                    // the remaining vertical space on the page,
+                    // keeping eventual overflow to itself.
+                    // minHeight: 0 is necessary due to a quirk of FlexBox,
+                    // See https://stackoverflow.com/q/36230944/13118494
+                    styles={{
+                      root: {
+                        height: "100%",
+                        display: "flex",
+                        flexDirection: "column",
+                      },
+                      panel: { flexGrow: 1, minHeight: 0 },
+                    }}
+                  >
                     <Tabs.List>
                       <Tabs.Tab value="players" icon={<IconUsers size={14} />}>
                         Players
@@ -190,7 +206,7 @@ function DemoDetailsView({ demo }: { demo: Demo }) {
                     </Tabs.Panel>
 
                     <Tabs.Panel value="timeline" pt="xs">
-                      <Timeline />
+                      <Highlights gameSummary={gameSummary} />
                     </Tabs.Panel>
 
                     <Tabs.Panel value="info" pt="xs">

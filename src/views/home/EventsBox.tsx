@@ -1,5 +1,5 @@
 import { Box, Text } from "@mantine/core";
-import { IconBookmarks } from "@tabler/icons";
+import { IconBookmark } from "@tabler/icons";
 
 import { DemoEvent } from "../../demo";
 import { IconKillstreak } from "../../icons";
@@ -32,7 +32,7 @@ export default function EventsBox({ events }: { events: DemoEvent[] }) {
           {event.name === "Killstreak" ? (
             <IconKillstreak color="gray" />
           ) : (
-            <IconBookmarks color="gray" />
+            <IconBookmark color="gray" />
           )}
           <Text inline color="dimmed">
             {event.value}
