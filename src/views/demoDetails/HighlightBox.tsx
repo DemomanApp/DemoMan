@@ -38,46 +38,53 @@ const useStyles = createStyles(
   })
 );
 
-function PlayerName({ player }: { player: PlayerSummary }) {
+function PlayerName({ player }: { player: PlayerSummary | undefined }) {
   const theme = useMantineTheme();
   let color = "unset";
-  if (player.team === "red") {
-    color = theme.colors.red[6];
-  } else if (player.team === "blue") {
-    color = theme.colors.blue[6];
+  let name = "<unknown>";
+  if (player !== undefined) {
+    if (player.team === "red") {
+      color = theme.colors.red[6];
+    } else if (player.team === "blue") {
+      color = theme.colors.blue[6];
+    }
+    name = player.name;
   }
-  return <span style={{ color }}>{player.name}</span>;
+  return <span style={{ color }}>{name}</span>;
+}
+
+function PlayerNames({ players }: { players: (PlayerSummary | undefined)[] }) {
+  if (players.length === 0) {
+    return <></>;
+  }
+
+  return (
+    <>
+      {<PlayerName player={players[0]} />}
+      {players.slice(1).map((player) => (
+        <>
+          &nbsp;+&nbsp;
+          <PlayerName player={player} />
+        </>
+      ))}
+    </>
+  );
 }
 
 function KillHighlightBox(
   highlight: KillHighlight,
   playerMap: Map<UserId, PlayerSummary>
 ) {
-  const defaultPlayerSummary: PlayerSummary = {
-    name: "<unknown>",
-    steam_id: 0,
-    user_id: 0,
-    team: "other",
-    classes: [],
-    damage: 0,
-    kills: 0,
-    deaths: 0,
-    assists: 0,
-    healing: 0,
-    invulns: 0,
-    captures: 0,
-  };
-
   const { classes } = useStyles({ justifyContent: "right" });
 
   const killer = playerMap.get(highlight.killer_id);
   const assister =
     highlight.assister_id === null
       ? undefined
-      : playerMap.get(highlight.assister_id) ?? defaultPlayerSummary;
+      : playerMap.get(highlight.assister_id);
 
   // Victim should always be known, but just in case...
-  const victim = playerMap.get(highlight.victim_id) ?? defaultPlayerSummary;
+  const victim = playerMap.get(highlight.victim_id);
 
   // Special case for kill messages with text instead of a kill icon
   if (highlight.kill_icon === "#fall") {
@@ -97,7 +104,7 @@ function KillHighlightBox(
   } else if (highlight.kill_icon === "#assisted_suicide") {
     return (
       <div className={classes.root}>
-        <PlayerName player={killer ?? defaultPlayerSummary} />
+        <PlayerName player={killer} />
         {assister !== undefined && (
           <>
             &nbsp;+&nbsp;
@@ -176,15 +183,14 @@ function PointCapturedHighlightBox(
   highlight: PointCapturedHighlight,
   playerMap: Map<UserId, PlayerSummary>
 ) {
-  const { classes } = useStyles({ justifyContent: "left" });
+  const { classes } = useStyles({ justifyContent: "right" });
 
-  const cappers = highlight.cappers.map(
-    (capper) => playerMap.get(capper)?.name ?? "<unknown>"
-  );
+  const cappers = highlight.cappers.map((capper) => playerMap.get(capper));
 
   return (
     <div className={classes.root}>
-      {cappers.join(" + ")} captured {highlight.point_name}
+      <PlayerNames players={cappers} />
+      &nbsp; captured {highlight.point_name}
     </div>
   );
 }
