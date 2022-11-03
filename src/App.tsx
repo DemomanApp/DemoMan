@@ -1,5 +1,11 @@
 import { useEffect, useRef, useState } from "react";
-import { useNavigate, Routes, Route, useLocation } from "react-router-dom";
+import {
+  useNavigate,
+  Routes,
+  Route,
+  useLocation,
+  Link,
+} from "react-router-dom";
 
 import { appWindow } from "@tauri-apps/api/window";
 
@@ -21,6 +27,7 @@ import {
   IconDots,
   IconFolder,
   IconSettings,
+  IconPlug,
 } from "@tabler/icons";
 
 import { AppShellProvider, NavbarButton } from "./AppShell";
@@ -28,6 +35,7 @@ import { AppShellProvider, NavbarButton } from "./AppShell";
 import HomeView from "./views/home";
 import SettingsView from "./views/settings";
 import DemoDetailsView from "./views/demoDetails";
+import RconSetup from "./views/rconSetup";
 
 type HeaderIconProps = {
   icon: JSX.Element;
@@ -99,6 +107,13 @@ export default function App() {
                   <NavbarButton icon={IconDots} />
                 </Menu.Target>
                 <Menu.Dropdown>
+                  <Menu.Item
+                    icon={<IconPlug size={14} />}
+                    component={Link}
+                    to="/rcon-setup"
+                  >
+                    Set up RCON
+                  </Menu.Item>
                   <Menu.Item icon={<IconFolder size={14} />}>
                     Open demos folder
                   </Menu.Item>
@@ -167,6 +182,7 @@ export default function App() {
             element={<DemoDetailsView />}
           />
           <Route path="/settings" element={<SettingsView />} />
+          <Route path="/rcon-setup" element={<RconSetup />} />
         </Routes>
       </AppShell>
     </AppShellProvider>
