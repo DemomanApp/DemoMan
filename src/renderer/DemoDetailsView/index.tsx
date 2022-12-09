@@ -1,5 +1,5 @@
 import { useContext, useState } from "react";
-import { shell } from "electron";
+import { shell, clipboard } from "electron";
 import log from "electron-log";
 
 import {
@@ -9,6 +9,9 @@ import {
   Autocomplete,
   TextField,
   Stack,
+  IconButton,
+  useTheme,
+  Tooltip,
 } from "@mui/material";
 import {
   Edit as EditIcon,
@@ -16,6 +19,8 @@ import {
   FolderOpen as FolderOpenIcon,
   ArrowBackIosNew as ArrowBackIcon,
   Check as CheckIcon,
+  ContentCopy as CopyIcon,
+  PlayArrow as PlayIcon,
 } from "@mui/icons-material";
 import { Navigate, useNavigate, useParams } from "react-router-dom";
 
@@ -44,6 +49,8 @@ export default function DemoDetailsView() {
     addKnownBookmark,
   } = useContext(DemosContext);
   const navigate = useNavigate();
+
+  const theme = useTheme();
 
   const demoName = (useParams() as DemoDetailsRouteParams).name;
   const demo = getDemoByName(decodeURIComponent(demoName));
@@ -105,12 +112,33 @@ export default function DemoDetailsView() {
           />
         }
         center={
-          <Typography variant="h5" noWrap component="div">
-            {demo.name}
-          </Typography>
+          <>
+            <Typography variant="h5" noWrap component="div">
+              {demo.name}
+            </Typography>
+            <Tooltip title="Copy demo name">
+              <IconButton
+                onClick={() => {
+                  clipboard.writeText(demo.name);
+                }}
+                size="small"
+                style={{ marginLeft: 4 }}
+              >
+                <CopyIcon
+                  fontSize="inherit"
+                  style={{ color: theme.palette.text.secondary }}
+                />
+              </IconButton>
+            </Tooltip>
+          </>
         }
         right={
           <>
+            <AppBarButton
+              tooltip="Copy playdemo command"
+              icon={<PlayIcon />}
+              onClick={() => clipboard.writeText(`playdemo "${demo.path}"`)}
+            />
             <AppBarButton
               tooltip="Rename"
               icon={<EditIcon />}
