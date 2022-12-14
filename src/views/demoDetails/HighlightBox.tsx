@@ -34,6 +34,7 @@ const useStyles = createStyles(
       alignItems: "center",
       justifyContent,
       height: 40,
+      paddingRight: 16,
     },
   })
 );
