@@ -125,7 +125,13 @@ function DemoDetailsView({ demo }: { demo: Demo }) {
                 {demo.mapName}
               </Text>
             </Paper>
-            <Stack align="flex-start">
+            <Stack
+              style={{
+                height: "100%",
+                justifyContent: "space-between",
+                alignItems: "flex-start",
+              }}
+            >
               <List>
                 <List.Item icon={<IconUser />}>{demo.clientName}</List.Item>
                 <List.Item icon={<IconServer />}>
@@ -168,52 +174,50 @@ function DemoDetailsView({ demo }: { demo: Demo }) {
                 </Fill>
               )}
               success={(gameSummary) => (
-                <>
-                  <Tabs
-                    defaultValue="players"
-                    // These styles prevent tall tab panels (mainly the timeline tab)
-                    // from overflowing. I want the panel to take up exactly
-                    // the remaining vertical space on the page,
-                    // keeping eventual overflow to itself.
-                    // minHeight: 0 is necessary due to a quirk of FlexBox,
-                    // See https://stackoverflow.com/q/36230944/13118494
-                    styles={{
-                      root: {
-                        height: "100%",
-                        display: "flex",
-                        flexDirection: "column",
-                      },
-                      panel: { flexGrow: 1, minHeight: 0 },
-                    }}
-                  >
-                    <Tabs.List>
-                      <Tabs.Tab value="players" icon={<IconUsers size={14} />}>
-                        Players
-                      </Tabs.Tab>
-                      <Tabs.Tab
-                        value="timeline"
-                        icon={<IconTimeline size={14} />}
-                      >
-                        Timeline
-                      </Tabs.Tab>
-                      <Tabs.Tab value="info" icon={<IconFileInfo size={14} />}>
-                        Info
-                      </Tabs.Tab>
-                    </Tabs.List>
+                <Tabs
+                  defaultValue="players"
+                  // These styles prevent tall tab panels (mainly the timeline tab)
+                  // from overflowing. I want the panel to take up exactly
+                  // the remaining vertical space on the page,
+                  // keeping eventual overflow to itself.
+                  // minHeight: 0 is necessary due to a quirk of FlexBox,
+                  // See https://stackoverflow.com/q/36230944/13118494
+                  styles={{
+                    root: {
+                      height: "100%",
+                      display: "flex",
+                      flexDirection: "column",
+                    },
+                    panel: { flexGrow: 1, minHeight: 0 },
+                  }}
+                >
+                  <Tabs.List>
+                    <Tabs.Tab value="players" icon={<IconUsers size={14} />}>
+                      Players
+                    </Tabs.Tab>
+                    <Tabs.Tab
+                      value="timeline"
+                      icon={<IconTimeline size={14} />}
+                    >
+                      Timeline
+                    </Tabs.Tab>
+                    <Tabs.Tab value="info" icon={<IconFileInfo size={14} />}>
+                      Info
+                    </Tabs.Tab>
+                  </Tabs.List>
 
-                    <Tabs.Panel value="players" pt="xs">
-                      <PlayerList gameSummary={gameSummary} />
-                    </Tabs.Panel>
+                  <Tabs.Panel value="players" pt="xs">
+                    <PlayerList gameSummary={gameSummary} />
+                  </Tabs.Panel>
 
-                    <Tabs.Panel value="timeline" pt="xs">
-                      <Highlights gameSummary={gameSummary} />
-                    </Tabs.Panel>
+                  <Tabs.Panel value="timeline" pt="xs">
+                    <Highlights gameSummary={gameSummary} />
+                  </Tabs.Panel>
 
-                    <Tabs.Panel value="info" pt="xs">
-                      TODO
-                    </Tabs.Panel>
-                  </Tabs>
-                </>
+                  <Tabs.Panel value="info" pt="xs">
+                    TODO
+                  </Tabs.Panel>
+                </Tabs>
               )}
             />
           </div>
