@@ -23,8 +23,11 @@ const useStyles = createStyles(
         : theme.colorScheme === "dark"
           ? theme.colors.dark[8]
           : theme.white,
-      color: theme.white,
+      color: selectionMode ? theme.white : undefined,
     },
+    icon: {
+      color: selectionMode ? theme.white : undefined,
+    }
   })
 );
 
@@ -44,6 +47,7 @@ export default function BottomBar({
         radius={0}
         size={40}
         onClick={toggleSelectionMode}
+        className={classes.icon}
       >
         <IconListCheck />
       </ActionIcon>
