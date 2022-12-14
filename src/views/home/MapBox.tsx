@@ -33,7 +33,13 @@ const useStyles = createStyles((theme) => {
       height: textBoxHeight,
       borderRight: border,
     },
-    text: { overflow: "hidden", textOverflow: "ellipsis", maxWidth: width },
+    text: {
+      overflow: "hidden",
+      textOverflow: "ellipsis",
+      maxWidth: width,
+      lineHeight: `${textBoxHeight}px`,
+      textAlign: "center",
+    },
   };
 });
 
@@ -55,12 +61,7 @@ export default function MapBox({ mapName }: { mapName: string }) {
         }
       />
       <div className={classes.textBox}>
-        <Text
-          color="dimmed"
-          align="center"
-          className={classes.text}
-          weight={600}
-        >
+        <Text color="dimmed" className={classes.text} weight={600}>
           {mapName}
         </Text>
       </div>
