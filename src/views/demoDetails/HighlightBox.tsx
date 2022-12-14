@@ -188,10 +188,27 @@ function PointCapturedHighlightBox(
 
   const cappers = highlight.cappers.map((capper) => playerMap.get(capper));
 
+  let icon;
+
+  // For some reason the two capture icons are slightly
+  // misaligned: The red variant has more empty pixels
+  // on the right side of the icon.
+  // Also, the colors of the icons come straight from the game
+  // files and thus do not match the rest of the app's color
+  // scheme.
+  // TODO fix that.
+  if (highlight.capturing_team === 2) {
+    icon = "redcapture";
+  } else if (highlight.capturing_team === 3) {
+    icon = "bluecapture";
+  }
+
   return (
     <div className={classes.root}>
       <PlayerNames players={cappers} />
-      &nbsp; captured {highlight.point_name}
+      &nbsp;
+      {icon !== undefined && <KillIcon killIcon={icon} />}
+      captured {highlight.point_name}
     </div>
   );
 }
