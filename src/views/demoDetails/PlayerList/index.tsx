@@ -1,7 +1,8 @@
 import { createStyles, Paper, ScrollArea, Text } from "@mantine/core";
-import { GameSummary, PlayerSummary } from "../../../demo";
+import { GameSummary, PlayerSummary, EMPTY_SCOREBOARD } from "../../../demo";
 import { TableHeader } from "./TableHeader";
 import { PlayerBox } from "./PlayerBox";
+import { ScoreboardTable } from "./ScoreboardTable";
 
 export type PlayerListProps = {
   gameSummary: GameSummary;
@@ -52,6 +53,9 @@ export default function PlayerList({ gameSummary }: PlayerListProps) {
     }
   });
 
+  redPlayers.sort((a, b) => b.scoreboard?.points - a.scoreboard?.points);
+  bluPlayers.sort((a, b) => b.scoreboard?.points - a.scoreboard?.points);
+
   const { classes } = useStyles();
 
   return (
@@ -83,20 +87,24 @@ export default function PlayerList({ gameSummary }: PlayerListProps) {
         <TableHeader />
       </div>
       {/* Player list */}
-      <ScrollArea.Autosize maxHeight={300}>
+      <ScrollArea.Autosize maxHeight={360}>
         <div>
           <div className={classes.playerListColumn}>
             {bluPlayers.map((player) => (
-              <PlayerBox key={player.user_id} player={player} />
+              <PlayerBox key={player.user_id} player={player} mainPlayer={ player.user_id === gameSummary.local_user_id } />
             ))}
           </div>
           <div className={classes.playerListColumn}>
             {redPlayers.map((player) => (
-              <PlayerBox key={player.user_id} player={player} />
+              <PlayerBox key={player.user_id} player={player} mainPlayer={ player.user_id === gameSummary.local_user_id } />
             ))}
           </div>
         </div>
       </ScrollArea.Autosize>
+      <div>
+        {/* Player-specific scoreboard */}
+        <ScoreboardTable scoreboard={ gameSummary.players.find(s => s.user_id === gameSummary.local_user_id)?.scoreboard ?? EMPTY_SCOREBOARD }/>
+      </div>
     </Paper>
   );
 }

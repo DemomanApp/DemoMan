@@ -14,9 +14,11 @@ const useStyles = createStyles((theme) => ({
       theme.colorScheme === "dark"
         ? theme.colors.dark[2]
         : theme.colors.gray[6],
+    paddingRight: 8,
   },
   playerColumn: {
-    width: "50%",
+    // width: "50%",
+    flexGrow: 1,
     paddingLeft: "8px",
   },
   classesColumn: {
@@ -24,7 +26,7 @@ const useStyles = createStyles((theme) => ({
   },
   smallColumn: {
     width: "32px",
-    textAlign: "center",
+    textAlign: "right",
   },
 }));
 
@@ -33,8 +35,9 @@ export function TableHeader() {
 
   return (
     <div className={classes.root}>
-      <span className={classes.playerColumn}>Player</span>
-      <span className={classes.classesColumn}>Classes</span>
+      <span className={classes.smallColumn}></span>
+      <span className={classes.playerColumn}>Name</span>
+      <span className={classes.smallColumn} style={{ width: 40 }}>Score</span>
       <span className={classes.smallColumn}>K</span>
       <span className={classes.smallColumn}>A</span>
       <span className={classes.smallColumn}>D</span>

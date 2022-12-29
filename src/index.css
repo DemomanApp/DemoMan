@@ -3,3 +3,23 @@ body {
   user-select: none;
   -webkit-user-select: none;
 }
+
+
+/*
+ * ===============================
+ *           SCOREBOARD
+ * ===============================
+ */
+.scoreboard {
+  table-layout: fixed;
+  background: rgba(0, 0, 0, 0.4);
+}
+
+.scoreboard td:nth-child(even) {
+  text-align: left;
+  color: #2FDD24; /* Default HUD color */
+}
+
+.scoreboard td:nth-child(odd) {
+  text-align: right;
+}

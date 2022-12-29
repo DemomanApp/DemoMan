@@ -43,12 +43,16 @@ use tf_demo_parser::{
             stringtable::StringTableEntry,
         },
         parser::{ analyser::{ Class, Team, UserId }, MessageHandler },
-        sendprop::SendPropIdentifier,
+        sendprop::{
+            SendProp,
+            SendPropIdentifier,
+        },
     },
     MessageType,
     ParserState,
     Stream,
 };
+pub use crate::demo::Scoreboard;
 
 pub use custom_damage::CustomDamage;
 pub use damage_flag::DamageFlag;
@@ -140,13 +144,7 @@ pub struct PlayerState {
 
     team: Team,
 
-    damage: usize,
-    kills: usize,
-    deaths: usize,
-    assists: usize,
-    healing: usize,
-    invulns: usize,
-    captures: usize,
+    scoreboard: Scoreboard,
 
     // Temporary state data
     class: Class,
@@ -208,18 +206,7 @@ pub struct PlayerSummary {
     team: Team,
     classes: Vec<usize>,
 
-    damage: usize,
-    kills: usize,
-    deaths: usize,
-    assists: usize,
-    healing: usize,
-    invulns: usize,
-    captures: usize,
-
-    // Ideas for other stats:
-    // headshots
-    // backstabs
-    // dominations
+    scoreboard: Scoreboard,
 }
 
 impl From<PlayerState> for PlayerSummary {
@@ -229,13 +216,7 @@ impl From<PlayerState> for PlayerSummary {
             steam_id,
             user_id,
             team,
-            damage,
-            kills,
-            deaths,
-            assists,
-            healing,
-            invulns,
-            captures,
+            scoreboard,
             time_on_class,
             ..
         } = state;
@@ -258,13 +239,7 @@ impl From<PlayerState> for PlayerSummary {
                 .into_iter()
                 .map(|(i, _v)| i)
                 .collect(),
-            damage,
-            kills,
-            deaths,
-            assists,
-            healing,
-            invulns,
-            captures,
+            scoreboard,
         }
     }
 }
@@ -374,6 +349,26 @@ impl MessageHandler for GameDetailsAnalyser {
     }
 }
 
+/**
+ * Helper function to make processing integer properties easier.
+ *
+ * parse_integer_prop(packet, "DT_TFPlayerScoringDataExclusive", "m_iPoints", |points| { println!("Scored {} points", points) });
+ */
+fn parse_integer_prop<F>(packet: &PacketEntity, table: &str, name: &str, parser_state: &ParserState, handler: F)
+    where F: FnOnce(u32) {
+    use tf_demo_parser::demo::sendprop::SendPropValue;
+
+    match packet.get_prop_by_name(table, name, parser_state) {
+        Some(prop) => {
+            match prop.value {
+                SendPropValue::Integer(val) => handler(val as u32),
+                _ => {} // not an integer, ignore
+            }
+        },
+        None => {} // the packet doesn't have this property
+    }
+}
+
 impl GameDetailsAnalyser {
     fn add_highlight(&mut self, event: Highlight, tick: DemoTick) {
         self.highlights.push(HighlightEvent { tick, event })
@@ -402,6 +397,7 @@ impl GameDetailsAnalyser {
             "CTFPlayerResource" => self.handle_player_resource(entity, parser_state),
             "CTFTeam" => self.handle_team(entity, parser_state),
             "CWeaponMedigun" => self.handle_medigun(entity, parser_state),
+
             _ => {}
         }
     }
@@ -432,17 +428,8 @@ impl GameDetailsAnalyser {
             GameEvent::PlayerDisconnect(event) => {
                 self.handle_player_disconnect_event(event, tick);
             }
-            GameEvent::TeamPlayPointCaptured(event) => {
-                self.handle_point_captured_event(event, tick);
-            }
             GameEvent::CrossbowHeal(event) => {
                 self.handle_crossbow_heal_event(event, tick);
-            }
-            GameEvent::PlayerHealed(event) => {
-                self.handle_player_healed_event(event, tick);
-            }
-            GameEvent::PlayerChargeDeployed(event) => {
-                self.handle_uber_used_event(event, tick);
             }
             _ => {}
         }
@@ -483,11 +470,6 @@ impl GameDetailsAnalyser {
                                 // player.charge = i64
                                 //     ::try_from(&prop.value)
                                 //     .unwrap_or_default() as u8;
-                            }
-                            "m_iDamage" => {
-                                player.damage = i64
-                                    ::try_from(&prop.value)
-                                    .unwrap_or_default() as usize;
                             }
                             _ => {}
                         }
@@ -531,6 +513,72 @@ impl GameDetailsAnalyser {
                 "_condition_bits"
             );
 
+            // Player score
+            const CAPTURES_PROP: SendPropIdentifier = SendPropIdentifier::new(
+                "DT_TFPlayerScoringDataExclusive",
+                "m_iCaptures"
+            );
+            const DEFENSES_PROP: SendPropIdentifier = SendPropIdentifier::new(
+                "DT_TFPlayerScoringDataExclusive",
+                "m_iDefenses"
+            );
+            const KILLS_PROP: SendPropIdentifier = SendPropIdentifier::new(
+                "DT_TFPlayerScoringDataExclusive",
+                "m_iKills"
+            );
+            const DEATHS_PROP: SendPropIdentifier = SendPropIdentifier::new(
+                "DT_TFPlayerScoringDataExclusive",
+                "m_iDeaths"
+            );
+            const DOMINATIONS_PROP: SendPropIdentifier = SendPropIdentifier::new(
+                "DT_TFPlayerScoringDataExclusive",
+                "m_iDominations"
+            );
+            const REVENGE_PROP: SendPropIdentifier = SendPropIdentifier::new(
+                "DT_TFPlayerScoringDataExclusive",
+                "m_iRevenge"
+            );
+            const BUILDINGS_DESTROYED_PROP: SendPropIdentifier = SendPropIdentifier::new(
+                "DT_TFPlayerScoringDataExclusive",
+                "m_iBuildingsDestroyed"
+            );
+            const HEADSHOTS_PROP: SendPropIdentifier = SendPropIdentifier::new(
+                "DT_TFPlayerScoringDataExclusive",
+                "m_iCaptures"
+            );
+            const BACKSTABS_PROP: SendPropIdentifier = SendPropIdentifier::new(
+                "DT_TFPlayerScoringDataExclusive",
+                "m_iBackstabs"
+            );
+            const HEAL_POINTS_PROP: SendPropIdentifier = SendPropIdentifier::new(
+                "DT_TFPlayerScoringDataExclusive",
+                "m_iHealPoints"
+            );
+            const INVULNS_PROP: SendPropIdentifier = SendPropIdentifier::new(
+                "DT_TFPlayerScoringDataExclusive",
+                "m_iInvulns"
+            );
+            const TELEPORTS_PROP: SendPropIdentifier = SendPropIdentifier::new(
+                "DT_TFPlayerScoringDataExclusive",
+                "m_iTeleports"
+            );
+            const DAMAGE_DONE_PROP: SendPropIdentifier = SendPropIdentifier::new(
+                "DT_TFPlayerScoringDataExclusive",
+                "m_iDamageDone"
+            );
+            const KILL_ASSISTS_PROP: SendPropIdentifier = SendPropIdentifier::new(
+                "DT_TFPlayerScoringDataExclusive",
+                "m_iKillAssists"
+            );
+            const BONUS_POINTS_PROP: SendPropIdentifier = SendPropIdentifier::new(
+                "DT_TFPlayerScoringDataExclusive",
+                "m_iBonusPoints"
+            );
+            const POINTS_PROP: SendPropIdentifier = SendPropIdentifier::new(
+                "DT_TFPlayerScoringDataExclusive",
+                "m_iPoints"
+            );
+
             for prop in entity.props(parser_state) {
                 match prop.identifier {
                     LIFE_STATE_PROP => {
@@ -561,6 +609,118 @@ impl GameDetailsAnalyser {
                             ::try_from(&prop.value)
                             .unwrap_or_default() as u32;
                     }
+                    CAPTURES_PROP => {
+                        let captures = i64::try_from(&prop.value).unwrap_or_default() as u32;
+
+                        if captures > player.scoreboard.captures {
+                            player.scoreboard.captures = captures;
+                        }
+                    },
+                    DEFENSES_PROP => {
+                        let defenses = i64::try_from(&prop.value).unwrap_or_default() as u32;
+
+                        if defenses > player.scoreboard.defenses {
+                            player.scoreboard.defenses = defenses;
+                        }
+                    },
+                    KILLS_PROP => {
+                        let kills = i64::try_from(&prop.value).unwrap_or_default() as u32;
+
+                        if kills > player.scoreboard.kills {
+                            player.scoreboard.kills = kills;
+                        }
+                    },
+                    DEATHS_PROP => {
+                        let deaths = i64::try_from(&prop.value).unwrap_or_default() as u32;
+
+                        if deaths > player.scoreboard.deaths {
+                            player.scoreboard.deaths = deaths;
+                        }
+                    },
+                    DOMINATIONS_PROP => {
+                        let dominations = i64::try_from(&prop.value).unwrap_or_default() as u32;
+
+                        if dominations > player.scoreboard.dominations {
+                            player.scoreboard.dominations = dominations;
+                        }
+                    },
+                    REVENGE_PROP => {
+                        let revenges = i64::try_from(&prop.value).unwrap_or_default() as u32;
+
+                        if revenges > player.scoreboard.revenges {
+                            player.scoreboard.revenges = revenges;
+                        }
+                    },
+                    BUILDINGS_DESTROYED_PROP => {
+                        let buildings_destroyed = i64::try_from(&prop.value).unwrap_or_default() as u32;
+
+                        if buildings_destroyed > player.scoreboard.buildings_destroyed {
+                            player.scoreboard.buildings_destroyed = buildings_destroyed;
+                        }
+                    },
+                    HEADSHOTS_PROP => {
+                        let headshots = i64::try_from(&prop.value).unwrap_or_default() as u32;
+
+                        if headshots > player.scoreboard.headshots {
+                            player.scoreboard.headshots = headshots;
+                        }
+                    },
+                    BACKSTABS_PROP => {
+                        let backstabs = i64::try_from(&prop.value).unwrap_or_default() as u32;
+
+                        if backstabs > player.scoreboard.backstabs {
+                            player.scoreboard.backstabs = backstabs;
+                        }
+                    },
+                    HEAL_POINTS_PROP => {
+                        let healing = i64::try_from(&prop.value).unwrap_or_default() as u32;
+
+                        if healing > player.scoreboard.healing {
+                            player.scoreboard.healing = healing;
+                        }
+                    },
+                    INVULNS_PROP => {
+                        let ubercharges = i64::try_from(&prop.value).unwrap_or_default() as u32;
+
+                        if ubercharges > player.scoreboard.ubercharges {
+                            player.scoreboard.ubercharges = ubercharges;
+                        }
+                    },
+                    TELEPORTS_PROP => {
+                        let teleports = i64::try_from(&prop.value).unwrap_or_default() as u32;
+
+                        if teleports > player.scoreboard.teleports {
+                            player.scoreboard.teleports = teleports;
+                        }
+                    },
+                    DAMAGE_DONE_PROP => {
+                        let damage_dealt = i64::try_from(&prop.value).unwrap_or_default() as u32;
+
+                        if damage_dealt > player.scoreboard.damage_dealt {
+                            player.scoreboard.damage_dealt = damage_dealt;
+                        }
+                    },
+                    KILL_ASSISTS_PROP => {
+                        let assists = i64::try_from(&prop.value).unwrap_or_default() as u32;
+
+                        if assists > player.scoreboard.assists {
+                            player.scoreboard.assists = assists;
+                        }
+                    },
+                    BONUS_POINTS_PROP => {
+                        let bonus_points = i64::try_from(&prop.value).unwrap_or_default() as u32;
+
+                        if bonus_points > player.scoreboard.bonus_points {
+                            player.scoreboard.bonus_points = bonus_points;
+                        }
+                    },
+                    POINTS_PROP => {
+                        let points = i64::try_from(&prop.value).unwrap_or_default() as u32;
+
+                        if points > player.scoreboard.points {
+                            player.scoreboard.points = points;
+                        }
+                    },
                     _ => {}
                 }
             }
@@ -665,13 +825,7 @@ impl GameDetailsAnalyser {
 
     fn handle_player_hurt_event(&mut self, event: &PlayerHurtEvent, tick: DemoTick) {
         let victim_id = UserId::from(event.user_id);
-
         let attacker_id = UserId::from(event.attacker);
-        if attacker_id != victim_id {
-            if let Some(attacker) = self.players.get_mut(&attacker_id) {
-                attacker.damage += event.damage_amount as usize;
-            }
-        }
 
         let victim = self.players.get(&victim_id).expect("failed to find victim");
 
@@ -708,21 +862,6 @@ impl GameDetailsAnalyser {
             Some(UserId::from(event.assister))
         };
         let victim_id = UserId::from(event.user_id);
-
-        // Increment stats
-        if let Some(killer) = self.players.get_mut(&killer_id) {
-            killer.kills += 1;
-        }
-        if
-            let Some(assister) = maybe_assister_id.and_then(|assister_id|
-                self.players.get_mut(&assister_id)
-            )
-        {
-            assister.assists += 1;
-        }
-        if let Some(victim) = self.players.get_mut(&victim_id) {
-            victim.deaths += 1;
-        }
 
         let victim = self.players.get(&victim_id);
 
@@ -904,52 +1043,6 @@ impl GameDetailsAnalyser {
             },
             tick
         );
-    }
-
-    fn handle_point_captured_event(&mut self, event: &TeamPlayPointCapturedEvent, tick: DemoTick) {
-        // No more than 8 players are recorded in the `cappers`
-        // field of the teamplay_point_captured event.
-        let mut cappers = Vec::with_capacity(8);
-
-        for capper_entity_id in event.cappers.as_bytes() {
-            let capper_entity_id = EntityId::from(*capper_entity_id as usize);
-            if let Some(capper_user_id) = self.player_entities.get(&capper_entity_id) {
-                cappers.push(*capper_user_id);
-            }
-        }
-
-        self.add_highlight(
-            Highlight::PointCaptured {
-                point_name: event.cp_name.to_string(),
-                capturing_team: event.team,
-                cappers,
-            },
-            tick
-        );
-
-        for capper_entity_id in event.cappers.as_bytes().iter() {
-            if
-                let Some(capper_user_id) = self.player_entities.get(
-                    &EntityId::from(*capper_entity_id as usize)
-                )
-            {
-                if let Some(capper) = self.players.get_mut(capper_user_id) {
-                    capper.captures += 1;
-                }
-            }
-        }
-    }
-
-    fn handle_player_healed_event(&mut self, event: &PlayerHealedEvent, _tick: DemoTick) {
-        if let Some(healer) = self.players.get_mut(&UserId::from(event.healer)) {
-            healer.healing += event.amount as usize;
-        }
-    }
-
-    fn handle_uber_used_event(&mut self, event: &PlayerChargeDeployedEvent, _tick: DemoTick) {
-        if let Some(healer) = self.players.get_mut(&UserId::from(event.user_id)) {
-            healer.invulns += 1;
-        }
     }
 }
 
