@@ -349,26 +349,6 @@ impl MessageHandler for GameDetailsAnalyser {
     }
 }
 
-/**
- * Helper function to make processing integer properties easier.
- *
- * parse_integer_prop(packet, "DT_TFPlayerScoringDataExclusive", "m_iPoints", |points| { println!("Scored {} points", points) });
- */
-fn parse_integer_prop<F>(packet: &PacketEntity, table: &str, name: &str, parser_state: &ParserState, handler: F)
-    where F: FnOnce(u32) {
-    use tf_demo_parser::demo::sendprop::SendPropValue;
-
-    match packet.get_prop_by_name(table, name, parser_state) {
-        Some(prop) => {
-            match prop.value {
-                SendPropValue::Integer(val) => handler(val as u32),
-                _ => {} // not an integer, ignore
-            }
-        },
-        None => {} // the packet doesn't have this property
-    }
-}
-
 impl GameDetailsAnalyser {
     fn add_highlight(&mut self, event: Highlight, tick: DemoTick) {
         self.highlights.push(HighlightEvent { tick, event })
@@ -544,7 +524,7 @@ impl GameDetailsAnalyser {
             );
             const HEADSHOTS_PROP: SendPropIdentifier = SendPropIdentifier::new(
                 "DT_TFPlayerScoringDataExclusive",
-                "m_iCaptures"
+                "m_iHeadshots"
             );
             const BACKSTABS_PROP: SendPropIdentifier = SendPropIdentifier::new(
                 "DT_TFPlayerScoringDataExclusive",
