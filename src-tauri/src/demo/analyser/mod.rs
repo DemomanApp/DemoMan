@@ -488,6 +488,9 @@ impl GameDetailsAnalyser {
             GameEvent::PlayerDisconnect(event) => {
                 self.handle_player_disconnect_event(event, tick);
             }
+            GameEvent::TeamPlayPointCaptured(event) => {
+                self.handle_point_captured_event(event, tick);
+            }
             GameEvent::CrossbowHeal(event) => {
                 self.handle_crossbow_heal_event(event, tick);
             }
@@ -1035,6 +1038,28 @@ impl GameDetailsAnalyser {
     fn handle_round_win_event(&mut self, event: &TeamPlayRoundWinEvent, tick: DemoTick) {
         self.current_round += 1; // yuck
         self.add_highlight(Highlight::RoundWin { winner: event.team }, tick)
+    }
+
+    fn handle_point_captured_event(&mut self, event: &TeamPlayPointCapturedEvent, tick: DemoTick) {
+        // No more than 8 players are recorded in the `cappers`
+        // field of the teamplay_point_captured event.
+        let mut cappers = Vec::with_capacity(8);
+
+        for capper_entity_id in event.cappers.as_bytes() {
+            let capper_entity_id = EntityId::from(*capper_entity_id as usize);
+            if let Some(capper_user_id) = self.player_entities.get(&capper_entity_id) {
+                cappers.push(*capper_user_id);
+            }
+        }
+
+        self.add_highlight(
+            Highlight::PointCaptured {
+                point_name: event.cp_name.to_string(),
+                capturing_team: event.team,
+                cappers,
+            },
+            tick
+        );
     }
 
     fn handle_player_connect_event(&mut self, event: &PlayerConnectClientEvent, tick: DemoTick) {
