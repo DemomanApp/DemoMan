@@ -1028,6 +1028,7 @@ impl GameDetailsAnalyser {
         _event: &TeamPlayRoundStalemateEvent,
         tick: DemoTick
     ) {
+        self.current_round += 1; // yuck
         self.add_highlight(Highlight::RoundStalemate, tick)
     }
 
