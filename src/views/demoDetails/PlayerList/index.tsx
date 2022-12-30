@@ -1,8 +1,9 @@
-import { createStyles, Paper, ScrollArea, Text } from "@mantine/core";
+import { createStyles, Paper, ScrollArea, Tabs, Text } from "@mantine/core";
 import { GameSummary, PlayerSummary, EMPTY_SCOREBOARD } from "../../../demo";
 import { TableHeader } from "./TableHeader";
 import { PlayerBox } from "./PlayerBox";
-import { ScoreboardTable } from "./ScoreboardTable";
+import ScoreboardTable from "./ScoreboardTable";
+import { MutableRefObject, useRef, useState } from "react";
 
 export type PlayerListProps = {
   gameSummary: GameSummary;
@@ -43,6 +44,15 @@ export default function PlayerList({ gameSummary }: PlayerListProps) {
   const bluPlayers: PlayerSummary[] = [];
   const others: PlayerSummary[] = [];
 
+  const mainPlayer: PlayerSummary | null = gameSummary.players.find(p => p.user_id === gameSummary.local_user_id) ?? null;
+
+  // Used so we can display the scoreboard for any arbitrary player via user interaction
+  const scoreboardRef: MutableRefObject<ScoreboardTable | null> = useRef(null);
+  const [currentPlayer, setCurrentPlayer] = useState(mainPlayer);
+
+  // currentTab will be either the round number (0..n), or "match" to display the scoreboard for the entire game
+  const [currentTab, setCurrentTab] = useState<string | number>("match");
+
   gameSummary.players.forEach((player) => {
     if (player.team === "red") {
       redPlayers.push(player);
@@ -53,6 +63,8 @@ export default function PlayerList({ gameSummary }: PlayerListProps) {
     }
   });
 
+  // TODO: Allow the tables to be sorted by the column headers (kills, deaths, etc)
+  // TODO: Maybe add a button to export the match data as JSON?
   redPlayers.sort((a, b) => b.scoreboard?.points - a.scoreboard?.points);
   bluPlayers.sort((a, b) => b.scoreboard?.points - a.scoreboard?.points);
 
@@ -91,19 +103,57 @@ export default function PlayerList({ gameSummary }: PlayerListProps) {
         <div>
           <div className={classes.playerListColumn}>
             {bluPlayers.map((player) => (
-              <PlayerBox key={player.user_id} player={player} mainPlayer={ player.user_id === gameSummary.local_user_id } />
+              <PlayerBox key={player.user_id} player={player} onClick={ () => {
+                setCurrentPlayer(player);
+                const scoreboard = currentTab === "match" ? player.scoreboard : player.round_scoreboards[currentTab as unknown as number];
+                scoreboardRef.current?.setScoreboard(scoreboard);
+              } } selected={ player.user_id === mainPlayer?.user_id } />
             ))}
           </div>
           <div className={classes.playerListColumn}>
             {redPlayers.map((player) => (
-              <PlayerBox key={player.user_id} player={player} mainPlayer={ player.user_id === gameSummary.local_user_id } />
+              <PlayerBox key={player.user_id} onClick={ () => {
+                setCurrentPlayer(player);
+                const scoreboard = currentTab === "match" ? player.scoreboard : player.round_scoreboards[currentTab as unknown as number];
+                scoreboardRef.current?.setScoreboard(scoreboard);
+              } } player={player} selected={ player.user_id === mainPlayer?.user_id } />
             ))}
           </div>
         </div>
       </ScrollArea.Autosize>
       <div>
-        {/* Player-specific scoreboard */}
-        <ScoreboardTable scoreboard={ gameSummary.players.find(s => s.user_id === gameSummary.local_user_id)?.scoreboard ?? EMPTY_SCOREBOARD }/>
+        <Tabs defaultValue={"match"}>
+          <Tabs.List>
+            <Tabs.Tab
+                value={"match"}
+                onClick={ () => {
+                  setCurrentTab("match");
+                  scoreboardRef.current?.setScoreboard(currentPlayer?.scoreboard ?? EMPTY_SCOREBOARD);
+                } }
+            >
+              Match
+            </Tabs.Tab>
+            {
+              Array.from({ length: gameSummary.num_rounds }, (x, i) => i).map((roundNum) => {
+                return (
+                    <Tabs.Tab
+                        value={`round${roundNum}`}
+                        key={roundNum}
+                        disabled={ (currentPlayer?.round_scoreboards[roundNum] ?? null) === null } // disable if the player wasn't in this round
+                        onClick={ () => {
+                          setCurrentTab(roundNum);
+                          scoreboardRef.current?.setScoreboard(currentPlayer?.round_scoreboards[roundNum] ?? EMPTY_SCOREBOARD);
+                        } }
+                    >
+                      Round {roundNum + 1}
+                    </Tabs.Tab>
+                );
+              })
+            }
+          </Tabs.List>
+        </Tabs>
+        {/* The actual scoreboard component.  This will be updated when players or tabs are clicked, rather than creating an entirely new component */}
+        <ScoreboardTable ref={scoreboardRef} scoreboard={ mainPlayer?.scoreboard ?? EMPTY_SCOREBOARD }/>
       </div>
     </Paper>
   );

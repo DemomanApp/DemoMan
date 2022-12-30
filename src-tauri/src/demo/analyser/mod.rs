@@ -59,6 +59,7 @@ pub use damage_flag::DamageFlag;
 pub use player_condition::PlayerCondition;
 pub use player_flag::PlayerFlag;
 pub use weapon_class::WeaponClass;
+use crate::demo::analyser::Comparison::{Equal, Greater, Lesser};
 
 #[derive(Debug, Default, Clone, Copy, Serialize, Deserialize, PartialEq, FromPrimitive)]
 pub enum PlayerLifeState {
@@ -133,6 +134,7 @@ pub struct GameSummary {
     pub red_team_score: u32,
     pub blue_team_score: u32,
     pub interval_per_tick: f32,
+    pub num_rounds: u32,
     pub players: Vec<PlayerSummary>,
 }
 
@@ -144,7 +146,11 @@ pub struct PlayerState {
 
     team: Team,
 
+    /// The scoreboard for the entire match
     scoreboard: Scoreboard,
+
+    /// Per-round scoreboards
+    round_scoreboards: HashMap<u32, Scoreboard>,
 
     // Temporary state data
     class: Class,
@@ -206,7 +212,11 @@ pub struct PlayerSummary {
     team: Team,
     classes: Vec<usize>,
 
+    /// The scoreboard for the entire match
     scoreboard: Scoreboard,
+
+    /// Per-round scoreboards
+    round_scoreboards: HashMap<u32, Scoreboard>,
 }
 
 impl From<PlayerState> for PlayerSummary {
@@ -217,6 +227,7 @@ impl From<PlayerState> for PlayerSummary {
             user_id,
             team,
             scoreboard,
+            round_scoreboards,
             time_on_class,
             ..
         } = state;
@@ -240,6 +251,7 @@ impl From<PlayerState> for PlayerSummary {
                 .map(|(i, _v)| i)
                 .collect(),
             scoreboard,
+            round_scoreboards,
         }
     }
 }
@@ -258,6 +270,9 @@ pub struct GameDetailsAnalyser {
     red_team_score: u32,
     blue_team_score: u32,
     local_entity_id: EntityId,
+
+    /// The current round being played.  Increments while parsing
+    current_round: u32,
 
     player_entities: HashMap<EntityId, UserId>,
 }
@@ -345,6 +360,71 @@ impl MessageHandler for GameDetailsAnalyser {
             blue_team_score: self.blue_team_score,
             interval_per_tick: self.interval_per_tick,
             players: self.players.into_values().map(PlayerSummary::from).collect(),
+            num_rounds: self.current_round,
+        }
+    }
+}
+
+enum Comparison {
+    Lesser,
+    Greater,
+    Equal,
+}
+
+impl Comparison {
+    fn compare<T: PartialOrd>(a: T, b: T) -> Comparison {
+        if a < b {
+            Lesser
+        } else if a > b {
+            Greater
+        } else {
+            Equal
+        }
+    }
+}
+
+// Macro to help with parsing scoreboard properties.  The logic is the same for each property,
+// just with a different attribute name.  This makes it easier to manage all 16+ score attributes
+macro_rules! process_score_prop {
+    ($prop: expr, $name: ident, $player: expr, $current_round: expr) => {
+        {
+            let $name = i64::try_from(&$prop.value).unwrap_or_default() as u32;
+
+            // Compare the value on the packet with the value on the match scoreboard
+            // (which is the maximum received value)
+            match Comparison::compare($name, $player.scoreboard.$name) {
+                Lesser => {
+                    // Less than the match score
+                    // Since match scores can never decrease, this property is guaranteed to be for the current round
+                    $player.round_scoreboards.entry($current_round).or_default().$name = $name;
+                },
+                Greater => {
+                    // More than the current value for the entire match, which guarantees it's
+                    // for the player's global scoreboard
+                    $player.scoreboard.$name = $name;
+                    if $current_round == 0 ||
+                        !$player.round_scoreboards.iter().any(|(round, scoreboard)| *round < $current_round && scoreboard.$name > 0) {
+                        // The player had no values for this property in any previous round,
+                        // which means this value is ALSO the value for the current round
+                        $player.round_scoreboards.entry($current_round).or_default().$name = $name;
+                    } else {
+                        // The player had a nonzero score for this property in at least one previous
+                        // round, which means that the score for this round MUST be less than the match score
+                    }
+                },
+                Equal => {
+                    // Same value as the match scoreboard.  Don't bother updating it.
+                    if $current_round == 0 ||
+                        !$player.round_scoreboards.iter().any(|(round, scoreboard)| *round < $current_round && scoreboard.$name > 0) {
+                        // Same value as the match score, but the player had no values for this
+                        // property in any previous round, which means this value is the value for the current round
+                        $player.round_scoreboards.entry($current_round).or_default().$name = $name;
+                    } else {
+                        // The player had a nonzero score for this property in at least one previous
+                        // round, which means that the score for this round MUST be less than the match score
+                    }
+                }
+            }
         }
     }
 }
@@ -465,6 +545,8 @@ impl GameDetailsAnalyser {
         parser_state: &ParserState,
         tick: DemoTick
     ) {
+        let current_round = self.current_round;
+
         if let Some(player) = self.get_player_of_entity_mut(&entity.entity_index) {
             const LIFE_STATE_PROP: SendPropIdentifier = SendPropIdentifier::new(
                 "DT_BasePlayer",
@@ -493,7 +575,19 @@ impl GameDetailsAnalyser {
                 "_condition_bits"
             );
 
-            // Player score
+            // Properties for tracking per-player scoreboard information.
+            // NOTE: These tables are actually called m_ScoreData and m_RoundScoreData, encoded
+            // as DT_TFPlayerScoringDataExclusive structures.  The parser uses the data struct name
+            // instead of the table name in the props it gives us (it may be encoded that way in
+            // the raw packet, which would be unfortunate).  This makes it tricky to determine which
+            // props correspond to m_ScoreData table and which correspond to the m_RoundScoreData
+            // table.  The current implementation compares the values with the currently tracked
+            // scoreboard information, and if it's a larger value it's probably the match-specific
+            // data.  If it's less than the currently known match data, it'll be for the round
+            // because scoreboard data can never decrease
+            //
+            // NOTE: some game modes DO subtract deaths from the points total,
+            // but I don't care enough about that to bother checking for it
             const CAPTURES_PROP: SendPropIdentifier = SendPropIdentifier::new(
                 "DT_TFPlayerScoringDataExclusive",
                 "m_iCaptures"
@@ -590,116 +684,52 @@ impl GameDetailsAnalyser {
                             .unwrap_or_default() as u32;
                     }
                     CAPTURES_PROP => {
-                        let captures = i64::try_from(&prop.value).unwrap_or_default() as u32;
-
-                        if captures > player.scoreboard.captures {
-                            player.scoreboard.captures = captures;
-                        }
+                        process_score_prop!(prop, captures, player, current_round);
                     },
                     DEFENSES_PROP => {
-                        let defenses = i64::try_from(&prop.value).unwrap_or_default() as u32;
-
-                        if defenses > player.scoreboard.defenses {
-                            player.scoreboard.defenses = defenses;
-                        }
+                        process_score_prop!(prop, defenses, player, current_round);
                     },
                     KILLS_PROP => {
-                        let kills = i64::try_from(&prop.value).unwrap_or_default() as u32;
-
-                        if kills > player.scoreboard.kills {
-                            player.scoreboard.kills = kills;
-                        }
+                        process_score_prop!(prop, kills, player, current_round);
                     },
                     DEATHS_PROP => {
-                        let deaths = i64::try_from(&prop.value).unwrap_or_default() as u32;
-
-                        if deaths > player.scoreboard.deaths {
-                            player.scoreboard.deaths = deaths;
-                        }
+                        process_score_prop!(prop, deaths, player, current_round);
                     },
                     DOMINATIONS_PROP => {
-                        let dominations = i64::try_from(&prop.value).unwrap_or_default() as u32;
-
-                        if dominations > player.scoreboard.dominations {
-                            player.scoreboard.dominations = dominations;
-                        }
+                        process_score_prop!(prop, dominations, player, current_round);
                     },
                     REVENGE_PROP => {
-                        let revenges = i64::try_from(&prop.value).unwrap_or_default() as u32;
-
-                        if revenges > player.scoreboard.revenges {
-                            player.scoreboard.revenges = revenges;
-                        }
+                        process_score_prop!(prop, revenges, player, current_round);
                     },
                     BUILDINGS_DESTROYED_PROP => {
-                        let buildings_destroyed = i64::try_from(&prop.value).unwrap_or_default() as u32;
-
-                        if buildings_destroyed > player.scoreboard.buildings_destroyed {
-                            player.scoreboard.buildings_destroyed = buildings_destroyed;
-                        }
+                        process_score_prop!(prop, buildings_destroyed, player, current_round);
                     },
                     HEADSHOTS_PROP => {
-                        let headshots = i64::try_from(&prop.value).unwrap_or_default() as u32;
-
-                        if headshots > player.scoreboard.headshots {
-                            player.scoreboard.headshots = headshots;
-                        }
+                        process_score_prop!(prop, headshots, player, current_round);
                     },
                     BACKSTABS_PROP => {
-                        let backstabs = i64::try_from(&prop.value).unwrap_or_default() as u32;
-
-                        if backstabs > player.scoreboard.backstabs {
-                            player.scoreboard.backstabs = backstabs;
-                        }
+                        process_score_prop!(prop, backstabs, player, current_round);
                     },
                     HEAL_POINTS_PROP => {
-                        let healing = i64::try_from(&prop.value).unwrap_or_default() as u32;
-
-                        if healing > player.scoreboard.healing {
-                            player.scoreboard.healing = healing;
-                        }
+                        process_score_prop!(prop, healing, player, current_round);
                     },
                     INVULNS_PROP => {
-                        let ubercharges = i64::try_from(&prop.value).unwrap_or_default() as u32;
-
-                        if ubercharges > player.scoreboard.ubercharges {
-                            player.scoreboard.ubercharges = ubercharges;
-                        }
+                        process_score_prop!(prop, ubercharges, player, current_round);
                     },
                     TELEPORTS_PROP => {
-                        let teleports = i64::try_from(&prop.value).unwrap_or_default() as u32;
-
-                        if teleports > player.scoreboard.teleports {
-                            player.scoreboard.teleports = teleports;
-                        }
+                        process_score_prop!(prop, teleports, player, current_round);
                     },
                     DAMAGE_DONE_PROP => {
-                        let damage_dealt = i64::try_from(&prop.value).unwrap_or_default() as u32;
-
-                        if damage_dealt > player.scoreboard.damage_dealt {
-                            player.scoreboard.damage_dealt = damage_dealt;
-                        }
+                        process_score_prop!(prop, damage_dealt, player, current_round);
                     },
                     KILL_ASSISTS_PROP => {
-                        let assists = i64::try_from(&prop.value).unwrap_or_default() as u32;
-
-                        if assists > player.scoreboard.assists {
-                            player.scoreboard.assists = assists;
-                        }
+                        process_score_prop!(prop, assists, player, current_round);
                     },
                     BONUS_POINTS_PROP => {
-                        let bonus_points = i64::try_from(&prop.value).unwrap_or_default() as u32;
-
-                        if bonus_points > player.scoreboard.bonus_points {
-                            player.scoreboard.bonus_points = bonus_points;
-                        }
+                        process_score_prop!(prop, bonus_points, player, current_round);
                     },
                     POINTS_PROP => {
-                        let points = i64::try_from(&prop.value).unwrap_or_default() as u32;
-
-                        if points > player.scoreboard.points {
-                            player.scoreboard.points = points;
-                        }
+                        process_score_prop!(prop, points, player, current_round);
                     },
                     _ => {}
                 }
@@ -1003,6 +1033,7 @@ impl GameDetailsAnalyser {
     }
 
     fn handle_round_win_event(&mut self, event: &TeamPlayRoundWinEvent, tick: DemoTick) {
+        self.current_round += 1; // yuck
         self.add_highlight(Highlight::RoundWin { winner: event.team }, tick)
     }
 

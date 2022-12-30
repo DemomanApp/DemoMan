@@ -3,9 +3,15 @@ import ClassIcon from "../../../components/ClassIcon";
 
 import { GameSummary, PlayerSummary } from "../../../demo";
 
-export function PlayerBox({ player, mainPlayer }: { player: PlayerSummary, mainPlayer: boolean }) {
+interface PlayerBoxProps {
+    player: PlayerSummary;
+    selected: boolean;
+    onClick: () => void;
+}
+
+export function PlayerBox({ player, selected, onClick }: PlayerBoxProps) {
   return (
-    <div style={{ height: "40px", display: "flex", alignItems: "center", paddingRight: 8, background: mainPlayer ? "#444" : "none" }}>
+    <div onClick={ onClick } style={{ height: "40px", display: "flex", alignItems: "center", paddingRight: 8, background: selected ? "#444" : "none" }}>
       <div style={{ width: 32 }}>
         <ClassIcon cls={player.classes[0]} muted={false} size={24} />
       </div>

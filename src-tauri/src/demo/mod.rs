@@ -14,7 +14,6 @@ use serde::{ Deserialize, Serialize };
 use self::errors::DemoReadError;
 
 pub mod analyser;
-pub mod scoreboard_analyzer;
 pub mod errors;
 
 pub const HEADER_SIZE: usize = 8 + 4 + 4 + 260 + 260 + 260 + 260 + 4 + 4 + 4 + 4;

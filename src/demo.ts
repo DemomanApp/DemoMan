@@ -107,6 +107,10 @@ export type HighlightEvent = {
   event: Highlight;
 };
 
+type ScoreboardMap = {
+  [key: number]: Scoreboard;
+}
+
 export type PlayerSummary = {
   name: string;
   steam_id: SteamID;
@@ -116,6 +120,8 @@ export type PlayerSummary = {
   classes: number[];
 
   scoreboard: Scoreboard;
+
+  round_scoreboards: ScoreboardMap;
 };
 
 export type GameSummary = {
@@ -125,6 +131,7 @@ export type GameSummary = {
   blue_team_score: number;
   interval_per_tick: number;
   players: PlayerSummary[];
+  num_rounds: number;
 };
 
 export type Scoreboard = {

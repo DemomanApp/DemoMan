@@ -1,50 +1,37 @@
-import { useState } from "react";
-import { useParams } from "react-router-dom";
+import React from "react";
+import { Scoreboard, EMPTY_SCOREBOARD } from "../../../demo";
 
+interface ScoreboardTableProps {
+	scoreboard: Scoreboard;
+}
 
-import {
-  ActionIcon,
-  Alert,
-  Button,
-  Center,
-  Container,
-  createStyles,
-  Group,
-  List,
-  Loader,
-  Paper,
-  Popover,
-  Stack,
-  Tabs,
-  Text,
-  TextInput,
-  Tooltip,
-} from "@mantine/core";
-import {
-  IconAlertCircle,
-  IconCalendarEvent,
-  IconCheck,
-  IconClock,
-  IconFileAnalytics,
-  IconFileInfo,
-  IconPencil,
-  IconPlayerPlay,
-  IconServer,
-  IconTimeline,
-  IconUser,
-  IconUsers,
-} from "@tabler/icons";
+interface ScoreboardTableState {
+	scoreboard: Scoreboard
+}
 
-import { Scoreboard } from "../../../demo";
+export default class ScoreboardTable extends React.Component<ScoreboardTableProps, ScoreboardTableState> {
+	constructor(props: ScoreboardTableProps) {
+		super(props);
 
-export function ScoreboardTable({ scoreboard }: { scoreboard: Scoreboard }) {
-	return (
-		<div>
-			<table className="scoreboard" style={{ width: "100%" }}>
-				<thead>
+		this.state = {
+			scoreboard: props.scoreboard ?? EMPTY_SCOREBOARD
+		};
+	}
+
+	setScoreboard(newScoreboard: Scoreboard) {
+		this.setState({ scoreboard: newScoreboard ?? EMPTY_SCOREBOARD });
+	}
+
+	render() {
+		const scoreboard: Scoreboard = this.state.scoreboard;
+
+		return (
+			<div>
+				<table className="scoreboard" style={{ width: "100%" }}>
+					<thead>
 					{/* No headers */}
-				</thead>
-				<tbody>
+					</thead>
+					<tbody>
 					<tr>
 						<td>Kills:</td>
 						<td>{ scoreboard.kills }</td>
@@ -88,8 +75,9 @@ export function ScoreboardTable({ scoreboard }: { scoreboard: Scoreboard }) {
 						<td>Damage:</td>
 						<td>{ scoreboard.damage_dealt }</td>
 					</tr>
-				</tbody>
-			</table>
-		</div>
-	);
+					</tbody>
+				</table>
+			</div>
+		);
+	}
 }
