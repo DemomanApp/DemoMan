@@ -1,9 +1,11 @@
 import { createStyles, Paper, ScrollArea, Tabs, Text } from "@mantine/core";
-import { GameSummary, PlayerSummary, EMPTY_SCOREBOARD } from "../../../demo";
+import { GameSummary, PlayerSummary, EMPTY_SCOREBOARD, Scoreboard } from "../../../demo";
 import { TableHeader } from "./TableHeader";
 import { PlayerBox } from "./PlayerBox";
 import ScoreboardTable from "./ScoreboardTable";
 import { MutableRefObject, useRef, useState } from "react";
+import { Simulate } from "react-dom/test-utils";
+import play = Simulate.play;
 
 export type PlayerListProps = {
   gameSummary: GameSummary;
@@ -36,6 +38,16 @@ const useStyles = createStyles((theme) => ({
     width: "50%",
     display: "inline-block",
     verticalAlign: "top",
+  },
+  scoreboardDivider: {
+    border: "none",
+    borderTop: "1px solid #444",
+    margin: "16px",
+  },
+  scoreboardPlayerNameHeader: {
+    paddingLeft: "16px",
+    fontWeight: 800,
+    fontSize: "16pt",
   },
 }));
 
@@ -121,6 +133,11 @@ export default function PlayerList({ gameSummary }: PlayerListProps) {
           </div>
         </div>
       </ScrollArea.Autosize>
+      {/* Divider above the scoreboard*/}
+      <hr className={classes.scoreboardDivider}/>
+      <div className={classes.scoreboardPlayerNameHeader}>
+        { currentPlayer?.name ?? "" }
+      </div>
       <div>
         <Tabs defaultValue={"match"}>
           <Tabs.List>
