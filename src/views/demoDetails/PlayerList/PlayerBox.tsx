@@ -1,7 +1,7 @@
-import { Text } from "@mantine/core";
+import { createStyles, Text } from "@mantine/core";
 import ClassIcon from "../../../components/ClassIcon";
 
-import { GameSummary, PlayerSummary } from "../../../demo";
+import { PlayerSummary } from "../../../demo";
 
 interface PlayerBoxProps {
     player: PlayerSummary;
@@ -9,30 +9,68 @@ interface PlayerBoxProps {
     onClick: () => void;
 }
 
+const useStyles = createStyles((_theme) => ({
+  box: {
+    height: "40px",
+    display: "flex",
+    alignItems: "center",
+    paddingRight: 8,
+    "&:hover": {
+      backgroundColor: "rgba(255, 255, 255, 0.05)",
+      cursor: "pointer",
+    }
+  },
+  selectedBox: {
+    height: "40px",
+    display: "flex",
+    alignItems: "center",
+    paddingRight: 8,
+    background: "rgba(140, 210, 255, 0.2)",
+    "&:hover": {
+      backgroundColor: "rgba(140, 210, 255, 0.1)",
+      cursor: "pointer",
+    }
+  },
+  classIcon: {
+    width: 32
+  },
+  playerName: {
+    addingLeft: "8px",
+    textOverflow: "ellipsis",
+    overflow: "hidden",
+    whiteSpace: "nowrap",
+    fontFamily: "Verdana",
+  },
+  pointsScoreboardValue: {
+    width: 40,
+    textAlign: "right",
+    fontFamily: "Verdana",
+  },
+  simpleScoreboardValue: {
+    width: 30,
+    textAlign: "right",
+    fontFamily: "Verdana",
+  },
+}));
+
 export function PlayerBox({ player, selected, onClick }: PlayerBoxProps) {
+  const { classes } = useStyles();
+
   return (
-    <div onClick={ onClick } style={{ height: "40px", display: "flex", alignItems: "center", paddingRight: 8, background: selected ? "#444" : "none" }}>
-      <div style={{ width: 32 }}>
+    <div onClick={ onClick } className={ selected ? classes.selectedBox : classes.box }>
+      <div className={ classes.classIcon }>
         <ClassIcon cls={player.classes[0]} muted={false} size={24} />
       </div>
       <div style={{ flexGrow: 1 }}>
-        <Text
-          style={{
-            paddingLeft: "8px",
-            textOverflow: "ellipsis",
-            overflow: "hidden",
-            whiteSpace: "nowrap",
-            fontFamily: "Verdana",
-          }}
-        >
+        <Text className={classes.playerName}>
           {player.name}
         </Text>
       </div>
       {/* TODO: Show player's dominations */}
-      <div style={{ width: 40, textAlign: "right", fontFamily: "Verdana" }}>{player.scoreboard.points}</div>
-      <div style={{ width: 32, textAlign: "right", fontFamily: "Verdana"  }}>{player.scoreboard.kills}</div>
-      <div style={{ width: 32, textAlign: "right", fontFamily: "Verdana"  }}>{player.scoreboard.assists}</div>
-      <div style={{ width: 32, textAlign: "right", fontFamily: "Verdana"  }}>{player.scoreboard.deaths}</div>
+      <div className={ classes.pointsScoreboardValue }>{player.scoreboard.points}</div>
+      <div className={ classes.simpleScoreboardValue }>{player.scoreboard.kills}</div>
+      <div className={ classes.simpleScoreboardValue }>{player.scoreboard.assists}</div>
+      <div className={ classes.simpleScoreboardValue }>{player.scoreboard.deaths}</div>
     </div>
   );
 }

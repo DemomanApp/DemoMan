@@ -4,8 +4,6 @@ import { TableHeader } from "./TableHeader";
 import { PlayerBox } from "./PlayerBox";
 import ScoreboardTable from "./ScoreboardTable";
 import { MutableRefObject, useRef, useState } from "react";
-import { Simulate } from "react-dom/test-utils";
-import play = Simulate.play;
 
 export type PlayerListProps = {
   gameSummary: GameSummary;
@@ -115,20 +113,30 @@ export default function PlayerList({ gameSummary }: PlayerListProps) {
         <div>
           <div className={classes.playerListColumn}>
             {bluPlayers.map((player) => (
-              <PlayerBox key={player.user_id} player={player} onClick={ () => {
-                setCurrentPlayer(player);
-                const scoreboard = currentTab === "match" ? player.scoreboard : player.round_scoreboards[currentTab as unknown as number];
-                scoreboardRef.current?.setScoreboard(scoreboard);
-              } } selected={ player.user_id === mainPlayer?.user_id } />
+              <PlayerBox
+                  key={player.user_id}
+                  player={player}
+                  onClick={ () => {
+                    setCurrentPlayer(player);
+                    const scoreboard = currentTab === "match" ? player.scoreboard : player.round_scoreboards[currentTab as unknown as number];
+                    scoreboardRef.current?.setScoreboard(scoreboard);
+                  } }
+                  selected={ player.user_id === currentPlayer?.user_id }
+              />
             ))}
           </div>
           <div className={classes.playerListColumn}>
             {redPlayers.map((player) => (
-              <PlayerBox key={player.user_id} onClick={ () => {
-                setCurrentPlayer(player);
-                const scoreboard = currentTab === "match" ? player.scoreboard : player.round_scoreboards[currentTab as unknown as number];
-                scoreboardRef.current?.setScoreboard(scoreboard);
-              } } player={player} selected={ player.user_id === mainPlayer?.user_id } />
+              <PlayerBox
+                  key={player.user_id}
+                  onClick={ () => {
+                    setCurrentPlayer(player);
+                    const scoreboard = currentTab === "match" ? player.scoreboard : player.round_scoreboards[currentTab as unknown as number];
+                    scoreboardRef.current?.setScoreboard(scoreboard);
+                  } }
+                  player={player}
+                  selected={ player.user_id === currentPlayer?.user_id }
+              />
             ))}
           </div>
         </div>
