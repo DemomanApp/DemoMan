@@ -26,6 +26,7 @@ use tf_demo_parser::{
             PlayerHealedEvent,
             PlayerHurtEvent,
             PlayerSpawnEvent,
+            PlayerTeamEvent,
             TeamPlayPointCapturedEvent,
             TeamPlayRoundStalemateEvent,
             TeamPlayRoundStartEvent,
@@ -459,6 +460,10 @@ impl GameDetailsAnalyser {
             GameEvent::PlayerHurt(event) => {
                 self.handle_player_hurt_event(event, tick);
             }
+            GameEvent::PlayerTeam(event) => {
+                // Player changed teams (game assigned on join, manually changed, or autobalanced)
+                self.handle_player_team_event(event, tick);
+            }
             GameEvent::PlayerSpawn(event) => {
                 self.handle_player_spawn_event(event, tick);
             }
@@ -516,9 +521,15 @@ impl GameDetailsAnalyser {
                     if let Some(player) = self.get_player_of_entity_mut(&EntityId::from(entity_id)) {
                         match table_name.as_str() {
                             "m_iTeam" => {
-                                player.team = Team::new(
-                                    i64::try_from(&prop.value).unwrap_or_default()
-                                );
+                                let new_team = Team::new(i64::try_from(&prop.value).unwrap_or_default());
+
+                                // "other" team cannot be joined
+                                // it's the default team when a player joins, but that's already
+                                // the default value when a player state is created so there's no
+                                // point in assigning it
+                                if new_team != Team::Other {
+                                    player.team = new_team;
+                                }
                             }
                             "m_iPlayerClass" => {
                                 player.class = Class::new(
@@ -707,6 +718,16 @@ impl GameDetailsAnalyser {
                 &user_info.player_info.steam_id
             ).unwrap_or_default();
             player.user_id = user_info.player_info.user_id;
+        }
+    }
+
+    fn handle_player_team_event(&mut self, event: &PlayerTeamEvent, tick: DemoTick) {
+        let player_id = event.user_id;
+
+        if let Ok(team) = Team::try_from(event.team) {
+            if let Some(player) = self.players.get_mut(&player_id.into()) {
+                player.team = team;
+            }
         }
     }
 

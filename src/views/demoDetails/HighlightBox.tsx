@@ -118,61 +118,6 @@ function PlayerNames({ players, team }: { players: (PlayerSummary | undefined)[]
   );
 }
 
-/**
- * Infers which teams all three players are on, in case only one or two are missing team information.
- * If all three players are missing team data, then the "other" team is returned for all of them.
- * Returns an array of the team for the killer and assister and the team for the victim, in that order.
- *
- * NOTE: This returns inaccurate results when players assist or kill players on their own team.
- *
- * @param killer the killing player
- * @param assister the assisting player (optional)
- * @param victim the dead player
- */
-const inferTeams = function(killer: PlayerSummary | HighlightPlayerSnapshot, assister: PlayerSummary | HighlightPlayerSnapshot | null | undefined, victim: PlayerSummary | HighlightPlayerSnapshot): Team[] {
-  let aggroTeam: Team = "other";
-  let victimTeam: Team = "other";
-
-  if (killer.team !== "other" && killer.team !== "spectator") {
-    aggroTeam = killer.team as Team;
-    switch (aggroTeam) {
-      case "red":
-        victimTeam = "blue";
-        break;
-      case "blue":
-        victimTeam = "red";
-        break;
-    }
-  } else if (assister !== null && assister !== undefined && assister?.team !== "other" && assister?.team !== "spectator") {
-    aggroTeam = assister.team as Team;
-    switch (aggroTeam) {
-      case "red":
-        victimTeam = "blue";
-        break;
-      case "blue":
-        victimTeam = "red";
-        break;
-    }
-  } else if (victim.team !== "other" && victim.team !== "spectator") {
-    victimTeam = victim.team as Team;
-    switch (victimTeam) {
-      case "red":
-        aggroTeam = "blue";
-        break;
-      case "blue":
-        aggroTeam = "red";
-        break;
-    }
-  }
-
-  if (killer.user_id === victim.user_id || assister?.user_id === victim.user_id) {
-    // suicide or self-assisted kill, unflip the victim team
-    victimTeam = aggroTeam;
-  }
-
-  return [aggroTeam, victimTeam];
-};
-
 function KillHighlightBox(
   highlight: KillHighlight,
   playerMap: Map<UserId, PlayerSummary>
@@ -181,55 +126,51 @@ function KillHighlightBox(
 
   const { killer, assister, victim } = highlight;
 
-  // Infer teams in case somebody doesn't have a team assigned.
-  // This prevents displaying uncolored names in most cases
-  const [aggroTeam, victimTeam] = inferTeams(killer, assister, victim);
-
   // Special case for kill messages with text instead of a kill icon
   if (highlight.kill_icon === "#fall") {
     return (
       <div className={classes.root}>
-        <PlayerName player={victim} team={victimTeam}/>
+        <PlayerName player={victim} />
         &nbsp;fell to a clumsy, painful death
       </div>
     );
   } else if (highlight.kill_icon === "#suicide") {
     return (
       <div className={classes.root}>
-        <PlayerName player={victim} team={victimTeam} />
+        <PlayerName player={victim} />
         &nbsp;bid farewell, cruel world!
       </div>
     );
   } else if (highlight.kill_icon === "#assisted_suicide") {
     return (
       <div className={classes.root}>
-        <PlayerName player={killer} team={aggroTeam} />
-        { assister !== null && assister !== undefined && assister?.user_id !== 0 && (
+        <PlayerName player={killer} />
+        { assister !== null && assister !== undefined && (
           <>
             &nbsp;+&nbsp;
-            <PlayerName player={assister} team={aggroTeam}/>
+            <PlayerName player={assister} />
           </>
         )}
         &nbsp;
         <b>finished off</b>
         &nbsp;
-        <PlayerName player={victim} team={victimTeam}/>
+        <PlayerName player={victim} />
       </div>
     );
   } else {
     return (
       <div className={classes.root}>
-        { killer !== null && killer !== undefined && killer.user_id !== 0 && killer.user_id !== victim.user_id && <PlayerName player={killer} team={aggroTeam} />}
+        { killer !== null && killer !== undefined && killer.user_id !== victim.user_id && <PlayerName player={killer} />}
         { assister !== null && assister !== undefined && assister.user_id !== 0 && (
           <>
             &nbsp;+&nbsp;
-            <PlayerName player={assister} team={aggroTeam}/>
+            <PlayerName player={assister} />
           </>
         )}
         &nbsp;
         <KillIcon killIcon={highlight.kill_icon} />
         &nbsp;
-        <PlayerName player={victim} team={victimTeam} />
+        <PlayerName player={victim} />
       </div>
     );
   }
