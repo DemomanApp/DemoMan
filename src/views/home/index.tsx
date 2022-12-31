@@ -20,6 +20,7 @@ import BottomBar from "./BottomBar";
 import { NavbarPortal, NavbarButton } from "../../AppShell";
 import { getDemosInDirectory } from "../../api";
 import { Async, Fill } from "../../components";
+import useStore from "../../hooks/useStore";
 
 const PADDING_SIZE = 16;
 
@@ -192,10 +193,12 @@ function MainView({ demos }: { demos: Demo[] }) {
 }
 
 export default function HomeViewAsyncWrapper() {
+  const [demoPath, _setDemoPath] = useStore("demoPath");
+
   return (
     <Async
       promiseFn={getDemosInDirectory}
-      args={["/home/rasmus/steamapps-common/Team Fortress 2/tf/demos"]}
+      args={[demoPath ?? "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Team Fortress 2\\tf\\demos"]}
       loading={
         <Fill>
           <Loader size="lg" variant="dots" />
