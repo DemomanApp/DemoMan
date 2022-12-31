@@ -13,6 +13,7 @@ import {
   UserId,
   PlayerSummary,
   TEAM_NAMES,
+  HighlightPlayerSnapshot, Team,
 } from "../../demo";
 import { KillIcon } from "../../components";
 
@@ -39,38 +40,138 @@ const useStyles = createStyles(
   })
 );
 
-function PlayerName({ player }: { player: PlayerSummary | undefined }) {
+type PlayerNameProps = {
+  player: PlayerSummary | HighlightPlayerSnapshot | undefined;
+  /**
+   * The team the player is on.  Used to override the team color on the player object.
+   * This can be helpful in the uncommon cases where the player's team is set to "other".
+   */
+  team?: Team | number;
+}
+
+function PlayerName({ player, team = undefined }: PlayerNameProps) {
   const theme = useMantineTheme();
   let color = "unset";
-  let name = "<unknown>";
-  if (player !== undefined) {
-    if (player.team === "red") {
-      color = theme.colors.red[6];
-    } else if (player.team === "blue") {
-      color = theme.colors.blue[6];
+  const name = player?.name ?? "<unknown>";
+
+  if (team !== undefined) {
+    switch (team) {
+      case "red":
+      case 2: // red team number
+        color = theme.colors.red[6];
+        break;
+      case "blue":
+      case 3: // blue team number
+        color = theme.colors.blue[6];
+        break;
+      default: // no team specified
+        break;
     }
-    name = player.name;
+  }
+
+  if (color === "unset") {
+    if (player !== undefined) {
+      if (player.team === "red") {
+        color = theme.colors.red[6];
+      } else if (player.team === "blue") {
+        color = theme.colors.blue[6];
+      } else {
+        // No team was specified and the player isn't associated with a team (did we miss an m_iTeam update?)
+      }
+    }
   }
   return <span style={{ color }}>{name}</span>;
 }
 
-function PlayerNames({ players }: { players: (PlayerSummary | undefined)[] }) {
+/**
+ * Returns an array equivalent to the given one, but with filler objects between every original value.
+ *
+ * @param array
+ * @param filler
+ */
+const injectBetween = function<T>(array: T[], filler: () => T): T[] {
+  const output: T[] = [];
+  array.forEach((value, i) => {
+    output.push(value);
+    if (i < array.length - 1) {
+      output.push(filler());
+    }
+  });
+  return output;
+};
+
+function PlayerNames({ players, team }: { players: (PlayerSummary | undefined)[], team: number }) {
   if (players.length === 0) {
     return <></>;
   }
 
   return (
     <>
-      {<PlayerName player={players[0]} />}
-      {players.slice(1).map((player) => (
-        <>
-          &nbsp;+&nbsp;
-          <PlayerName player={player} />
-        </>
-      ))}
+      {
+        injectBetween(players.map((player) => {
+          return (
+            <PlayerName key={ player?.user_id } player={ player } team={ team }/>
+          );
+        }), () => { return (<>&nbsp;+&nbsp;</>); })
+      }
     </>
   );
 }
+
+/**
+ * Infers which teams all three players are on, in case only one or two are missing team information.
+ * If all three players are missing team data, then the "other" team is returned for all of them.
+ * Returns an array of the team for the killer and assister and the team for the victim, in that order.
+ *
+ * NOTE: This returns inaccurate results when players assist or kill players on their own team.
+ *
+ * @param killer the killing player
+ * @param assister the assisting player (optional)
+ * @param victim the dead player
+ */
+const inferTeams = function(killer: PlayerSummary | HighlightPlayerSnapshot, assister: PlayerSummary | HighlightPlayerSnapshot | null | undefined, victim: PlayerSummary | HighlightPlayerSnapshot): Team[] {
+  let aggroTeam: Team = "other";
+  let victimTeam: Team = "other";
+
+  if (killer.team !== "other" && killer.team !== "spectator") {
+    aggroTeam = killer.team as Team;
+    switch (aggroTeam) {
+      case "red":
+        victimTeam = "blue";
+        break;
+      case "blue":
+        victimTeam = "red";
+        break;
+    }
+  } else if (assister !== null && assister !== undefined && assister?.team !== "other" && assister?.team !== "spectator") {
+    aggroTeam = assister.team as Team;
+    switch (aggroTeam) {
+      case "red":
+        victimTeam = "blue";
+        break;
+      case "blue":
+        victimTeam = "red";
+        break;
+    }
+  } else if (victim.team !== "other" && victim.team !== "spectator") {
+    victimTeam = victim.team as Team;
+    switch (victimTeam) {
+      case "red":
+        aggroTeam = "blue";
+        break;
+      case "blue":
+        aggroTeam = "red";
+        break;
+    }
+  }
+
+  if (killer.user_id === victim.user_id || assister?.user_id === victim.user_id) {
+    // suicide or self-assisted kill, unflip the victim team
+    victimTeam = aggroTeam;
+  }
+
+  return [aggroTeam, victimTeam];
+};
 
 function KillHighlightBox(
   highlight: KillHighlight,
@@ -78,60 +179,57 @@ function KillHighlightBox(
 ) {
   const { classes } = useStyles({ justifyContent: "right" });
 
-  const killer = playerMap.get(highlight.killer_id);
-  const assister =
-    highlight.assister_id === null
-      ? undefined
-      : playerMap.get(highlight.assister_id);
+  const { killer, assister, victim } = highlight;
 
-  // Victim should always be known, but just in case...
-  const victim = playerMap.get(highlight.victim_id);
+  // Infer teams in case somebody doesn't have a team assigned.
+  // This prevents displaying uncolored names in most cases
+  const [aggroTeam, victimTeam] = inferTeams(killer, assister, victim);
 
   // Special case for kill messages with text instead of a kill icon
   if (highlight.kill_icon === "#fall") {
     return (
       <div className={classes.root}>
-        <PlayerName player={victim} />
+        <PlayerName player={victim} team={victimTeam}/>
         &nbsp;fell to a clumsy, painful death
       </div>
     );
   } else if (highlight.kill_icon === "#suicide") {
     return (
       <div className={classes.root}>
-        <PlayerName player={victim} />
+        <PlayerName player={victim} team={victimTeam} />
         &nbsp;bid farewell, cruel world!
       </div>
     );
   } else if (highlight.kill_icon === "#assisted_suicide") {
     return (
       <div className={classes.root}>
-        <PlayerName player={killer} />
-        {assister !== undefined && (
+        <PlayerName player={killer} team={aggroTeam} />
+        { assister !== null && assister !== undefined && assister?.user_id !== 0 && (
           <>
             &nbsp;+&nbsp;
-            <PlayerName player={assister} />
+            <PlayerName player={assister} team={aggroTeam}/>
           </>
         )}
         &nbsp;
         <b>finished off</b>
         &nbsp;
-        <PlayerName player={victim} />
+        <PlayerName player={victim} team={victimTeam}/>
       </div>
     );
   } else {
     return (
       <div className={classes.root}>
-        {killer !== undefined && <PlayerName player={killer} />}
-        {assister !== undefined && (
+        { killer !== null && killer !== undefined && killer.user_id !== 0 && killer.user_id !== victim.user_id && <PlayerName player={killer} team={aggroTeam} />}
+        { assister !== null && assister !== undefined && assister.user_id !== 0 && (
           <>
             &nbsp;+&nbsp;
-            <PlayerName player={assister} />
+            <PlayerName player={assister} team={aggroTeam}/>
           </>
         )}
         &nbsp;
         <KillIcon killIcon={highlight.kill_icon} />
         &nbsp;
-        <PlayerName player={victim} />
+        <PlayerName player={victim} team={victimTeam} />
       </div>
     );
   }
@@ -142,10 +240,9 @@ function ChatMessageHighlightBox(
   playerMap: Map<UserId, PlayerSummary>
 ) {
   const { classes } = useStyles({ justifyContent: "left" });
-  const playerName = playerMap.get(highlight.sender)?.name ?? "<unknown>";
   return (
     <div className={classes.root}>
-      <b>{playerName}:</b>&nbsp;
+      <PlayerName player={highlight.sender} />:&nbsp;
       {highlight.text}
     </div>
   );
@@ -156,9 +253,8 @@ function AirshotHighlightBox(
   playerMap: Map<UserId, PlayerSummary>
 ) {
   const { classes } = useStyles({ justifyContent: "center" });
-  const attackerName =
-    playerMap.get(highlight.attacker_id)?.name ?? "<unknown>";
-  const victimName = playerMap.get(highlight.victim_id)?.name ?? "<unknown>";
+  const attackerName = highlight.attacker.name;
+  const victimName = highlight.victim.name;
   return (
     <div className={classes.root}>
       AIRSHOT: {attackerName} airshot {victimName}
@@ -171,8 +267,8 @@ function CrossbowAirshotHighlightBox(
   playerMap: Map<UserId, PlayerSummary>
 ) {
   const { classes } = useStyles({ justifyContent: "center" });
-  const healerName = playerMap.get(highlight.healer_id)?.name ?? "<unknown>";
-  const targetName = playerMap.get(highlight.target_id)?.name ?? "<unknown>";
+  const healerName = highlight.healer.name;
+  const targetName = highlight.target.name;
   return (
     <div className={classes.root}>
       AIRSHOT: {healerName} airshot {targetName}
@@ -205,7 +301,7 @@ function PointCapturedHighlightBox(
 
   return (
     <div className={classes.root}>
-      <PlayerNames players={cappers} />
+      <PlayerNames players={cappers} team={highlight.capturing_team} />
       &nbsp;
       {icon !== undefined && <KillIcon killIcon={icon} />}
       captured {highlight.point_name}
