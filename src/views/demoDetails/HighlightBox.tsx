@@ -187,26 +187,31 @@ function KillStreakHighlightBox(
   let message;
   switch(streak) {
     case 5:
-      message = "is on a killing spree!";
+      message = "is on a Killing Spree!";
       break;
     case 10:
-      message = "is unstoppable!";
+      message = "is Unstoppable!";
       break;
     case 15:
-      message = "is on a rampage!";
+      message = "is on a Rampage!";
       break;
     case 20:
-      message = "is God-like!";
+      message = "is GOD-like!";
       break;
     default:
-      message = "is still God-like!";
+      if (streak > 0 && streak % 5 === 0) {
+        // Multiple of 5 and greater than 20, so it's a continuation of a godlike streak
+        message = "is still GOD-like!";
+      } else {
+        // Bad reporting? Fall back to reasonable message
+        message = "is collecting frags!";
+      }
       break;
   }
 
   return (
-    <div className={ classes.root } style={{ display: "flex", margin: "auto" }}>
-      <PlayerName player={ player }/>
-      { message }
+    <div className={ classes.root }>
+      <span><PlayerName player={ player }/> { message }</span>
       <KillstreakIcon streak={ streak }/>
     </div>
   );
