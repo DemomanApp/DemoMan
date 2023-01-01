@@ -942,7 +942,7 @@ impl GameDetailsAnalyser {
                 self.add_highlight(
                     Highlight::KillStreak {
                         player: HighlightPlayerSnapshot::for_player(assister.user_id, &self.players),
-                        streak: event.kill_streak_total,
+                        streak: event.kill_streak_assist,
                     },
                     tick,
                 );
