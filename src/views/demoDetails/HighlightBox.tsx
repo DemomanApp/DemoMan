@@ -13,9 +13,10 @@ import {
   UserId,
   PlayerSummary,
   TEAM_NAMES,
-  HighlightPlayerSnapshot, Team,
+  HighlightPlayerSnapshot, Team, KillStreakHighlight, KillStreakEndedHighlight,
 } from "../../demo";
 import { KillIcon } from "../../components";
+import KillstreakIcon from "../../components/KillstreakIcon";
 
 type HighlightProps = {
   event: Highlight;
@@ -168,12 +169,77 @@ function KillHighlightBox(
           </>
         )}
         &nbsp;
+        <KillstreakIcon streak={highlight.streak} />
         <KillIcon killIcon={highlight.kill_icon} />
         &nbsp;
         <PlayerName player={victim} />
       </div>
     );
   }
+}
+
+function KillStreakHighlightBox(
+  highlight: KillStreakHighlight,
+  playerMap: Map<UserId, PlayerSummary>
+) {
+  const { classes } = useStyles({ justifyContent: "center" });
+  const { player, streak } = highlight;
+  let message;
+  switch(streak) {
+    case 5:
+      message = "is on a killing spree!";
+      break;
+    case 10:
+      message = "is unstoppable!";
+      break;
+    case 15:
+      message = "is on a rampage!";
+      break;
+    case 20:
+      message = "is God-like!";
+      break;
+    default:
+      message = "is still God-like!";
+      break;
+  }
+
+  return (
+    <div className={ classes.root } style={{ display: "flex", margin: "auto" }}>
+      <PlayerName player={ player }/>
+      { message }
+      <KillstreakIcon streak={ streak }/>
+    </div>
+  );
+}
+
+function KillStreakEndedHighlightBox(
+  highlight: KillStreakEndedHighlight,
+  playerMap: Map<UserId, PlayerSummary>
+) {
+  const { classes } = useStyles({ justifyContent: "center" });
+  const { killer, victim, streak } = highlight;
+
+  let message;
+  if (killer.user_id === victim.user_id) {
+    message = (
+      <span>
+        <PlayerName player={ killer } /> ended their own killstreak
+      </span>
+    );
+  } else {
+    message = (
+      <span>
+        <PlayerName player={killer} /> ended <PlayerName player={victim} />&apos;s killstreak
+      </span>
+    );
+  }
+
+  return (
+    <div className={classes.root} style={{ display: "flex", margin: "auto" }}>
+      <span>{ message }</span>
+      <KillstreakIcon streak={ streak }/>
+    </div>
+  );
 }
 
 function ChatMessageHighlightBox(
@@ -309,6 +375,10 @@ function UnpauseHighlightBox() {
 export default function HighlightBox({ event, playerMap }: HighlightProps) {
   if (event.t === "Kill") {
     return KillHighlightBox(event.c, playerMap);
+  } else if (event.t === "KillStreak") {
+    return KillStreakHighlightBox(event.c, playerMap);
+  } else if(event.t === "KillStreakEnded") {
+    return KillStreakEndedHighlightBox(event.c, playerMap);
   } else if (event.t === "ChatMessage") {
     return ChatMessageHighlightBox(event.c, playerMap);
   } else if (event.t === "Airshot") {

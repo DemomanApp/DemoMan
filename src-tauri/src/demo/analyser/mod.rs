@@ -130,6 +130,15 @@ pub enum Highlight {
         drop: bool,
         airshot: bool,
     },
+    KillStreak {
+        player: HighlightPlayerSnapshot,
+        streak: u16,
+    },
+    KillStreakEnded {
+        killer: HighlightPlayerSnapshot,
+        victim: HighlightPlayerSnapshot,
+        streak: u16
+    },
     ChatMessage {
         sender: HighlightPlayerSnapshot,
         text: String,
@@ -915,6 +924,41 @@ impl GameDetailsAnalyser {
             },
             tick,
         );
+
+        if event.kill_streak_total > 0 && event.kill_streak_total % 5 == 0 {
+            self.add_highlight(
+                Highlight::KillStreak {
+                    player: HighlightPlayerSnapshot::for_player(killer_id, &self.players),
+                    streak: event.kill_streak_total,
+                },
+                tick
+            );
+        }
+
+        // Note: kill_streak_assist is only incremented when a medic gets an assist while their
+        // medigun is active (which isn't always when their heal target gets a kill!)
+        if event.kill_streak_assist > 0 && event.kill_streak_assist % 5 == 0 {
+            if let Some(assister) = maybe_assister_id.and_then(|a| self.players.get(&a)) {
+                self.add_highlight(
+                    Highlight::KillStreak {
+                        player: HighlightPlayerSnapshot::for_player(assister.user_id, &self.players),
+                        streak: event.kill_streak_total,
+                    },
+                    tick,
+                );
+            }
+        };
+
+        if event.kill_streak_victim >= 10 {
+            self.add_highlight(
+                Highlight::KillStreakEnded {
+                    killer: HighlightPlayerSnapshot::for_player(killer_id, &self.players),
+                    victim: HighlightPlayerSnapshot::for_player(victim_id, &self.players),
+                    streak: event.kill_streak_victim
+                },
+                tick
+            );
+        }
     }
 
     fn handle_crossbow_heal_event(&mut self, event: &CrossbowHealEvent, tick: DemoTick) {
