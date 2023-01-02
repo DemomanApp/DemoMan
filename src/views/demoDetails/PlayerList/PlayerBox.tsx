@@ -4,9 +4,9 @@ import ClassIcon from "../../../components/ClassIcon";
 import { PlayerSummary } from "../../../demo";
 
 interface PlayerBoxProps {
-    player: PlayerSummary;
-    selected: boolean;
-    onClick: () => void;
+  player: PlayerSummary;
+  selected: boolean;
+  onClick: () => void;
 }
 
 const useStyles = createStyles((_theme) => ({
@@ -18,7 +18,7 @@ const useStyles = createStyles((_theme) => ({
     "&:hover": {
       backgroundColor: "rgba(255, 255, 255, 0.05)",
       cursor: "pointer",
-    }
+    },
   },
   selectedBox: {
     height: "40px",
@@ -29,10 +29,10 @@ const useStyles = createStyles((_theme) => ({
     "&:hover": {
       backgroundColor: "rgba(140, 210, 255, 0.1)",
       cursor: "pointer",
-    }
+    },
   },
   classIcon: {
-    width: 32
+    width: 32,
   },
   playerName: {
     addingLeft: "8px",
@@ -57,20 +57,29 @@ export function PlayerBox({ player, selected, onClick }: PlayerBoxProps) {
   const { classes } = useStyles();
 
   return (
-    <div onClick={ onClick } className={ selected ? classes.selectedBox : classes.box }>
-      <div className={ classes.classIcon }>
+    <div
+      onClick={onClick}
+      className={selected ? classes.selectedBox : classes.box}
+    >
+      <div className={classes.classIcon}>
         <ClassIcon cls={player.classes[0]} muted={false} size={24} />
       </div>
       <div style={{ flexGrow: 1 }}>
-        <Text className={classes.playerName}>
-          {player.name}
-        </Text>
+        <Text className={classes.playerName}>{player.name}</Text>
       </div>
       {/* TODO: Show player's dominations */}
-      <div className={ classes.pointsScoreboardValue }>{player.scoreboard.points}</div>
-      <div className={ classes.simpleScoreboardValue }>{player.scoreboard.kills}</div>
-      <div className={ classes.simpleScoreboardValue }>{player.scoreboard.assists}</div>
-      <div className={ classes.simpleScoreboardValue }>{player.scoreboard.deaths}</div>
+      <div className={classes.pointsScoreboardValue}>
+        {player.scoreboard.points}
+      </div>
+      <div className={classes.simpleScoreboardValue}>
+        {player.scoreboard.kills}
+      </div>
+      <div className={classes.simpleScoreboardValue}>
+        {player.scoreboard.assists}
+      </div>
+      <div className={classes.simpleScoreboardValue}>
+        {player.scoreboard.deaths}
+      </div>
     </div>
   );
 }

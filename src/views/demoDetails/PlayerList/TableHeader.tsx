@@ -37,7 +37,9 @@ export function TableHeader() {
     <div className={classes.root}>
       <span className={classes.smallColumn}></span>
       <span className={classes.playerColumn}>Name</span>
-      <span className={classes.smallColumn} style={{ width: 40 }}>Score</span>
+      <span className={classes.smallColumn} style={{ width: 40 }}>
+        Score
+      </span>
       <span className={classes.smallColumn}>K</span>
       <span className={classes.smallColumn}>A</span>
       <span className={classes.smallColumn}>D</span>

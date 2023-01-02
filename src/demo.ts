@@ -109,7 +109,7 @@ export type HighlightEvent = {
 
 type ScoreboardMap = {
   [key: number]: Scoreboard;
-}
+};
 
 export type PlayerSummary = {
   name: string;

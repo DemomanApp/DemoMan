@@ -4,7 +4,6 @@ body {
   -webkit-user-select: none;
 }
 
-
 /*
  * ===============================
  *           SCOREBOARD
@@ -29,5 +28,5 @@ body {
 }
 
 .scoreboard .score-value.non-zero-score {
-  color: #2FDD24; /* Default HUD color */
+  color: #2fdd24; /* Default HUD color */
 }
