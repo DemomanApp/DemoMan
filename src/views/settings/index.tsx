@@ -11,8 +11,8 @@ const useStyles = createStyles((theme) => ({
     margin: "12px",
     display: "flex",
     flexDirection: "column",
-    gap: "8px"
-  }
+    gap: "8px",
+  },
 }));
 
 export default function SettingsView() {
@@ -29,15 +29,15 @@ export default function SettingsView() {
   }, []);
 
   return (
-    <div className={ classes.root }>
+    <div className={classes.root}>
       <h1>Settings</h1>
 
       <TextInput
-        label={ "Demos Folder" }
-        placeholder={ defaultDir }
-        error={ validPath ? undefined : "Directory does not exist!" }
-        defaultValue={ demoPath ?? defaultDirState.result ?? "" }
-        onChange={ (event) => {
+        label={"Demos Folder"}
+        placeholder={defaultDir}
+        error={validPath ? undefined : "Directory does not exist!"}
+        defaultValue={demoPath ?? defaultDirState.result ?? ""}
+        onChange={(event) => {
           const dirPath = event.target.value;
           if (dirPath.length === 0) {
             setValidPath(true);
@@ -55,18 +55,16 @@ export default function SettingsView() {
                 return;
               })
               .catch((err) => {
-                console.log(`Given directory ${ dirPath } does not exist!`, err);
+                console.log(`Given directory ${dirPath} does not exist!`, err);
                 setValidPath(false);
               });
           }
-        } }
+        }}
       />
 
       <div>
         <Link to={"/"}>
-          <Button>
-            Back
-          </Button>
+          <Button>Back</Button>
         </Link>
       </div>
     </div>

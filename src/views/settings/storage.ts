@@ -2,9 +2,12 @@ import { homeDir } from "@tauri-apps/api/path";
 import { type as osType } from "@tauri-apps/api/os";
 
 export const DEFAULT_STORAGE_DIRS = {
-  Windows_NT: () => "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Team Fortress 2\\tf\\demos",
-  Darwin: (userHome: string) => `${userHome}/Library/Application Support/Steam/steamapps/common/Team Fortress 2/tf/demos`,
-  Linux: (userHome: string) => `${userHome}/.local/share/Steam/steamapps/common/Team Fortress 2/tf/demos`,
+  Windows_NT: () =>
+    "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Team Fortress 2\\tf\\demos",
+  Darwin: (userHome: string) =>
+    `${userHome}/Library/Application Support/Steam/steamapps/common/Team Fortress 2/tf/demos`,
+  Linux: (userHome: string) =>
+    `${userHome}/.local/share/Steam/steamapps/common/Team Fortress 2/tf/demos`,
 };
 
 /**
