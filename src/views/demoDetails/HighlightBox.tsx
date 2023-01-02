@@ -175,15 +175,14 @@ function KillHighlightBox(
       <div className={classes.root}>
         {killer !== null &&
           killer !== undefined &&
-          killer.user_id !== victim.user_id && <PlayerName player={killer} />}
-        {assister !== null &&
-          assister !== undefined &&
-          assister.user_id !== 0 && (
-            <>
-              &nbsp;+&nbsp;
-              <PlayerName player={assister} />
-            </>
-          )}
+          killer.user_id !== victim.user_id &&
+          killer.team !== "other" && <PlayerName player={killer} />}
+        {assister !== null && assister !== undefined && (
+          <>
+            &nbsp;+&nbsp;
+            <PlayerName player={assister} />
+          </>
+        )}
         &nbsp;
         <KillstreakIcon streak={highlight.streak} />
         <KillIcon killIcon={highlight.kill_icon} />

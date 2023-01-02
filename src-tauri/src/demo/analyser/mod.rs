@@ -88,16 +88,27 @@ pub struct HighlightPlayerSnapshot {
 }
 
 impl HighlightPlayerSnapshot {
-    fn for_player(player_id: UserId, lookup: &HashMap<UserId, PlayerState>) -> Self {
-        let player = lookup.get(&player_id);
+    fn for_player(player_id: u16, lookup: &HashMap<UserId, PlayerState>) -> Self {
+        let player = lookup.get(&player_id.into());
 
         Self::for_player_with_name(player_id, player.map(|p| p.name.clone()), lookup)
     }
 
-    fn for_player_with_name(user_id: UserId, name_override: Option<String>, lookup: &HashMap<UserId, PlayerState>) -> Self {
+    fn for_player_with_name(user_id: u16, name_override: Option<String>, lookup: &HashMap<UserId, PlayerState>) -> Self {
         const UNKNOWN_TEAM: Team = Team::Other;
 
-        match lookup.get(&user_id) {
+        if user_id == 0 {
+            // World.  Need to check the raw value first, otherwise we could end up attributing to
+            // a player whose ID number is a multiple of 256 (which would look weird, with a bunch
+            // of highlights attributed to the wrong person!)
+            return Self {
+                user_id: 0u16.into(),
+                name: name_override.unwrap_or("WORLD".to_string()),
+                team: UNKNOWN_TEAM,
+            }
+        }
+
+        match lookup.get(&user_id.into()) {
             Some(player) => {
                 Self {
                     user_id: player.user_id,
@@ -108,7 +119,7 @@ impl HighlightPlayerSnapshot {
             None => {
                 // Most likely UserId(0)
                 Self {
-                    user_id,
+                    user_id: user_id.into(),
                     name: name_override.unwrap_or("<unknown>".to_string()),
                     team: UNKNOWN_TEAM,
                 }
@@ -515,7 +526,7 @@ impl GameDetailsAnalyser {
 
             self.add_highlight(
                 Highlight::ChatMessage {
-                    sender: HighlightPlayerSnapshot::for_player(player_id, &self.players),
+                    sender: HighlightPlayerSnapshot::for_player(player_id.0 as u16, &self.players),
                     text: message.plain_text(),
                 },
                 tick
@@ -774,8 +785,8 @@ impl GameDetailsAnalyser {
             )
         {
             self.add_highlight(Highlight::Airshot {
-                attacker: HighlightPlayerSnapshot::for_player(attacker_id, &self.players),
-                victim: HighlightPlayerSnapshot::for_player(victim_id, &self.players),
+                attacker: HighlightPlayerSnapshot::for_player(event.attacker, &self.players),
+                victim: HighlightPlayerSnapshot::for_player(event.user_id, &self.players),
             }, tick);
         }
     }
@@ -911,11 +922,11 @@ impl GameDetailsAnalyser {
 
         self.add_highlight(
             Highlight::Kill {
-                killer: HighlightPlayerSnapshot::for_player_with_name(killer_id, killer_name_override, &self.players),
-                assister: maybe_assister_id.map(|assister| {
-                    HighlightPlayerSnapshot::for_player(assister, &self.players)
+                killer: HighlightPlayerSnapshot::for_player_with_name(event.attacker, killer_name_override, &self.players),
+                assister: maybe_assister_id.map(|_assister| {
+                    HighlightPlayerSnapshot::for_player(event.assister, &self.players)
                 }),
-                victim: HighlightPlayerSnapshot::for_player(victim_id, &self.players),
+                victim: HighlightPlayerSnapshot::for_player(event.user_id, &self.players),
                 weapon: event.weapon.to_string(),
                 kill_icon: kill_icon.to_string(),
                 streak: event.kill_streak_total as usize,
@@ -928,7 +939,7 @@ impl GameDetailsAnalyser {
         if event.kill_streak_total > 0 && event.kill_streak_total % 5 == 0 {
             self.add_highlight(
                 Highlight::KillStreak {
-                    player: HighlightPlayerSnapshot::for_player(killer_id, &self.players),
+                    player: HighlightPlayerSnapshot::for_player(event.attacker, &self.players),
                     streak: event.kill_streak_total,
                 },
                 tick
@@ -938,10 +949,10 @@ impl GameDetailsAnalyser {
         // Note: kill_streak_assist is only incremented when a medic gets an assist while their
         // medigun is active (which isn't always when their heal target gets a kill!)
         if event.kill_streak_assist > 0 && event.kill_streak_assist % 5 == 0 {
-            if let Some(assister) = maybe_assister_id.and_then(|a| self.players.get(&a)) {
+            if let Some(_assister) = maybe_assister_id.and_then(|a| self.players.get(&a)) {
                 self.add_highlight(
                     Highlight::KillStreak {
-                        player: HighlightPlayerSnapshot::for_player(assister.user_id, &self.players),
+                        player: HighlightPlayerSnapshot::for_player(event.assister, &self.players),
                         streak: event.kill_streak_assist,
                     },
                     tick,
@@ -952,8 +963,8 @@ impl GameDetailsAnalyser {
         if event.kill_streak_victim >= 10 {
             self.add_highlight(
                 Highlight::KillStreakEnded {
-                    killer: HighlightPlayerSnapshot::for_player(killer_id, &self.players),
-                    victim: HighlightPlayerSnapshot::for_player(victim_id, &self.players),
+                    killer: HighlightPlayerSnapshot::for_player(event.attacker, &self.players),
+                    victim: HighlightPlayerSnapshot::for_player(event.user_id, &self.players),
                     streak: event.kill_streak_victim
                 },
                 tick
@@ -963,14 +974,13 @@ impl GameDetailsAnalyser {
 
     fn handle_crossbow_heal_event(&mut self, event: &CrossbowHealEvent, tick: DemoTick) {
         let target_id = UserId::from(event.target);
-        let healer_id = UserId::from(event.healer);
 
         if let Some(target_player) = self.players.get(&target_id) {
             if target_player.has_cond(&PlayerCondition::TF_COND_BLASTJUMPING) {
                 self.add_highlight(
                     Highlight::CrossbowAirshot {
-                        healer: HighlightPlayerSnapshot::for_player(healer_id, &self.players),
-                        target: HighlightPlayerSnapshot::for_player(target_id, &self.players)
+                        healer: HighlightPlayerSnapshot::for_player(event.healer as u16, &self.players),
+                        target: HighlightPlayerSnapshot::for_player(event.target as u16, &self.players)
                     },
                     tick
                 );

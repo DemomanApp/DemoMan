@@ -45,7 +45,7 @@ export type SteamID = number;
 export type HighlightPlayerSnapshot = {
   user_id: UserId;
   name: string;
-  team: number;
+  team: string;
 };
 
 export type KillHighlight = {
