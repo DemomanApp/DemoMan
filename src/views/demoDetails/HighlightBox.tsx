@@ -13,7 +13,10 @@ import {
   UserId,
   PlayerSummary,
   TEAM_NAMES,
-  HighlightPlayerSnapshot, Team, KillStreakHighlight, KillStreakEndedHighlight,
+  HighlightPlayerSnapshot,
+  Team,
+  KillStreakHighlight,
+  KillStreakEndedHighlight,
 } from "../../demo";
 import { KillIcon } from "../../components";
 import KillstreakIcon from "../../components/KillstreakIcon";
@@ -48,7 +51,7 @@ type PlayerNameProps = {
    * This can be helpful in the uncommon cases where the player's team is set to "other".
    */
   team?: Team | number;
-}
+};
 
 function PlayerName({ player, team = undefined }: PlayerNameProps) {
   const theme = useMantineTheme();
@@ -90,7 +93,7 @@ function PlayerName({ player, team = undefined }: PlayerNameProps) {
  * @param array
  * @param filler
  */
-const injectBetween = function<T>(array: T[], filler: () => T): T[] {
+const injectBetween = function <T>(array: T[], filler: () => T): T[] {
   const output: T[] = [];
   array.forEach((value, i) => {
     output.push(value);
@@ -101,20 +104,29 @@ const injectBetween = function<T>(array: T[], filler: () => T): T[] {
   return output;
 };
 
-function PlayerNames({ players, team }: { players: (PlayerSummary | undefined)[], team: number }) {
+function PlayerNames({
+  players,
+  team,
+}: {
+  players: (PlayerSummary | undefined)[];
+  team: number;
+}) {
   if (players.length === 0) {
     return <></>;
   }
 
   return (
     <>
-      {
-        injectBetween(players.map((player) => {
+      {injectBetween(
+        players.map((player) => {
           return (
-            <PlayerName key={ player?.user_id } player={ player } team={ team }/>
+            <PlayerName key={player?.user_id} player={player} team={team} />
           );
-        }), () => { return (<>&nbsp;+&nbsp;</>); })
-      }
+        }),
+        () => {
+          return <>&nbsp;+&nbsp;</>;
+        }
+      )}
     </>
   );
 }
@@ -146,7 +158,7 @@ function KillHighlightBox(
     return (
       <div className={classes.root}>
         <PlayerName player={killer} />
-        { assister !== null && assister !== undefined && (
+        {assister !== null && assister !== undefined && (
           <>
             &nbsp;+&nbsp;
             <PlayerName player={assister} />
@@ -161,13 +173,17 @@ function KillHighlightBox(
   } else {
     return (
       <div className={classes.root}>
-        { killer !== null && killer !== undefined && killer.user_id !== victim.user_id && <PlayerName player={killer} />}
-        { assister !== null && assister !== undefined && assister.user_id !== 0 && (
-          <>
-            &nbsp;+&nbsp;
-            <PlayerName player={assister} />
-          </>
-        )}
+        {killer !== null &&
+          killer !== undefined &&
+          killer.user_id !== victim.user_id && <PlayerName player={killer} />}
+        {assister !== null &&
+          assister !== undefined &&
+          assister.user_id !== 0 && (
+            <>
+              &nbsp;+&nbsp;
+              <PlayerName player={assister} />
+            </>
+          )}
         &nbsp;
         <KillstreakIcon streak={highlight.streak} />
         <KillIcon killIcon={highlight.kill_icon} />
@@ -185,7 +201,7 @@ function KillStreakHighlightBox(
   const { classes } = useStyles({ justifyContent: "center" });
   const { player, streak } = highlight;
   let message;
-  switch(streak) {
+  switch (streak) {
     case 5:
       message = "is on a Killing Spree!";
       break;
@@ -210,9 +226,11 @@ function KillStreakHighlightBox(
   }
 
   return (
-    <div className={ classes.root }>
-      <span><PlayerName player={ player }/> { message }</span>
-      <KillstreakIcon streak={ streak }/>
+    <div className={classes.root}>
+      <span>
+        <PlayerName player={player} /> {message}
+      </span>
+      <KillstreakIcon streak={streak} />
     </div>
   );
 }
@@ -228,21 +246,22 @@ function KillStreakEndedHighlightBox(
   if (killer.user_id === victim.user_id) {
     message = (
       <span>
-        <PlayerName player={ killer } /> ended their own killstreak
+        <PlayerName player={killer} /> ended their own killstreak
       </span>
     );
   } else {
     message = (
       <span>
-        <PlayerName player={killer} /> ended <PlayerName player={victim} />&apos;s killstreak
+        <PlayerName player={killer} /> ended <PlayerName player={victim} />
+        &apos;s killstreak
       </span>
     );
   }
 
   return (
     <div className={classes.root} style={{ display: "flex", margin: "auto" }}>
-      <span>{ message }</span>
-      <KillstreakIcon streak={ streak }/>
+      <span>{message}</span>
+      <KillstreakIcon streak={streak} />
     </div>
   );
 }
@@ -254,7 +273,8 @@ function ChatMessageHighlightBox(
   const { classes } = useStyles({ justifyContent: "left" });
   return (
     <div className={classes.root}>
-      <PlayerName player={highlight.sender} />:&nbsp;
+      <PlayerName player={highlight.sender} />
+      :&nbsp;
       {highlight.text}
     </div>
   );
@@ -382,7 +402,7 @@ export default function HighlightBox({ event, playerMap }: HighlightProps) {
     return KillHighlightBox(event.c, playerMap);
   } else if (event.t === "KillStreak") {
     return KillStreakHighlightBox(event.c, playerMap);
-  } else if(event.t === "KillStreakEnded") {
+  } else if (event.t === "KillStreakEnded") {
     return KillStreakEndedHighlightBox(event.c, playerMap);
   } else if (event.t === "ChatMessage") {
     return ChatMessageHighlightBox(event.c, playerMap);

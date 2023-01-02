@@ -46,7 +46,7 @@ export type HighlightPlayerSnapshot = {
   user_id: UserId;
   name: string;
   team: number;
-}
+};
 
 export type KillHighlight = {
   killer: HighlightPlayerSnapshot;
@@ -62,13 +62,13 @@ export type KillHighlight = {
 export type KillStreakHighlight = {
   player: HighlightPlayerSnapshot;
   streak: number;
-}
+};
 
 export type KillStreakEndedHighlight = {
   killer: HighlightPlayerSnapshot;
   victim: HighlightPlayerSnapshot;
   streak: number;
-}
+};
 
 export type ChatMessageHighlight = {
   sender: HighlightPlayerSnapshot;
@@ -107,8 +107,8 @@ export type PlayerDisconnectedHighlight = {
 
 export type Highlight =
   | { t: "Kill"; c: KillHighlight }
-  | { t: "KillStreak", c: KillStreakHighlight }
-  | { t: "KillStreakEnded", c: KillStreakEndedHighlight }
+  | { t: "KillStreak"; c: KillStreakHighlight }
+  | { t: "KillStreakEnded"; c: KillStreakEndedHighlight }
   | { t: "ChatMessage"; c: ChatMessageHighlight }
   | { t: "Airshot"; c: AirshotHighlight }
   | { t: "CrossbowAirshot"; c: CrossbowAirshotHighlight }
