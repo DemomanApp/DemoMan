@@ -21,6 +21,8 @@ import { NavbarPortal, NavbarButton } from "../../AppShell";
 import { getDemosInDirectory } from "../../api";
 import { Async, Fill } from "../../components";
 import useStore from "../../hooks/useStore";
+import { homeDir } from "@tauri-apps/api/path";
+import { useAsync } from "react-async-hook";
 
 const PADDING_SIZE = 16;
 
@@ -194,11 +196,13 @@ function MainView({ demos }: { demos: Demo[] }) {
 
 export default function HomeViewAsyncWrapper() {
   const [demoPath, _setDemoPath] = useStore("demoPath");
+  // Used as fallback in case the user hasn't configured the demos directory yet
+  const homeDirState = useAsync(() => homeDir(), []);
 
   return (
     <Async
       promiseFn={getDemosInDirectory}
-      args={[demoPath ?? "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Team Fortress 2\\tf\\demos"]}
+      args={[demoPath ?? homeDirState.result ?? ""]}
       loading={
         <Fill>
           <Loader size="lg" variant="dots" />
@@ -207,7 +211,8 @@ export default function HomeViewAsyncWrapper() {
       error={(error) => (
         <Fill>
           <Alert color="red">
-            An error occured while loading this demo directory: {String(error)}
+            {/* NOTE: this shouldn't happen unless no home directory was found */}
+            An error occurred while scanning for demo files. Is the demo storage directory set?
           </Alert>
         </Fill>
       )}

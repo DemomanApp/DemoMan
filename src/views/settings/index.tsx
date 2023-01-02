@@ -3,6 +3,8 @@ import useStore from "../../hooks/useStore";
 import { Button, createStyles, TextInput } from "@mantine/core";
 import { fs } from "@tauri-apps/api";
 import { useState } from "react";
+import { useAsync } from "react-async-hook";
+import { getPlatformStorageDir } from "./storage";
 
 const useStyles = createStyles((theme) => ({
   root: {
@@ -16,8 +18,15 @@ const useStyles = createStyles((theme) => ({
 export default function SettingsView() {
   const [demoPath, setDemoPath] = useStore("demoPath");
   const [validPath, setValidPath] = useState(true);
+  const [defaultDir, setDefaultDir] = useState("");
 
   const { classes } = useStyles();
+
+  const defaultDirState = useAsync(async () => {
+    const dir = await getPlatformStorageDir();
+    setDefaultDir(dir ?? "");
+    return;
+  }, []);
 
   return (
     <div className={ classes.root }>
@@ -25,10 +34,9 @@ export default function SettingsView() {
 
       <TextInput
         label={ "Demos Folder" }
-        // Let's be honest, most users will be on Windows
-        placeholder={ "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Team Fortress 2\\tf\\demos" }
+        placeholder={ defaultDir }
         error={ validPath ? undefined : "Directory does not exist!" }
-        defaultValue={demoPath}
+        defaultValue={ demoPath ?? defaultDirState.result ?? "" }
         onChange={ (event) => {
           const dirPath = event.target.value;
           if (dirPath.length === 0) {
