@@ -1,7 +1,7 @@
 import KillStreakIcon from "../assets/kill_icons/killstreak_icon.png";
 import KillStreakIconNeg from "../assets/kill_icons/killstreak_icon_neg.png";
 
-import { useMantineTheme } from "@mantine/core";
+import { Text, useMantineTheme } from "@mantine/core";
 
 export type KillstreakIconProps = {
   streak: number;
@@ -17,22 +17,21 @@ export default function KillstreakIcon({ streak }: KillstreakIconProps) {
       <span
         style={{
           display: "flex",
-          flexDirection: "row",
-          paddingLeft: 4,
-          color: "white",
-          fontFamily: "Verdana",
-          fontWeight: 800,
+          alignItems: "center",
+          gap: 2,
+          margin: "0 2px",
         }}
       >
-        <span style={{ margin: "auto" }}>{streak}</span>
-        <div
+        <Text weight={800}>{streak}</Text>
+        <span
           style={{
             backgroundImage: `url(${
               colorScheme === "dark" ? iconFile : iconNegFile
             })`,
-            height: 32,
-            width: 33,
-            transform: "scale(0.5)",
+            backgroundRepeat: "no-repeat",
+            backgroundSize: 16,
+            height: 16,
+            width: 16,
           }}
         />
       </span>
