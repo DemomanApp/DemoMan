@@ -87,47 +87,6 @@ pub struct HighlightPlayerSnapshot {
     team: Team,
 }
 
-impl HighlightPlayerSnapshot {
-    fn for_player(player_id: u16, lookup: &HashMap<UserId, PlayerState>) -> Self {
-        let player = lookup.get(&player_id.into());
-
-        Self::for_player_with_name(player_id, player.map(|p| p.name.clone()), lookup)
-    }
-
-    fn for_player_with_name(user_id: u16, name_override: Option<String>, lookup: &HashMap<UserId, PlayerState>) -> Self {
-        const UNKNOWN_TEAM: Team = Team::Other;
-
-        if user_id == 0 {
-            // World.  Need to check the raw value first, otherwise we could end up attributing to
-            // a player whose ID number is a multiple of 256 (which would look weird, with a bunch
-            // of highlights attributed to the wrong person!)
-            return Self {
-                user_id: 0u16.into(),
-                name: name_override.unwrap_or("WORLD".to_string()),
-                team: UNKNOWN_TEAM,
-            }
-        }
-
-        match lookup.get(&user_id.into()) {
-            Some(player) => {
-                Self {
-                    user_id: player.user_id,
-                    name: name_override.unwrap_or(player.name.clone()),
-                    team: player.team,
-                }
-            }
-            None => {
-                // Most likely UserId(0)
-                Self {
-                    user_id: user_id.into(),
-                    name: name_override.unwrap_or("<unknown>".to_string()),
-                    team: UNKNOWN_TEAM,
-                }
-            }
-        }
-    }
-}
-
 #[derive(Debug, Serialize, PartialEq)]
 #[serde(tag = "t", content = "c")]
 pub enum Highlight {
@@ -526,7 +485,7 @@ impl GameDetailsAnalyser {
 
             self.add_highlight(
                 Highlight::ChatMessage {
-                    sender: HighlightPlayerSnapshot::for_player(player_id.0 as u16, &self.players),
+                    sender: self.player_snapshot(player_id.0 as u16, None),
                     text: message.plain_text(),
                 },
                 tick
@@ -785,8 +744,8 @@ impl GameDetailsAnalyser {
             )
         {
             self.add_highlight(Highlight::Airshot {
-                attacker: HighlightPlayerSnapshot::for_player(event.attacker, &self.players),
-                victim: HighlightPlayerSnapshot::for_player(event.user_id, &self.players),
+                attacker: self.player_snapshot(event.attacker, None),
+                victim: self.player_snapshot(event.user_id, None),
             }, tick);
         }
     }
@@ -922,11 +881,11 @@ impl GameDetailsAnalyser {
 
         self.add_highlight(
             Highlight::Kill {
-                killer: HighlightPlayerSnapshot::for_player_with_name(event.attacker, killer_name_override, &self.players),
+                killer: self.player_snapshot(event.attacker, killer_name_override),
                 assister: maybe_assister_id.map(|_assister| {
-                    HighlightPlayerSnapshot::for_player(event.assister, &self.players)
+                    self.player_snapshot(event.assister, None)
                 }),
-                victim: HighlightPlayerSnapshot::for_player(event.user_id, &self.players),
+                victim: self.player_snapshot(event.user_id, None),
                 weapon: event.weapon.to_string(),
                 kill_icon: kill_icon.to_string(),
                 streak: event.kill_streak_total as usize,
@@ -939,7 +898,7 @@ impl GameDetailsAnalyser {
         if event.kill_streak_total > 0 && event.kill_streak_total % 5 == 0 {
             self.add_highlight(
                 Highlight::KillStreak {
-                    player: HighlightPlayerSnapshot::for_player(event.attacker, &self.players),
+                    player: self.player_snapshot(event.attacker, None),
                     streak: event.kill_streak_total,
                 },
                 tick
@@ -952,7 +911,7 @@ impl GameDetailsAnalyser {
             if let Some(_assister) = maybe_assister_id.and_then(|a| self.players.get(&a)) {
                 self.add_highlight(
                     Highlight::KillStreak {
-                        player: HighlightPlayerSnapshot::for_player(event.assister, &self.players),
+                        player: self.player_snapshot(event.assister, None),
                         streak: event.kill_streak_assist,
                     },
                     tick,
@@ -963,8 +922,8 @@ impl GameDetailsAnalyser {
         if event.kill_streak_victim >= 10 {
             self.add_highlight(
                 Highlight::KillStreakEnded {
-                    killer: HighlightPlayerSnapshot::for_player(event.attacker, &self.players),
-                    victim: HighlightPlayerSnapshot::for_player(event.user_id, &self.players),
+                    killer: self.player_snapshot(event.attacker, None),
+                    victim: self.player_snapshot(event.user_id, None),
                     streak: event.kill_streak_victim
                 },
                 tick
@@ -979,8 +938,8 @@ impl GameDetailsAnalyser {
             if target_player.has_cond(&PlayerCondition::TF_COND_BLASTJUMPING) {
                 self.add_highlight(
                     Highlight::CrossbowAirshot {
-                        healer: HighlightPlayerSnapshot::for_player(event.healer as u16, &self.players),
-                        target: HighlightPlayerSnapshot::for_player(event.target as u16, &self.players)
+                        healer: self.player_snapshot(event.healer as u16, None),
+                        target: self.player_snapshot(event.target as u16, None)
                     },
                     tick
                 );
@@ -1074,6 +1033,39 @@ impl GameDetailsAnalyser {
     fn handle_uber_used_event(&mut self, event: &PlayerChargeDeployedEvent, _tick: DemoTick) {
         if let Some(healer) = self.players.get_mut(&UserId::from(event.user_id)) {
             healer.invulns += 1;
+        }
+    }
+
+    fn player_snapshot(&self, user_id: u16, name_override: Option<String>) -> HighlightPlayerSnapshot {
+        const UNKNOWN_TEAM: Team = Team::Other;
+
+        if user_id == 0 {
+            // World.  Need to check the raw value first, otherwise we could end up attributing to
+            // a player whose ID number is a multiple of 256 (which would look weird, with a bunch
+            // of highlights attributed to the wrong person!)
+            return HighlightPlayerSnapshot {
+                user_id: 0u16.into(),
+                name: name_override.unwrap_or("WORLD".to_string()),
+                team: UNKNOWN_TEAM,
+            }
+        }
+
+        match self.players.get(&user_id.into()) {
+            Some(player) => {
+                HighlightPlayerSnapshot {
+                    user_id: player.user_id,
+                    name: name_override.unwrap_or(player.name.clone()),
+                    team: player.team,
+                }
+            }
+            None => {
+                // Most likely UserId(0)
+                HighlightPlayerSnapshot {
+                    user_id: user_id.into(),
+                    name: name_override.unwrap_or("<unknown>".to_string()),
+                    team: UNKNOWN_TEAM,
+                }
+            }
         }
     }
 }
