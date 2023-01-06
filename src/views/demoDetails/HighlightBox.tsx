@@ -155,7 +155,7 @@ function KillHighlightBox(highlight: KillHighlight) {
     return (
       <div className={classes.root}>
         <PlayerName player={killer} />
-        {assister !== null && assister !== undefined && (
+        {assister !== null && (
           <>
             &nbsp;+&nbsp;
             <PlayerName player={assister} />
@@ -171,10 +171,9 @@ function KillHighlightBox(highlight: KillHighlight) {
     return (
       <div className={classes.root}>
         {killer !== null &&
-          killer !== undefined &&
           killer.user_id !== victim.user_id &&
           killer.team !== "other" && <PlayerName player={killer} />}
-        {assister !== null && assister !== undefined && (
+        {assister !== null && (
           <>
             &nbsp;+&nbsp;
             <PlayerName player={assister} />
