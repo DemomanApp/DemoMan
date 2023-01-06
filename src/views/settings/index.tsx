@@ -46,7 +46,7 @@ export default function SettingsView() {
             // still accept it
             fs.exists(dirPath)
               .then((result) => {
-                if (result as unknown as boolean) {
+                if (result) {
                   setDemoPath(dirPath);
                   setValidPath(true);
                 } else {

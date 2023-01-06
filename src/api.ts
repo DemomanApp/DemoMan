@@ -48,6 +48,10 @@ export async function getDemoDetails(demoPath: string) {
   });
 }
 
+export async function getTf2Dir() {
+  return invoke<string>("get_tf2_dir");
+}
+
 export async function initRcon(password: string) {
   return invoke<void>("init_rcon", { password });
 }
