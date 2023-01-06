@@ -93,12 +93,15 @@ function PlayerName({ player, team = undefined }: PlayerNameProps) {
  * @param array
  * @param filler
  */
-const injectBetween = function <T>(array: T[], filler: () => T): T[] {
+const injectBetween = function <T>(
+  array: T[],
+  filler: (index: number) => T
+): T[] {
   const output: T[] = [];
   array.forEach((value, i) => {
     output.push(value);
     if (i < array.length - 1) {
-      output.push(filler());
+      output.push(filler(i));
     }
   });
   return output;
@@ -123,8 +126,8 @@ function PlayerNames({
             <PlayerName key={player?.user_id} player={player} team={team} />
           );
         }),
-        () => {
-          return <>&nbsp;+&nbsp;</>;
+        (index) => {
+          return <span key={index}>&nbsp;+&nbsp;</span>;
         }
       )}
     </>
