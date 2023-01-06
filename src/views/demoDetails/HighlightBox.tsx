@@ -131,10 +131,7 @@ function PlayerNames({
   );
 }
 
-function KillHighlightBox(
-  highlight: KillHighlight,
-  playerMap: Map<UserId, PlayerSummary>
-) {
+function KillHighlightBox(highlight: KillHighlight) {
   const { classes } = useStyles({ justifyContent: "right" });
 
   const { killer, assister, victim } = highlight;
@@ -193,10 +190,7 @@ function KillHighlightBox(
   }
 }
 
-function KillStreakHighlightBox(
-  highlight: KillStreakHighlight,
-  playerMap: Map<UserId, PlayerSummary>
-) {
+function KillStreakHighlightBox(highlight: KillStreakHighlight) {
   const { classes } = useStyles({ justifyContent: "center" });
   const { player, streak } = highlight;
   let message;
@@ -234,10 +228,7 @@ function KillStreakHighlightBox(
   );
 }
 
-function KillStreakEndedHighlightBox(
-  highlight: KillStreakEndedHighlight,
-  playerMap: Map<UserId, PlayerSummary>
-) {
+function KillStreakEndedHighlightBox(highlight: KillStreakEndedHighlight) {
   const { classes } = useStyles({ justifyContent: "center" });
   const { killer, victim, streak } = highlight;
 
@@ -265,10 +256,7 @@ function KillStreakEndedHighlightBox(
   );
 }
 
-function ChatMessageHighlightBox(
-  highlight: ChatMessageHighlight,
-  playerMap: Map<UserId, PlayerSummary>
-) {
+function ChatMessageHighlightBox(highlight: ChatMessageHighlight) {
   const { classes } = useStyles({ justifyContent: "left" });
   return (
     <div className={classes.root}>
@@ -279,10 +267,7 @@ function ChatMessageHighlightBox(
   );
 }
 
-function AirshotHighlightBox(
-  highlight: AirshotHighlight,
-  playerMap: Map<UserId, PlayerSummary>
-) {
+function AirshotHighlightBox(highlight: AirshotHighlight) {
   const { classes } = useStyles({ justifyContent: "center" });
   const attackerName = highlight.attacker.name;
   const victimName = highlight.victim.name;
@@ -293,10 +278,7 @@ function AirshotHighlightBox(
   );
 }
 
-function CrossbowAirshotHighlightBox(
-  highlight: CrossbowAirshotHighlight,
-  playerMap: Map<UserId, PlayerSummary>
-) {
+function CrossbowAirshotHighlightBox(highlight: CrossbowAirshotHighlight) {
   const { classes } = useStyles({ justifyContent: "center" });
   const healerName = highlight.healer.name;
   const targetName = highlight.target.name;
@@ -398,17 +380,17 @@ function UnpauseHighlightBox() {
 
 export default function HighlightBox({ event, playerMap }: HighlightProps) {
   if (event.t === "Kill") {
-    return KillHighlightBox(event.c, playerMap);
+    return KillHighlightBox(event.c);
   } else if (event.t === "KillStreak") {
-    return KillStreakHighlightBox(event.c, playerMap);
+    return KillStreakHighlightBox(event.c);
   } else if (event.t === "KillStreakEnded") {
-    return KillStreakEndedHighlightBox(event.c, playerMap);
+    return KillStreakEndedHighlightBox(event.c);
   } else if (event.t === "ChatMessage") {
-    return ChatMessageHighlightBox(event.c, playerMap);
+    return ChatMessageHighlightBox(event.c);
   } else if (event.t === "Airshot") {
-    return AirshotHighlightBox(event.c, playerMap);
+    return AirshotHighlightBox(event.c);
   } else if (event.t === "CrossbowAirshot") {
-    return CrossbowAirshotHighlightBox(event.c, playerMap);
+    return CrossbowAirshotHighlightBox(event.c);
   } else if (event.t === "PointCaptured") {
     return PointCapturedHighlightBox(event.c, playerMap);
   } else if (event.t === "RoundStalemate") {
