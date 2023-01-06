@@ -502,13 +502,7 @@ impl GameDetailsAnalyser {
                             "m_iTeam" => {
                                 let new_team = Team::new(i64::try_from(&prop.value).unwrap_or_default());
 
-                                // "other" team cannot be joined
-                                // it's the default team when a player joins, but that's already
-                                // the default value when a player state is created so there's no
-                                // point in assigning it
-                                if new_team != Team::Other {
-                                    player.team = new_team;
-                                }
+                                player.team = new_team;
                             }
                             "m_iPlayerClass" => {
                                 player.class = Class::new(
