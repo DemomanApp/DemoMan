@@ -6,7 +6,7 @@ import { getTf2Dir } from "../../api";
  * Gets the default platform-specific demo file storage directory.
  * Only supports Windows, Mac, and Linux.  This will return `null` if run on any other platform.
  */
-export async function getPlatformStorageDir(): Promise<string | null> {
+export async function getDefaultDemosDir(): Promise<string | null> {
   const type = await osType();
   const separator = type === "Windows_NT" ? "\\" : "/";
   const userHomeDir = await homeDir();

@@ -21,8 +21,8 @@ import { NavbarPortal, NavbarButton } from "../../AppShell";
 import { getDemosInDirectory } from "../../api";
 import { Async, Fill } from "../../components";
 import useStore from "../../hooks/useStore";
-import { homeDir } from "@tauri-apps/api/path";
 import { useAsync } from "react-async-hook";
+import { getDefaultDemosDir } from "../settings/storage";
 
 const PADDING_SIZE = 16;
 
@@ -197,12 +197,12 @@ function MainView({ demos }: { demos: Demo[] }) {
 export default function HomeViewAsyncWrapper() {
   const [demoPath, _setDemoPath] = useStore("demoPath");
   // Used as fallback in case the user hasn't configured the demos directory yet
-  const homeDirState = useAsync(() => homeDir(), []);
+  const defaultTf2DirState = useAsync(() => getDefaultDemosDir(), []);
 
   return (
     <Async
       promiseFn={getDemosInDirectory}
-      args={[demoPath ?? homeDirState.result ?? ""]}
+      args={[demoPath ?? defaultTf2DirState.result ?? ""]}
       loading={
         <Fill>
           <Loader size="lg" variant="dots" />
