@@ -249,7 +249,7 @@ function KillStreakEndedHighlightBox(highlight: KillStreakEndedHighlight) {
   }
 
   return (
-    <div className={classes.root} style={{ display: "flex", margin: "auto" }}>
+    <div className={classes.root}>
       <span>{message}</span>
       <KillstreakIcon streak={streak} />
     </div>
