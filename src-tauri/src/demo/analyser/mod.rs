@@ -485,7 +485,7 @@ impl GameDetailsAnalyser {
 
             self.add_highlight(
                 Highlight::ChatMessage {
-                    sender: self.player_snapshot(player_id.0 as u16, None),
+                    sender: self.player_snapshot(player_id.0 as u16),
                     text: message.plain_text(),
                 },
                 tick
@@ -738,8 +738,8 @@ impl GameDetailsAnalyser {
             )
         {
             self.add_highlight(Highlight::Airshot {
-                attacker: self.player_snapshot(event.attacker, None),
-                victim: self.player_snapshot(event.user_id, None),
+                attacker: self.player_snapshot(event.attacker),
+                victim: self.player_snapshot(event.user_id),
             }, tick);
         }
     }
@@ -875,11 +875,11 @@ impl GameDetailsAnalyser {
 
         self.add_highlight(
             Highlight::Kill {
-                killer: self.player_snapshot(event.attacker, killer_name_override),
+                killer: self.player_snapshot_with_name(event.attacker, killer_name_override),
                 assister: maybe_assister_id.map(|_assister| {
-                    self.player_snapshot(event.assister, None)
+                    self.player_snapshot(event.assister)
                 }),
-                victim: self.player_snapshot(event.user_id, None),
+                victim: self.player_snapshot(event.user_id),
                 weapon: event.weapon.to_string(),
                 kill_icon: kill_icon.to_string(),
                 streak: event.kill_streak_total as usize,
@@ -892,7 +892,7 @@ impl GameDetailsAnalyser {
         if event.kill_streak_total > 0 && event.kill_streak_total % 5 == 0 {
             self.add_highlight(
                 Highlight::KillStreak {
-                    player: self.player_snapshot(event.attacker, None),
+                    player: self.player_snapshot(event.attacker),
                     streak: event.kill_streak_total,
                 },
                 tick
@@ -905,7 +905,7 @@ impl GameDetailsAnalyser {
             if let Some(_assister) = maybe_assister_id.and_then(|a| self.players.get(&a)) {
                 self.add_highlight(
                     Highlight::KillStreak {
-                        player: self.player_snapshot(event.assister, None),
+                        player: self.player_snapshot(event.assister),
                         streak: event.kill_streak_assist,
                     },
                     tick,
@@ -916,8 +916,8 @@ impl GameDetailsAnalyser {
         if event.kill_streak_victim >= 10 {
             self.add_highlight(
                 Highlight::KillStreakEnded {
-                    killer: self.player_snapshot(event.attacker, None),
-                    victim: self.player_snapshot(event.user_id, None),
+                    killer: self.player_snapshot(event.attacker),
+                    victim: self.player_snapshot(event.user_id),
                     streak: event.kill_streak_victim
                 },
                 tick
@@ -932,8 +932,8 @@ impl GameDetailsAnalyser {
             if target_player.has_cond(&PlayerCondition::TF_COND_BLASTJUMPING) {
                 self.add_highlight(
                     Highlight::CrossbowAirshot {
-                        healer: self.player_snapshot(event.healer as u16, None),
-                        target: self.player_snapshot(event.target as u16, None)
+                        healer: self.player_snapshot(event.healer as u16),
+                        target: self.player_snapshot(event.target as u16)
                     },
                     tick
                 );
@@ -1030,7 +1030,15 @@ impl GameDetailsAnalyser {
         }
     }
 
-    fn player_snapshot(&self, user_id: u16, name_override: Option<String>) -> HighlightPlayerSnapshot {
+    /// Creates a snapshot for a player with the given user ID.
+    fn player_snapshot(&self, user_id: u16) -> HighlightPlayerSnapshot {
+        self.player_snapshot_with_name(user_id, None)
+    }
+
+    /// Creates a snapshot for a player with the given user ID and an optional specified name.
+    /// If a name isn't provided, the player's current name will be taken from the current demo
+    /// state.
+    fn player_snapshot_with_name(&self, user_id: u16, name_override: Option<String>) -> HighlightPlayerSnapshot {
         const UNKNOWN_TEAM: Team = Team::Other;
 
         if user_id == 0 {
