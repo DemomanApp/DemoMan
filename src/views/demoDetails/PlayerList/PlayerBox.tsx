@@ -39,17 +39,14 @@ const useStyles = createStyles((_theme) => ({
     textOverflow: "ellipsis",
     overflow: "hidden",
     whiteSpace: "nowrap",
-    fontFamily: "Verdana",
   },
   pointsScoreboardValue: {
     width: 40,
     textAlign: "right",
-    fontFamily: "Verdana",
   },
   simpleScoreboardValue: {
     width: 30,
     textAlign: "right",
-    fontFamily: "Verdana",
   },
 }));
 
