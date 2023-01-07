@@ -42,10 +42,16 @@ export type UserId = number;
 
 export type SteamID = number;
 
+export type HighlightPlayerSnapshot = {
+  user_id: UserId;
+  name: string;
+  team: string;
+};
+
 export type KillHighlight = {
-  killer_id: UserId;
-  assister_id: UserId | null;
-  victim_id: UserId;
+  killer: HighlightPlayerSnapshot;
+  assister: HighlightPlayerSnapshot | null;
+  victim: HighlightPlayerSnapshot;
   weapon: string;
   kill_icon: string;
   streak: number;
@@ -53,19 +59,30 @@ export type KillHighlight = {
   airshot: boolean;
 };
 
+export type KillStreakHighlight = {
+  player: HighlightPlayerSnapshot;
+  streak: number;
+};
+
+export type KillStreakEndedHighlight = {
+  killer: HighlightPlayerSnapshot;
+  victim: HighlightPlayerSnapshot;
+  streak: number;
+};
+
 export type ChatMessageHighlight = {
-  sender: UserId;
+  sender: HighlightPlayerSnapshot;
   text: string;
 };
 
 export type AirshotHighlight = {
-  attacker_id: UserId;
-  victim_id: UserId;
+  attacker: HighlightPlayerSnapshot;
+  victim: HighlightPlayerSnapshot;
 };
 
 export type CrossbowAirshotHighlight = {
-  healer_id: UserId;
-  target_id: UserId;
+  healer: HighlightPlayerSnapshot;
+  target: HighlightPlayerSnapshot;
 };
 
 export type PointCapturedHighlight = {
@@ -90,6 +107,8 @@ export type PlayerDisconnectedHighlight = {
 
 export type Highlight =
   | { t: "Kill"; c: KillHighlight }
+  | { t: "KillStreak"; c: KillStreakHighlight }
+  | { t: "KillStreakEnded"; c: KillStreakEndedHighlight }
   | { t: "ChatMessage"; c: ChatMessageHighlight }
   | { t: "Airshot"; c: AirshotHighlight }
   | { t: "CrossbowAirshot"; c: CrossbowAirshotHighlight }

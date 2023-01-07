@@ -26,6 +26,7 @@ use tf_demo_parser::{
             PlayerHealedEvent,
             PlayerHurtEvent,
             PlayerSpawnEvent,
+            PlayerTeamEvent,
             TeamPlayPointCapturedEvent,
             TeamPlayRoundStalemateEvent,
             TeamPlayRoundStartEvent,
@@ -71,35 +72,59 @@ pub struct HighlightEvent {
     event: Highlight,
 }
 
+/// Snapshot of a player at the time a highlight occurred so highlights will display using the
+/// correct team colors.
+#[derive(Debug, Serialize, PartialEq)]
+pub struct HighlightPlayerSnapshot {
+    /// The ID of the player.
+    user_id: UserId,
+
+    /// The name of the player at the time the highlight occurred.
+    name: String,
+
+    /// What team the player was on at the time.
+    /// NOTE: This can sometimes be Team::Other (probably when an m_iTeam update is missing)
+    team: Team,
+}
+
 #[derive(Debug, Serialize, PartialEq)]
 #[serde(tag = "t", content = "c")]
 pub enum Highlight {
     Kill {
-        killer_id: UserId,
-        assister_id: Option<UserId>,
-        victim_id: UserId,
+        killer: HighlightPlayerSnapshot,
+        assister: Option<HighlightPlayerSnapshot>,
+        victim: HighlightPlayerSnapshot,
         weapon: String,
         kill_icon: String,
         streak: usize,
         drop: bool,
         airshot: bool,
     },
+    KillStreak {
+        player: HighlightPlayerSnapshot,
+        streak: u16,
+    },
+    KillStreakEnded {
+        killer: HighlightPlayerSnapshot,
+        victim: HighlightPlayerSnapshot,
+        streak: u16
+    },
     ChatMessage {
-        sender: UserId,
+        sender: HighlightPlayerSnapshot,
         text: String,
     },
     Airshot {
-        attacker_id: UserId,
-        victim_id: UserId,
+        attacker: HighlightPlayerSnapshot,
+        victim: HighlightPlayerSnapshot,
     },
     CrossbowAirshot {
-        healer_id: UserId,
-        target_id: UserId,
+        healer: HighlightPlayerSnapshot,
+        target: HighlightPlayerSnapshot,
     },
     PointCaptured {
         point_name: String,
         capturing_team: u8,
-        cappers: Vec<UserId>,
+        cappers: Vec<UserId>, // snapshots aren't needed since we already know the team as part of the event
     },
     RoundStalemate,
     RoundStart,
@@ -108,7 +133,7 @@ pub enum Highlight {
         // TODO: Win reason?
     },
     PlayerConnected {
-        user_id: UserId,
+        user_id: UserId, // can't use snapshots here because there's no team yet
     },
     PlayerDisconnected {
         user_id: UserId,
@@ -414,6 +439,10 @@ impl GameDetailsAnalyser {
             GameEvent::PlayerHurt(event) => {
                 self.handle_player_hurt_event(event, tick);
             }
+            GameEvent::PlayerTeam(event) => {
+                // Player changed teams (game assigned on join, manually changed, or autobalanced)
+                self.handle_player_team_event(event, tick);
+            }
             GameEvent::PlayerSpawn(event) => {
                 self.handle_player_spawn_event(event, tick);
             }
@@ -450,11 +479,13 @@ impl GameDetailsAnalyser {
 
     fn handle_usermessage(&mut self, message: &UserMessage, tick: DemoTick) {
         if let UserMessage::SayText2(message) = message {
+            let player_id = *self.player_entities
+                .get(&u32::from(message.client).into())
+                .unwrap_or(&0u32.into());
+
             self.add_highlight(
                 Highlight::ChatMessage {
-                    sender: *self.player_entities
-                        .get(&EntityId::from(u32::from(message.client)))
-                        .unwrap_or(&UserId::from(0u32)),
+                    sender: self.player_snapshot(player_id.0 as u16),
                     text: message.plain_text(),
                 },
                 tick
@@ -469,9 +500,9 @@ impl GameDetailsAnalyser {
                     if let Some(player) = self.get_player_of_entity_mut(&EntityId::from(entity_id)) {
                         match table_name.as_str() {
                             "m_iTeam" => {
-                                player.team = Team::new(
-                                    i64::try_from(&prop.value).unwrap_or_default()
-                                );
+                                let new_team = Team::new(i64::try_from(&prop.value).unwrap_or_default());
+
+                                player.team = new_team;
                             }
                             "m_iPlayerClass" => {
                                 player.class = Class::new(
@@ -663,6 +694,16 @@ impl GameDetailsAnalyser {
         }
     }
 
+    fn handle_player_team_event(&mut self, event: &PlayerTeamEvent, tick: DemoTick) {
+        let player_id = event.user_id;
+
+        if let Ok(team) = Team::try_from(event.team) {
+            if let Some(player) = self.players.get_mut(&player_id.into()) {
+                player.team = team;
+            }
+        }
+    }
+
     fn handle_player_hurt_event(&mut self, event: &PlayerHurtEvent, tick: DemoTick) {
         let victim_id = UserId::from(event.user_id);
 
@@ -696,7 +737,10 @@ impl GameDetailsAnalyser {
                     TF_WEAPON_CROSSBOW
             )
         {
-            self.add_highlight(Highlight::Airshot { attacker_id, victim_id }, tick);
+            self.add_highlight(Highlight::Airshot {
+                attacker: self.player_snapshot(event.attacker),
+                victim: self.player_snapshot(event.user_id),
+            }, tick);
         }
     }
 
@@ -738,6 +782,7 @@ impl GameDetailsAnalyser {
         }
 
         let mut kill_icon = event.weapon.as_ref();
+        let mut killer_name_override: Option<String> = None;
 
         // Substitute the kill icon according to the kill flags, if necessary.
         if let Some(custom_kill) = CustomDamage::from_u16(event.custom_kill) {
@@ -789,22 +834,19 @@ impl GameDetailsAnalyser {
                 }
                 TF_DMG_CUSTOM_EYEBALL_ROCKET => {
                     if killer_id == 0 {
-                        // TODO
-                        // Set the killer name to "MONOCULUS!"
+                        killer_name_override = Some("MONOCULUS!".into());
                     }
                 }
                 | TF_DMG_CUSTOM_MERASMUS_ZAP
                 | TF_DMG_CUSTOM_MERASMUS_GRENADE
                 | TF_DMG_CUSTOM_MERASMUS_DECAPITATION => {
                     if killer_id == 0 {
-                        // TODO
-                        // Set the killer name to "MERASMUS!"
+                        killer_name_override = Some("MERASMUS!".into());
                     }
                 }
                 TF_DMG_CUSTOM_SPELL_SKELETON => {
                     if killer_id == 0 {
-                        // TODO
-                        // Set the killer name to "SKELETON"
+                        killer_name_override = Some("SKELETON".into());
                     }
                 }
                 TF_DMG_CUSTOM_KART => {
@@ -833,29 +875,65 @@ impl GameDetailsAnalyser {
 
         self.add_highlight(
             Highlight::Kill {
-                killer_id,
-                assister_id: maybe_assister_id,
-                victim_id,
+                killer: self.player_snapshot_with_name(event.attacker, killer_name_override),
+                assister: maybe_assister_id.map(|_assister| {
+                    self.player_snapshot(event.assister)
+                }),
+                victim: self.player_snapshot(event.user_id),
                 weapon: event.weapon.to_string(),
                 kill_icon: kill_icon.to_string(),
                 streak: event.kill_streak_total as usize,
                 drop,
                 airshot,
             },
-            tick
-        )
+            tick,
+        );
+
+        if event.kill_streak_total > 0 && event.kill_streak_total % 5 == 0 {
+            self.add_highlight(
+                Highlight::KillStreak {
+                    player: self.player_snapshot(event.attacker),
+                    streak: event.kill_streak_total,
+                },
+                tick
+            );
+        }
+
+        // Note: kill_streak_assist is only incremented when a medic gets an assist while their
+        // medigun is active (which isn't always when their heal target gets a kill!)
+        if event.kill_streak_assist > 0 && event.kill_streak_assist % 5 == 0 {
+            if let Some(_assister) = maybe_assister_id.and_then(|a| self.players.get(&a)) {
+                self.add_highlight(
+                    Highlight::KillStreak {
+                        player: self.player_snapshot(event.assister),
+                        streak: event.kill_streak_assist,
+                    },
+                    tick,
+                );
+            }
+        };
+
+        if event.kill_streak_victim >= 10 {
+            self.add_highlight(
+                Highlight::KillStreakEnded {
+                    killer: self.player_snapshot(event.attacker),
+                    victim: self.player_snapshot(event.user_id),
+                    streak: event.kill_streak_victim
+                },
+                tick
+            );
+        }
     }
 
     fn handle_crossbow_heal_event(&mut self, event: &CrossbowHealEvent, tick: DemoTick) {
         let target_id = UserId::from(event.target);
-        let healer_id = UserId::from(event.healer);
 
         if let Some(target_player) = self.players.get(&target_id) {
             if target_player.has_cond(&PlayerCondition::TF_COND_BLASTJUMPING) {
                 self.add_highlight(
                     Highlight::CrossbowAirshot {
-                        healer_id,
-                        target_id,
+                        healer: self.player_snapshot(event.healer as u16),
+                        target: self.player_snapshot(event.target as u16)
                     },
                     tick
                 );
@@ -949,6 +1027,47 @@ impl GameDetailsAnalyser {
     fn handle_uber_used_event(&mut self, event: &PlayerChargeDeployedEvent, _tick: DemoTick) {
         if let Some(healer) = self.players.get_mut(&UserId::from(event.user_id)) {
             healer.invulns += 1;
+        }
+    }
+
+    /// Creates a snapshot for a player with the given user ID.
+    fn player_snapshot(&self, user_id: u16) -> HighlightPlayerSnapshot {
+        self.player_snapshot_with_name(user_id, None)
+    }
+
+    /// Creates a snapshot for a player with the given user ID and an optional specified name.
+    /// If a name isn't provided, the player's current name will be taken from the current demo
+    /// state.
+    fn player_snapshot_with_name(&self, user_id: u16, name_override: Option<String>) -> HighlightPlayerSnapshot {
+        const UNKNOWN_TEAM: Team = Team::Other;
+
+        if user_id == 0 {
+            // World.  Need to check the raw value first, otherwise we could end up attributing to
+            // a player whose ID number is a multiple of 256 (which would look weird, with a bunch
+            // of highlights attributed to the wrong person!)
+            return HighlightPlayerSnapshot {
+                user_id: 0u16.into(),
+                name: name_override.unwrap_or("WORLD".to_string()),
+                team: UNKNOWN_TEAM,
+            }
+        }
+
+        match self.players.get(&user_id.into()) {
+            Some(player) => {
+                HighlightPlayerSnapshot {
+                    user_id: player.user_id,
+                    name: name_override.unwrap_or(player.name.clone()),
+                    team: player.team,
+                }
+            }
+            None => {
+                // Most likely UserId(0)
+                HighlightPlayerSnapshot {
+                    user_id: user_id.into(),
+                    name: name_override.unwrap_or("<unknown>".to_string()),
+                    team: UNKNOWN_TEAM,
+                }
+            }
         }
     }
 }
