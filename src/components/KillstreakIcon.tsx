@@ -29,9 +29,9 @@ export default function KillstreakIcon({ streak }: KillstreakIconProps) {
               colorScheme === "dark" ? iconFile : iconNegFile
             })`,
             backgroundRepeat: "no-repeat",
-            backgroundSize: 16,
+            backgroundSize: 17,
             height: 16,
-            width: 16,
+            width: 17,
           }}
         />
       </span>
