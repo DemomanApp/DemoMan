@@ -4,7 +4,7 @@ mod player_condition;
 mod player_flag;
 mod weapon_class;
 
-use std::cmp::Reverse;
+use std::cmp::{ Ordering, Reverse };
 use std::{ convert::TryFrom, collections::HashMap };
 use std::str::FromStr;
 
@@ -19,11 +19,9 @@ use tf_demo_parser::{
         data::DemoTick,
         gameevent_gen::{
             CrossbowHealEvent,
-            PlayerChargeDeployedEvent,
             PlayerConnectClientEvent,
             PlayerDeathEvent,
             PlayerDisconnectEvent,
-            PlayerHealedEvent,
             PlayerHurtEvent,
             PlayerSpawnEvent,
             TeamPlayPointCapturedEvent,
@@ -44,7 +42,6 @@ use tf_demo_parser::{
         },
         parser::{ analyser::{ Class, Team, UserId }, MessageHandler },
         sendprop::{
-            SendProp,
             SendPropIdentifier,
         },
     },
@@ -59,7 +56,6 @@ pub use damage_flag::DamageFlag;
 pub use player_condition::PlayerCondition;
 pub use player_flag::PlayerFlag;
 pub use weapon_class::WeaponClass;
-use crate::demo::analyser::Comparison::{Equal, Greater, Lesser};
 
 #[derive(Debug, Default, Clone, Copy, Serialize, Deserialize, PartialEq, FromPrimitive)]
 pub enum PlayerLifeState {
@@ -365,24 +361,6 @@ impl MessageHandler for GameDetailsAnalyser {
     }
 }
 
-enum Comparison {
-    Lesser,
-    Greater,
-    Equal,
-}
-
-impl Comparison {
-    fn compare<T: PartialOrd>(a: T, b: T) -> Comparison {
-        if a < b {
-            Lesser
-        } else if a > b {
-            Greater
-        } else {
-            Equal
-        }
-    }
-}
-
 // Macro to help with parsing scoreboard properties.  The logic is the same for each property,
 // just with a different attribute name.  This makes it easier to manage all 16+ score attributes
 macro_rules! process_score_prop {
@@ -392,13 +370,13 @@ macro_rules! process_score_prop {
 
             // Compare the value on the packet with the value on the match scoreboard
             // (which is the maximum received value)
-            match Comparison::compare($name, $player.scoreboard.$name) {
-                Lesser => {
+            match $name.cmp(&$player.scoreboard.$name) {
+                Ordering::Less => {
                     // Less than the match score
                     // Since match scores can never decrease, this property is guaranteed to be for the current round
                     $player.round_scoreboards.entry($current_round).or_default().$name = $name;
                 },
-                Greater => {
+                Ordering::Greater => {
                     // More than the current value for the entire match, which guarantees it's
                     // for the player's global scoreboard
                     $player.scoreboard.$name = $name;
@@ -412,7 +390,7 @@ macro_rules! process_score_prop {
                         // round, which means that the score for this round MUST be less than the match score
                     }
                 },
-                Equal => {
+                Ordering::Equal => {
                     // Same value as the match scoreboard.  Don't bother updating it.
                     if $current_round == 0 ||
                         !$player.round_scoreboards.iter().any(|(round, scoreboard)| *round < $current_round && scoreboard.$name > 0) {
