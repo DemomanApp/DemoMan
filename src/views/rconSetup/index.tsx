@@ -16,8 +16,7 @@ export default function RconSetup() {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
 
-  // See https://github.com/mantinedev/mantine/issues/2642
-  if (rconPassword === undefined || rconPassword === "") {
+  if (rconPassword === undefined) {
     // Set a new random password
     setRconPassword(btoa(Math.random().toString()).substring(10, 20));
     return null;

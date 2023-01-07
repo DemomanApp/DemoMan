@@ -1,11 +1,5 @@
 import { useLocalStorage } from "@mantine/hooks";
 
-// Note: Currently, if a key is not found in the store
-// and the default value is set to `undefined`,
-// this hook returns an empty string instead of `undefined`.
-// Related issue:
-// https://github.com/mantinedev/mantine/issues/2642
-
 export type StoreSchema = {
   demoPath: string | undefined;
   demoPaths: string[];

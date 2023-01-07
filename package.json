@@ -14,9 +14,9 @@
   },
   "dependencies": {
     "@emotion/react": "^11.10.4",
-    "@mantine/core": "^5.5.4",
-    "@mantine/hooks": "^5.5.4",
-    "@mantine/modals": "^5.5.4",
+    "@mantine/core": "^5.10.0",
+    "@mantine/hooks": "^5.10.0",
+    "@mantine/modals": "^5.10.0",
     "@tabler/icons": "^1.101.0",
     "@tauri-apps/api": "^1.1.0",
     "memoize-one": "^6.0.0",
