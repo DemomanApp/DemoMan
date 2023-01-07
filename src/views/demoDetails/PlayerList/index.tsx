@@ -1,3 +1,4 @@
+import { useState } from "react";
 import {
   createStyles,
   Paper,
@@ -7,10 +8,9 @@ import {
   Title,
 } from "@mantine/core";
 import { EMPTY_SCOREBOARD, GameSummary, PlayerSummary } from "../../../demo";
-import { TableHeader } from "./TableHeader";
 import { PlayerBox } from "./PlayerBox";
-import ScoreboardTable from "./ScoreboardTable";
-import { useState } from "react";
+import { ScoreboardTable } from "./ScoreboardTable";
+import { TableHeader } from "./TableHeader";
 
 export type PlayerListProps = {
   gameSummary: GameSummary;

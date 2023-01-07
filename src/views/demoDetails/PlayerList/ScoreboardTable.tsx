@@ -26,7 +26,7 @@ const useStyles = createStyles((theme) => ({
   },
 }));
 
-export default function ScoreboardTable({ scoreboard }: ScoreboardTableProps) {
+export function ScoreboardTable({ scoreboard }: ScoreboardTableProps) {
   const { classes } = useStyles();
 
   return (
