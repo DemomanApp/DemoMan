@@ -87,6 +87,32 @@ export default function PlayerList({ gameSummary }: PlayerListProps) {
 
   const { classes } = useStyles();
 
+  /**
+   * Creates a function for use on player selection.  This will set set the scoreboard to
+   * display the board for the currently selected round (or match, if that tab is selected).
+   * If the player has no scoreboard for that round, this will switch the selected tab
+   * back to the match tab and display that scoreboard instead.
+   */
+  function createPlayerSelectionCallback(player: PlayerSummary) {
+    return () => {
+      setCurrentPlayer(player);
+      if (currentTab === "match") {
+        scoreboardRef.current?.setScoreboard(player.scoreboard);
+      } else {
+        const roundNum = currentTab as unknown as number;
+        const roundScoreboard = player?.round_scoreboards[roundNum];
+        if (roundScoreboard !== undefined) {
+          scoreboardRef.current?.setScoreboard(roundScoreboard);
+        } else {
+          setCurrentTab("match");
+          scoreboardRef.current?.setScoreboard(
+            player?.scoreboard ?? EMPTY_SCOREBOARD
+          );
+        }
+      }
+    };
+  }
+
   return (
     <Paper radius="md" className={classes.paper} withBorder>
       {/* Header */}
@@ -123,16 +149,7 @@ export default function PlayerList({ gameSummary }: PlayerListProps) {
               <PlayerBox
                 key={player.user_id}
                 player={player}
-                onClick={() => {
-                  setCurrentPlayer(player);
-                  const scoreboard =
-                    currentTab === "match"
-                      ? player.scoreboard
-                      : player.round_scoreboards[
-                          currentTab as unknown as number
-                        ];
-                  scoreboardRef.current?.setScoreboard(scoreboard);
-                }}
+                onClick={createPlayerSelectionCallback(player)}
                 selected={player.user_id === currentPlayer?.user_id}
               />
             ))}
@@ -141,16 +158,7 @@ export default function PlayerList({ gameSummary }: PlayerListProps) {
             {redPlayers.map((player) => (
               <PlayerBox
                 key={player.user_id}
-                onClick={() => {
-                  setCurrentPlayer(player);
-                  const scoreboard =
-                    currentTab === "match"
-                      ? player.scoreboard
-                      : player.round_scoreboards[
-                          currentTab as unknown as number
-                        ];
-                  scoreboardRef.current?.setScoreboard(scoreboard);
-                }}
+                onClick={createPlayerSelectionCallback(player)}
                 player={player}
                 selected={player.user_id === currentPlayer?.user_id}
               />
@@ -164,7 +172,7 @@ export default function PlayerList({ gameSummary }: PlayerListProps) {
         <Title>{currentPlayer?.name ?? ""}</Title>
       </div>
       <div>
-        <Tabs defaultValue={"match"}>
+        <Tabs defaultValue={"match"} value={currentTab.toString()}>
           <Tabs.List>
             <Tabs.Tab
               value={"match"}
@@ -181,18 +189,24 @@ export default function PlayerList({ gameSummary }: PlayerListProps) {
               (roundNum) => {
                 return (
                   <Tabs.Tab
-                    value={`round${roundNum}`}
+                    value={`${roundNum}`}
                     key={roundNum}
                     disabled={
                       (currentPlayer?.round_scoreboards[roundNum] ?? null) ===
                       null
                     } // disable if the player wasn't in this round
                     onClick={() => {
-                      setCurrentTab(roundNum);
-                      scoreboardRef.current?.setScoreboard(
-                        currentPlayer?.round_scoreboards[roundNum] ??
-                          EMPTY_SCOREBOARD
-                      );
+                      const roundScoreboard =
+                        currentPlayer?.round_scoreboards[roundNum];
+                      if (roundScoreboard !== undefined) {
+                        setCurrentTab(roundNum);
+                        scoreboardRef.current?.setScoreboard(roundScoreboard);
+                      } else {
+                        setCurrentTab("match");
+                        scoreboardRef.current?.setScoreboard(
+                          currentPlayer?.scoreboard ?? EMPTY_SCOREBOARD
+                        );
+                      }
                     }}
                   >
                     Round {roundNum + 1}
