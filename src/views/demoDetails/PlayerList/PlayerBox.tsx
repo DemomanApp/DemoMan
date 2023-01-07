@@ -9,14 +9,14 @@ interface PlayerBoxProps {
   onClick: () => void;
 }
 
-const useStyles = createStyles((_theme) => ({
+const useStyles = createStyles((theme) => ({
   box: {
     height: "40px",
     display: "flex",
     alignItems: "center",
     paddingRight: 8,
     "&:hover": {
-      backgroundColor: "rgba(255, 255, 255, 0.05)",
+      backgroundColor: theme.colors.dark[5],
       cursor: "pointer",
     },
   },
@@ -25,9 +25,9 @@ const useStyles = createStyles((_theme) => ({
     display: "flex",
     alignItems: "center",
     paddingRight: 8,
-    background: "rgba(140, 210, 255, 0.2)",
+    background: theme.colors.indigo[9],
     "&:hover": {
-      backgroundColor: "rgba(140, 210, 255, 0.1)",
+      backgroundColor: theme.colors.indigo[7],
       cursor: "pointer",
     },
   },
