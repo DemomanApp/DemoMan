@@ -10,7 +10,7 @@ import { EMPTY_SCOREBOARD, GameSummary, PlayerSummary } from "../../../demo";
 import { TableHeader } from "./TableHeader";
 import { PlayerBox } from "./PlayerBox";
 import ScoreboardTable from "./ScoreboardTable";
-import { MutableRefObject, useRef, useState } from "react";
+import { useState } from "react";
 
 export type PlayerListProps = {
   gameSummary: GameSummary;
@@ -63,9 +63,10 @@ export default function PlayerList({ gameSummary }: PlayerListProps) {
     gameSummary.players.find((p) => p.user_id === gameSummary.local_user_id) ??
     null;
 
-  // Used so we can display the scoreboard for any arbitrary player via user interaction
-  const scoreboardRef: MutableRefObject<ScoreboardTable | null> = useRef(null);
   const [currentPlayer, setCurrentPlayer] = useState(mainPlayer);
+  const [currentScoreboard, setCurrentScoreboard] = useState(
+    mainPlayer?.scoreboard
+  );
 
   // currentTab will be either the round number (0..n), or "match" to display the scoreboard for the entire game
   const [currentTab, setCurrentTab] = useState<string | number>("match");
@@ -97,17 +98,15 @@ export default function PlayerList({ gameSummary }: PlayerListProps) {
     return () => {
       setCurrentPlayer(player);
       if (currentTab === "match") {
-        scoreboardRef.current?.setScoreboard(player.scoreboard);
+        setCurrentScoreboard(player.scoreboard);
       } else {
         const roundNum = currentTab as unknown as number;
         const roundScoreboard = player?.round_scoreboards[roundNum];
         if (roundScoreboard !== undefined) {
-          scoreboardRef.current?.setScoreboard(roundScoreboard);
+          setCurrentScoreboard(roundScoreboard);
         } else {
           setCurrentTab("match");
-          scoreboardRef.current?.setScoreboard(
-            player?.scoreboard ?? EMPTY_SCOREBOARD
-          );
+          setCurrentScoreboard(player?.scoreboard ?? EMPTY_SCOREBOARD);
         }
       }
     };
@@ -178,7 +177,7 @@ export default function PlayerList({ gameSummary }: PlayerListProps) {
               value={"match"}
               onClick={() => {
                 setCurrentTab("match");
-                scoreboardRef.current?.setScoreboard(
+                setCurrentScoreboard(
                   currentPlayer?.scoreboard ?? EMPTY_SCOREBOARD
                 );
               }}
@@ -200,10 +199,10 @@ export default function PlayerList({ gameSummary }: PlayerListProps) {
                         currentPlayer?.round_scoreboards[roundNum];
                       if (roundScoreboard !== undefined) {
                         setCurrentTab(roundNum);
-                        scoreboardRef.current?.setScoreboard(roundScoreboard);
+                        setCurrentScoreboard(roundScoreboard);
                       } else {
                         setCurrentTab("match");
-                        scoreboardRef.current?.setScoreboard(
+                        setCurrentScoreboard(
                           currentPlayer?.scoreboard ?? EMPTY_SCOREBOARD
                         );
                       }
@@ -217,10 +216,7 @@ export default function PlayerList({ gameSummary }: PlayerListProps) {
           </Tabs.List>
         </Tabs>
         {/* The actual scoreboard component.  This will be updated when players or tabs are clicked, rather than creating an entirely new component */}
-        <ScoreboardTable
-          ref={scoreboardRef}
-          scoreboard={mainPlayer?.scoreboard ?? EMPTY_SCOREBOARD}
-        />
+        <ScoreboardTable scoreboard={currentScoreboard ?? EMPTY_SCOREBOARD} />
       </div>
     </Paper>
   );
