@@ -18,8 +18,8 @@ serde_json = "^1.0"
 serde = { version = "^1.0", features = ["derive"] }
 tauri = { version = "^1.0", features = ["api-all"] }
 log = "^0.4"
-bitbuffer = "0.10.8"
-trash = "2.1.5"
+bitbuffer = "0.10.9"
+trash = "3.0.0"
 steamid-ng = "1.0.0"
 num-traits = "0.2.15"
 num-derive = "0.3.3"
@@ -28,7 +28,7 @@ tokio = "1.21.2"
 
 [dependencies.tf-demo-parser]
 git = "https://github.com/demostf/parser"
-rev = "9e3f008e510a0b69cefd48e606adccb7669e700c"
+rev = "d82555e58adfe0a03c66a80d94bc141c1599cb91"
 
 [dependencies.tauri-plugin-store]
 # To be replaced by a proper package when it becomes available
