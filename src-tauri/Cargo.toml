@@ -30,11 +30,6 @@ tokio = "1.21.2"
 git = "https://github.com/demostf/parser"
 rev = "d82555e58adfe0a03c66a80d94bc141c1599cb91"
 
-[dependencies.tauri-plugin-store]
-# To be replaced by a proper package when it becomes available
-git = "https://github.com/tauri-apps/tauri-plugin-store"
-branch = "dev"
-
 [dependencies.tauri-plugin-log]
 # To be replaced by a proper package when it becomes available
 git = "https://github.com/tauri-apps/tauri-plugin-log"
