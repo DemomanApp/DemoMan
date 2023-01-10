@@ -211,9 +211,11 @@ export default function HomeViewAsyncWrapper() {
       error={(error) => (
         <Fill>
           <Alert color="red">
-            {/* NOTE: this shouldn't happen unless no home directory was found */}
             An error occurred while scanning for demo files. Is the demo storage
             directory set?
+            <div>
+              Error: {String(error)}
+            </div>
           </Alert>
         </Fill>
       )}
