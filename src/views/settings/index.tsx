@@ -57,12 +57,6 @@ export default function SettingsView() {
           <TextInput value={demoPath ?? ""} disabled={true}></TextInput>
         </span>
       </ScrollArea.Autosize>
-
-      <div>
-        <Link to={"/"}>
-          <Button>Back</Button>
-        </Link>
-      </div>
     </div>
   );
 }
