@@ -21,7 +21,6 @@ import { NavbarPortal, NavbarButton } from "../../AppShell";
 import { getDemosInDirectory } from "../../api";
 import { Async, Fill } from "../../components";
 import useStore from "../../hooks/useStore";
-import { useAsync } from "react-async-hook";
 import { getDefaultDemosDir } from "../settings/storage";
 
 const PADDING_SIZE = 16;
@@ -195,14 +194,30 @@ function MainView({ demos }: { demos: Demo[] }) {
 }
 
 export default function HomeViewAsyncWrapper() {
-  const [demoPath, _setDemoPath] = useStore("demoPath");
-  // Used as fallback in case the user hasn't configured the demos directory yet
-  const defaultTf2DirState = useAsync(() => getDefaultDemosDir(), []);
+  const [storedDemoPath, setStoredDemoPath] = useStore("demoPath");
+  const [demoPath, setDemoPath] = useState(storedDemoPath);
+
+  if (storedDemoPath === undefined) {
+    // Used as fallback in case the user hasn't configured the demos directory yet
+    getDefaultDemosDir()
+      .then(dir => {
+        if (storedDemoPath === undefined) {
+          setStoredDemoPath(dir);
+          setDemoPath(dir);
+        }
+        return dir;
+      })
+      .catch(_err => {
+        // Failed to get the default directory.  At this point, there's nothing reasonable
+        // we can do other than alert the user and prompt them to set the directory themselves
+        return;
+      });
+  }
 
   return (
     <Async
       promiseFn={getDemosInDirectory}
-      args={[demoPath ?? defaultTf2DirState.result ?? ""]}
+      args={[demoPath ?? ""]}
       loading={
         <Fill>
           <Loader size="lg" variant="dots" />
