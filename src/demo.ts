@@ -126,6 +126,10 @@ export type HighlightEvent = {
   event: Highlight;
 };
 
+type ScoreboardMap = {
+  [key: number]: Scoreboard;
+};
+
 export type PlayerSummary = {
   name: string;
   steam_id: SteamID;
@@ -134,13 +138,9 @@ export type PlayerSummary = {
   team: Team;
   classes: number[];
 
-  damage: number;
-  kills: number;
-  deaths: number;
-  assists: number;
-  healing: number;
-  invulns: number;
-  captures: number;
+  scoreboard: Scoreboard;
+
+  round_scoreboards: ScoreboardMap;
 };
 
 export type GameSummary = {
@@ -150,6 +150,48 @@ export type GameSummary = {
   blue_team_score: number;
   interval_per_tick: number;
   players: PlayerSummary[];
+  num_rounds: number;
+};
+
+export type Scoreboard = {
+  points: number;
+  kills: number;
+  assists: number;
+  deaths: number;
+  buildings_destroyed: number;
+  captures: number;
+  defenses: number;
+  dominations: number;
+  revenges: number;
+  ubercharges: number;
+  headshots: number;
+  teleports: number;
+  healing: number;
+  backstabs: number;
+  bonus_points: number;
+  support: number;
+  damage_dealt: number;
+};
+
+export const EMPTY_SCOREBOARD = {
+  user_id: 0,
+  points: 0,
+  kills: 0,
+  assists: 0,
+  deaths: 0,
+  buildings_destroyed: 0,
+  captures: 0,
+  defenses: 0,
+  dominations: 0,
+  revenges: 0,
+  ubercharges: 0,
+  headshots: 0,
+  teleports: 0,
+  healing: 0,
+  backstabs: 0,
+  bonus_points: 0,
+  support: 0,
+  damage_dealt: 0,
 };
 
 export function isStvDemo(demo: Demo) {

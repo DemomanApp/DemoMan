@@ -1,7 +1,16 @@
-import { createStyles, Paper, ScrollArea, Text } from "@mantine/core";
-import { GameSummary, PlayerSummary } from "../../../demo";
-import { TableHeader } from "./TableHeader";
+import { useState } from "react";
+import {
+  createStyles,
+  Paper,
+  ScrollArea,
+  Tabs,
+  Text,
+  Title,
+} from "@mantine/core";
+import { EMPTY_SCOREBOARD, GameSummary, PlayerSummary } from "../../../demo";
 import { PlayerBox } from "./PlayerBox";
+import { ScoreboardTable } from "./ScoreboardTable";
+import { TableHeader } from "./TableHeader";
 
 export type PlayerListProps = {
   gameSummary: GameSummary;
@@ -35,12 +44,32 @@ const useStyles = createStyles((theme) => ({
     display: "inline-block",
     verticalAlign: "top",
   },
+  scoreboardDivider: {
+    border: "none",
+    borderTop: "1px solid #444",
+    margin: "16px",
+  },
+  scoreboardPlayerNameHeader: {
+    paddingLeft: "16px",
+  },
 }));
 
 export default function PlayerList({ gameSummary }: PlayerListProps) {
   const redPlayers: PlayerSummary[] = [];
   const bluPlayers: PlayerSummary[] = [];
   const others: PlayerSummary[] = [];
+
+  const mainPlayer: PlayerSummary | null =
+    gameSummary.players.find((p) => p.user_id === gameSummary.local_user_id) ??
+    null;
+
+  const [currentPlayer, setCurrentPlayer] = useState(mainPlayer);
+  const [currentScoreboard, setCurrentScoreboard] = useState(
+    mainPlayer?.scoreboard
+  );
+
+  // currentTab will be either the round number (0..n), or "match" to display the scoreboard for the entire game
+  const [currentTab, setCurrentTab] = useState<string | number>("match");
 
   gameSummary.players.forEach((player) => {
     if (player.team === "red") {
@@ -52,7 +81,36 @@ export default function PlayerList({ gameSummary }: PlayerListProps) {
     }
   });
 
+  // TODO: Allow the tables to be sorted by the column headers (kills, deaths, etc)
+  // TODO: Maybe add a button to export the match data as JSON?
+  redPlayers.sort((a, b) => b.scoreboard?.points - a.scoreboard?.points);
+  bluPlayers.sort((a, b) => b.scoreboard?.points - a.scoreboard?.points);
+
   const { classes } = useStyles();
+
+  /**
+   * Creates a function for use on player selection.  This will set set the scoreboard to
+   * display the board for the currently selected round (or match, if that tab is selected).
+   * If the player has no scoreboard for that round, this will switch the selected tab
+   * back to the match tab and display that scoreboard instead.
+   */
+  function createPlayerSelectionCallback(player: PlayerSummary) {
+    return () => {
+      setCurrentPlayer(player);
+      if (currentTab === "match") {
+        setCurrentScoreboard(player.scoreboard);
+      } else {
+        const roundNum = currentTab as unknown as number;
+        const roundScoreboard = player?.round_scoreboards[roundNum];
+        if (roundScoreboard !== undefined) {
+          setCurrentScoreboard(roundScoreboard);
+        } else {
+          setCurrentTab("match");
+          setCurrentScoreboard(player?.scoreboard ?? EMPTY_SCOREBOARD);
+        }
+      }
+    };
+  }
 
   return (
     <Paper radius="md" className={classes.paper} withBorder>
@@ -83,20 +141,83 @@ export default function PlayerList({ gameSummary }: PlayerListProps) {
         <TableHeader />
       </div>
       {/* Player list */}
-      <ScrollArea.Autosize maxHeight={300}>
+      <ScrollArea.Autosize maxHeight={360}>
         <div>
           <div className={classes.playerListColumn}>
             {bluPlayers.map((player) => (
-              <PlayerBox key={player.user_id} player={player} />
+              <PlayerBox
+                key={player.user_id}
+                player={player}
+                onClick={createPlayerSelectionCallback(player)}
+                selected={player.user_id === currentPlayer?.user_id}
+              />
             ))}
           </div>
           <div className={classes.playerListColumn}>
             {redPlayers.map((player) => (
-              <PlayerBox key={player.user_id} player={player} />
+              <PlayerBox
+                key={player.user_id}
+                onClick={createPlayerSelectionCallback(player)}
+                player={player}
+                selected={player.user_id === currentPlayer?.user_id}
+              />
             ))}
           </div>
         </div>
       </ScrollArea.Autosize>
+      {/* Divider above the scoreboard*/}
+      <hr className={classes.scoreboardDivider} />
+      <div className={classes.scoreboardPlayerNameHeader}>
+        <Title>{currentPlayer?.name ?? ""}</Title>
+      </div>
+      <div>
+        <Tabs defaultValue={"match"} value={currentTab.toString()}>
+          <Tabs.List>
+            <Tabs.Tab
+              value={"match"}
+              onClick={() => {
+                setCurrentTab("match");
+                setCurrentScoreboard(
+                  currentPlayer?.scoreboard ?? EMPTY_SCOREBOARD
+                );
+              }}
+            >
+              Match
+            </Tabs.Tab>
+            {Array.from({ length: gameSummary.num_rounds }, (x, i) => i).map(
+              (roundNum) => {
+                return (
+                  <Tabs.Tab
+                    value={`${roundNum}`}
+                    key={roundNum}
+                    disabled={
+                      (currentPlayer?.round_scoreboards[roundNum] ?? null) ===
+                      null
+                    } // disable if the player wasn't in this round
+                    onClick={() => {
+                      const roundScoreboard =
+                        currentPlayer?.round_scoreboards[roundNum];
+                      if (roundScoreboard !== undefined) {
+                        setCurrentTab(roundNum);
+                        setCurrentScoreboard(roundScoreboard);
+                      } else {
+                        setCurrentTab("match");
+                        setCurrentScoreboard(
+                          currentPlayer?.scoreboard ?? EMPTY_SCOREBOARD
+                        );
+                      }
+                    }}
+                  >
+                    Round {roundNum + 1}
+                  </Tabs.Tab>
+                );
+              }
+            )}
+          </Tabs.List>
+        </Tabs>
+        {/* The actual scoreboard component.  This will be updated when players or tabs are clicked, rather than creating an entirely new component */}
+        <ScoreboardTable scoreboard={currentScoreboard ?? EMPTY_SCOREBOARD} />
+      </div>
     </Paper>
   );
 }
