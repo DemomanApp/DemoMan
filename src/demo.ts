@@ -140,6 +140,29 @@ export type Highlight =
   | { PlayerTeamChange: PlayerTeamChangeHighlight }
   | { Pause: PauseHighlight };
 
+// Awful hack to get around using #[serde(tag = "...")],
+// which is unsupported by bincode.
+export type TaggedHighlight =
+  | { type: "Kill"; highlight: KillHighlight }
+  | { type: "KillStreak"; highlight: KillStreakHighlight }
+  | { type: "KillStreakEnded"; highlight: KillStreakEndedHighlight }
+  | { type: "ChatMessage"; highlight: ChatMessageHighlight }
+  | { type: "Airshot"; highlight: AirshotHighlight }
+  | { type: "CrossbowAirshot"; highlight: CrossbowAirshotHighlight }
+  | { type: "PointCaptured"; highlight: PointCapturedHighlight }
+  | { type: "RoundStalemate"; highlight: RoundStalemateHighlight }
+  | { type: "RoundStart"; highlight: RoundStartHighlight }
+  | { type: "RoundWin"; highlight: RoundWinHighlight }
+  | { type: "PlayerConnected"; highlight: PlayerConnectedHighlight }
+  | { type: "PlayerDisconnected"; highlight: PlayerDisconnectedHighlight }
+  | { type: "PlayerTeamChange"; highlight: PlayerTeamChangeHighlight }
+  | { type: "Pause"; highlight: PauseHighlight };
+
+export function destructureHighlight(hl: Highlight): TaggedHighlight {
+  const [type, highlight] = Object.entries(hl)[0];
+  return { type, highlight } as TaggedHighlight;
+}
+
 export type HighlightEvent = {
   tick: number;
   event: Highlight;
