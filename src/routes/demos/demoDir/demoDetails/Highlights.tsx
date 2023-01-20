@@ -61,6 +61,12 @@ function doesHighlightIncludePlayer(
       return samePlayer(playerId, highlight.highlight.player);
     case "PlayerDisconnected":
       return samePlayer(playerId, highlight.highlight.player);
+    case "PointCaptured":
+      return highlight.highlight.cappers.some((capper) =>
+        samePlayer(playerId, capper)
+      );
+    case "PlayerTeamChange":
+      return samePlayer(playerId, highlight.highlight.player);
     default:
       return true;
   }
@@ -96,20 +102,21 @@ export default function HighlightsList({ gameSummary }: TimelineProps) {
       highlights = highlights.filter((highlight) => {
         const taggedHighlight = destructureHighlight(highlight.event);
         if (taggedHighlight.type === "ChatMessage") {
-          regex.test(taggedHighlight.highlight.sender.name) ||
-            regex.test(taggedHighlight.highlight.text);
+          return (
+            regex.test(taggedHighlight.highlight.sender.name) ||
+            regex.test(taggedHighlight.highlight.text)
+          );
         } else {
           return true;
         }
       });
     }
     if (!filters.visibleKillfeed) {
+      highlights = highlights.filter((h) => !highlightIsType(h.event, "Kill"));
+    }
+    if (!filters.visibleCaptures) {
       highlights = highlights.filter(
-        (h) =>
-          !(
-            highlightIsType(h.event, "Kill") ||
-            highlightIsType(h.event, "PointCaptured")
-          )
+        (h) => !highlightIsType(h.event, "PointCaptured")
       );
     }
     if (!filters.visibleChat) {
@@ -122,7 +129,8 @@ export default function HighlightsList({ gameSummary }: TimelineProps) {
         (h) =>
           !(
             highlightIsType(h.event, "PlayerConnected") ||
-            highlightIsType(h.event, "PlayerDisconnected")
+            highlightIsType(h.event, "PlayerDisconnected") ||
+            highlightIsType(h.event, "PlayerTeamChange")
           )
       );
     }
@@ -142,6 +150,15 @@ export default function HighlightsList({ gameSummary }: TimelineProps) {
             highlightIsType(h.event, "RoundStart") ||
             highlightIsType(h.event, "RoundWin") ||
             highlightIsType(h.event, "RoundStalemate")
+          )
+      );
+    }
+    if (!filters.visibleAirshots) {
+      highlights = highlights.filter(
+        (h) =>
+          !(
+            highlightIsType(h.event, "Airshot") ||
+            highlightIsType(h.event, "CrossbowAirshot")
           )
       );
     }
