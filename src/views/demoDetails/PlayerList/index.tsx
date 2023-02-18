@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
+
 import {
   createStyles,
   Paper,
@@ -7,6 +8,7 @@ import {
   Text,
   Title,
 } from "@mantine/core";
+
 import { EMPTY_SCOREBOARD, GameSummary, PlayerSummary } from "../../../demo";
 import { PlayerBox } from "./PlayerBox";
 import { ScoreboardTable } from "./ScoreboardTable";
@@ -55,9 +57,29 @@ const useStyles = createStyles((theme) => ({
 }));
 
 export default function PlayerList({ gameSummary }: PlayerListProps) {
-  const redPlayers: PlayerSummary[] = [];
-  const bluPlayers: PlayerSummary[] = [];
-  const others: PlayerSummary[] = [];
+  const { classes } = useStyles();
+
+  const [redPlayers, bluPlayers, others] = useMemo(() => {
+    const redPlayers: PlayerSummary[] = [];
+    const bluPlayers: PlayerSummary[] = [];
+    const others: PlayerSummary[] = [];
+
+    gameSummary.players.forEach((player) => {
+      if (player.team === "red") {
+        redPlayers.push(player);
+      } else if (player.team === "blue") {
+        bluPlayers.push(player);
+      } else {
+        others.push(player);
+      }
+    });
+  
+    // TODO: Allow the tables to be sorted by the column headers (kills, deaths, etc)
+    // TODO: Maybe add a button to export the match data as JSON?
+    redPlayers.sort((a, b) => b.scoreboard?.points - a.scoreboard?.points);
+    bluPlayers.sort((a, b) => b.scoreboard?.points - a.scoreboard?.points);
+    return [redPlayers, bluPlayers, others];
+  }, [gameSummary]);
 
   const mainPlayer: PlayerSummary | null =
     gameSummary.players.find((p) => p.user_id === gameSummary.local_user_id) ??
@@ -70,23 +92,6 @@ export default function PlayerList({ gameSummary }: PlayerListProps) {
 
   // currentTab will be either the round number (0..n), or "match" to display the scoreboard for the entire game
   const [currentTab, setCurrentTab] = useState<string | number>("match");
-
-  gameSummary.players.forEach((player) => {
-    if (player.team === "red") {
-      redPlayers.push(player);
-    } else if (player.team === "blue") {
-      bluPlayers.push(player);
-    } else {
-      others.push(player);
-    }
-  });
-
-  // TODO: Allow the tables to be sorted by the column headers (kills, deaths, etc)
-  // TODO: Maybe add a button to export the match data as JSON?
-  redPlayers.sort((a, b) => b.scoreboard?.points - a.scoreboard?.points);
-  bluPlayers.sort((a, b) => b.scoreboard?.points - a.scoreboard?.points);
-
-  const { classes } = useStyles();
 
   /**
    * Creates a function for use on player selection.  This will set set the scoreboard to
