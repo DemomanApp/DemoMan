@@ -75,6 +75,7 @@ function DemoDetailsView({ demo }: { demo: Demo }) {
               size="xl"
               inline
               style={{ cursor: "default", whiteSpace: "nowrap" }}
+              color="white"
             >
               {demo.name}
             </Text>

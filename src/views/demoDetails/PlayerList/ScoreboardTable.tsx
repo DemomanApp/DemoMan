@@ -10,7 +10,10 @@ const useStyles = createStyles((theme) => ({
   scoreboard: {
     tableLayout: "fixed",
     width: "100%",
-    background: "rgba(0, 0, 0, 0.4)",
+    background:
+      theme.colorScheme === "dark"
+        ? theme.colors.dark[9]
+        : theme.colors.gray[1],
   },
   scoreLabel: {
     textAlign: "right",

@@ -2,6 +2,7 @@ import { useMemo, useState } from "react";
 
 import {
   createStyles,
+  Divider,
   Paper,
   ScrollArea,
   Tabs,
@@ -46,13 +47,8 @@ const useStyles = createStyles((theme) => ({
     display: "inline-block",
     verticalAlign: "top",
   },
-  scoreboardDivider: {
-    border: "none",
-    borderTop: "1px solid #444",
-    margin: "16px",
-  },
   scoreboardPlayerNameHeader: {
-    paddingLeft: "16px",
+    paddingLeft: 8,
   },
 }));
 
@@ -73,7 +69,7 @@ export default function PlayerList({ gameSummary }: PlayerListProps) {
         others.push(player);
       }
     });
-  
+
     // TODO: Allow the tables to be sorted by the column headers (kills, deaths, etc)
     // TODO: Maybe add a button to export the match data as JSON?
     redPlayers.sort((a, b) => b.scoreboard?.points - a.scoreboard?.points);
@@ -145,6 +141,7 @@ export default function PlayerList({ gameSummary }: PlayerListProps) {
         <TableHeader />
         <TableHeader />
       </div>
+      <Divider/>
       {/* Player list */}
       <ScrollArea.Autosize maxHeight={360}>
         <div>
@@ -171,7 +168,7 @@ export default function PlayerList({ gameSummary }: PlayerListProps) {
         </div>
       </ScrollArea.Autosize>
       {/* Divider above the scoreboard*/}
-      <hr className={classes.scoreboardDivider} />
+      <Divider />
       <div className={classes.scoreboardPlayerNameHeader}>
         <Title>{currentPlayer?.name ?? ""}</Title>
       </div>
