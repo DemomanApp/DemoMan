@@ -2,7 +2,7 @@ import { Box, Text } from "@mantine/core";
 import { IconBookmark } from "@tabler/icons";
 
 import { DemoEvent } from "../../demo";
-import { IconKillstreak } from "../../icons";
+import { IconKillstreak } from "../../components/icons";
 
 export default function EventsBox({ events }: { events: DemoEvent[] }) {
   if (events.length === 0) {
