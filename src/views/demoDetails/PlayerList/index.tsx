@@ -55,7 +55,7 @@ const useStyles = createStyles((theme) => ({
 export default function PlayerList({ gameSummary }: PlayerListProps) {
   const { classes } = useStyles();
 
-  const [redPlayers, bluPlayers, others] = useMemo(() => {
+  const [redPlayers, bluPlayers, _others] = useMemo(() => {
     const redPlayers: PlayerSummary[] = [];
     const bluPlayers: PlayerSummary[] = [];
     const others: PlayerSummary[] = [];

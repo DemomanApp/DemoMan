@@ -21,7 +21,7 @@ type DemoListRowProps = {
 const useStyles = createStyles(
   (
     theme,
-    { selectionMode, selected }: { selectionMode: boolean; selected: boolean }
+    { selectionMode: _, selected }: { selectionMode: boolean; selected: boolean }
   ) => ({
     paper: {
       height: "120px",
