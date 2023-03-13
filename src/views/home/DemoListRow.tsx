@@ -1,7 +1,7 @@
 import { memo } from "react";
 
 import { createStyles, Group, Paper, Text, Title } from "@mantine/core";
-import { IconCalendarEvent, IconDeviceTv, IconUser } from "@tabler/icons";
+import { IconCalendarEvent, IconDeviceTv, IconUser } from "@tabler/icons-react";
 
 import { Demo, isStvDemo } from "../../demo";
 import { areEqual } from "react-window";

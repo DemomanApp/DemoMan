@@ -1,9 +1,9 @@
 import { SVGProps } from "react";
 
-import { TablerIcon, TablerIconProps } from "@tabler/icons";
+import { Icon, TablerIconsProps } from "@tabler/icons-react";
 
 function svgProps(
-  { color, size, stroke, ...other }: TablerIconProps,
+  { color, size, stroke, ...other }: TablerIconsProps,
   name: string
 ): SVGProps<SVGSVGElement> {
   return {
@@ -21,7 +21,7 @@ function svgProps(
   };
 }
 
-export const IconKillstreak: TablerIcon = (props) => (
+export const IconKillstreak: Icon = (props) => (
   <svg {...svgProps(props, "killstreak")}>
     <path stroke="none" d="M0 0h24v24H0z" />
     <path d="m 20,12 -8,8 H 4 L 12,12 4,4 h 8 z" />
@@ -29,7 +29,7 @@ export const IconKillstreak: TablerIcon = (props) => (
   </svg>
 );
 
-export const IconStv: TablerIcon = (props) => (
+export const IconStv: Icon = (props) => (
   <svg {...svgProps(props, "stv")}>
     <path stroke="none" d="M0 0h24v24H0z" />
     <path d="M 7,8 H 4 A 1,1 0 0 0 3,9 v 2 a 1,1 0 0 0 1,1 h 2 a 1,1 0 0 1 1,1 v 2 A 1,1 0 0 1 6,16 H 3" />
@@ -38,7 +38,7 @@ export const IconStv: TablerIcon = (props) => (
   </svg>
 );
 
-export const IconPov: TablerIcon = (props) => (
+export const IconPov: Icon = (props) => (
   <svg {...svgProps(props, "pov")}>
     <path stroke="none" d="M0 0h24v24H0z" />
     <path d="m 17,8 2,8 2,-8" />

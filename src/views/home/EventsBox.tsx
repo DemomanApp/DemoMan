@@ -1,5 +1,5 @@
 import { Box, Text } from "@mantine/core";
-import { IconBookmark } from "@tabler/icons";
+import { IconBookmark } from "@tabler/icons-react";
 
 import { DemoEvent } from "../../demo";
 import { IconKillstreak } from "../../components/icons";

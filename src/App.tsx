@@ -28,7 +28,7 @@ import {
   IconFolder,
   IconSettings,
   IconPlug,
-} from "@tabler/icons";
+} from "@tabler/icons-react";
 
 import { AppShellProvider, NavbarButton } from "./AppShell";
 
