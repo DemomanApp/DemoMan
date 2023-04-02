@@ -143,7 +143,7 @@ pub fn read_demo_header(
 /// If no JSON file exists or it is invalid, empty lists will be returned.
 pub fn read_events_and_tags(json_path: &Path) -> (Vec<DemoEvent>, Vec<String>) {
     // This fails if the file does not exist or is not readable
-    if let Ok(bytes) = fs::read(&json_path) {
+    if let Ok(bytes) = fs::read(json_path) {
         // This fails if the file does not contain valid JSON matching the `DemoJsonFile` type.
         if let Ok(deserialized) = serde_json::from_slice::<DemoJsonFileDe>(&bytes) {
             return (

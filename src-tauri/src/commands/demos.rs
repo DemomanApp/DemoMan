@@ -91,7 +91,7 @@ pub fn delete_demo(
     if trash {
         trash::delete(&demo.path).or(Err(DemoCommandError::FileDeleteFailed))?;
 
-        if let Err(e) = trash::delete(&demo.path.with_extension("json")) {
+        if let Err(e) = trash::delete(demo.path.with_extension("json")) {
             if let trash::Error::CouldNotAccess { target: _ } = e {
                 // We don't care if the file was not found
                 // because the demo has no JSON file.
@@ -102,7 +102,7 @@ pub fn delete_demo(
     } else {
         std::fs::remove_file(&demo.path).or(Err(DemoCommandError::FileDeleteFailed))?;
 
-        if let Err(e) = std::fs::remove_file(&demo.path.with_extension("json")) {
+        if let Err(e) = std::fs::remove_file(demo.path.with_extension("json")) {
             if e.kind() == std::io::ErrorKind::NotFound {
                 // We don't care if the file was not found
                 // because the demo has no JSON file.
@@ -132,8 +132,8 @@ pub fn rename_demo(
 
     std::fs::rename(&demo.path, &new_path).or(Err(DemoCommandError::FileRenameFailed))?;
     if let Err(e) = std::fs::rename(
-        &demo.path.with_extension("json"),
-        &new_path.with_extension("json"),
+        demo.path.with_extension("json"),
+        new_path.with_extension("json"),
     ) {
         // We don't care if the file was not found
         // because the demo has no JSON file.

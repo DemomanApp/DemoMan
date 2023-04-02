@@ -1144,11 +1144,11 @@ impl GameDetailsAnalyser {
                 HighlightPlayerSnapshot {
                     user_id,
                     name: name_override.unwrap_or_else(|| {
-                        (if user_id == 0 {
+                        if user_id == 0 {
                             "WORLD".to_string()
                         } else {
                             "<unknown>".to_string()
-                        })
+                        }
                     }),
                     team: Team::Other,
                 }
