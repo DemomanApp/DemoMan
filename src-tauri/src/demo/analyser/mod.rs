@@ -13,7 +13,6 @@ use num_derive::FromPrimitive;
 use num_traits::FromPrimitive;
 use serde::{Deserialize, Serialize};
 
-pub use crate::demo::Scoreboard;
 use steamid_ng::SteamID;
 use tf_demo_parser::demo::header::Header;
 use tf_demo_parser::{
@@ -149,6 +148,30 @@ pub struct GameSummary {
     pub interval_per_tick: f32,
     pub num_rounds: u32,
     pub players: Vec<PlayerSummary>,
+}
+
+/**
+ * Generic scoreboard struct. This is used to track the current scores for a single player.
+ */
+#[derive(Debug, Serialize, Deserialize, PartialEq, Default, Clone)]
+pub struct Scoreboard {
+    pub points: u32,
+    pub kills: u32,
+    pub assists: u32,
+    pub deaths: u32,
+    pub buildings_destroyed: u32,
+    pub captures: u32,
+    pub defenses: u32,
+    pub dominations: u32,
+    pub revenges: u32,
+    pub ubercharges: u32,
+    pub headshots: u32,
+    pub teleports: u32,
+    pub healing: u32,
+    pub backstabs: u32,
+    pub bonus_points: u32,
+    pub support: u32,
+    pub damage_dealt: u32,
 }
 
 #[derive(Debug, Default)]
