@@ -8,8 +8,8 @@ use std::{collections::HashMap, path::PathBuf, sync::Mutex};
 use tauri::async_runtime::Mutex as AsyncMutex;
 use tauri_plugin_log::LogTarget;
 
-use tokio::net::TcpStream;
 use rcon::Connection;
+use tokio::net::TcpStream;
 
 use demo::Demo;
 
