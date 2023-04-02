@@ -24,7 +24,7 @@ steamid-ng = "1.0.0"
 num-traits = "0.2.15"
 num-derive = "0.3.3"
 rcon = { version = "0.6.0", features = ["rt-tokio"] }
-tokio = "1.21.2"
+tokio = "1.24.2"
 
 [dependencies.tf-demo-parser]
 git = "https://github.com/demostf/parser"
