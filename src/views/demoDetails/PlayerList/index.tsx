@@ -143,7 +143,7 @@ export default function PlayerList({ gameSummary }: PlayerListProps) {
       </div>
       <Divider/>
       {/* Player list */}
-      <ScrollArea.Autosize maxHeight={360}>
+      <ScrollArea.Autosize mah={360}>
         <div>
           <div className={classes.playerListColumn}>
             {bluPlayers.map((player) => (
