@@ -21,6 +21,9 @@ const useStyles = createStyles((theme) => ({
     width: "32px",
     textAlign: "right",
   },
+  scoreColumn: {
+    textAlign: "right",
+  },
 }));
 
 export function TableHeader() {
@@ -30,7 +33,7 @@ export function TableHeader() {
     <div className={classes.root}>
       <span className={classes.smallColumn}></span>
       <span className={classes.playerColumn}>Name</span>
-      <span className={classes.smallColumn} style={{ width: 40 }}>
+      <span className={classes.scoreColumn}>
         Score
       </span>
       <span className={classes.smallColumn}>K</span>

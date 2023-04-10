@@ -19,18 +19,12 @@ const useStyles = createStyles(
       margin: 2,
       borderRadius: theme.fn.radius("sm"),
       backgroundColor: selected
-        ? theme.fn.rgba(
-            theme.colors[theme.primaryColor][8],
-            0.3
-          )
+        ? theme.fn.rgba(theme.colors[theme.primaryColor][8], 0.3)
         : "transparent",
       cursor: "pointer",
       "&:hover": {
         backgroundColor: selected
-          ? theme.fn.rgba(
-            theme.colors[theme.primaryColor][6],
-            0.3
-          )
+          ? theme.fn.rgba(theme.colors[theme.primaryColor][6], 0.3)
           : theme.colorScheme === "dark"
           ? theme.colors.dark[5]
           : theme.colors.gray[3],
@@ -38,6 +32,7 @@ const useStyles = createStyles(
     },
     classIcon: {
       marginRight: 8,
+      width: 24,
     },
     playerName: {
       textOverflow: "ellipsis",
@@ -45,11 +40,10 @@ const useStyles = createStyles(
       whiteSpace: "nowrap",
     },
     pointsScoreboardValue: {
-      width: 40,
       textAlign: "right",
     },
     simpleScoreboardValue: {
-      width: 30,
+      width: 32,
       textAlign: "right",
     },
   })
@@ -61,7 +55,9 @@ export function PlayerBox({ player, selected, onClick }: PlayerBoxProps) {
   return (
     <div onClick={onClick} className={classes.root}>
       <div className={classes.classIcon}>
-        <ClassIcon cls={player.classes[0]} muted={false} size={24} />
+        {player.classes.length !== 0 && (
+          <ClassIcon cls={player.classes[0]} size={24} />
+        )}
       </div>
       <div style={{ flexGrow: 1 }}>
         <Text className={classes.playerName}>{player.name}</Text>
