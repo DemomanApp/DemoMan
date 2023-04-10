@@ -50,7 +50,7 @@ function HoverMenuItem({
   return (
     <Tooltip label={label}>
       <ActionIcon
-        onClick={(event) => {
+        onClick={(event: React.MouseEvent<HTMLButtonElement>) => {
           onClick();
           event.stopPropagation();
         }}
