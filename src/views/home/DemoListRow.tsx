@@ -101,7 +101,7 @@ const useStyles = createStyles(
         ? theme.fn.variant({ variant: "light", color: theme.primaryColor })
             .background
         : theme.colorScheme === "dark"
-        ? theme.colors.dark[8]
+        ? theme.colors.dark[7]
         : theme.white,
     },
     content: {
