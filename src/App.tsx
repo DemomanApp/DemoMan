@@ -1,10 +1,9 @@
 import { useEffect, useRef, useState } from "react";
 import {
   useNavigate,
-  Routes,
-  Route,
   useLocation,
   Link,
+  Outlet,
 } from "react-router-dom";
 
 import { appWindow } from "@tauri-apps/api/window";
@@ -31,11 +30,6 @@ import {
 } from "@tabler/icons-react";
 
 import { AppShellProvider, NavbarButton } from "./AppShell";
-
-import HomeView from "./views/home";
-import SettingsView from "./views/settings";
-import DemoDetailsView from "./views/demoDetails";
-import RconSetup from "./views/rconSetup";
 
 type HeaderIconProps = {
   icon: JSX.Element;
@@ -179,15 +173,7 @@ export default function App() {
           },
         })}
       >
-        <Routes>
-          <Route path="/" element={<HomeView />} />
-          <Route
-            path="/demo/:demoName/:activeTab"
-            element={<DemoDetailsView />}
-          />
-          <Route path="/settings" element={<SettingsView />} />
-          <Route path="/rcon-setup" element={<RconSetup />} />
-        </Routes>
+        <Outlet />
       </AppShell>
     </AppShellProvider>
   );

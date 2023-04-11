@@ -1,15 +1,16 @@
-import React from "react";
+import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
-import { BrowserRouter } from "react-router-dom";
+
+import { RouterProvider } from "react-router-dom";
 
 import { MantineProvider } from "@mantine/core";
 
 import "./index.css";
-import App from "./App";
+import router from "./router";
 
 // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
 createRoot(document.getElementById("root")!).render(
-  <React.StrictMode>
+  <StrictMode>
     <MantineProvider
       theme={{
         colorScheme: "dark",
@@ -26,9 +27,7 @@ createRoot(document.getElementById("root")!).render(
       withNormalizeCSS
       withGlobalStyles
     >
-      <BrowserRouter>
-        <App />
-      </BrowserRouter>
+      <RouterProvider router={router} />
     </MantineProvider>
-  </React.StrictMode>
+  </StrictMode>
 );
