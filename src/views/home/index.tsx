@@ -195,7 +195,6 @@ function MainView({ demos }: { demos: Demo[] }) {
 
 export default function HomeViewAsyncWrapper() {
   const [storedDemoPath, setStoredDemoPath] = useStore("demoPath");
-  const [demoPath, setDemoPath] = useState(storedDemoPath);
 
   if (storedDemoPath === undefined) {
     // Used as fallback in case the user hasn't configured the demos directory yet
@@ -203,7 +202,6 @@ export default function HomeViewAsyncWrapper() {
       .then(dir => {
         if (storedDemoPath === undefined) {
           setStoredDemoPath(dir);
-          setDemoPath(dir);
         }
         return dir;
       })
@@ -217,7 +215,7 @@ export default function HomeViewAsyncWrapper() {
   return (
     <Async
       promiseFn={getDemosInDirectory}
-      args={[demoPath ?? ""]}
+      args={[storedDemoPath ?? ""]}
       loading={
         <Fill>
           <Loader size="lg" variant="dots" />
