@@ -1,4 +1,3 @@
-import { Link } from "react-router-dom";
 import useStore from "../../hooks/useStore";
 import { Button, createStyles, ScrollArea, TextInput } from "@mantine/core";
 import { open as dialogOpen } from "@tauri-apps/api/dialog";
