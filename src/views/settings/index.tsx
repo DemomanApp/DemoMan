@@ -2,7 +2,7 @@ import useStore from "../../hooks/useStore";
 import { Button, createStyles, ScrollArea, TextInput } from "@mantine/core";
 import { open as dialogOpen } from "@tauri-apps/api/dialog";
 
-const useStyles = createStyles((theme) => ({
+const useStyles = createStyles({
   root: {
     margin: "12px",
     display: "flex",
@@ -18,7 +18,7 @@ const useStyles = createStyles((theme) => ({
     width: 160,
     fontSize: "16pt",
   },
-}));
+});
 
 export default function SettingsView() {
   const [demoPath, setDemoPath] = useStore("demoPath");
