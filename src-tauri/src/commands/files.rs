@@ -1,5 +1,5 @@
 use steamlocate::SteamDir;
-use tauri::{InvokeError, State};
+use tauri::State;
 use serde::Serialize;
 use crate::AppState;
 
