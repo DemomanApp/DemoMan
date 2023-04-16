@@ -8,6 +8,7 @@ const useStyles = createStyles({
     display: "flex",
     flexDirection: "column",
     gap: "8px",
+    height: "100%"
   },
   row: {
     display: "flex",
@@ -29,7 +30,7 @@ export default function SettingsView() {
     <div className={classes.root}>
       <h1>Settings</h1>
 
-      <ScrollArea.Autosize maxHeight={400}>
+      <ScrollArea>
         <span className={classes.row}>
           <span className={classes.rowLabel}>
             <label>Demos Folder</label>
@@ -55,7 +56,7 @@ export default function SettingsView() {
           </Button>
           <TextInput value={demoPath ?? ""} disabled={true}></TextInput>
         </span>
-      </ScrollArea.Autosize>
+      </ScrollArea>
     </div>
   );
 }
