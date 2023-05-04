@@ -1,6 +1,7 @@
+use serde::Serialize;
 use steamlocate::SteamDir;
 use tauri::State;
-use serde::Serialize;
+
 use crate::AppState;
 
 #[derive(Clone, Debug, Serialize)]
