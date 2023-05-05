@@ -20,6 +20,8 @@ import BottomBar from "./BottomBar";
 import { NavbarPortal, NavbarButton } from "../../AppShell";
 import { getDemosInDirectory } from "../../api";
 import { Async, Fill } from "../../components";
+import useStore from "../../hooks/useStore";
+import { getDefaultDemosDir } from "../settings/storage";
 
 const PADDING_SIZE = 16;
 
@@ -192,10 +194,28 @@ function MainView({ demos }: { demos: Demo[] }) {
 }
 
 export default function HomeViewAsyncWrapper() {
+  const [storedDemoPath, setStoredDemoPath] = useStore("demoPath");
+
+  if (storedDemoPath === undefined) {
+    // Used as fallback in case the user hasn't configured the demos directory yet
+    getDefaultDemosDir()
+      .then(dir => {
+        if (storedDemoPath === undefined) {
+          setStoredDemoPath(dir);
+        }
+        return dir;
+      })
+      .catch(_err => {
+        // Failed to get the default directory.  At this point, there's nothing reasonable
+        // we can do other than alert the user and prompt them to set the directory themselves
+        return;
+      });
+  }
+
   return (
     <Async
       promiseFn={getDemosInDirectory}
-      args={["/home/rasmus/steamapps-common/Team Fortress 2/tf/demos"]}
+      args={[storedDemoPath ?? ""]}
       loading={
         <Fill>
           <Loader size="lg" variant="dots" />
@@ -204,7 +224,11 @@ export default function HomeViewAsyncWrapper() {
       error={(error) => (
         <Fill>
           <Alert color="red">
-            An error occured while loading this demo directory: {String(error)}
+            An error occurred while scanning for demo files. Is the demo storage
+            directory set?
+            <div>
+              Error: {String(error)}
+            </div>
           </Alert>
         </Fill>
       )}

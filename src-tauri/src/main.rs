@@ -53,6 +53,7 @@ fn main() {
             commands::demos::rename_demo,
             commands::demos::set_demo_events,
             commands::demos::set_demo_tags,
+            commands::files::get_tf2_dir,
             commands::rcon::init_rcon,
             commands::rcon::send_command,
         ])
