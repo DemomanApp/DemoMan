@@ -173,27 +173,6 @@ export type Scoreboard = {
   damage_dealt: number;
 };
 
-export const EMPTY_SCOREBOARD = {
-  user_id: 0,
-  points: 0,
-  kills: 0,
-  assists: 0,
-  deaths: 0,
-  buildings_destroyed: 0,
-  captures: 0,
-  defenses: 0,
-  dominations: 0,
-  revenges: 0,
-  ubercharges: 0,
-  headshots: 0,
-  teleports: 0,
-  healing: 0,
-  backstabs: 0,
-  bonus_points: 0,
-  support: 0,
-  damage_dealt: 0,
-};
-
 export function isStvDemo(demo: Demo) {
   return demo.serverName === "";
 }
