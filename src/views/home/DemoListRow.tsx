@@ -95,7 +95,11 @@ const useStyles = createStyles(
             theme.fn.variant({ variant: "outline", color: theme.primaryColor })
               .border
           }`
-        : undefined,
+        : `0px 0px 0px 1px ${
+            theme.colorScheme === "dark"
+              ? theme.colors.dark[4]
+              : theme.colors.gray[3]
+          }`,
       borderRadius: theme.radius.md,
       backgroundColor: selected
         ? theme.fn.variant({ variant: "light", color: theme.primaryColor })
