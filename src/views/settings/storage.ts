@@ -6,10 +6,10 @@ import { getTf2Dir } from "../../api";
  * machine.  Falls back to the user's home directory if neither is found.
  */
 export async function getDefaultDemosDir(): Promise<string> {
-  const userHomeDir = await homeDir();
-
-  // Try getting the TF2 game directory, falling back to the user home directory if it couldn't be found
-  return await getTf2Dir()
-    .then((tf2Dir) => join(tf2Dir, "tf", "demos"))
-    .catch((_error) => userHomeDir);
+  try {
+    const Tf2Dir = await getTf2Dir();
+    return join(Tf2Dir, "tf", "demos");
+  } catch {
+    return homeDir();
+  }
 }
