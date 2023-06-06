@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useParams } from "react-router-dom";
+import { LoaderFunction, useLoaderData, useRouteError } from "react-router-dom";
 
 import {
   ActionIcon,
@@ -53,7 +53,9 @@ const useStyles = createStyles(() => ({
   },
 }));
 
-function DemoDetailsView({ demo }: { demo: Demo }) {
+export default function DemoDetailsView() {
+  const demo = useLoaderData() as Demo;
+
   const [renamePopoverOpen, setRenamePopoverOpen] = useState(false);
 
   const { classes } = useStyles();
@@ -228,25 +230,23 @@ function DemoDetailsView({ demo }: { demo: Demo }) {
   );
 }
 
-export default function DemoDetailsViewAsyncWrapper() {
-  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-  const demoName = decodeURIComponent(useParams().demoName!);
+export function ErrorElement() {
+  const error = useRouteError();
   return (
-    <Async
-      promiseFn={getDemoByName}
-      args={[demoName]}
-      error={(error) => (
-        <Center style={{ height: "100%" }}>
-          <Alert
-            icon={<IconAlertCircle size={16} />}
-            title="Error loading demo"
-            color="red"
-          >
-            An error occured while loading this demo: {String(error)}
-          </Alert>
-        </Center>
-      )}
-      success={(demo) => <DemoDetailsView demo={demo} />}
-    />
+    <Center style={{ height: "100%" }}>
+      <Alert
+        icon={<IconAlertCircle size={16} />}
+        title="Error loading demo"
+        color="red"
+      >
+        An error occured while loading this demo: {String(error)}
+      </Alert>
+    </Center>
   );
 }
+
+export const loader: LoaderFunction = async ({ params }): Promise<Demo> => {
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+  const demoName = decodeURIComponent(params.demoName!);
+  return getDemoByName(demoName);
+};
