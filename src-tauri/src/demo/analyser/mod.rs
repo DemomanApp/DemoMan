@@ -203,6 +203,10 @@ pub struct PlayerState {
     // in this variable (bit 11), everything else is in player_cond.
     condition_bits: u32,
 
+    // TODO use server tick instead,
+    // demo ticks continue running while the game is paused,
+    // making the class play durations inaccurate
+    last_spawn_tick: DemoTick,
     time_on_class: [usize; 9],
 }
 
@@ -560,10 +564,16 @@ impl GameDetailsAnalyser {
 
                                 player.team = new_team;
                             }
-                            "m_iPlayerClass" => {
-                                player.class =
-                                    Class::new(i64::try_from(&prop.value).unwrap_or_default());
-                            }
+                            // We currently use player spawn events as our source of truth
+                            // for determining the current player class. This is a second
+                            // possible method to determine the player class, which does *not*
+                            // always match with the first method.
+                            // TODO: Investigate what the differences are,
+                            //       maybe one is better than the other?
+                            // "m_iPlayerClass" => {
+                            //     player.class =
+                            //         Class::new(i64::try_from(&prop.value).unwrap_or_default());
+                            // }
                             "m_iChargeLevel" => {
                                 // This is only networked in tournament mode
                                 // player.charge = i64
@@ -874,7 +884,7 @@ impl GameDetailsAnalyser {
         };
         let victim_id = UserId::from(event.user_id);
 
-        let victim = self.players.get(&victim_id);
+        let victim = self.players.get_mut(&victim_id);
 
         let drop: bool;
         let airshot: bool;
@@ -882,6 +892,10 @@ impl GameDetailsAnalyser {
         if let Some(victim) = victim {
             drop = victim.charge == 100;
             airshot = victim.has_cond(&PlayerCondition::TF_COND_BLASTJUMPING);
+            if victim.class != Class::Other {
+                victim.time_on_class[(victim.class as usize) - 1] +=
+                    u32::from(tick - victim.last_spawn_tick) as usize;
+            }
         } else {
             drop = false;
             airshot = false;
@@ -1053,11 +1067,10 @@ impl GameDetailsAnalyser {
         }
     }
 
-    fn handle_player_spawn_event(&mut self, event: &PlayerSpawnEvent, _tick: DemoTick) {
+    fn handle_player_spawn_event(&mut self, event: &PlayerSpawnEvent, tick: DemoTick) {
         if let Some(player) = self.players.get_mut(&UserId::from(event.user_id)) {
-            if (event.class as usize) > 0 {
-                player.time_on_class[(event.class as usize) - 1] += 1; // TODO use time, not spawns
-            }
+            player.class = Class::new(event.class);
+            player.last_spawn_tick = tick;
         }
     }
 
