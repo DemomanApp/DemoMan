@@ -80,10 +80,9 @@ const useStyles = createStyles(
       overflow: "hidden",
       "&:hover": {
         backgroundColor: selected
-          ? theme.fn.variant({ variant: "light", color: theme.primaryColor })
-              .background
+          ? theme.fn.rgba(theme.colors[theme.primaryColor][5], 0.2)
           : theme.colorScheme === "dark"
-          ? theme.colors.dark[5]
+          ? theme.colors.dark[6]
           : theme.colors.gray[1],
         [`& .${getStylesRef("menu")}`]: {
           display: "flex",
@@ -92,8 +91,9 @@ const useStyles = createStyles(
       transition: "background-color 150ms ease, border-color 150ms ease",
       boxShadow: selected
         ? `0px 0px 0px 2px ${
-            theme.fn.variant({ variant: "outline", color: theme.primaryColor })
-              .border
+            theme.colorScheme === "dark"
+              ? theme.colors[theme.primaryColor][5]
+              : theme.fn.primaryColor()
           }`
         : `0px 0px 0px 1px ${
             theme.colorScheme === "dark"
@@ -102,8 +102,7 @@ const useStyles = createStyles(
           }`,
       borderRadius: theme.radius.md,
       backgroundColor: selected
-        ? theme.fn.variant({ variant: "light", color: theme.primaryColor })
-            .background
+        ? theme.fn.rgba(theme.colors[theme.primaryColor][8], 0.2)
         : theme.colorScheme === "dark"
         ? theme.colors.dark[7]
         : theme.white,

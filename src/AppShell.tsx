@@ -60,12 +60,8 @@ const useNavbarButtonStyles = createStyles((theme) => ({
 
   active: {
     "&, &:hover": {
-      backgroundColor: theme.fn.variant({
-        variant: "filled",
-        color: theme.primaryColor,
-      }).background,
-      color: theme.fn.variant({ variant: "filled", color: theme.primaryColor })
-        .color,
+      backgroundColor: theme.fn.primaryColor(),
+      color: theme.white,
     },
   },
 }));
