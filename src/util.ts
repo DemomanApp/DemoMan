@@ -1,16 +1,28 @@
-export function formatPlaybackTime(seconds: number): string {
-  const fSeconds = Math.floor(seconds % 60);
-  const tMinutes = Math.floor(seconds / 60);
-  const fMinutes = tMinutes % 60;
-  const fHours = Math.floor(tMinutes / 60);
+function plural_s(value: number, text: string) {
+  return `${value} ${text}${value == 1 ? "" : "s"}`;
+}
 
-  if (fHours !== 0) {
-    return `${fHours} hour, ${fMinutes} minutes`;
+export function formatDuration(total_seconds: number): string {
+  total_seconds = Math.floor(total_seconds);
+
+  const total_minutes = Math.floor(total_seconds / 60);
+
+  const remaining_seconds = total_seconds;
+  const remaining_minutes = total_minutes % 60;
+  const remaining_hours = Math.floor(total_minutes / 60);
+
+  const remaining_seconds_str = plural_s(remaining_seconds, "second");
+  if (total_minutes == 0) {
+    return remaining_seconds_str;
   }
-  if (fMinutes !== 0) {
-    return `${fMinutes} minutes`;
+
+  const remaining_minutes_str = plural_s(remaining_minutes, "minute");
+  if (remaining_hours == 0) {
+    return remaining_minutes_str;
   }
-  return `${fSeconds} seconds`;
+
+  const remaining_hours_str = plural_s(remaining_hours, "hour");
+  return `${remaining_hours_str}, ${remaining_minutes_str}`;
 }
 
 export function formatFileSize(bytes: number): string {

@@ -37,7 +37,7 @@ import {
 import { getDemoByName, getDemoDetails, sendCommand } from "../../api";
 import { HeaderPortal } from "../../AppShell";
 import { Async, AsyncButton, Fill, MapThumbnail } from "../../components";
-import { formatFileSize, formatPlaybackTime } from "../../util";
+import { formatFileSize, formatDuration } from "../../util";
 import PlayerList from "./PlayerList";
 import { Demo } from "../../demo";
 import Highlights from "./Highlights";
@@ -149,7 +149,7 @@ export default function DemoDetailsView() {
                   {formatFileSize(demo.filesize)}
                 </List.Item>
                 <List.Item icon={<IconClock />}>
-                  {formatPlaybackTime(demo.playbackTime)}
+                  {formatDuration(demo.playbackTime)}
                 </List.Item>
               </List>
               <AsyncButton
