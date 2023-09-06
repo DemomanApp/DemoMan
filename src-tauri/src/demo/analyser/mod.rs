@@ -4,7 +4,7 @@ mod player_condition;
 mod player_flag;
 mod weapon_class;
 
-use std::cmp::{Ordering, Reverse};
+use std::cmp::Ordering;
 use std::str::FromStr;
 use std::{collections::HashMap, convert::TryFrom};
 
@@ -206,7 +206,7 @@ pub struct PlayerState {
     // TODO use server tick instead,
     // demo ticks continue running while the game is paused,
     // making the class play durations inaccurate
-    last_spawn_tick: DemoTick,
+    last_spawn_tick: Option<DemoTick>,
     time_on_class: [usize; 9],
 }
 
@@ -241,6 +241,19 @@ impl PlayerState {
         }
         conditions
     }
+
+    fn handle_life_end(&mut self, tick: DemoTick) {
+        if self.class != Class::Other {
+            if let Some(last_spawn_tick) = self.last_spawn_tick {
+                self.time_on_class[(self.class as usize) - 1] +=
+                    u32::from(tick - last_spawn_tick) as usize;
+            }
+        }
+
+        // Prevent this life from contributing to class playtime a
+        // second time, for example by dying after a round ended
+        self.last_spawn_tick = None;
+    }
 }
 
 #[derive(Debug, Default, Serialize)]
@@ -250,7 +263,7 @@ pub struct PlayerSummary {
     user_id: UserId,
 
     team: Team,
-    classes: Vec<usize>,
+    time_on_class: [usize; 9],
 
     /// The scoreboard for the entire match
     scoreboard: Scoreboard,
@@ -272,21 +285,12 @@ impl From<PlayerState> for PlayerSummary {
             ..
         } = state;
 
-        let mut classes: Vec<(usize, usize)> = time_on_class
-            .into_iter()
-            .enumerate()
-            // Remove classes with no playtime
-            .filter(|(_i, v)| *v != 0)
-            .collect();
-        // Sort by playtime, in descending order
-        classes.sort_by_key(|a| Reverse(a.1));
-
         Self {
             name,
             steam_id,
             user_id,
             team,
-            classes: classes.into_iter().map(|(i, _v)| i).collect(),
+            time_on_class,
             scoreboard,
             round_scoreboards,
         }
@@ -510,12 +514,14 @@ impl GameDetailsAnalyser {
             }
             GameEvent::TeamPlayRoundStalemate(event) => {
                 self.handle_round_stalemate_event(event, tick);
+                self.handle_round_end(tick);
             }
             GameEvent::TeamPlayRoundStart(event) => {
                 self.handle_round_start_event(event, tick);
             }
             GameEvent::TeamPlayRoundWin(event) => {
                 self.handle_round_win_event(event, tick);
+                self.handle_round_end(tick);
             }
             GameEvent::PlayerConnectClient(event) => {
                 self.handle_player_connect_event(event, tick);
@@ -816,7 +822,7 @@ impl GameDetailsAnalyser {
                 .insert(user_info.entity_id, user_info.player_info.user_id);
 
             // Remember this user's name/steamID
-            let mut player = self
+            let player = self
                 .players
                 .entry(user_info.player_info.user_id)
                 .or_insert_with(Default::default);
@@ -892,10 +898,7 @@ impl GameDetailsAnalyser {
         if let Some(victim) = victim {
             drop = victim.charge == 100;
             airshot = victim.has_cond(&PlayerCondition::TF_COND_BLASTJUMPING);
-            if victim.class != Class::Other {
-                victim.time_on_class[(victim.class as usize) - 1] +=
-                    u32::from(tick - victim.last_spawn_tick) as usize;
-            }
+            victim.handle_life_end(tick);
         } else {
             drop = false;
             airshot = false;
@@ -1070,7 +1073,7 @@ impl GameDetailsAnalyser {
     fn handle_player_spawn_event(&mut self, event: &PlayerSpawnEvent, tick: DemoTick) {
         if let Some(player) = self.players.get_mut(&UserId::from(event.user_id)) {
             player.class = Class::new(event.class);
-            player.last_spawn_tick = tick;
+            player.last_spawn_tick = Some(tick);
         }
     }
 
@@ -1079,7 +1082,6 @@ impl GameDetailsAnalyser {
         _event: &TeamPlayRoundStalemateEvent,
         tick: DemoTick,
     ) {
-        self.current_round += 1; // yuck
         self.add_highlight(Highlight::RoundStalemate, tick)
     }
 
@@ -1088,8 +1090,16 @@ impl GameDetailsAnalyser {
     }
 
     fn handle_round_win_event(&mut self, event: &TeamPlayRoundWinEvent, tick: DemoTick) {
-        self.current_round += 1; // yuck
         self.add_highlight(Highlight::RoundWin { winner: event.team }, tick)
+    }
+
+    fn handle_round_end(&mut self, tick: DemoTick) {
+        self.current_round += 1;
+        for player in self.players.values_mut() {
+            if player.life_state == PlayerLifeState::Alive {
+                player.handle_life_end(tick);
+            }
+        }
     }
 
     fn handle_point_captured_event(&mut self, event: &TeamPlayPointCapturedEvent, tick: DemoTick) {
@@ -1124,13 +1134,18 @@ impl GameDetailsAnalyser {
     }
 
     fn handle_player_disconnect_event(&mut self, event: &PlayerDisconnectEvent, tick: DemoTick) {
+        let user_id = UserId::from(event.user_id);
         self.add_highlight(
             Highlight::PlayerDisconnected {
-                user_id: UserId::from(event.user_id),
+                user_id,
                 reason: event.reason.to_string(),
             },
             tick,
         );
+
+        if let Some(player) = self.players.get_mut(&user_id) {
+            player.handle_life_end(tick);
+        }
     }
 
     /// Creates a snapshot for a player with the given user ID.

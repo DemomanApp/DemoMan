@@ -1,7 +1,8 @@
 import { createStyles, Text } from "@mantine/core";
-import ClassIcon from "../../../components/ClassIcon";
 
+import ClassIcon from "../../../components/ClassIcon";
 import { PlayerSummary } from "../../../demo";
+import { indexOfMax } from "../../../util";
 
 interface PlayerBoxProps {
   player: PlayerSummary;
@@ -52,11 +53,13 @@ const useStyles = createStyles(
 export function PlayerBox({ player, selected, onClick }: PlayerBoxProps) {
   const { classes } = useStyles({ selected });
 
+  const primary_class = indexOfMax(player.time_on_class);
+
   return (
     <div onClick={onClick} className={classes.root}>
       <div className={classes.classIcon}>
-        {player.classes.length !== 0 && (
-          <ClassIcon cls={player.classes[0]} size={24} />
+        {primary_class !== undefined && (
+          <ClassIcon cls={primary_class} size={24} />
         )}
       </div>
       <div style={{ flexGrow: 1 }}>

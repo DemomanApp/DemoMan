@@ -73,3 +73,15 @@ export function normalizeMapName(mapName: string) {
     )
     .join("_");
 }
+
+export function indexOfMax(arr: number[]): number | undefined {
+  let max = 0;
+  let max_index: number | undefined = undefined;
+  arr.forEach((value, index) => {
+    if (value > max) {
+      max = value;
+      max_index = index;
+    }
+  });
+  return max_index;
+}

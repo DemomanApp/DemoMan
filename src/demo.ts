@@ -136,7 +136,17 @@ export type PlayerSummary = {
   user_id: UserId;
 
   team: Team;
-  classes: number[];
+  time_on_class: [
+    number,
+    number,
+    number,
+    number,
+    number,
+    number,
+    number,
+    number,
+    number
+  ];
 
   scoreboard: Scoreboard;
 
