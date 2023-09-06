@@ -16,12 +16,12 @@ use crate::AppState;
 /// Returns the number of demos loaded if successful.
 #[tauri::command]
 pub async fn get_demos_in_directory(
-    dir_path: String,
+    dir_path: &Path,
     state: State<'_, AppState>,
 ) -> Result<Vec<Demo>, DemoReadError> {
     let mut cache = state.demo_cache.lock().expect("Failed to lock mutex");
 
-    let dir_path = Path::new(&dir_path).canonicalize()?;
+    let dir_path = Path::new(dir_path).canonicalize()?;
 
     info!("Reading demos from {}", dir_path.display());
 
@@ -43,14 +43,14 @@ pub async fn get_demos_in_directory(
 
 #[tauri::command]
 pub fn set_demo_events(
-    demo_name: String,
+    demo_name: &str,
     new_events: Vec<DemoEvent>,
     state: State<'_, AppState>,
 ) -> Result<(), DemoCommandError> {
     let mut demos_cache = state.demo_cache.lock().expect("Failed to lock mutex");
     let demo = demos_cache
         .demos
-        .get_mut(&demo_name)
+        .get_mut(demo_name)
         .ok_or(DemoCommandError::DemoNotFound)?;
     let json_path = demo.path.with_extension("json");
     write_events_and_tags(&json_path, &new_events, &demo.tags)?;
@@ -60,14 +60,14 @@ pub fn set_demo_events(
 
 #[tauri::command]
 pub fn set_demo_tags(
-    demo_name: String,
+    demo_name: &str,
     new_tags: Vec<String>,
     state: State<'_, AppState>,
 ) -> Result<(), DemoCommandError> {
     let mut demos_cache = state.demo_cache.lock().expect("Failed to lock mutex");
     let demo = demos_cache
         .demos
-        .get_mut(&demo_name)
+        .get_mut(demo_name)
         .ok_or(DemoCommandError::DemoNotFound)?;
     let json_path = demo.path.with_extension("json");
     write_events_and_tags(&json_path, &demo.events, &new_tags)?;
@@ -77,15 +77,15 @@ pub fn set_demo_tags(
 
 #[tauri::command]
 pub fn delete_demo(
-    demo_name: String,
+    demo_name: &str,
     trash: bool,
     state: State<'_, AppState>,
 ) -> Result<(), DemoCommandError> {
-    info!("Deleting demo {}", &demo_name);
+    info!("Deleting demo {}", demo_name);
     let mut demos_cache = state.demo_cache.lock().expect("Failed to lock mutex");
     let demo = demos_cache
         .demos
-        .get_mut(&demo_name)
+        .get_mut(demo_name)
         .ok_or(DemoCommandError::DemoNotFound)?;
 
     if trash {
@@ -111,24 +111,24 @@ pub fn delete_demo(
             }
         }
     }
-    demos_cache.demos.remove(&demo_name);
+    demos_cache.demos.remove(demo_name);
 
     Ok(())
 }
 
 #[tauri::command]
 pub fn rename_demo(
-    demo_name: String,
-    new_name: String,
+    demo_name: &str,
+    new_name: &str,
     state: State<'_, AppState>,
 ) -> Result<(), DemoCommandError> {
     let mut demos_cache = state.demo_cache.lock().expect("Failed to lock mutex");
     let mut demo = demos_cache
         .demos
-        .remove(&demo_name)
+        .remove(demo_name)
         .ok_or(DemoCommandError::DemoNotFound)?;
 
-    let new_path = demo.path.with_file_name(&new_name);
+    let new_path = demo.path.with_file_name(new_name);
 
     std::fs::rename(&demo.path, &new_path).or(Err(DemoCommandError::FileRenameFailed))?;
     if let Err(e) = std::fs::rename(
@@ -142,10 +142,10 @@ pub fn rename_demo(
         }
     }
 
-    demo.name = new_name.clone();
+    demo.name = new_name.to_string();
     demo.path = new_path;
 
-    demos_cache.demos.insert(new_name, demo);
+    demos_cache.demos.insert(new_name.to_string(), demo);
 
     Ok(())
 }
@@ -164,7 +164,7 @@ pub fn get_demo_by_name(
 }
 
 #[tauri::command]
-pub async fn get_demo_details(demo_path: String) -> Result<GameSummary, DemoCommandError> {
+pub async fn get_demo_details(demo_path: &str) -> Result<GameSummary, DemoCommandError> {
     let file = std::fs::read(demo_path).or(Err(DemoCommandError::FileReadFailed))?;
     let demo = tf_demo_parser::Demo::new(&file);
 
