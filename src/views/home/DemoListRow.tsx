@@ -143,9 +143,13 @@ function DemoListRow({
           <Title order={3} inline>
             {demo.name}
           </Title>
-          {isStvDemo(demo) && <IconDeviceTv />}
+          {isStvDemo(demo) && (
+            <Tooltip label="STV Demo">
+              <IconDeviceTv />
+            </Tooltip>
+          )}
+          <Badges items={demo.tags} max={3} />
         </Group>
-        <Badges items={demo.tags} max={3} />
         {!isStvDemo(demo) && (
           <Group spacing={4}>
             <IconUser color="grey" />

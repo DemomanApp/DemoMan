@@ -1,8 +1,12 @@
 import { Group, Badge, Text } from "@mantine/core";
-import { IconTags } from "@tabler/icons-react";
 
-
-export default function Badges({ items, max }: { items: string[]; max: number }) {
+export default function Badges({
+  items,
+  max,
+}: {
+  items: string[];
+  max: number;
+}) {
   if (items.length === 0) {
     return null;
   }
@@ -11,7 +15,6 @@ export default function Badges({ items, max }: { items: string[]; max: number })
   return (
     <div style={{ display: "flex" }}>
       <Group spacing={4}>
-        <IconTags color="gray" />
         {shownItems.map((item) => (
           <Badge
             key={item}
