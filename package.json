@@ -43,8 +43,14 @@
     "eslint-plugin-promise": "^6.0.1",
     "eslint-plugin-react": "^7.31.8",
     "eslint-plugin-react-hooks": "^4.6.0",
+    "postcss-preset-mantine": "^1.7.0",
     "typescript": "^4.8.4",
     "vite": "^3.2.7",
     "vite-plugin-eslint": "^1.8.1"
+  },
+  "postcss": {
+    "plugins": {
+      "postcss-preset-mantine": {}
+    }
   }
 }

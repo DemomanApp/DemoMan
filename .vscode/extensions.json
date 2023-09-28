@@ -10,13 +10,13 @@
     // and validation for the tauri config
     "tauri-apps.tauri-vscode",
 
-    // Not essential
-    "meganrogge.template-string-converter",
-
     // Eslint integration
     "dbaeumer.vscode-eslint",
 
     // Prettier for js and rust
     "esbenp.prettier-vscode",
+
+    // For postcss in our css modules
+    "csstools.postcss"
   ]
 }
