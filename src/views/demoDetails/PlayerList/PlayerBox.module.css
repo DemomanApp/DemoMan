@@ -6,8 +6,8 @@
   margin: 2px;
   border-radius: var(--mantine-radius-sm);
   cursor: pointer;
-
   background-color: transparent;
+
   &[data-selected="true"] {
     background-color: var(--mantine-primary-color-light);
   }
@@ -17,24 +17,29 @@
       var(--mantine-color-gray-3),
       var(--mantine-color-dark-5)
     );
+
     &[data-selected="true"] {
       background-color: var(--mantine-primary-color-light-hover);
     }
   }
 }
-.classIcon {
+
+.class-icon {
   margin-right: 8px;
   width: 24px;
 }
-.playerName {
+
+.player-name {
   text-overflow: ellipsis;
   overflow: hidden;
   white-space: nowrap;
 }
-.pointsScoreboardValue {
+
+.points-scoreboard-value {
   text-align: right;
 }
-.simpleScoreboardValue {
+
+.simple-scoreboard-value {
   width: 32px;
   text-align: right;
 }

@@ -39,4 +39,6 @@ jobs:
           cargo fmt --check
           cargo clippy --all-features --tests
       - name: Lint frontend
-        run: npm run lint:js
+        run: |
+          npm run lint:js
+          npm run lint:css

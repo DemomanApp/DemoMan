@@ -1,14 +1,17 @@
 .root {
   height: 100%;
 }
+
 .row {
   display: flex;
   gap: var(--mantine-spacing-xs);
 }
-.rowLabel {
+
+.row-label {
   width: 160px;
   font-size: 16pt;
 }
+
 .viewport {
   display: flex;
   flex-direction: column;

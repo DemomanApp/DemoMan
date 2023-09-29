@@ -125,21 +125,21 @@ function KillHighlightBox(highlight: KillHighlight) {
   // Special case for kill messages with text instead of a kill icon
   if (highlight.kill_icon === "#fall") {
     return (
-      <div className={classes.highlight_right}>
+      <div className={classes.highlightRight}>
         <PlayerName player={victim} />
         &nbsp;fell to a clumsy, painful death
       </div>
     );
   } else if (highlight.kill_icon === "#suicide") {
     return (
-      <div className={classes.highlight_right}>
+      <div className={classes.highlightRight}>
         <PlayerName player={victim} />
         &nbsp;bid farewell, cruel world!
       </div>
     );
   } else if (highlight.kill_icon === "#assisted_suicide") {
     return (
-      <div className={classes.highlight_right}>
+      <div className={classes.highlightRight}>
         <PlayerName player={killer} />
         {assister !== null && (
           <>
@@ -155,7 +155,7 @@ function KillHighlightBox(highlight: KillHighlight) {
     );
   } else {
     return (
-      <div className={classes.highlight_right}>
+      <div className={classes.highlightRight}>
         {killer !== null &&
           killer.user_id !== victim.user_id &&
           killer.team !== "other" && <PlayerName player={killer} />}
@@ -203,7 +203,7 @@ function KillStreakHighlightBox(highlight: KillStreakHighlight) {
   }
 
   return (
-    <div className={classes.highlight_center}>
+    <div className={classes.highlightCenter}>
       <span>
         <PlayerName player={player} /> {message}
       </span>
@@ -232,7 +232,7 @@ function KillStreakEndedHighlightBox(highlight: KillStreakEndedHighlight) {
   }
 
   return (
-    <div className={classes.highlight_center}>
+    <div className={classes.highlightCenter}>
       <span>{message}</span>
       <KillstreakIcon streak={streak} />
     </div>
@@ -241,7 +241,7 @@ function KillStreakEndedHighlightBox(highlight: KillStreakEndedHighlight) {
 
 function ChatMessageHighlightBox(highlight: ChatMessageHighlight) {
   return (
-    <div className={classes.highlight_left}>
+    <div className={classes.highlightLeft}>
       <PlayerName player={highlight.sender} />
       :&nbsp;
       {highlight.text}
@@ -253,7 +253,7 @@ function AirshotHighlightBox(highlight: AirshotHighlight) {
   const attackerName = highlight.attacker.name;
   const victimName = highlight.victim.name;
   return (
-    <div className={classes.highlight_center}>
+    <div className={classes.highlightCenter}>
       AIRSHOT: {attackerName} airshot {victimName}
     </div>
   );
@@ -263,7 +263,7 @@ function CrossbowAirshotHighlightBox(highlight: CrossbowAirshotHighlight) {
   const healerName = highlight.healer.name;
   const targetName = highlight.target.name;
   return (
-    <div className={classes.highlight_center}>
+    <div className={classes.highlightCenter}>
       AIRSHOT: {healerName} airshot {targetName}
     </div>
   );
@@ -296,7 +296,7 @@ function PointCapturedHighlightBox(
     highlight.point_name;
 
   return (
-    <div className={classes.highlight_right}>
+    <div className={classes.highlightRight}>
       <PlayerNames players={cappers} team={highlight.capturing_team} />
       &nbsp;
       {icon !== undefined && <KillIcon killIcon={icon} />}
@@ -307,19 +307,19 @@ function PointCapturedHighlightBox(
 
 function RoundStalemateHighlightBox() {
   return (
-    <div className={classes.highlight_center}>Round ended in a stalemate</div>
+    <div className={classes.highlightCenter}>Round ended in a stalemate</div>
   );
 }
 
 function RoundStartHighlightBox() {
-  return <div className={classes.highlight_center}>New round started</div>;
+  return <div className={classes.highlightCenter}>New round started</div>;
 }
 
 function RoundWinHighlightBox(highlight: RoundWinHighlight) {
   const team_number = highlight.winner;
   const teamName = TEAM_NAMES[team_number] ?? TEAM_NAMES[0];
   return (
-    <div className={classes.highlight_center}>{teamName} won the round</div>
+    <div className={classes.highlightCenter}>{teamName} won the round</div>
   );
 }
 
@@ -330,7 +330,7 @@ function PlayerConnectedHighlightBox(
   const playerName = playerMap.get(highlight.user_id)?.name ?? "<unknown>";
 
   return (
-    <div className={classes.highlight_left}>
+    <div className={classes.highlightLeft}>
       {playerName} has joined the game
     </div>
   );
@@ -348,18 +348,18 @@ function PlayerDisconnectedHighlightBox(
     reason = "Kicked due to inactivity";
   }
   return (
-    <div className={classes.highlight_left}>
+    <div className={classes.highlightLeft}>
       {playerName} left the game ({reason})
     </div>
   );
 }
 
 function PauseHighlightBox() {
-  return <div className={classes.highlight_center}>Game paused.</div>;
+  return <div className={classes.highlightCenter}>Game paused.</div>;
 }
 
 function UnpauseHighlightBox() {
-  return <div className={classes.highlight_center}>Game resumed.</div>;
+  return <div className={classes.highlightCenter}>Game resumed.</div>;
 }
 
 export default function HighlightBox({ event, playerMap }: HighlightProps) {

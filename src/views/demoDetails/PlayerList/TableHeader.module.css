@@ -1,6 +1,7 @@
 .root {
   width: 50%;
   height: 32px;
+
   /* This accounts for the 8px of padding + 2px of margin of the table entries */
   padding-inline: 10px;
   display: inline-flex;
@@ -8,13 +9,16 @@
   line-height: 1;
   color: light-dark(var(--mantine-color-gray-6), var(--mantine-color-dark-2));
 }
-.playerColumn {
+
+.player-column {
   flex-grow: 1;
 }
-.smallColumn {
+
+.small-column {
   width: 32px;
   text-align: right;
 }
-.scoreColumn {
+
+.score-column {
   text-align: right;
 }

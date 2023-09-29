@@ -4,12 +4,14 @@
   align-items: stretch;
   overflow: hidden;
 }
+
 .header {
   width: 50%;
   display: inline-flex;
   justify-content: space-between;
   padding: 8px;
 }
+
 .divider {
   height: 4px;
   width: 100%;
@@ -21,11 +23,13 @@
     var(--mantine-color-red-7) 100%
   );
 }
-.playerListColumn {
+
+.player-list-column {
   width: 50%;
   display: inline-block;
   vertical-align: top;
 }
-.scoreboardPlayerNameHeader {
+
+.scoreboard-player-name-header {
   padding-left: 8px;
 }

@@ -3,8 +3,7 @@
   display: flex;
   align-items: center;
   justify-content: left;
-
-  background-color: light-dark(
+   background-color: light-dark(
     var(--mantine-color-white),
     var(--mantine-color-dark-8)
   );

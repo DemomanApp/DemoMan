@@ -1,0 +1,17 @@
+{
+  "extends": "stylelint-config-standard",
+  "rules": {
+    "function-no-unknown": [
+      true,
+      {
+        "ignoreFunctions": ["light-dark"]
+      }
+    ],
+    "at-rule-no-unknown": [
+      true,
+      {
+        "ignoreAtRules": ["mixin"]
+      }
+    ]
+  }
+}

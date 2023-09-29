@@ -14,9 +14,6 @@
     "dbaeumer.vscode-eslint",
 
     // Prettier for js and rust
-    "esbenp.prettier-vscode",
-
-    // For postcss in our css modules
-    "csstools.postcss"
+    "esbenp.prettier-vscode"
   ]
 }

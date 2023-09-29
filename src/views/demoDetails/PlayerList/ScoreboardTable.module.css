@@ -6,11 +6,14 @@
     var(--mantine-color-dark-9)
   );
 }
-.scoreLabel {
+
+.score-label {
   text-align: right;
 }
-.scoreValue {
+
+.score-value {
   text-align: left;
+
   &:not([data-value="0"]) {
     color: var(--mantine-color-green-5);
   }

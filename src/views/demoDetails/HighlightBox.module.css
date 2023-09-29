@@ -1,6 +1,6 @@
-.highlight_left,
-.highlight_center,
-.highlight_right {
+.highlight-left,
+.highlight-center,
+.highlight-right {
   flex-grow: 1;
   display: flex;
   align-items: center;
@@ -8,14 +8,14 @@
   padding-right: 16px;
 }
 
-.highlight_left {
+.highlight-left {
   justify-content: left;
 }
 
-.highlight_center {
+.highlight-center {
   justify-content: center;
 }
 
-.highlight_right {
+.highlight-right {
   justify-content: right;
 }

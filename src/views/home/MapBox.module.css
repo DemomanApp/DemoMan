@@ -12,22 +12,26 @@
   --border: 1px solid
     light-dark(var(--mantine-color-gray-3), var(--mantine-color-dark-4));
 }
+
 .img,
-.imgFallback {
+.img-fallback {
   height: calc(var(--total-height) - var(--textbox-height));
   width: var(--width);
 }
-.imgFallback {
+
+.img-fallback {
   display: flex;
   align-items: center;
   justify-content: center;
   border-right: var(--border);
   border-bottom: var(--border);
 }
-.textBox {
+
+.text-box {
   height: var(--textbox-height);
   border-right: var(--border);
 }
+
 .text {
   overflow: hidden;
   text-overflow: ellipsis;

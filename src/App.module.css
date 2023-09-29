@@ -16,11 +16,12 @@
   );
 }
 
-.headerContent {
+.header-content {
   flex-grow: 1;
   display: flex;
   justify-content: center;
   align-items: center;
+
   /* Because there are two buttons on the left and three on the right,
    * this is needed for centering */
   margin-left: 40px;
