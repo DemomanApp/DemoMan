@@ -1,48 +1,21 @@
 import useStore from "../../hooks/useStore";
-import {
-  Button,
-  createStyles,
-  ScrollArea,
-  Text,
-  TextInput,
-} from "@mantine/core";
+import { Button, ScrollArea, Text, TextInput } from "@mantine/core";
 import { open as dialogOpen } from "@tauri-apps/api/dialog";
 import { HeaderPortal } from "../../AppShell";
 
-const useStyles = createStyles((theme) => ({
-  root: {
-    height: "100%",
-  },
-  row: {
-    display: "flex",
-    gap: theme.spacing.xs,
-  },
-  rowLabel: {
-    width: 160,
-    fontSize: "16pt",
-  },
-  viewport: {
-    display: "flex",
-    flexDirection: "column",
-    gap: theme.spacing.sm,
-    margin: theme.spacing.sm,
-  },
-}));
+import classes from "./settings.module.css";
 
 export default function SettingsView() {
   const [demoPath, setDemoPath] = useStore("demoPath");
-
-  const { classes } = useStyles();
 
   return (
     <>
       <HeaderPortal>
         <Text
-          align="center"
-          weight={500}
+          fw={500}
           size="lg"
           inline
-          style={{ cursor: "default" }}
+          style={{ cursor: "default", textAlign: "center" }}
           data-tauri-drag-region
         >
           Settings

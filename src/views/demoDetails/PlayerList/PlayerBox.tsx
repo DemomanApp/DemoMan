@@ -1,8 +1,10 @@
-import { createStyles, Text } from "@mantine/core";
+import { Text } from "@mantine/core";
 
 import ClassIcon from "../../../components/ClassIcon";
 import { PlayerSummary } from "../../../demo";
 import { indexOfMax } from "../../../util";
+
+import classes from "./PlayerBox.module.css";
 
 interface PlayerBoxProps {
   player: PlayerSummary;
@@ -10,53 +12,11 @@ interface PlayerBoxProps {
   onClick: () => void;
 }
 
-const useStyles = createStyles(
-  (theme, { selected }: { selected: boolean }) => ({
-    root: {
-      height: "40px",
-      display: "flex",
-      alignItems: "center",
-      padding: 8,
-      margin: 2,
-      borderRadius: theme.fn.radius("sm"),
-      backgroundColor: selected
-        ? theme.fn.rgba(theme.colors[theme.primaryColor][8], 0.3)
-        : "transparent",
-      cursor: "pointer",
-      "&:hover": {
-        backgroundColor: selected
-          ? theme.fn.rgba(theme.colors[theme.primaryColor][6], 0.3)
-          : theme.colorScheme === "dark"
-          ? theme.colors.dark[5]
-          : theme.colors.gray[3],
-      },
-    },
-    classIcon: {
-      marginRight: 8,
-      width: 24,
-    },
-    playerName: {
-      textOverflow: "ellipsis",
-      overflow: "hidden",
-      whiteSpace: "nowrap",
-    },
-    pointsScoreboardValue: {
-      textAlign: "right",
-    },
-    simpleScoreboardValue: {
-      width: 32,
-      textAlign: "right",
-    },
-  })
-);
-
 export function PlayerBox({ player, selected, onClick }: PlayerBoxProps) {
-  const { classes } = useStyles({ selected });
-
   const primary_class = indexOfMax(player.time_on_class);
 
   return (
-    <div onClick={onClick} className={classes.root}>
+    <div onClick={onClick} className={classes.root} data-selected={selected}>
       <div className={classes.classIcon}>
         {primary_class !== undefined && (
           <ClassIcon cls={primary_class} size={24} />

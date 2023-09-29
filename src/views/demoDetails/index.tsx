@@ -7,7 +7,6 @@ import {
   Button,
   Center,
   Container,
-  createStyles,
   Group,
   List,
   Loader,
@@ -42,23 +41,12 @@ import PlayerList from "./PlayerList";
 import { Demo } from "../../demo";
 import Highlights from "./Highlights";
 
-const useStyles = createStyles(() => ({
-  container: {
-    height: "100%",
-    padding: "16px",
-  },
-  mapThumbnail: {
-    width: 320,
-    height: 180,
-  },
-}));
+import classes from "./demoDetails.module.css";
 
 export default function DemoDetailsView() {
   const demo = useLoaderData() as Demo;
 
   const [renamePopoverOpen, setRenamePopoverOpen] = useState(false);
-
-  const { classes } = useStyles();
 
   return (
     <>
@@ -72,12 +60,12 @@ export default function DemoDetailsView() {
         >
           <Popover.Target>
             <Text
-              align="center"
-              weight={700}
+              ta="center"
+              fw={700}
               size="xl"
               inline
               style={{ cursor: "default", whiteSpace: "nowrap" }}
-              color="white"
+              c="white"
             >
               {demo.name}
             </Text>
@@ -89,7 +77,7 @@ export default function DemoDetailsView() {
                 size="sm"
                 defaultValue={demo.name}
               />
-              <ActionIcon variant="transparent" ml="xs">
+              <ActionIcon variant="transparent" ml="xs" color="gray">
                 <IconCheck />
               </ActionIcon>
             </div>
@@ -115,7 +103,7 @@ export default function DemoDetailsView() {
                   <Stack
                     align="center"
                     justify="center"
-                    spacing="xs"
+                    gap="xs"
                     style={{ width: "100%", height: "100%" }}
                   >
                     No thumbnail available.
@@ -124,7 +112,7 @@ export default function DemoDetailsView() {
                 }
                 className={classes.mapThumbnail}
               />
-              <Text align="center" size="lg">
+              <Text ta="center" size="lg">
                 {demo.mapName}
               </Text>
             </Paper>
@@ -153,7 +141,7 @@ export default function DemoDetailsView() {
                 </List.Item>
               </List>
               <AsyncButton
-                rightIcon={<IconPlayerPlay />}
+                rightSection={<IconPlayerPlay />}
                 onClick={() => sendCommand(`playdemo "${demo.path}"`)}
               >
                 Play demo
@@ -166,7 +154,7 @@ export default function DemoDetailsView() {
               args={[demo.path]}
               loading={
                 <Fill>
-                  <Loader size="lg" variant="dots" />
+                  <Loader size="lg" type="dots" />
                 </Fill>
               }
               error={(error) => (
@@ -195,16 +183,22 @@ export default function DemoDetailsView() {
                   }}
                 >
                   <Tabs.List>
-                    <Tabs.Tab value="players" icon={<IconUsers size={14} />}>
+                    <Tabs.Tab
+                      value="players"
+                      leftSection={<IconUsers size={14} />}
+                    >
                       Players
                     </Tabs.Tab>
                     <Tabs.Tab
                       value="timeline"
-                      icon={<IconTimeline size={14} />}
+                      leftSection={<IconTimeline size={14} />}
                     >
                       Timeline
                     </Tabs.Tab>
-                    <Tabs.Tab value="info" icon={<IconFileInfo size={14} />}>
+                    <Tabs.Tab
+                      value="info"
+                      leftSection={<IconFileInfo size={14} />}
+                    >
                       Info
                     </Tabs.Tab>
                   </Tabs.List>

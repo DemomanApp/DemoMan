@@ -1,0 +1,17 @@
+.root {
+  table-layout: fixed;
+  width: 100%;
+  background-color: light-dark(
+    var(--mantine-color-gray-1),
+    var(--mantine-color-dark-9)
+  );
+}
+.scoreLabel {
+  text-align: right;
+}
+.scoreValue {
+  text-align: left;
+  &:not([data-value="0"]) {
+    color: var(--mantine-color-green-5);
+  }
+}

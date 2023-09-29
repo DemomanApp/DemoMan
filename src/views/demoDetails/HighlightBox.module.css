@@ -1,0 +1,21 @@
+.highlight_left,
+.highlight_center,
+.highlight_right {
+  flex-grow: 1;
+  display: flex;
+  align-items: center;
+  height: 40px;
+  padding-right: 16px;
+}
+
+.highlight_left {
+  justify-content: left;
+}
+
+.highlight_center {
+  justify-content: center;
+}
+
+.highlight_right {
+  justify-content: right;
+}

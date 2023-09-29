@@ -1,0 +1,8 @@
+.container {
+  height: 100%;
+  padding: 16px;
+}
+.mapThumbnail {
+  width: 320px;
+  height: 180px;
+}

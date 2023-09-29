@@ -7,8 +7,10 @@ import {
 } from "react";
 import ReactDOM from "react-dom";
 
-import { createStyles, UnstyledButton } from "@mantine/core";
+import { UnstyledButton } from "@mantine/core";
 import { Icon } from "@tabler/icons-react";
+
+import classes from "./AppShell.module.css";
 
 type AppShellContextType = {
   headerRef: RefObject<HTMLDivElement>;
@@ -37,35 +39,6 @@ export function HeaderPortal({ children }: { children: ReactNode }) {
   return null;
 }
 
-const useNavbarButtonStyles = createStyles((theme) => ({
-  link: {
-    width: 50,
-    height: 50,
-    borderRadius: theme.radius.md,
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    color:
-      theme.colorScheme === "dark"
-        ? theme.colors.dark[0]
-        : theme.colors.gray[7],
-
-    "&:hover": {
-      backgroundColor:
-        theme.colorScheme === "dark"
-          ? theme.colors.dark[5]
-          : theme.colors.gray[0],
-    },
-  },
-
-  active: {
-    "&, &:hover": {
-      backgroundColor: theme.fn.primaryColor(),
-      color: theme.white,
-    },
-  },
-}));
-
 type NavbarButtonProps = {
   icon: Icon;
   active?: boolean;
@@ -77,11 +50,11 @@ export const NavbarButton = forwardRef<HTMLButtonElement, NavbarButtonProps>(
     { icon: Icon, active, onClick }: NavbarButtonProps,
     ref
   ) {
-    const { classes, cx } = useNavbarButtonStyles();
     return (
       <UnstyledButton
         onClick={onClick}
-        className={cx(classes.link, { [classes.active]: active })}
+        className={classes.link}
+        data-active={active}
         ref={ref}
       >
         <Icon stroke={1.5} />

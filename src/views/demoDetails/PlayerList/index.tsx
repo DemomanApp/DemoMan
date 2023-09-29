@@ -1,60 +1,19 @@
 import { useMemo, useState } from "react";
 
-import {
-  createStyles,
-  Divider,
-  Paper,
-  ScrollArea,
-  Tabs,
-  Text,
-  Title,
-} from "@mantine/core";
+import { Divider, Paper, ScrollArea, Tabs, Text, Title } from "@mantine/core";
 
 import { GameSummary, PlayerSummary } from "../../../demo";
 import { PlayerBox } from "./PlayerBox";
 import { ScoreboardTable } from "./ScoreboardTable";
 import { TableHeader } from "./TableHeader";
 
+import classes from "./PlayerList.module.css";
+
 export type PlayerListProps = {
   gameSummary: GameSummary;
 };
 
-const useStyles = createStyles((theme) => ({
-  paper: {
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "stretch",
-    overflow: "hidden",
-  },
-  header: {
-    width: "50%",
-    display: "inline-flex",
-    justifyContent: "space-between",
-    padding: "8px",
-  },
-  divider: {
-    height: "4px",
-    width: "100%",
-    background: `linear-gradient(90deg,\
-        ${theme.colors.blue[7]} 0%,\
-        ${theme.colors.blue[7]} 50%,\
-        ${theme.colors.red[7]} 50%,\
-        ${theme.colors.red[7]} 100%\
-        )`,
-  },
-  playerListColumn: {
-    width: "50%",
-    display: "inline-block",
-    verticalAlign: "top",
-  },
-  scoreboardPlayerNameHeader: {
-    paddingLeft: 8,
-  },
-}));
-
 export default function PlayerList({ gameSummary }: PlayerListProps) {
-  const { classes } = useStyles();
-
   const [redPlayers, bluPlayers, _others] = useMemo(() => {
     const redPlayers: PlayerSummary[] = [];
     const bluPlayers: PlayerSummary[] = [];
@@ -90,18 +49,18 @@ export default function PlayerList({ gameSummary }: PlayerListProps) {
       {/* Header */}
       <div>
         <div className={classes.header}>
-          <Text size={30} weight={600} color="blue.7">
+          <Text fz={30} fw={600} c="blue.7">
             BLU
           </Text>
-          <Text size={30} weight={600} color="blue.7">
+          <Text fz={30} fw={600} c="blue.7">
             {gameSummary.blue_team_score}
           </Text>
         </div>
         <div className={classes.header}>
-          <Text size={30} weight={600} color="red.7">
+          <Text fz={30} fw={600} c="red.7">
             {gameSummary.red_team_score}
           </Text>
-          <Text size={30} weight={600} color="red.7">
+          <Text fz={30} fw={600} c="red.7">
             RED
           </Text>
         </div>

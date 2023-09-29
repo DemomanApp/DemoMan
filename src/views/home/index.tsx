@@ -170,7 +170,6 @@ function MainView({ demos }: { demos: Demo[] }) {
                       <DemoListRow
                         demo={demos[index]}
                         selected={selectedRows[index]}
-                        selectionMode={selectionMode}
                         onClick={() => toggleRowSelected(index)}
                       />
                     </div>
@@ -199,13 +198,13 @@ export default function HomeViewAsyncWrapper() {
   if (storedDemoPath === undefined) {
     // Used as fallback in case the user hasn't configured the demos directory yet
     getDefaultDemosDir()
-      .then(dir => {
+      .then((dir) => {
         if (storedDemoPath === undefined) {
           setStoredDemoPath(dir);
         }
         return dir;
       })
-      .catch(_err => {
+      .catch((_err) => {
         // Failed to get the default directory.  At this point, there's nothing reasonable
         // we can do other than alert the user and prompt them to set the directory themselves
         return;
@@ -218,7 +217,7 @@ export default function HomeViewAsyncWrapper() {
       args={[storedDemoPath ?? ""]}
       loading={
         <Fill>
-          <Loader size="lg" variant="dots" />
+          <Loader size="lg" type="dots" />
         </Fill>
       }
       error={(error) => (
@@ -226,9 +225,7 @@ export default function HomeViewAsyncWrapper() {
           <Alert color="red">
             An error occurred while scanning for demo files. Is the demo storage
             directory set?
-            <div>
-              Error: {String(error)}
-            </div>
+            <div>Error: {String(error)}</div>
           </Alert>
         </Fill>
       )}

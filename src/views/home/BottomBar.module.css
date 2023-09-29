@@ -1,0 +1,24 @@
+.root {
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: left;
+
+  background-color: light-dark(
+    var(--mantine-color-white),
+    var(--mantine-color-dark-8)
+  );
+
+  &[data-selection-mode="true"] {
+    background-color: var(--mantine-primary-color-filled);
+    color: var(--mantine-color-white);
+  }
+}
+
+.icon {
+  color: var(--mantine-color-text);
+}
+
+.icon[data-selection-mode="true"] {
+  color: var(--mantine-color-white);
+}

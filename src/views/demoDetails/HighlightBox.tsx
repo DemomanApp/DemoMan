@@ -1,4 +1,4 @@
-import { createStyles, useMantineTheme } from "@mantine/core";
+import { useMantineTheme } from "@mantine/core";
 
 import {
   ChatMessageHighlight,
@@ -22,28 +22,12 @@ import { KillIcon } from "../../components";
 import KillstreakIcon from "../../components/KillstreakIcon";
 import CapturePoints from "../../assets/translations/capture_points.json";
 
+import classes from "./HighlightBox.module.css";
+
 type HighlightProps = {
   event: Highlight;
   playerMap: Map<UserId, PlayerSummary>;
 };
-
-const useStyles = createStyles(
-  (
-    theme,
-    {
-      justifyContent,
-    }: { justifyContent: React.CSSProperties["justifyContent"] }
-  ) => ({
-    root: {
-      flexGrow: 1,
-      display: "flex",
-      alignItems: "center",
-      justifyContent,
-      height: 40,
-      paddingRight: 16,
-    },
-  })
-);
 
 type PlayerNameProps = {
   player: PlayerSummary | HighlightPlayerSnapshot | undefined;
@@ -136,28 +120,26 @@ function PlayerNames({
 }
 
 function KillHighlightBox(highlight: KillHighlight) {
-  const { classes } = useStyles({ justifyContent: "right" });
-
   const { killer, assister, victim } = highlight;
 
   // Special case for kill messages with text instead of a kill icon
   if (highlight.kill_icon === "#fall") {
     return (
-      <div className={classes.root}>
+      <div className={classes.highlight_right}>
         <PlayerName player={victim} />
         &nbsp;fell to a clumsy, painful death
       </div>
     );
   } else if (highlight.kill_icon === "#suicide") {
     return (
-      <div className={classes.root}>
+      <div className={classes.highlight_right}>
         <PlayerName player={victim} />
         &nbsp;bid farewell, cruel world!
       </div>
     );
   } else if (highlight.kill_icon === "#assisted_suicide") {
     return (
-      <div className={classes.root}>
+      <div className={classes.highlight_right}>
         <PlayerName player={killer} />
         {assister !== null && (
           <>
@@ -173,7 +155,7 @@ function KillHighlightBox(highlight: KillHighlight) {
     );
   } else {
     return (
-      <div className={classes.root}>
+      <div className={classes.highlight_right}>
         {killer !== null &&
           killer.user_id !== victim.user_id &&
           killer.team !== "other" && <PlayerName player={killer} />}
@@ -194,7 +176,6 @@ function KillHighlightBox(highlight: KillHighlight) {
 }
 
 function KillStreakHighlightBox(highlight: KillStreakHighlight) {
-  const { classes } = useStyles({ justifyContent: "center" });
   const { player, streak } = highlight;
   let message;
   switch (streak) {
@@ -222,7 +203,7 @@ function KillStreakHighlightBox(highlight: KillStreakHighlight) {
   }
 
   return (
-    <div className={classes.root}>
+    <div className={classes.highlight_center}>
       <span>
         <PlayerName player={player} /> {message}
       </span>
@@ -232,7 +213,6 @@ function KillStreakHighlightBox(highlight: KillStreakHighlight) {
 }
 
 function KillStreakEndedHighlightBox(highlight: KillStreakEndedHighlight) {
-  const { classes } = useStyles({ justifyContent: "center" });
   const { killer, victim, streak } = highlight;
 
   let message;
@@ -252,7 +232,7 @@ function KillStreakEndedHighlightBox(highlight: KillStreakEndedHighlight) {
   }
 
   return (
-    <div className={classes.root}>
+    <div className={classes.highlight_center}>
       <span>{message}</span>
       <KillstreakIcon streak={streak} />
     </div>
@@ -260,9 +240,8 @@ function KillStreakEndedHighlightBox(highlight: KillStreakEndedHighlight) {
 }
 
 function ChatMessageHighlightBox(highlight: ChatMessageHighlight) {
-  const { classes } = useStyles({ justifyContent: "left" });
   return (
-    <div className={classes.root}>
+    <div className={classes.highlight_left}>
       <PlayerName player={highlight.sender} />
       :&nbsp;
       {highlight.text}
@@ -271,22 +250,20 @@ function ChatMessageHighlightBox(highlight: ChatMessageHighlight) {
 }
 
 function AirshotHighlightBox(highlight: AirshotHighlight) {
-  const { classes } = useStyles({ justifyContent: "center" });
   const attackerName = highlight.attacker.name;
   const victimName = highlight.victim.name;
   return (
-    <div className={classes.root}>
+    <div className={classes.highlight_center}>
       AIRSHOT: {attackerName} airshot {victimName}
     </div>
   );
 }
 
 function CrossbowAirshotHighlightBox(highlight: CrossbowAirshotHighlight) {
-  const { classes } = useStyles({ justifyContent: "center" });
   const healerName = highlight.healer.name;
   const targetName = highlight.target.name;
   return (
-    <div className={classes.root}>
+    <div className={classes.highlight_center}>
       AIRSHOT: {healerName} airshot {targetName}
     </div>
   );
@@ -296,8 +273,6 @@ function PointCapturedHighlightBox(
   highlight: PointCapturedHighlight,
   playerMap: Map<UserId, PlayerSummary>
 ) {
-  const { classes } = useStyles({ justifyContent: "right" });
-
   const cappers = highlight.cappers.map((capper) => playerMap.get(capper));
 
   let icon;
@@ -316,10 +291,12 @@ function PointCapturedHighlightBox(
   }
 
   const translationLookup = highlight.point_name.substring(1); // substring(1) to remove the leading "#" character
-  const pointName = CapturePoints[translationLookup as keyof typeof CapturePoints] ?? highlight.point_name;
+  const pointName =
+    CapturePoints[translationLookup as keyof typeof CapturePoints] ??
+    highlight.point_name;
 
   return (
-    <div className={classes.root}>
+    <div className={classes.highlight_right}>
       <PlayerNames players={cappers} team={highlight.capturing_team} />
       &nbsp;
       {icon !== undefined && <KillIcon killIcon={icon} />}
@@ -329,37 +306,40 @@ function PointCapturedHighlightBox(
 }
 
 function RoundStalemateHighlightBox() {
-  const { classes } = useStyles({ justifyContent: "center" });
-  return <div className={classes.root}>Round ended in a stalemate</div>;
+  return (
+    <div className={classes.highlight_center}>Round ended in a stalemate</div>
+  );
 }
 
 function RoundStartHighlightBox() {
-  const { classes } = useStyles({ justifyContent: "center" });
-  return <div className={classes.root}>New round started</div>;
+  return <div className={classes.highlight_center}>New round started</div>;
 }
 
 function RoundWinHighlightBox(highlight: RoundWinHighlight) {
-  const { classes } = useStyles({ justifyContent: "center" });
   const team_number = highlight.winner;
   const teamName = TEAM_NAMES[team_number] ?? TEAM_NAMES[0];
-  return <div className={classes.root}>{teamName} won the round</div>;
+  return (
+    <div className={classes.highlight_center}>{teamName} won the round</div>
+  );
 }
 
 function PlayerConnectedHighlightBox(
   highlight: PlayerConnectedHighlight,
   playerMap: Map<UserId, PlayerSummary>
 ) {
-  const { classes } = useStyles({ justifyContent: "left" });
   const playerName = playerMap.get(highlight.user_id)?.name ?? "<unknown>";
 
-  return <div className={classes.root}>{playerName} has joined the game</div>;
+  return (
+    <div className={classes.highlight_left}>
+      {playerName} has joined the game
+    </div>
+  );
 }
 
 function PlayerDisconnectedHighlightBox(
   highlight: PlayerDisconnectedHighlight,
   playerMap: Map<UserId, PlayerSummary>
 ) {
-  const { classes } = useStyles({ justifyContent: "left" });
   const playerName = playerMap.get(highlight.user_id)?.name ?? "<unknown>";
   let reason = highlight.reason;
   if (reason === "#TF_MM_Generic_Kicked") {
@@ -368,20 +348,18 @@ function PlayerDisconnectedHighlightBox(
     reason = "Kicked due to inactivity";
   }
   return (
-    <div className={classes.root}>
+    <div className={classes.highlight_left}>
       {playerName} left the game ({reason})
     </div>
   );
 }
 
 function PauseHighlightBox() {
-  const { classes } = useStyles({ justifyContent: "center" });
-  return <div className={classes.root}>Game paused.</div>;
+  return <div className={classes.highlight_center}>Game paused.</div>;
 }
 
 function UnpauseHighlightBox() {
-  const { classes } = useStyles({ justifyContent: "center" });
-  return <div className={classes.root}>Game resumed.</div>;
+  return <div className={classes.highlight_center}>Game resumed.</div>;
 }
 
 export default function HighlightBox({ event, playerMap }: HighlightProps) {

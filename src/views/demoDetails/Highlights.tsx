@@ -45,7 +45,7 @@ export default function HighlightsList({ gameSummary }: TimelineProps) {
                   style={{ ...style, display: "flex", alignItems: "center" }}
                 >
                   <Text
-                    color="dimmed"
+                    c="dimmed"
                     size="sm"
                     style={{
                       width: "7ch",

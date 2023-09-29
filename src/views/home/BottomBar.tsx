@@ -1,6 +1,8 @@
-import { ActionIcon, createStyles, Text } from "@mantine/core";
+import { ActionIcon, Text } from "@mantine/core";
 import { IconListCheck } from "@tabler/icons-react";
 import { formatFileSize } from "../../util";
+
+import classes from "./BottomBar.module.css";
 
 export type Props = {
   totalDemoCount: number;
@@ -11,26 +13,6 @@ export type Props = {
   toggleSelectionMode(): void;
 };
 
-const useStyles = createStyles(
-  (theme, { selectionMode }: { selectionMode: boolean }) => ({
-    root: {
-      height: "40px",
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "left",
-      backgroundColor: selectionMode
-        ? theme.colors.blue
-        : theme.colorScheme === "dark"
-          ? theme.colors.dark[8]
-          : theme.white,
-      color: selectionMode ? theme.white : undefined,
-    },
-    icon: {
-      color: selectionMode ? theme.white : undefined,
-    }
-  })
-);
-
 export default function BottomBar({
   totalDemoCount,
   totalFileSize,
@@ -39,15 +21,15 @@ export default function BottomBar({
   selectionMode,
   toggleSelectionMode,
 }: Props) {
-  const { classes } = useStyles({ selectionMode });
   return (
-    <div className={classes.root}>
+    <div className={classes.root} data-selection-mode={selectionMode}>
       <ActionIcon
         variant="subtle"
         radius={0}
         size={40}
         onClick={toggleSelectionMode}
         className={classes.icon}
+        data-selection-mode={selectionMode}
       >
         <IconListCheck />
       </ActionIcon>

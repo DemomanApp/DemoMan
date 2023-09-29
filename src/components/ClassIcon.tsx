@@ -1,5 +1,3 @@
-import { createStyles } from "@mantine/core";
-
 import ScoutIcon from "../assets/class_icons/scout.png";
 import SniperIcon from "../assets/class_icons/sniper.png";
 import SoldierIcon from "../assets/class_icons/soldier.png";
@@ -38,31 +36,20 @@ const classIconMap = [
   EngineerIcon,
 ];
 
-const useStyles = createStyles(
-  (theme, { size }: { size: number }) => ({
-    root: {
-      width: size ?? 32,
-      height: size ?? 32,
-    },
-  })
-);
-
 export type ClassIconProps = {
   cls: Class;
   size?: number;
 };
 
-export default function ClassIcon({
-  cls,
-  size = 32,
-}: ClassIconProps) {
-  const { classes } = useStyles({ size });
-
+export default function ClassIcon({ cls, size = 32 }: ClassIconProps) {
   return (
     <img
       alt={stringifyClass(cls)}
       src={classIconMap[cls]}
-      className={classes.root}
+      style={{
+        width: size ?? 32,
+        height: size ?? 32,
+      }}
     />
   );
 }

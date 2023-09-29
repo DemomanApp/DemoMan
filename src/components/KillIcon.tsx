@@ -1,4 +1,4 @@
-import { useMantineTheme } from "@mantine/core";
+import { useMantineColorScheme } from "@mantine/core";
 import KillIconData from "./KillIconData";
 
 export type KillIconProps = {
@@ -6,7 +6,7 @@ export type KillIconProps = {
 };
 
 export default function KillIcon({ killIcon }: KillIconProps) {
-  const { colorScheme } = useMantineTheme();
+  const { colorScheme } = useMantineColorScheme();
   let weaponData = KillIconData[killIcon];
   if (weaponData === undefined) {
     weaponData = KillIconData["skull"];

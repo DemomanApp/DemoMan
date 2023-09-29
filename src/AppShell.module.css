@@ -1,0 +1,25 @@
+.link {
+  width: 50px;
+  height: 50px;
+  border-radius: var(--mantine-radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: light-dark(var(--mantine-color-gray-7), var(--mantine-color-dark-0));
+
+  @mixin hover {
+    background-color: light-dark(
+      var(--mantine-color-gray-0),
+      var(--mantine-color-dark-5)
+    );
+  }
+
+  &[data-active="true"] {
+    background-color: var(--mantine-primary-color-filled);
+    color: var(--mantine-color-white);
+
+    @mixin hover {
+      background-color: var(--mantine-primary-color-filled-hover);
+    }
+  }
+}

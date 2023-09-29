@@ -2,8 +2,6 @@ import { memo } from "react";
 
 import {
   ActionIcon,
-  createStyles,
-  getStylesRef,
   Group,
   HoverCard,
   Paper,
@@ -31,10 +29,11 @@ import { IconKillstreak } from "../../components/icons";
 import MapBox from "./MapBox";
 import Badges from "./Badges";
 
+import classes from "./DemoListRow.module.css";
+
 type DemoListRowProps = {
   demo: Demo;
   selected: boolean;
-  selectionMode: boolean;
   onClick(): void;
 };
 
@@ -54,6 +53,8 @@ function HoverMenuItem({
           onClick();
           event.stopPropagation();
         }}
+        variant="transparent"
+        color="gray"
       >
         <Icon size={18} />
       </ActionIcon>
@@ -61,86 +62,20 @@ function HoverMenuItem({
   );
 }
 
-// TODO fix the background color when hovering,
-// maybe add a hover effect to the thumbnail as well
-const useStyles = createStyles(
-  (
-    theme,
-    {
-      selectionMode: _,
-      selected,
-    }: { selectionMode: boolean; selected: boolean }
-  ) => ({
-    paper: {
-      height: "120px",
-      cursor: "pointer",
-      display: "flex",
-      alignItems: "stretch",
-      // Needed so the corners of the child elements respect the border radius
-      overflow: "hidden",
-      "&:hover": {
-        backgroundColor: selected
-          ? theme.fn.rgba(theme.colors[theme.primaryColor][5], 0.2)
-          : theme.colorScheme === "dark"
-          ? theme.colors.dark[6]
-          : theme.colors.gray[1],
-        [`& .${getStylesRef("menu")}`]: {
-          display: "flex",
-        },
-      },
-      transition: "background-color 150ms ease, border-color 150ms ease",
-      boxShadow: selected
-        ? `0px 0px 0px 2px ${
-            theme.colorScheme === "dark"
-              ? theme.colors[theme.primaryColor][5]
-              : theme.fn.primaryColor()
-          }`
-        : `0px 0px 0px 1px ${
-            theme.colorScheme === "dark"
-              ? theme.colors.dark[4]
-              : theme.colors.gray[3]
-          }`,
-      borderRadius: theme.radius.md,
-      backgroundColor: selected
-        ? theme.fn.rgba(theme.colors[theme.primaryColor][8], 0.2)
-        : theme.colorScheme === "dark"
-        ? theme.colors.dark[7]
-        : theme.white,
-    },
-    content: {
-      display: "flex",
-      flexDirection: "column",
-      justifyContent: "start",
-      alignItems: "start",
-      padding: "8px",
-      flexGrow: 1,
-    },
-    menu: {
-      ref: getStylesRef("menu"),
-      display: "none", // Changes to "flex" when hovered
-      alignItems: "center",
-      position: "absolute",
-      top: -16,
-      right: 16,
-      height: 32,
-    },
-  })
-);
-
-function DemoListRow({
-  demo,
-  selected,
-  selectionMode,
-  onClick,
-}: DemoListRowProps) {
-  const { classes } = useStyles({ selectionMode, selected });
+function DemoListRow({ demo, selected, onClick }: DemoListRowProps) {
   const birthtime = new Date(demo.birthtime * 1000);
   return (
-    <Paper className={classes.paper} radius="md" shadow="xl" onClick={onClick}>
+    <Paper
+      className={classes.paper}
+      radius="md"
+      shadow="xl"
+      onClick={onClick}
+      data-selected={selected}
+    >
       <MapBox mapName={demo.mapName} />
       <div className={classes.content}>
-        <Group spacing="xs">
-          <Title order={3} inline>
+        <Group gap="xs">
+          <Title order={3} style={{ lineHeight: 1 }}>
             {demo.name}
           </Title>
           {isStvDemo(demo) && (
@@ -151,14 +86,14 @@ function DemoListRow({
           <Badges items={demo.tags} max={3} />
         </Group>
         {!isStvDemo(demo) && (
-          <Group spacing={4}>
+          <Group gap={4}>
             <IconUser color="grey" />
-            <Text color="dimmed">{demo.clientName}</Text>
+            <Text c="dimmed">{demo.clientName}</Text>
           </Group>
         )}
-        <Group spacing={4}>
+        <Group gap={4}>
           <IconCalendarEvent color="gray" />
-          <Text color="dimmed">{birthtime.toLocaleString()}</Text>
+          <Text c="dimmed">{birthtime.toLocaleString()}</Text>
         </Group>
         {demo.events.length !== 0 && (
           <HoverCard
@@ -172,9 +107,9 @@ function DemoListRow({
             })}
           >
             <HoverCard.Target>
-              <Group spacing={4}>
+              <Group gap={4}>
                 <IconBookmarks color="gray" />
-                <Text color="dimmed">{demo.events.length} Bookmarks</Text>
+                <Text c="dimmed">{demo.events.length} Bookmarks</Text>
               </Group>
             </HoverCard.Target>
             <HoverCard.Dropdown>
@@ -189,23 +124,23 @@ function DemoListRow({
                   },
                 })}
               >
-                <Stack align="stretch" spacing={0}>
+                <Stack align="stretch" gap={0}>
                   {demo.events.map((event, idx) => (
-                    <Group key={idx} align="center" position="left" spacing={0}>
+                    <Group key={idx} align="center" justify="left" gap={0}>
                       {event.name === "Bookmark" ? (
                         <IconBookmark />
                       ) : (
                         <IconKillstreak />
                       )}
                       <Text
-                        sx={(theme) => ({
+                        style={{
                           flexGrow: 1,
-                          marginRight: theme.spacing.xs,
-                        })}
+                          marginRight: "var(--mantine-spacing-xs)",
+                        }}
                       >
                         {event.value}
                       </Text>
-                      <Text color="dimmed" size="xs">
+                      <Text c="dimmed" size="xs">
                         {event.tick}
                       </Text>
                     </Group>

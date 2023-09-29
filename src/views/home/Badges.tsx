@@ -14,7 +14,7 @@ export default function Badges({
   const shownItems = items.slice(0, max);
   return (
     <div style={{ display: "flex" }}>
-      <Group spacing={4}>
+      <Group gap={4}>
         {shownItems.map((item) => (
           <Badge
             key={item}
@@ -26,7 +26,7 @@ export default function Badges({
           </Badge>
         ))}
         {overflowAmount > 0 && (
-          <Text size="sm" color="dimmed">
+          <Text size="sm" c="dimmed">
             +{overflowAmount} more
           </Text>
         )}

@@ -1,14 +1,12 @@
-import { createStyles } from "@mantine/core";
-
 import { Scoreboard } from "../../../demo";
+
+import classes from "./ScoreboardTable.module.css";
 
 type ScoreboardTableProps = {
   scoreboard: Scoreboard;
 };
 
 function ScoreboardItem({ label, value }: { label: string; value: number }) {
-  const { classes } = useStyles();
-
   return (
     <>
       <td className={classes.scoreLabel}>{label}:</td>
@@ -19,29 +17,7 @@ function ScoreboardItem({ label, value }: { label: string; value: number }) {
   );
 }
 
-const useStyles = createStyles((theme) => ({
-  root: {
-    tableLayout: "fixed",
-    width: "100%",
-    background:
-      theme.colorScheme === "dark"
-        ? theme.colors.dark[9]
-        : theme.colors.gray[1],
-  },
-  scoreLabel: {
-    textAlign: "right",
-  },
-  scoreValue: {
-    textAlign: "left",
-    "&:not([data-value=\"0\"])": {
-      color: theme.colors.green[5],
-    },
-  },
-}));
-
 export function ScoreboardTable({ scoreboard }: ScoreboardTableProps) {
-  const { classes } = useStyles();
-
   return (
     <div>
       <table className={classes.root}>
@@ -60,10 +36,7 @@ export function ScoreboardTable({ scoreboard }: ScoreboardTableProps) {
           </tr>
           <tr>
             <ScoreboardItem label="Assists" value={scoreboard.assists} />
-            <ScoreboardItem
-              label="Domination"
-              value={scoreboard.dominations}
-            />
+            <ScoreboardItem label="Domination" value={scoreboard.dominations} />
             <ScoreboardItem label="Teleports" value={scoreboard.teleports} />
             <ScoreboardItem label="Support" value={scoreboard.support} />
           </tr>
