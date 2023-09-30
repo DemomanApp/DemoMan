@@ -13,8 +13,9 @@ import { Icon } from "@tabler/icons-react";
 import classes from "./AppShell.module.css";
 
 type AppShellContextType = {
-  headerRef: RefObject<HTMLDivElement>;
-  navbarRef: RefObject<HTMLDivElement>;
+  headerLeftRef: RefObject<HTMLDivElement>;
+  headerCenterRef: RefObject<HTMLDivElement>;
+  headerRightRef: RefObject<HTMLDivElement>;
 };
 
 const AppShellContext = createContext<AppShellContextType>(
@@ -23,38 +24,38 @@ const AppShellContext = createContext<AppShellContextType>(
 
 export const AppShellProvider = AppShellContext.Provider;
 
-export function NavbarPortal({ children }: { children: ReactNode }) {
-  const { navbarRef } = useContext(AppShellContext);
-  if (navbarRef.current !== null) {
-    return ReactDOM.createPortal(children, navbarRef.current);
-  }
-  return null;
+type HeaderPortalProps = {
+  left?: ReactNode;
+  center?: ReactNode;
+  right?: ReactNode;
+};
+
+export function HeaderPortal({ left, center, right }: HeaderPortalProps) {
+  const { headerLeftRef, headerCenterRef, headerRightRef } =
+    useContext(AppShellContext);
+  return (
+    <>
+      {headerLeftRef.current !== null &&
+        ReactDOM.createPortal(left, headerLeftRef.current)}
+      {headerCenterRef.current !== null &&
+        ReactDOM.createPortal(center, headerCenterRef.current)}
+      {headerRightRef.current !== null &&
+        ReactDOM.createPortal(right, headerRightRef.current)}
+    </>
+  );
 }
 
-export function HeaderPortal({ children }: { children: ReactNode }) {
-  const { headerRef } = useContext(AppShellContext);
-  if (headerRef.current !== null) {
-    return ReactDOM.createPortal(children, headerRef.current);
-  }
-  return null;
-}
-
-type NavbarButtonProps = {
+type HeaderButtonProps = {
   icon: Icon;
-  active?: boolean;
   onClick?(): void;
 };
 
-export const NavbarButton = forwardRef<HTMLButtonElement, NavbarButtonProps>(
-  function _NavbarButton(
-    { icon: Icon, active, onClick }: NavbarButtonProps,
-    ref
-  ) {
+export const HeaderButton = forwardRef<HTMLButtonElement, HeaderButtonProps>(
+  function _HeaderButton({ icon: Icon, onClick }: HeaderButtonProps, ref) {
     return (
       <UnstyledButton
         onClick={onClick}
-        className={classes.link}
-        data-active={active}
+        className={classes.navbarButton}
         ref={ref}
       >
         <Icon stroke={1.5} />

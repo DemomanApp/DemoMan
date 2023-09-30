@@ -18,9 +18,7 @@
       },
       "fs": {
         "all": true,
-        "scope": [
-          "**"
-        ]
+        "scope": ["**"]
       }
     },
     "bundle": {
@@ -65,11 +63,10 @@
     "windows": [
       {
         "fullscreen": false,
-        "height": 600,
+        "height": 800,
         "resizable": true,
         "title": "DemoMan",
-        "width": 800,
-        "decorations": false
+        "width": 1200
       }
     ]
   }

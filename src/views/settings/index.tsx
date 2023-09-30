@@ -1,26 +1,35 @@
-import useStore from "../../hooks/useStore";
-import { Button, ScrollArea, Text, TextInput } from "@mantine/core";
 import { open as dialogOpen } from "@tauri-apps/api/dialog";
-import { HeaderPortal } from "../../AppShell";
+import { useNavigate } from "react-router-dom";
+import { Button, ScrollArea, Text, TextInput } from "@mantine/core";
+import { IconChevronLeft } from "@tabler/icons-react";
+
+import useStore from "../../hooks/useStore";
+import { HeaderButton, HeaderPortal } from "../../AppShell";
 
 import classes from "./settings.module.css";
 
 export default function SettingsView() {
+  const navigate = useNavigate();
+
   const [demoPath, setDemoPath] = useStore("demoPath");
 
   return (
     <>
-      <HeaderPortal>
-        <Text
-          fw={500}
-          size="lg"
-          inline
-          style={{ cursor: "default", textAlign: "center" }}
-          data-tauri-drag-region
-        >
-          Settings
-        </Text>
-      </HeaderPortal>
+      <HeaderPortal
+        left={
+          <HeaderButton icon={IconChevronLeft} onClick={() => navigate(-1)} />
+        }
+        center={
+          <Text
+            fw={500}
+            size="lg"
+            inline
+            style={{ cursor: "default", textAlign: "center" }}
+          >
+            Settings
+          </Text>
+        }
+      />
       <ScrollArea classNames={{ root: classes.root }}>
         <div className={classes.viewport}>
           <span className={classes.row}>

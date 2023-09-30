@@ -6,18 +6,24 @@ import {
   useMemo,
   forwardRef,
 } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import AutoSizer from "react-virtualized-auto-sizer";
 import { FixedSizeList, ListChildComponentProps } from "react-window";
 import memoize from "memoize-one";
 
-import { Alert, ScrollArea, Loader } from "@mantine/core";
-import { IconFilter, IconSearch, IconArrowsSort } from "@tabler/icons-react";
+import { Alert, ScrollArea, Loader, Input, Menu } from "@mantine/core";
+import {
+  IconSearch,
+  IconDots,
+  IconSettings,
+  IconPlug,
+  IconFolder,
+} from "@tabler/icons-react";
 
 import { Demo } from "../../demo";
 import DemoListRow from "./DemoListRow";
 import BottomBar from "./BottomBar";
-import { NavbarPortal, NavbarButton } from "../../AppShell";
+import { HeaderButton, HeaderPortal } from "../../AppShell";
 import { getDemosInDirectory } from "../../api";
 import { Async, Fill } from "../../components";
 import useStore from "../../hooks/useStore";
@@ -122,11 +128,43 @@ function MainView({ demos }: { demos: Demo[] }) {
 
   return (
     <>
-      <NavbarPortal>
-        <NavbarButton icon={IconFilter} />
-        <NavbarButton icon={IconSearch} />
-        <NavbarButton icon={IconArrowsSort} />
-      </NavbarPortal>
+      <HeaderPortal
+        center={
+          <Input
+            variant="filled"
+            placeholder="Search"
+            style={{ width: "100%" }}
+            size="sm"
+            leftSection={<IconSearch size={16} />}
+          />
+        }
+        right={
+          <Menu shadow="md" position="bottom-end">
+            <Menu.Target>
+              <HeaderButton icon={IconDots} />
+            </Menu.Target>
+            <Menu.Dropdown>
+              <Menu.Item
+                leftSection={<IconSettings size={14} />}
+                component={Link}
+                to="/settings"
+              >
+                Settings
+              </Menu.Item>
+              <Menu.Item
+                leftSection={<IconPlug size={14} />}
+                component={Link}
+                to="/rcon-setup"
+              >
+                Set up RCON
+              </Menu.Item>
+              <Menu.Item leftSection={<IconFolder size={14} />}>
+                Open demos folder
+              </Menu.Item>
+            </Menu.Dropdown>
+          </Menu>
+        }
+      />
       <div
         style={{
           height: "100%",

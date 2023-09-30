@@ -1,5 +1,10 @@
 import { useState } from "react";
-import { LoaderFunction, useLoaderData, useRouteError } from "react-router-dom";
+import {
+  LoaderFunction,
+  useLoaderData,
+  useNavigate,
+  useRouteError,
+} from "react-router-dom";
 
 import {
   ActionIcon,
@@ -22,6 +27,7 @@ import {
   IconAlertCircle,
   IconCalendarEvent,
   IconCheck,
+  IconChevronLeft,
   IconClock,
   IconFileAnalytics,
   IconFileInfo,
@@ -34,7 +40,7 @@ import {
 } from "@tabler/icons-react";
 
 import { getDemoByName, getDemoDetails, sendCommand } from "../../api";
-import { HeaderPortal } from "../../AppShell";
+import { HeaderButton, HeaderPortal } from "../../AppShell";
 import { Async, AsyncButton, Fill, MapThumbnail } from "../../components";
 import { formatFileSize, formatDuration } from "../../util";
 import PlayerList from "./PlayerList";
@@ -45,54 +51,62 @@ import classes from "./demoDetails.module.css";
 
 export default function DemoDetailsView() {
   const demo = useLoaderData() as Demo;
+  const navigate = useNavigate();
 
   const [renamePopoverOpen, setRenamePopoverOpen] = useState(false);
 
   return (
     <>
-      <HeaderPortal>
-        <Popover
-          trapFocus
-          opened={renamePopoverOpen}
-          arrowSize={16}
-          withArrow
-          onClose={() => setRenamePopoverOpen(false)}
-        >
-          <Popover.Target>
-            <Text
-              ta="center"
-              fw={700}
-              size="xl"
-              inline
-              style={{ cursor: "default", whiteSpace: "nowrap" }}
-              c="white"
+      <HeaderPortal
+        left={
+          <HeaderButton icon={IconChevronLeft} onClick={() => navigate(-1)} />
+        }
+        center={
+          <>
+            <Popover
+              trapFocus
+              opened={renamePopoverOpen}
+              arrowSize={16}
+              withArrow
+              onClose={() => setRenamePopoverOpen(false)}
             >
-              {demo.name}
-            </Text>
-          </Popover.Target>
-          <Popover.Dropdown>
-            <div style={{ display: "flex", alignItems: "center" }}>
-              <TextInput
-                placeholder="New name"
+              <Popover.Target>
+                <Text
+                  ta="center"
+                  fw={700}
+                  size="xl"
+                  inline
+                  style={{ cursor: "default", whiteSpace: "nowrap" }}
+                  c="white"
+                >
+                  {demo.name}
+                </Text>
+              </Popover.Target>
+              <Popover.Dropdown>
+                <div style={{ display: "flex", alignItems: "center" }}>
+                  <TextInput
+                    placeholder="New name"
+                    size="sm"
+                    defaultValue={demo.name}
+                  />
+                  <ActionIcon variant="transparent" ml="xs" color="gray">
+                    <IconCheck />
+                  </ActionIcon>
+                </div>
+              </Popover.Dropdown>
+            </Popover>
+            <Tooltip label="Rename demo">
+              <ActionIcon
+                variant="transparent"
                 size="sm"
-                defaultValue={demo.name}
-              />
-              <ActionIcon variant="transparent" ml="xs" color="gray">
-                <IconCheck />
+                onClick={() => setRenamePopoverOpen(!renamePopoverOpen)}
+              >
+                <IconPencil color="gray" />
               </ActionIcon>
-            </div>
-          </Popover.Dropdown>
-        </Popover>
-        <Tooltip label="Rename demo">
-          <ActionIcon
-            variant="transparent"
-            size="sm"
-            onClick={() => setRenamePopoverOpen(!renamePopoverOpen)}
-          >
-            <IconPencil color="gray" />
-          </ActionIcon>
-        </Tooltip>
-      </HeaderPortal>
+            </Tooltip>
+          </>
+        }
+      />
       <Container className={classes.container}>
         <Stack style={{ height: "100%" }}>
           <Group>

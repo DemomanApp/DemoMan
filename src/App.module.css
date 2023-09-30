@@ -16,20 +16,23 @@
   );
 }
 
-.header-content {
+.header-left,
+.header-center,
+.header-right {
   flex-grow: 1;
+  flex-basis: 0;
   display: flex;
-  justify-content: center;
   align-items: center;
-
-  /* Because there are two buttons on the left and three on the right,
-   * this is needed for centering */
-  margin-left: 40px;
 }
 
-.navbar {
-  background-color: light-dark(
-    var(--mantine-color-white),
-    var(--mantine-color-dark-7)
-  );
+.header-left {
+  justify-content: left;
+}
+
+.header-center {
+  justify-content: center;
+}
+
+.header-right {
+  justify-content: right;
 }
