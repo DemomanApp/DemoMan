@@ -3,26 +3,22 @@ function plural_s(value: number, text: string) {
 }
 
 export function formatDuration(total_seconds: number): string {
-  total_seconds = Math.floor(total_seconds);
+  const seconds = Math.floor(total_seconds % 60);
+  const minutes = Math.floor(total_seconds / 60) % 60;
+  const hours = Math.floor(total_seconds / 3600);
 
-  const total_minutes = Math.floor(total_seconds / 60);
-
-  const remaining_seconds = total_seconds;
-  const remaining_minutes = total_minutes % 60;
-  const remaining_hours = Math.floor(total_minutes / 60);
-
-  const remaining_seconds_str = plural_s(remaining_seconds, "second");
-  if (total_minutes == 0) {
-    return remaining_seconds_str;
+  const seconds_str = plural_s(seconds, "second");
+  if (total_seconds < 60) {
+    return seconds_str;
   }
 
-  const remaining_minutes_str = plural_s(remaining_minutes, "minute");
-  if (remaining_hours == 0) {
-    return remaining_minutes_str;
+  const minutes_str = plural_s(minutes, "minute");
+  if (total_seconds < 3600) {
+    return minutes_str;
   }
 
-  const remaining_hours_str = plural_s(remaining_hours, "hour");
-  return `${remaining_hours_str}, ${remaining_minutes_str}`;
+  const hours_str = plural_s(hours, "hour");
+  return `${hours_str}, ${minutes_str}`;
 }
 
 export function formatFileSize(bytes: number): string {
