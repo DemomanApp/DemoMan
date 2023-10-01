@@ -10,7 +10,7 @@ edition = "2021"
 rust-version = "1.71"
 
 [build-dependencies]
-tauri-build = "1.4"
+tauri-build = { version = "1.4", features = [] }
 
 [dependencies]
 bitbuffer = "0.10"
