@@ -118,7 +118,7 @@ export default function PlayerList({ gameSummary }: PlayerListProps) {
                 </Tabs.Tab>
                 {Array.from(
                   { length: gameSummary.num_rounds },
-                  (x, i) => i
+                  (_x, i) => i
                 ).map((roundNum) => {
                   return (
                     <Tabs.Tab
