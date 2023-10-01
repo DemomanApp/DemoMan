@@ -25,10 +25,6 @@
       "active": true,
       "category": "Utility",
       "copyright": "",
-      "deb": {
-        "depends": []
-      },
-      "externalBin": [],
       "icon": [
         "icons/32x32.png",
         "icons/128x128.png",
@@ -38,21 +34,8 @@
       ],
       "identifier": "com.narcha.demoman",
       "longDescription": "Easily browse and organize all your demo files, find highlights, and edit bookmarks!",
-      "macOS": {
-        "entitlements": null,
-        "exceptionDomain": "",
-        "frameworks": [],
-        "providerShortName": null,
-        "signingIdentity": null
-      },
-      "resources": [],
       "shortDescription": "The TF2 Demo Manager",
-      "targets": "all",
-      "windows": {
-        "certificateThumbprint": null,
-        "digestAlgorithm": "sha256",
-        "timestampUrl": ""
-      }
+      "targets": "all"
     },
     "security": {
       "csp": null
