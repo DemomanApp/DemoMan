@@ -30,13 +30,14 @@
   },
   "devDependencies": {
     "@tauri-apps/cli": "^1.4",
+    "@types/node": "^20.8.0",
     "@types/react": "^18.0.21",
     "@types/react-dom": "^18.0.6",
     "@types/react-virtualized-auto-sizer": "^1.0.1",
     "@types/react-window": "^1.8.5",
-    "@typescript-eslint/eslint-plugin": "^5.39.0",
-    "@typescript-eslint/parser": "^5.39.0",
-    "@vitejs/plugin-react": "^2.1.0",
+    "@typescript-eslint/eslint-plugin": "^6.7.0",
+    "@typescript-eslint/parser": "^6.7.0",
+    "@vitejs/plugin-react": "^4.1.0",
     "autoprefixer": "^10.4.16",
     "eslint": "^8.25.0",
     "eslint-config-prettier": "^8.5.0",
@@ -48,8 +49,8 @@
     "postcss-preset-mantine": "^1.7.0",
     "stylelint": "^15.10.3",
     "stylelint-config-standard": "^34.0.0",
-    "typescript": "^4.8.4",
-    "vite": "^3.2.7",
+    "typescript": "^5.2.2",
+    "vite": "^4.4.4",
     "vite-plugin-eslint": "^1.8.1"
   },
   "postcss": {

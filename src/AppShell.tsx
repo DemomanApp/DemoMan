@@ -5,7 +5,7 @@ import {
   RefObject,
   useContext,
 } from "react";
-import ReactDOM from "react-dom";
+import { createPortal } from "react-dom";
 
 import { UnstyledButton } from "@mantine/core";
 import { Icon } from "@tabler/icons-react";
@@ -36,11 +36,11 @@ export function HeaderPortal({ left, center, right }: HeaderPortalProps) {
   return (
     <>
       {headerLeftRef.current !== null &&
-        ReactDOM.createPortal(left, headerLeftRef.current)}
+        createPortal(left, headerLeftRef.current)}
       {headerCenterRef.current !== null &&
-        ReactDOM.createPortal(center, headerCenterRef.current)}
+        createPortal(center, headerCenterRef.current)}
       {headerRightRef.current !== null &&
-        ReactDOM.createPortal(right, headerRightRef.current)}
+        createPortal(right, headerRightRef.current)}
     </>
   );
 }
