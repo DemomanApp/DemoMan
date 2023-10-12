@@ -7,8 +7,10 @@ import { MantineProvider } from "@mantine/core";
 
 import "@mantine/core/styles.css";
 
-import "./index.css";
 import router from "./router";
+import "./globalExtensions";
+
+import "./index.css";
 
 // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
 createRoot(document.getElementById("root")!).render(

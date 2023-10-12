@@ -2,7 +2,6 @@ import { Text } from "@mantine/core";
 
 import ClassIcon from "../../../components/ClassIcon";
 import { PlayerSummary } from "../../../demo";
-import { indexOfMax } from "../../../util";
 
 import classes from "./PlayerBox.module.css";
 
@@ -13,7 +12,7 @@ interface PlayerBoxProps {
 }
 
 export function PlayerBox({ player, selected, onClick }: PlayerBoxProps) {
-  const primary_class = indexOfMax(player.time_on_class);
+  const primary_class = player.time_on_class.indexOfMax();
 
   return (
     <div onClick={onClick} className={classes.root} data-selected={selected}>
