@@ -1,4 +1,4 @@
-import { useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Outlet } from "react-router-dom";
 
 import { AppShell } from "@mantine/core";
@@ -12,6 +12,14 @@ export default function App() {
   const headerCenterRef = useRef<HTMLDivElement>(null);
   const headerRightRef = useRef<HTMLDivElement>(null);
 
+  // HACK: We need to ensure that the header refs are set correctly
+  //       when rendering our child components. Without this, they would
+  //       sometimes remain set to `null`, resulting in an empty header bar.
+  const [hasRendered, setHasRendered] = useState(false);
+
+  // This runs after the first render, where the refs are set.
+  useEffect(() => setHasRendered(true), []);
+
   return (
     <AppShellProvider
       value={{ headerLeftRef, headerCenterRef, headerRightRef }}
@@ -22,9 +30,7 @@ export default function App() {
           <div ref={headerCenterRef} className={classes.headerCenter} />
           <div ref={headerRightRef} className={classes.headerRight} />
         </AppShell.Header>
-        <AppShell.Main>
-          <Outlet />
-        </AppShell.Main>
+        <AppShell.Main>{hasRendered && <Outlet />}</AppShell.Main>
       </AppShell>
     </AppShellProvider>
   );
