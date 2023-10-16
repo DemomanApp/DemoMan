@@ -1,12 +1,12 @@
 import { createBrowserRouter } from "react-router-dom";
 
-import HomeView from "./views/home";
+import HomeView from "./routes/home";
 import DemoDetailsView, {
   loader as demoDetailsLoader,
   ErrorElement as DemoDetailsErrorElement,
-} from "./views/demoDetails";
-import SettingsView from "./views/settings";
-import RconSetup from "./views/rconSetup";
+} from "./routes/demoDetails";
+import SettingsView from "./routes/settings";
+import RconSetup from "./routes/rconSetup";
 
 export default createBrowserRouter([
   {
