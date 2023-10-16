@@ -23,7 +23,7 @@ import {
 import { Demo } from "../../demo";
 import DemoListRow from "./DemoListRow";
 import BottomBar from "./BottomBar";
-import { HeaderButton, HeaderPortal } from "../../AppShell";
+import AppShell, { HeaderButton } from "../../AppShell";
 import { getDemosInDirectory } from "../../api";
 import { Async, Fill } from "../../components";
 import useStore from "../../hooks/useStore";
@@ -127,9 +127,9 @@ function MainView({ demos }: { demos: Demo[] }) {
   const itemData = createItemData(sortedDemos, selectedRows, handleRowClick);
 
   return (
-    <>
-      <HeaderPortal
-        center={
+    <AppShell
+      header={{
+        center: (
           <Input
             variant="filled"
             placeholder="Search"
@@ -137,8 +137,8 @@ function MainView({ demos }: { demos: Demo[] }) {
             size="sm"
             leftSection={<IconSearch size={16} />}
           />
-        }
-        right={
+        ),
+        right: (
           <Menu
             shadow="md"
             position="bottom-end"
@@ -179,8 +179,9 @@ function MainView({ demos }: { demos: Demo[] }) {
               </Menu.Item>
             </Menu.Dropdown>
           </Menu>
-        }
-      />
+        ),
+      }}
+    >
       <div
         style={{
           height: "100%",
@@ -242,7 +243,7 @@ function MainView({ demos }: { demos: Demo[] }) {
           toggleSelectionMode={() => setSelectionMode(!selectionMode)}
         />
       </div>
-    </>
+    </AppShell>
   );
 }
 

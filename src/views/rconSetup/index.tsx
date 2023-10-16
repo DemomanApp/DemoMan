@@ -10,7 +10,7 @@ import {
 import useStore from "../../hooks/useStore";
 import { initRcon, sendCommand } from "../../api";
 import { AsyncButton, AsyncCopyButton } from "../../components";
-import { HeaderButton, HeaderPortal } from "../../AppShell";
+import AppShell, { HeaderButton } from "../../AppShell";
 import { useNavigate } from "react-router-dom";
 
 export default function RconSetup() {
@@ -29,12 +29,13 @@ export default function RconSetup() {
   const launchFlags = `-usercon +rcon_password ${rconPassword} +ip 0.0.0.0 +hostport 27969 +net_start`;
 
   return (
-    <>
-      <HeaderPortal
-        left={
+    <AppShell
+      header={{
+        left: (
           <HeaderButton icon={IconChevronLeft} onClick={() => navigate(-1)} />
-        }
-      />
+        ),
+      }}
+    >
       <Center style={{ height: "100%" }}>
         <Stack>
           <div>Add this to your launch options:</div>
@@ -106,6 +107,6 @@ export default function RconSetup() {
           )}
         </Stack>
       </Center>
-    </>
+    </AppShell>
   );
 }

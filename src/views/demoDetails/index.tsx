@@ -40,7 +40,7 @@ import {
 } from "@tabler/icons-react";
 
 import { getDemoByName, getDemoDetails, sendCommand } from "../../api";
-import { HeaderButton, HeaderPortal } from "../../AppShell";
+import AppShell, { HeaderButton } from "../../AppShell";
 import { Async, AsyncButton, Fill, MapThumbnail } from "../../components";
 import { formatFileSize, formatDuration } from "../../util";
 import PlayerList from "./PlayerList";
@@ -56,12 +56,12 @@ export default function DemoDetailsView() {
   const [renamePopoverOpen, setRenamePopoverOpen] = useState(false);
 
   return (
-    <>
-      <HeaderPortal
-        left={
+    <AppShell
+      header={{
+        left: (
           <HeaderButton icon={IconChevronLeft} onClick={() => navigate(-1)} />
-        }
-        center={
+        ),
+        center: (
           <>
             <Popover
               trapFocus
@@ -105,8 +105,9 @@ export default function DemoDetailsView() {
               </ActionIcon>
             </Tooltip>
           </>
-        }
-      />
+        ),
+      }}
+    >
       <Container className={classes.container}>
         <Stack style={{ height: "100%" }}>
           <Group>
@@ -234,7 +235,7 @@ export default function DemoDetailsView() {
           </div>
         </Stack>
       </Container>
-    </>
+    </AppShell>
   );
 }
 

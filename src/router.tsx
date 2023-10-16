@@ -1,6 +1,5 @@
 import { createBrowserRouter } from "react-router-dom";
 
-import App from "./App";
 import HomeView from "./views/home";
 import DemoDetailsView, {
   loader as demoDetailsLoader,
@@ -12,7 +11,6 @@ import RconSetup from "./views/rconSetup";
 export default createBrowserRouter([
   {
     path: "/",
-    element: <App />,
     children: [
       {
         index: true,

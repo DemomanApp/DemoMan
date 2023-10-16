@@ -1,3 +1,42 @@
+.main {
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  background-color: light-dark(
+    var(--mantine-color-gray-2),
+    var(--mantine-color-dark-9)
+  );
+}
+
+.header {
+  display: flex;
+  background-color: light-dark(
+    var(--mantine-color-white),
+    var(--mantine-color-dark-6)
+  );
+}
+
+.header-left,
+.header-center,
+.header-right {
+  flex-grow: 1;
+  flex-basis: 0;
+  display: flex;
+  align-items: center;
+}
+
+.header-left {
+  justify-content: left;
+}
+
+.header-center {
+  justify-content: center;
+}
+
+.header-right {
+  justify-content: right;
+}
+
 .navbar-button {
   width: 40px;
   height: 40px;

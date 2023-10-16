@@ -4,7 +4,7 @@ import { Button, ScrollArea, Text, TextInput } from "@mantine/core";
 import { IconChevronLeft } from "@tabler/icons-react";
 
 import useStore from "../../hooks/useStore";
-import { HeaderButton, HeaderPortal } from "../../AppShell";
+import AppShell, { HeaderButton } from "../../AppShell";
 
 import classes from "./settings.module.css";
 
@@ -14,12 +14,12 @@ export default function SettingsView() {
   const [demoPath, setDemoPath] = useStore("demoPath");
 
   return (
-    <>
-      <HeaderPortal
-        left={
+    <AppShell
+      header={{
+        left: (
           <HeaderButton icon={IconChevronLeft} onClick={() => navigate(-1)} />
-        }
-        center={
+        ),
+        center: (
           <Text
             fw={500}
             size="lg"
@@ -28,8 +28,9 @@ export default function SettingsView() {
           >
             Settings
           </Text>
-        }
-      />
+        ),
+      }}
+    >
       <ScrollArea classNames={{ root: classes.root }}>
         <div className={classes.viewport}>
           <span className={classes.row}>
@@ -59,6 +60,6 @@ export default function SettingsView() {
           </span>
         </div>
       </ScrollArea>
-    </>
+    </AppShell>
   );
 }

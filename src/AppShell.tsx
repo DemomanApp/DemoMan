@@ -1,49 +1,29 @@
-import {
-  createContext,
-  forwardRef,
-  ReactNode,
-  RefObject,
-  useContext,
-} from "react";
-import { createPortal } from "react-dom";
+import { ReactNode, forwardRef } from "react";
 
-import { UnstyledButton } from "@mantine/core";
+import { AppShell, UnstyledButton } from "@mantine/core";
 import { Icon } from "@tabler/icons-react";
 
 import classes from "./AppShell.module.css";
 
-type AppShellContextType = {
-  headerLeftRef: RefObject<HTMLDivElement>;
-  headerCenterRef: RefObject<HTMLDivElement>;
-  headerRightRef: RefObject<HTMLDivElement>;
+type AppShellProps = {
+  children: ReactNode;
+  header: {
+    left?: ReactNode;
+    center?: ReactNode;
+    right?: ReactNode;
+  };
 };
 
-const AppShellContext = createContext<AppShellContextType>(
-  {} as AppShellContextType
+export default ({ children, header }: AppShellProps) => (
+  <AppShell padding={0} header={{ height: 50 }} classNames={classes}>
+    <AppShell.Header>
+      <div className={classes.headerLeft}>{header.left}</div>
+      <div className={classes.headerCenter}>{header.center}</div>
+      <div className={classes.headerRight}>{header.right}</div>
+    </AppShell.Header>
+    <AppShell.Main>{children}</AppShell.Main>
+  </AppShell>
 );
-
-export const AppShellProvider = AppShellContext.Provider;
-
-type HeaderPortalProps = {
-  left?: ReactNode;
-  center?: ReactNode;
-  right?: ReactNode;
-};
-
-export function HeaderPortal({ left, center, right }: HeaderPortalProps) {
-  const { headerLeftRef, headerCenterRef, headerRightRef } =
-    useContext(AppShellContext);
-  return (
-    <>
-      {headerLeftRef.current !== null &&
-        createPortal(left, headerLeftRef.current)}
-      {headerCenterRef.current !== null &&
-        createPortal(center, headerCenterRef.current)}
-      {headerRightRef.current !== null &&
-        createPortal(right, headerRightRef.current)}
-    </>
-  );
-}
 
 type HeaderButtonProps = {
   icon: Icon;
