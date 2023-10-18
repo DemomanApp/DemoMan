@@ -825,7 +825,7 @@ impl GameDetailsAnalyser {
             let player = self
                 .players
                 .entry(user_info.player_info.user_id)
-                .or_insert_with(Default::default);
+                .or_default();
 
             player.name = user_info.player_info.name;
             player.steam_id =
