@@ -1,5 +1,7 @@
 import { useState } from "react";
 
+import { nanoid } from "nanoid";
+
 import { isNotEmpty, useForm } from "@mantine/form";
 import {
   ActionIcon,
@@ -19,6 +21,7 @@ import useStore from "../../hooks/useStore";
 import PathPicker from "./PathPicker";
 
 import classes from "./settings.module.css";
+import { drop } from "../../util";
 
 export default function DemoDirsSetting() {
   const [demoDirs, setDemoDirs] = useStore("demoDirs");
@@ -68,25 +71,23 @@ export default function DemoDirsSetting() {
         </Text>
         <Stack align="stretch" pt="md" gap="sm">
           {demoDirs !== undefined &&
-            Object.entries(demoDirs).map(([key, value]) => (
+            Object.entries(demoDirs).map(([key, { label, path }]) => (
               <div key={key} className={classes.demoDir}>
                 <div className={classes.labelRow}>
                   <Text size="lg" fw={600} style={{ flex: 1 }}>
-                    {key}
+                    {label}
                   </Text>
                   <ActionIcon
                     variant="subtle"
                     color="red.9"
                     className={classes.demoDirAction}
-                    onClick={() =>
-                      setDemoDirs(({ [key]: _key, ...rest }) => rest)
-                    }
+                    onClick={() => setDemoDirs(drop(key))}
                   >
                     <IconTrash stroke={1.5} />
                   </ActionIcon>
                 </div>
                 <Text c="dimmed" style={{ wordBreak: "break-all" }}>
-                  {value}
+                  {path}
                 </Text>
               </div>
             ))}
@@ -104,7 +105,7 @@ export default function DemoDirsSetting() {
           onSubmit={form.onSubmit(({ label, path }) => {
             setDemoDirs((previousDemoDirs) => ({
               ...previousDemoDirs,
-              [label]: path,
+              [nanoid()]: { label, path },
             }));
             setDialogOpen(false);
           })}

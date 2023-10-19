@@ -7,7 +7,7 @@ import { MantineProvider } from "@mantine/core";
 
 import "@mantine/core/styles.css";
 
-import router from "./router";
+import router from "./routes/router";
 import "./globalExtensions";
 
 import "./index.css";

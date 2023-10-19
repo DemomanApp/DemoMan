@@ -69,3 +69,10 @@ export function normalizeMapName(mapName: string) {
     )
     .join("_");
 }
+
+/// `drop(key)` return a function that returns its argument,
+/// but without the key `key`. Useful as an argument to `useState` setters.
+export function drop<V>(key: string) {
+  return ({ [key]: _key, ...rest }: Record<string, V>): Record<string, V> =>
+    rest;
+}
