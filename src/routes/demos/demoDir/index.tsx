@@ -6,12 +6,18 @@ import {
   useMemo,
   forwardRef,
 } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import {
+  Link,
+  LoaderFunction,
+  useLoaderData,
+  useNavigate,
+  useRouteError,
+} from "react-router-dom";
 import AutoSizer from "react-virtualized-auto-sizer";
 import { FixedSizeList, ListChildComponentProps } from "react-window";
 import memoize from "memoize-one";
 
-import { Alert, ScrollArea, Loader, Input, Menu } from "@mantine/core";
+import { Alert, ScrollArea, Input, Menu } from "@mantine/core";
 import {
   IconSearch,
   IconDots,
@@ -25,9 +31,8 @@ import DemoListRow from "./DemoListRow";
 import BottomBar from "./BottomBar";
 import AppShell, { HeaderButton } from "../../../AppShell";
 import { getDemosInDirectory } from "../../../api";
-import { Async, Fill } from "../../../components";
-import useStore from "../../../hooks/useStore";
-import { getDefaultDemosDir } from "../../settings/storage";
+import { Fill } from "../../../components";
+import { StoreSchema } from "../../../hooks/useStore";
 
 const PADDING_SIZE = 16;
 
@@ -69,9 +74,11 @@ const createItemData = memoize(
   })
 );
 
-function MainView({ demos }: { demos: Demo[] }) {
+export default () => {
   const navigate = useNavigate();
   const listRef = useRef<FixedSizeList>(null);
+
+  const demos = useLoaderData() as Demo[];
 
   const [selectedRows, setSelectedRows] = useState<boolean[]>([]);
   const [selectionMode, setSelectionMode] = useState(false);
@@ -245,46 +252,36 @@ function MainView({ demos }: { demos: Demo[] }) {
       </div>
     </AppShell>
   );
-}
+};
 
-export default function HomeViewAsyncWrapper() {
-  const [storedDemoPath, setStoredDemoPath] = useStore("demoPath");
-
-  if (storedDemoPath === undefined) {
-    // Used as fallback in case the user hasn't configured the demos directory yet
-    getDefaultDemosDir()
-      .then((dir) => {
-        if (storedDemoPath === undefined) {
-          setStoredDemoPath(dir);
-        }
-        return dir;
-      })
-      .catch((_err) => {
-        // Failed to get the default directory.  At this point, there's nothing reasonable
-        // we can do other than alert the user and prompt them to set the directory themselves
-        return;
-      });
-  }
-
+export function ErrorElement() {
+  const error = useRouteError();
   return (
-    <Async
-      promiseFn={getDemosInDirectory}
-      args={[storedDemoPath ?? ""]}
-      loading={
-        <Fill>
-          <Loader size="lg" type="dots" />
-        </Fill>
-      }
-      error={(error) => (
-        <Fill>
-          <Alert color="red">
-            An error occurred while scanning for demo files. Is the demo storage
-            directory set?
-            <div>Error: {String(error)}</div>
-          </Alert>
-        </Fill>
-      )}
-      success={(result) => <MainView demos={result} />}
-    />
+    <Fill>
+      <Alert color="red">
+        An error occurred while scanning for demo files. Is the demo storage
+        directory set?
+        <div>Error: {String(error)}</div>
+      </Alert>
+    </Fill>
   );
 }
+
+export const loader: LoaderFunction = async ({ params }): Promise<Demo[]> => {
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+  const demoDirId = decodeURIComponent(params.demoDirId!);
+
+  // TODO fix this mess
+  // Idea: implement a custom global store
+  const demoDirs = JSON.parse(
+    window.localStorage.getItem("demoDirs") ?? "{}"
+  ) as StoreSchema["demoDirs"];
+
+  console.debug(demoDirs);
+
+  const path = demoDirs[demoDirId].path;
+
+  console.log("path:", path);
+
+  return await getDemosInDirectory(path);
+};

@@ -1,7 +1,10 @@
 import { createBrowserRouter } from "react-router-dom";
 
 import DemosRoute from "./demos";
-import DemoDirRoute from "./demos/demoDir";
+import DemoDirRoute, {
+  loader as demoDirLoader,
+  ErrorElement as DemoDirErrorElement,
+} from "./demos/demoDir";
 import DemoDetailsRoute, {
   loader as demoDetailsLoader,
   ErrorElement as DemoDetailsErrorElement,
@@ -28,6 +31,8 @@ export default createBrowserRouter([
           {
             path: ":demoDirId",
             element: <DemoDirRoute />,
+            loader: demoDirLoader,
+            errorElement: <DemoDirErrorElement />,
             children: [
               {
                 path: ":demoName",
