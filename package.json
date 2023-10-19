@@ -15,6 +15,7 @@
   },
   "dependencies": {
     "@mantine/core": "^7.0",
+    "@mantine/form": "^7.0",
     "@mantine/hooks": "^7.0",
     "@mantine/modals": "^7.0",
     "@tabler/icons-react": "^2.0.0",

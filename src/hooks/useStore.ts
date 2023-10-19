@@ -1,14 +1,17 @@
 import { useLocalStorage } from "@mantine/hooks";
 
+type DemoDirId = string;
+type Path = string;
+
 export type StoreSchema = {
-  demoPath: string | undefined;
-  demoPaths: string[];
+  primaryDemoDir: DemoDirId | undefined;
+  demoDirs: Record<DemoDirId, Path>;
   rconPassword: string | undefined;
 };
 
 const storeDefaults: Required<StoreSchema> = {
-  demoPath: undefined,
-  demoPaths: [],
+  primaryDemoDir: undefined,
+  demoDirs: {},
   rconPassword: undefined,
 };
 
