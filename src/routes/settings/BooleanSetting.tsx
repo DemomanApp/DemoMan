@@ -15,7 +15,10 @@ export default function BooleanSetting({
 }) {
   return (
     <div className={classes.setting}>
-      <div className={classes.labelRow} onClick={() => setValue((v) => !v)}>
+      <div
+        className={classes.labelRowClickable}
+        onClick={() => setValue((v) => !v)}
+      >
         <Text className={classes.label}>{name}</Text>
         <Switch size="md" checked={value} className={classes.switch} />
       </div>

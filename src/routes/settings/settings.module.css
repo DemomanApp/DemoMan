@@ -5,6 +5,11 @@
 .label-row {
   display: flex;
   width: 100%;
+}
+
+.label-row-clickable {
+  display: flex;
+  width: 100%;
   cursor: pointer;
 }
 
@@ -32,3 +37,4 @@
     }
   }
 }
+
