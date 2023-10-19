@@ -17,10 +17,10 @@ import {
   Team,
   KillStreakHighlight,
   KillStreakEndedHighlight,
-} from "../../demo";
-import { KillIcon } from "../../components";
-import KillstreakIcon from "../../components/KillstreakIcon";
-import CapturePoints from "../../assets/translations/capture_points.json";
+} from "../../../../demo";
+import { KillIcon } from "../../../../components";
+import KillstreakIcon from "../../../../components/KillstreakIcon";
+import CapturePoints from "../../../../assets/translations/capture_points.json";
 
 import classes from "./HighlightBox.module.css";
 

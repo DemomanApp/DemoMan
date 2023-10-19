@@ -39,12 +39,12 @@ import {
   IconUsers,
 } from "@tabler/icons-react";
 
-import { getDemoByName, getDemoDetails, sendCommand } from "../../api";
-import AppShell, { HeaderButton } from "../../AppShell";
-import { Async, AsyncButton, Fill, MapThumbnail } from "../../components";
-import { formatFileSize, formatDuration } from "../../util";
+import { getDemoByName, getDemoDetails, sendCommand } from "../../../../api";
+import AppShell, { HeaderButton } from "../../../../AppShell";
+import { Async, AsyncButton, Fill, MapThumbnail } from "../../../../components";
+import { formatFileSize, formatDuration } from "../../../../util";
 import PlayerList from "./PlayerList";
-import { Demo } from "../../demo";
+import { Demo } from "../../../../demo";
 import Highlights from "./Highlights";
 
 import classes from "./demoDetails.module.css";

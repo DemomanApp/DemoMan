@@ -1,7 +1,7 @@
 import { Text } from "@mantine/core";
 
-import ClassIcon from "../../../components/ClassIcon";
-import { PlayerSummary } from "../../../demo";
+import ClassIcon from "../../../../../components/ClassIcon";
+import { PlayerSummary } from "../../../../../demo";
 
 import classes from "./PlayerBox.module.css";
 

@@ -1,4 +1,4 @@
-import { Scoreboard } from "../../../demo";
+import { Scoreboard } from "../../../../../demo";
 
 import classes from "./ScoreboardTable.module.css";
 

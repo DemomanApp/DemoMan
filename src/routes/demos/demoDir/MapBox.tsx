@@ -1,6 +1,6 @@
 import { Text } from "@mantine/core";
 
-import { MapThumbnail } from "../../components";
+import { MapThumbnail } from "../../../components";
 
 import classes from "./MapBox.module.css";
 

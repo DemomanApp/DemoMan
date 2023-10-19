@@ -24,8 +24,8 @@ import {
 } from "@tabler/icons-react";
 import { areEqual } from "react-window";
 
-import { Demo, isStvDemo } from "../../demo";
-import { IconKillstreak } from "../../components/icons";
+import { Demo, isStvDemo } from "../../../demo";
+import { IconKillstreak } from "../../../components/icons";
 import MapBox from "./MapBox";
 import Badges from "./Badges";
 

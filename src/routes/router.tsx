@@ -1,12 +1,14 @@
 import { createBrowserRouter } from "react-router-dom";
 
-import HomeView from "./home";
-import DemoDetailsView, {
+import DemosRoute from "./demos";
+import DemoDirRoute from "./demos/demoDir";
+import DemoDetailsRoute, {
   loader as demoDetailsLoader,
   ErrorElement as DemoDetailsErrorElement,
-} from "./demoDetails";
+} from "./demos/demoDir/demoDetails";
 import SettingsView from "./settings";
 import RconSetup from "./rconSetup";
+import IndexRoute from "./IndexRoute";
 
 export default createBrowserRouter([
   {
@@ -14,13 +16,28 @@ export default createBrowserRouter([
     children: [
       {
         index: true,
-        element: <HomeView />,
+        element: <IndexRoute />,
       },
       {
-        path: "demo/:demoName/:activeTab",
-        element: <DemoDetailsView />,
-        loader: demoDetailsLoader,
-        errorElement: <DemoDetailsErrorElement />,
+        path: "demos",
+        children: [
+          {
+            index: true,
+            element: <DemosRoute />,
+          },
+          {
+            path: ":demoDirId",
+            element: <DemoDirRoute />,
+            children: [
+              {
+                path: ":demoName",
+                element: <DemoDetailsRoute />,
+                loader: demoDetailsLoader,
+                errorElement: <DemoDetailsErrorElement />,
+              },
+            ],
+          },
+        ],
       },
       {
         path: "settings",

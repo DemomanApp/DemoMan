@@ -1,6 +1,6 @@
 import { ActionIcon, Text } from "@mantine/core";
 import { IconListCheck } from "@tabler/icons-react";
-import { formatFileSize } from "../../util";
+import { formatFileSize } from "../../../util";
 
 import classes from "./BottomBar.module.css";
 

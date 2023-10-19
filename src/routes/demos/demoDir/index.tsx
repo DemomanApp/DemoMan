@@ -20,14 +20,14 @@ import {
   IconFolder,
 } from "@tabler/icons-react";
 
-import { Demo } from "../../demo";
+import { Demo } from "../../../demo";
 import DemoListRow from "./DemoListRow";
 import BottomBar from "./BottomBar";
-import AppShell, { HeaderButton } from "../../AppShell";
-import { getDemosInDirectory } from "../../api";
-import { Async, Fill } from "../../components";
-import useStore from "../../hooks/useStore";
-import { getDefaultDemosDir } from "../settings/storage";
+import AppShell, { HeaderButton } from "../../../AppShell";
+import { getDemosInDirectory } from "../../../api";
+import { Async, Fill } from "../../../components";
+import useStore from "../../../hooks/useStore";
+import { getDefaultDemosDir } from "../../settings/storage";
 
 const PADDING_SIZE = 16;
 

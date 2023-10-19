@@ -5,7 +5,7 @@ import { FixedSizeList } from "react-window";
 
 import { ScrollArea, Text } from "@mantine/core";
 
-import { GameSummary, UserId, PlayerSummary } from "../../demo";
+import { GameSummary, UserId, PlayerSummary } from "../../../../demo";
 import HighlightBox from "./HighlightBox";
 
 export type TimelineProps = {
