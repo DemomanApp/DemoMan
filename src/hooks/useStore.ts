@@ -1,22 +1,6 @@
 import { useLocalStorage } from "@mantine/hooks";
 
-type DemoDirId = string;
-type Path = string;
-
-type DemoDir = {
-  label: string;
-  path: Path;
-};
-
-export type StoreSchema = {
-  demoDirs: Record<DemoDirId, DemoDir>;
-  rconPassword: string | undefined;
-};
-
-const storeDefaults: Required<StoreSchema> = {
-  demoDirs: {},
-  rconPassword: undefined,
-};
+import { StoreSchema, storeDefaults } from "../store";
 
 export default function useStore<K extends keyof StoreSchema>(key: K) {
   return useLocalStorage<StoreSchema[K]>({

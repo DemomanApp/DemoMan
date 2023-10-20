@@ -33,14 +33,12 @@ export default createBrowserRouter([
             element: <DemoDirRoute />,
             loader: demoDirLoader,
             errorElement: <DemoDirErrorElement />,
-            children: [
-              {
-                path: ":demoName",
-                element: <DemoDetailsRoute />,
-                loader: demoDetailsLoader,
-                errorElement: <DemoDetailsErrorElement />,
-              },
-            ],
+          },
+          {
+            path: ":demoDirId/:demoName",
+            element: <DemoDetailsRoute />,
+            loader: demoDetailsLoader,
+            errorElement: <DemoDetailsErrorElement />,
           },
         ],
       },

@@ -32,7 +32,7 @@ import BottomBar from "./BottomBar";
 import AppShell, { HeaderButton } from "../../../AppShell";
 import { getDemosInDirectory } from "../../../api";
 import { Fill } from "../../../components";
-import { StoreSchema } from "../../../hooks/useStore";
+import { getStoreValue } from "../../../store";
 
 const PADDING_SIZE = 16;
 
@@ -103,9 +103,7 @@ export default () => {
           return newSelectedIndices;
         });
       } else {
-        navigate(
-          `/demo/${encodeURIComponent(sortedDemos[index].name)}/players`
-        );
+        navigate(`${encodeURIComponent(sortedDemos[index].name)}`);
       }
     },
     [navigate, selectionMode, sortedDemos]
@@ -271,11 +269,7 @@ export const loader: LoaderFunction = async ({ params }): Promise<Demo[]> => {
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const demoDirId = decodeURIComponent(params.demoDirId!);
 
-  // TODO fix this mess
-  // Idea: implement a custom global store
-  const demoDirs = JSON.parse(
-    window.localStorage.getItem("demoDirs") ?? "{}"
-  ) as StoreSchema["demoDirs"];
+  const demoDirs = getStoreValue("demoDirs");
 
   const path = demoDirs[demoDirId].path;
 
