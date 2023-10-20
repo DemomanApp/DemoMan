@@ -109,7 +109,10 @@ function DemoListRow({ demo, selected, onClick }: DemoListRowProps) {
             <HoverCard.Target>
               <Group gap={4}>
                 <IconBookmarks stroke={1.5} />
-                <Text c="dimmed">{demo.events.length} Bookmarks</Text>
+                <Text c="dimmed">
+                  {demo.events.length}{" "}
+                  {demo.events.length === 1 ? "Bookmark" : "Bookmarks"}
+                </Text>
               </Group>
             </HoverCard.Target>
             <HoverCard.Dropdown>
