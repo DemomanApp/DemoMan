@@ -140,7 +140,7 @@ export default () => {
             placeholder="Search"
             style={{ width: "100%" }}
             size="sm"
-            leftSection={<IconSearch size={16} />}
+            leftSection={<IconSearch size={18} stroke={1.5} />}
           />
         ),
         right: (
@@ -166,20 +166,20 @@ export default () => {
             </Menu.Target>
             <Menu.Dropdown>
               <Menu.Item
-                leftSection={<IconSettings size={14} />}
+                leftSection={<IconSettings size={14} stroke={1.5} />}
                 component={Link}
                 to="/settings"
               >
                 Settings
               </Menu.Item>
               <Menu.Item
-                leftSection={<IconPlug size={14} />}
+                leftSection={<IconPlug size={14} stroke={1.5} />}
                 component={Link}
                 to="/rcon-setup"
               >
                 Set up RCON
               </Menu.Item>
-              <Menu.Item leftSection={<IconFolder size={14} />}>
+              <Menu.Item leftSection={<IconFolder size={14} stroke={1.5} />}>
                 Open demos folder
               </Menu.Item>
             </Menu.Dropdown>

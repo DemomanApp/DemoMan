@@ -93,7 +93,7 @@ export default function RconSetup() {
           </div>
           {error !== null && (
             <Alert
-              icon={<IconAlertCircle size={16} />}
+              icon={<IconAlertCircle size={16} stroke={1.5} />}
               title="Error"
               color="red"
             >
@@ -101,7 +101,10 @@ export default function RconSetup() {
             </Alert>
           )}
           {success && (
-            <Alert icon={<IconCircleCheck size={16} />} title="Success!">
+            <Alert
+              icon={<IconCircleCheck size={16} stroke={1.5} />}
+              title="Success!"
+            >
               Connection established.
             </Alert>
           )}

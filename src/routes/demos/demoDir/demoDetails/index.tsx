@@ -90,7 +90,7 @@ export default function DemoDetailsView() {
                     defaultValue={demo.name}
                   />
                   <ActionIcon variant="transparent" ml="xs" color="gray">
-                    <IconCheck />
+                    <IconCheck stroke={1.5} />
                   </ActionIcon>
                 </div>
               </Popover.Dropdown>
@@ -101,7 +101,7 @@ export default function DemoDetailsView() {
                 size="sm"
                 onClick={() => setRenamePopoverOpen(!renamePopoverOpen)}
               >
-                <IconPencil color="gray" />
+                <IconPencil color="gray" stroke={1.5} />
               </ActionIcon>
             </Tooltip>
           </>
@@ -139,24 +139,26 @@ export default function DemoDetailsView() {
               }}
             >
               <List>
-                <List.Item icon={<IconUser />}>{demo.clientName}</List.Item>
-                <List.Item icon={<IconServer />}>
+                <List.Item icon={<IconUser stroke={1.5} />}>
+                  {demo.clientName}
+                </List.Item>
+                <List.Item icon={<IconServer stroke={1.5} />}>
                   <span style={{ fontFamily: "monospace, monospace" }}>
                     {demo.serverName}
                   </span>
                 </List.Item>
-                <List.Item icon={<IconCalendarEvent />}>
+                <List.Item icon={<IconCalendarEvent stroke={1.5} />}>
                   {new Date(demo.birthtime * 1000).toLocaleString()}
                 </List.Item>
-                <List.Item icon={<IconFileAnalytics />}>
+                <List.Item icon={<IconFileAnalytics stroke={1.5} />}>
                   {formatFileSize(demo.filesize)}
                 </List.Item>
-                <List.Item icon={<IconClock />}>
+                <List.Item icon={<IconClock stroke={1.5} />}>
                   {formatDuration(demo.playbackTime)}
                 </List.Item>
               </List>
               <AsyncButton
-                rightSection={<IconPlayerPlay />}
+                rightSection={<IconPlayerPlay stroke={1.5} />}
                 onClick={() => sendCommand(`playdemo "${demo.path}"`)}
               >
                 Play demo
@@ -200,19 +202,19 @@ export default function DemoDetailsView() {
                   <Tabs.List>
                     <Tabs.Tab
                       value="players"
-                      leftSection={<IconUsers size={14} />}
+                      leftSection={<IconUsers size={14} stroke={1.5} />}
                     >
                       Players
                     </Tabs.Tab>
                     <Tabs.Tab
                       value="timeline"
-                      leftSection={<IconTimeline size={14} />}
+                      leftSection={<IconTimeline size={14} stroke={1.5} />}
                     >
                       Timeline
                     </Tabs.Tab>
                     <Tabs.Tab
                       value="info"
-                      leftSection={<IconFileInfo size={14} />}
+                      leftSection={<IconFileInfo size={14} stroke={1.5} />}
                     >
                       Info
                     </Tabs.Tab>
@@ -244,7 +246,7 @@ export function ErrorElement() {
   return (
     <Center style={{ height: "100%" }}>
       <Alert
-        icon={<IconAlertCircle size={16} />}
+        icon={<IconAlertCircle size={16} stroke={1.5} />}
         title="Error loading demo"
         color="red"
       >
