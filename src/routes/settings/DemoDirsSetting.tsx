@@ -32,13 +32,16 @@ export default function DemoDirsSetting() {
       path: "",
     },
     validate: {
-      label: (value) => {
-        if (value.length == 0) {
+      label: (newLabel) => {
+        if (newLabel.length == 0) {
           return "Label cannot be empty";
         }
         // TODO: remove the assertion after this is fixed:
         //       https://github.com/mantinedev/mantine/issues/4827
-        if (value in demoDirs!) {
+        //       The fix should land in v7.2.0
+        if (
+          Object.values(demoDirs!).some((value) => value.label === newLabel)
+        ) {
           return "A demo directory with this label already exists";
         }
         return null;
