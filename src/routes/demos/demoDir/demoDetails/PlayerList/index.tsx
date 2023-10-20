@@ -2,7 +2,7 @@ import { useMemo, useState } from "react";
 
 import { Divider, Paper, ScrollArea, Tabs, Text, Title } from "@mantine/core";
 
-import { GameSummary, PlayerSummary } from "../../../../../demo";
+import { GameSummary, PlayerSummary } from "@/demo";
 import { PlayerBox } from "./PlayerBox";
 import { ScoreboardTable } from "./ScoreboardTable";
 import { TableHeader } from "./TableHeader";

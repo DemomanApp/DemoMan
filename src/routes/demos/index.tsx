@@ -1,5 +1,5 @@
 import { Navigate } from "react-router-dom";
-import useStore from "../../hooks/useStore";
+import useStore from "@/hooks/useStore";
 
 export default () => {
   const [demoDirs, _setDemoDirs] = useStore("demoDirs");

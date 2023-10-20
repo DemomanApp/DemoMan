@@ -7,10 +7,10 @@ import {
   IconCircleCheck,
 } from "@tabler/icons-react";
 
-import useStore from "../../hooks/useStore";
-import { initRcon, sendCommand } from "../../api";
-import { AsyncButton, AsyncCopyButton } from "../../components";
-import AppShell, { HeaderButton } from "../../AppShell";
+import useStore from "@/hooks/useStore";
+import { initRcon, sendCommand } from "@/api";
+import { AsyncButton, AsyncCopyButton } from "@/components";
+import AppShell, { HeaderButton } from "@/AppShell";
 import { useNavigate } from "react-router-dom";
 
 export default function RconSetup() {

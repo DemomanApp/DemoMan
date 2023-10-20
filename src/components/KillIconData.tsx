@@ -1,10 +1,10 @@
-import KillIconMap1 from "../assets/kill_icons/d_images.png";
-import KillIconMap2 from "../assets/kill_icons/d_images_v2.png";
-import KillIconMap3 from "../assets/kill_icons/d_images_v3.png";
+import KillIconMap1 from "@/assets/kill_icons/d_images.png";
+import KillIconMap2 from "@/assets/kill_icons/d_images_v2.png";
+import KillIconMap3 from "@/assets/kill_icons/d_images_v3.png";
 
-import KillIconMap1Neg from "../assets/kill_icons/dneg_images.png";
-import KillIconMap2Neg from "../assets/kill_icons/dneg_images_v2.png";
-import KillIconMap3Neg from "../assets/kill_icons/dneg_images_v3.png";
+import KillIconMap1Neg from "@/assets/kill_icons/dneg_images.png";
+import KillIconMap2Neg from "@/assets/kill_icons/dneg_images_v2.png";
+import KillIconMap3Neg from "@/assets/kill_icons/dneg_images_v3.png";
 
 type KillIconDataEntry = {
   iconFile: string;

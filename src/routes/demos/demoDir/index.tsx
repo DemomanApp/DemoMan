@@ -26,13 +26,13 @@ import {
   IconFolder,
 } from "@tabler/icons-react";
 
-import { Demo } from "../../../demo";
+import { Demo } from "@/demo";
 import DemoListRow from "./DemoListRow";
 import BottomBar from "./BottomBar";
-import AppShell, { HeaderButton } from "../../../AppShell";
-import { getDemosInDirectory } from "../../../api";
-import { Fill } from "../../../components";
-import { getStoreValue } from "../../../store";
+import AppShell, { HeaderButton } from "@/AppShell";
+import { getDemosInDirectory } from "@/api";
+import { Fill } from "@/components";
+import { getStoreValue } from "@/store";
 
 const PADDING_SIZE = 16;
 

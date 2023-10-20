@@ -1,5 +1,5 @@
 import { homeDir, join } from "@tauri-apps/api/path";
-import { getTf2Dir } from "../../api";
+import { getTf2Dir } from "@/api";
 
 /**
  * Gets the default platform-specific demo file storage directory, assuming Steam and TF2 are installed on the local

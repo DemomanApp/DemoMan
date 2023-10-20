@@ -1,13 +1,13 @@
-import ScoutIcon from "../assets/class_icons/scout.png";
-import SniperIcon from "../assets/class_icons/sniper.png";
-import SoldierIcon from "../assets/class_icons/soldier.png";
-import DemomanIcon from "../assets/class_icons/demoman.png";
-import MedicIcon from "../assets/class_icons/medic.png";
-import HeavyIcon from "../assets/class_icons/heavy.png";
-import PyroIcon from "../assets/class_icons/pyro.png";
-import SpyIcon from "../assets/class_icons/spy.png";
-import EngineerIcon from "../assets/class_icons/engineer.png";
-import { Class, stringifyClass } from "../demo";
+import ScoutIcon from "@/assets/class_icons/scout.png";
+import SniperIcon from "@/assets/class_icons/sniper.png";
+import SoldierIcon from "@/assets/class_icons/soldier.png";
+import DemomanIcon from "@/assets/class_icons/demoman.png";
+import MedicIcon from "@/assets/class_icons/medic.png";
+import HeavyIcon from "@/assets/class_icons/heavy.png";
+import PyroIcon from "@/assets/class_icons/pyro.png";
+import SpyIcon from "@/assets/class_icons/spy.png";
+import EngineerIcon from "@/assets/class_icons/engineer.png";
+import { Class, stringifyClass } from "@/demo";
 
 /*
   Class mapping:

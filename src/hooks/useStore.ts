@@ -1,6 +1,6 @@
 import { useLocalStorage } from "@mantine/hooks";
 
-import { StoreSchema, storeDefaults } from "../store";
+import { StoreSchema, storeDefaults } from "@/store";
 
 export default function useStore<K extends keyof StoreSchema>(key: K) {
   return useLocalStorage<StoreSchema[K]>({

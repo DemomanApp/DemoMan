@@ -17,11 +17,11 @@ import {
 } from "@mantine/core";
 import { IconPlus, IconTrash } from "@tabler/icons-react";
 
-import useStore from "../../hooks/useStore";
+import useStore from "@/hooks/useStore";
 import PathPicker from "./PathPicker";
 
 import classes from "./settings.module.css";
-import { drop } from "../../util";
+import { drop } from "@/util";
 
 export default function DemoDirsSetting() {
   const [demoDirs, setDemoDirs] = useStore("demoDirs");

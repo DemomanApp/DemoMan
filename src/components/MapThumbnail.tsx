@@ -1,4 +1,4 @@
-import { normalizeMapName } from "../util";
+import { normalizeMapName } from "@/util";
 
 const MAP_THUMBNAILS = import.meta.glob("../assets/map_thumbnails/*.png", {
   as: "url",

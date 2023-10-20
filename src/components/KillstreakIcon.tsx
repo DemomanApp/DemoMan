@@ -1,5 +1,5 @@
-import KillStreakIcon from "../assets/kill_icons/killstreak_icon.png";
-import KillStreakIconNeg from "../assets/kill_icons/killstreak_icon_neg.png";
+import KillStreakIcon from "@/assets/kill_icons/killstreak_icon.png";
+import KillStreakIconNeg from "@/assets/kill_icons/killstreak_icon_neg.png";
 
 import { Text, useMantineColorScheme } from "@mantine/core";
 

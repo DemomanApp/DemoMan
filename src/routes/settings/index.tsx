@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { Container, ScrollArea, Stack, Text } from "@mantine/core";
 import { IconChevronLeft } from "@tabler/icons-react";
 
-import AppShell, { HeaderButton } from "../../AppShell";
+import AppShell, { HeaderButton } from "@/AppShell";
 import BooleanSetting from "./BooleanSetting";
 import DemoDirsSetting from "./DemoDirsSetting";
 
