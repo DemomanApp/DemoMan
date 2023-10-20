@@ -277,11 +277,7 @@ export const loader: LoaderFunction = async ({ params }): Promise<Demo[]> => {
     window.localStorage.getItem("demoDirs") ?? "{}"
   ) as StoreSchema["demoDirs"];
 
-  console.debug(demoDirs);
-
   const path = demoDirs[demoDirId].path;
-
-  console.log("path:", path);
 
   return await getDemosInDirectory(path);
 };
