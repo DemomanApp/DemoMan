@@ -9,6 +9,7 @@ import {
 import {
   Link,
   LoaderFunction,
+  redirect,
   useLoaderData,
   useNavigate,
   useRouteError,
@@ -265,13 +266,19 @@ export function ErrorElement() {
   );
 }
 
-export const loader: LoaderFunction = async ({ params }): Promise<Demo[]> => {
+export const loader: LoaderFunction = async ({ params }) => {
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const demoDirId = decodeURIComponent(params.demoDirId!);
 
   const demoDirs = getStoreValue("demoDirs");
 
-  const path = demoDirs[demoDirId].path;
+  const demoDir = demoDirs[demoDirId];
 
-  return await getDemosInDirectory(path);
+  if (demoDir === undefined) {
+    // TODO redirect to a dedicated error page, like "/demos/invalid-id",
+    //      that displays an error messages and offers to redirect
+    return redirect("/demos");
+  }
+
+  return await getDemosInDirectory(demoDir.path);
 };
