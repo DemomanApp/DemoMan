@@ -33,7 +33,7 @@ pub async fn get_demos_in_directory(dir_path: &Path) -> Result<Vec<Demo>, DemoRe
 }
 
 #[tauri::command]
-pub fn set_demo_events(
+pub async fn set_demo_events(
     demo_path: &Path,
     new_events: Vec<DemoEvent>,
     state: State<'_, AppState>,
@@ -50,7 +50,7 @@ pub fn set_demo_events(
 }
 
 #[tauri::command]
-pub fn set_demo_tags(
+pub async fn set_demo_tags(
     demo_path: &Path,
     new_tags: Vec<String>,
     state: State<'_, AppState>,
@@ -67,7 +67,7 @@ pub fn set_demo_tags(
 }
 
 #[tauri::command]
-pub fn delete_demo(
+pub async fn delete_demo(
     demo_path: &Path,
     trash: bool,
     state: State<'_, AppState>,
@@ -107,7 +107,7 @@ pub fn delete_demo(
 }
 
 #[tauri::command]
-pub fn move_demo(
+pub async fn move_demo(
     demo_path: &Path,
     new_path: &Path,
     state: State<'_, AppState>,
@@ -150,7 +150,10 @@ pub fn move_demo(
 }
 
 #[tauri::command]
-pub fn get_demo(demo_path: &Path, state: State<'_, AppState>) -> Result<Demo, DemoCommandError> {
+pub async fn get_demo(
+    demo_path: &Path,
+    state: State<'_, AppState>,
+) -> Result<Demo, DemoCommandError> {
     debug!(target: "IPC", "get_demo {}", demo_path.display());
     let mut demo_cache = state.demo_cache.lock().expect("Failed to lock mutex");
 
