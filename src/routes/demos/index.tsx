@@ -1,18 +1,41 @@
-import { Navigate } from "react-router-dom";
 import useStore from "@/hooks/useStore";
+import { Fill } from "@/components";
+import DemoDirButton from "./DemoDirButton";
+import { Anchor, Stack, Text, Title } from "@mantine/core";
+import { Link } from "react-router-dom";
 
 export default () => {
-  const [demoDirs, _setDemoDirs] = useStore("demoDirs");
+  const [demoDirs] = useStore("demoDirs");
 
-  // TEMPORARY
-  // This will be replaced with something proper later
-  // Ideas:
-  // - Load the last used demo directory
-  // - Load a user-selectable "primary" demo directory
-  // - Show a selection screen, let the user choose
   const demoDirIds = Object.keys(demoDirs!);
-  if (demoDirIds.length !== 0) {
-    return <Navigate to={demoDirIds[0]} />;
-  }
-  return null;
+  return (
+    <Fill>
+      <Stack gap="sm">
+        <Title order={2} ta="center">
+          Select a demo directory
+        </Title>
+        {demoDirIds.length === 0 ? (
+          <Text ta="center">No demo directories set.</Text>
+        ) : (
+          demoDirIds.map((id) => {
+            const demoDir = demoDirs![id];
+            return <DemoDirButton id={id} demoDir={demoDir} key={id} />;
+          })
+        )}
+
+        <Text ta="center">
+          {/* 
+            TODO: Maybe allow demo directories to be added in-place?
+                  Or maybe add functionality to link to a specific setting
+                  and have it highlighted         
+          */}
+          You can add or remove demo directories in the{" "}
+          <Anchor component={Link} to="/settings">
+            settings
+          </Anchor>
+          .
+        </Text>
+      </Stack>
+    </Fill>
+  );
 };

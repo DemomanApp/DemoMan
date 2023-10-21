@@ -1,7 +1,7 @@
 type DemoDirId = string;
 type Path = string;
 
-type DemoDir = {
+export type DemoDir = {
   label: string;
   path: Path;
 };
