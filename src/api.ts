@@ -8,37 +8,37 @@ export async function getDemosInDirectory(dirPath: string) {
   });
 }
 
-export async function setDemoEvents(demoName: string, newEvents: DemoEvent[]) {
+export async function setDemoEvents(demoPath: string, newEvents: DemoEvent[]) {
   return invoke<void>("set_demo_events", {
-    demoName,
+    demoPath,
     newEvents,
   });
 }
 
-export async function setDemoTags(demoName: string, newTags: string[]) {
+export async function setDemoTags(demoPath: string, newTags: string[]) {
   return invoke<void>("set_demo_tags", {
-    demoName,
+    demoPath,
     newTags,
   });
 }
 
-export async function deleteDemo(demoName: string, trash: boolean) {
+export async function deleteDemo(demoPath: string, trash: boolean) {
   return invoke<void>("delete_demo", {
-    demoName,
+    demoPath,
     trash,
   });
 }
 
-export async function renameDemo(demoName: string, newName: string) {
-  return invoke<void>("rename_demo", {
-    demoName,
-    newName,
+export async function moveDemo(demoPath: string, newPath: string) {
+  return invoke<void>("move_demo", {
+    demoPath,
+    newPath,
   });
 }
 
-export async function getDemoByName(demoName: string) {
-  return invoke<Demo>("get_demo_by_name", {
-    demoName,
+export async function getDemo(demoPath: string) {
+  return invoke<Demo>("get_demo", {
+    demoPath,
   });
 }
 

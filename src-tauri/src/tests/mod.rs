@@ -1,19 +1,36 @@
+use crate::demo::{read_demo, Demo};
+
 #[test]
 fn test_demo_loading() {
     use crate::demo::{read_demos_in_directory, DemoEvent, DemoEventType};
     use std::path::Path;
 
-    let result = read_demos_in_directory(Path::new("src/tests/data/demos"))
-        .expect("Failed to read directory");
+    let demo_dir_path = Path::new("src/tests/data/demos");
+
+    let demo_names = read_demos_in_directory(demo_dir_path).expect("Failed to read directory");
+
+    // Out of the four directory entries with the `.dem` extension,
+    // one is a directory and should be ignored.
+    assert_eq!(demo_names.len(), 3);
+
+    let demos = demo_names
+        .iter()
+        .filter_map(|demo_name| {
+            let demo_path = demo_dir_path.join(demo_name).with_extension("dem");
+
+            read_demo(&demo_path).ok()
+        })
+        .collect::<Vec<Demo>>();
 
     // Only one of the four entries in the directory is a valid demo.
-    // The other entries should not be loaded into `result`,
+    // The other entries should not end up in `demos`,
     // and they should only produce a warn message and no panic.
     // Note: The logger is not initialized in the test environment and thus no message is logged.
-    assert_eq!(result.len(), 1);
+    assert_eq!(demos.len(), 1);
 
-    let demo = result.get("test_demo").expect("test_demo not found");
+    let demo = &demos[0];
 
+    assert_eq!(demo.name, "test_demo");
     assert_eq!(demo.filesize, 56583563);
     assert_eq!(demo.server_name, "kroket.fakkelbrigade.eu:27115".to_owned());
     assert_eq!(demo.client_name, "Narcha".to_owned());

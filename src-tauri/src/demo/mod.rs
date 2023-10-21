@@ -1,5 +1,4 @@
 use std::{
-    collections::HashMap,
     ffi::OsStr,
     fs::{self, read_dir, File},
     io::{Read, Write},
@@ -100,11 +99,13 @@ pub struct DemoJsonFileDe {
 
 #[derive(Debug, Serialize)]
 pub enum DemoCommandError {
+    BadFilename,
     DemoNotFound,
+    FileCopyFailed,
     FileDeleteFailed,
+    FileExists,
     FileOpenFailed,
     FileReadFailed,
-    FileRenameFailed,
     FileWriteFailed,
     OtherIOError,
     ParsingFailed,
@@ -185,29 +186,26 @@ pub fn read_demo(path: &Path) -> Result<Demo, DemoReadError> {
     ))
 }
 
-/// Find all demos in the directory at `dir_path` and collect them in a `HashMap`.
-pub fn read_demos_in_directory(dir_path: &Path) -> Result<HashMap<String, Demo>, DemoReadError> {
+/// Find all .dem files in the directory at `dir_path`
+/// and return their file stem (name without extension)
+pub fn read_demos_in_directory(dir_path: &Path) -> Result<Vec<String>, DemoReadError> {
     let dir_iterator = read_dir(dir_path)?;
 
-    let mut new_demos: HashMap<String, Demo> = HashMap::new();
+    let mut demos = Vec::new();
 
-    for dir_entry in dir_iterator.flatten() {
-        let file_path = dir_entry.path();
-
-        // Check if the file extension matches
-        if file_path.extension() == Some(OsStr::new("dem")) {
-            match read_demo(&file_path) {
-                Ok(demo) => {
-                    new_demos.insert(demo.name.clone(), demo);
-                }
-                Err(e) => {
-                    warn!("Demo failed to load: {:?}: {}", e, file_path.display());
-                }
+    for dir_entry in dir_iterator
+        .flatten()
+        .filter(|entry| entry.file_type().is_ok_and(|file_type| file_type.is_file()))
+    {
+        let path = dir_entry.path();
+        if path.extension() == Some(OsStr::new("dem")) {
+            if let Some(stem) = path.file_stem().and_then(OsStr::to_str) {
+                demos.push(stem.into());
             }
         }
     }
 
-    Ok(new_demos)
+    Ok(demos)
 }
 
 pub fn write_events_and_tags(

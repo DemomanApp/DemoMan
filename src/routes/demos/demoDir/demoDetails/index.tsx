@@ -39,7 +39,7 @@ import {
   IconUsers,
 } from "@tabler/icons-react";
 
-import { getDemoByName, getDemoDetails, sendCommand } from "@/api";
+import { getDemo, getDemoDetails, sendCommand } from "@/api";
 import AppShell, { HeaderButton } from "@/AppShell";
 import { Async, AsyncButton, Fill, MapThumbnail } from "@/components";
 import { formatFileSize, formatDuration } from "@/util";
@@ -48,6 +48,8 @@ import { Demo } from "@/demo";
 import Highlights from "./Highlights";
 
 import classes from "./demoDetails.module.css";
+import { getStoreValue } from "@/store";
+import { join } from "@tauri-apps/api/path";
 
 export default function DemoDetailsView() {
   const demo = useLoaderData() as Demo;
@@ -258,6 +260,13 @@ export function ErrorElement() {
 
 export const loader: LoaderFunction = async ({ params }): Promise<Demo> => {
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+  const demoDirId = params.demoDirId!;
+  const demoDirs = getStoreValue("demoDirs");
+  const demoDirPath = demoDirs[demoDirId].path;
+
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const demoName = decodeURIComponent(params.demoName!);
-  return getDemoByName(demoName);
+
+  const demoPath = await join(demoDirPath, `${demoName}.dem`);
+  return getDemo(demoPath);
 };

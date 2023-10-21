@@ -19,11 +19,7 @@ mod demo;
 #[cfg(test)]
 mod tests;
 
-#[derive(Default)]
-pub struct DemoCache {
-    pub demos: HashMap<String, Demo>,
-    pub cached_directory: Option<PathBuf>,
-}
+pub type DemoCache = HashMap<PathBuf, Demo>;
 
 #[derive(Default)]
 pub struct AppState {
@@ -47,10 +43,10 @@ fn main() {
         .manage(state)
         .invoke_handler(tauri::generate_handler![
             commands::demos::delete_demo,
-            commands::demos::get_demo_by_name,
             commands::demos::get_demo_details,
             commands::demos::get_demos_in_directory,
-            commands::demos::rename_demo,
+            commands::demos::get_demo,
+            commands::demos::move_demo,
             commands::demos::set_demo_events,
             commands::demos::set_demo_tags,
             commands::files::get_tf2_dir,
