@@ -9,11 +9,15 @@ type DemoDir = {
 export type StoreSchema = {
   demoDirs: Record<DemoDirId, DemoDir>;
   rconPassword: string | undefined;
+  enableLocationOverlay: boolean;
+  exampleBoolean: boolean;
 };
 
 export const storeDefaults: Required<StoreSchema> = {
   demoDirs: {},
   rconPassword: undefined,
+  enableLocationOverlay: false,
+  exampleBoolean: true,
 };
 
 function deserialize(storeValue: string | null) {

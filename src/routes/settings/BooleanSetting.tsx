@@ -1,29 +1,40 @@
-import { Divider, Switch, Text } from "@mantine/core";
+import { Switch, Text } from "@mantine/core";
 
 import classes from "./settings.module.css";
+import { StoreSchema } from "@/store";
+import useStore from "@/hooks/useStore";
+
+type BooleanKey = {
+  [storeKey in keyof StoreSchema]: StoreSchema[storeKey] extends boolean
+    ? storeKey
+    : never;
+}[keyof StoreSchema];
+
+// TODO:
+// Changing a setting that causes another component to rerender,
+// like toggling the location overlay, throws a react warning.
+// This could probably be fixed by implementing a custom store using a react context.
 
 export default function BooleanSetting({
   name,
   description,
-  value,
-  setValue,
+  storeKey,
 }: {
   name: string;
-  description: string;
-  value: boolean;
-  setValue: React.Dispatch<React.SetStateAction<boolean>>;
+  description?: string;
+  storeKey: BooleanKey;
 }) {
+  const [storeValue, setStoreValue] = useStore(storeKey);
   return (
     <div className={classes.setting}>
       <div
         className={classes.labelRowClickable}
-        onClick={() => setValue((v) => !v)}
+        onClick={() => setStoreValue((v) => !v)}
       >
         <Text className={classes.label}>{name}</Text>
-        <Switch size="md" checked={value} className={classes.switch} />
+        <Switch size="md" checked={storeValue} className={classes.switch} />
       </div>
-      <Text c="dimmed">{description}</Text>
-      <Divider mt="md" />
+      {description !== undefined && <Text c="dimmed">{description}</Text>}
     </div>
   );
 }

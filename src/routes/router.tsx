@@ -12,10 +12,12 @@ import DemoDetailsRoute, {
 import SettingsView from "./settings";
 import RconSetup from "./rconSetup";
 import IndexRoute from "./IndexRoute";
+import LocationOverlay from "./LocationOverlay";
 
 export default createBrowserRouter([
   {
     path: "/",
+    element: <LocationOverlay />,
     children: [
       {
         index: true,

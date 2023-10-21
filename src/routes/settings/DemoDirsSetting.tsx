@@ -6,7 +6,6 @@ import { isNotEmpty, useForm } from "@mantine/form";
 import {
   ActionIcon,
   Button,
-  Divider,
   Group,
   Input,
   Modal,
@@ -95,7 +94,6 @@ export default function DemoDirsSetting() {
               </div>
             ))}
         </Stack>
-        <Divider mt="md" />
       </div>
       <Modal
         title="New demo directory"

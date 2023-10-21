@@ -1,7 +1,6 @@
-import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-import { Container, ScrollArea, Stack, Text } from "@mantine/core";
+import { Container, Divider, ScrollArea, Stack, Text } from "@mantine/core";
 import { IconChevronLeft } from "@tabler/icons-react";
 
 import AppShell, { HeaderButton } from "@/AppShell";
@@ -10,8 +9,6 @@ import DemoDirsSetting from "./DemoDirsSetting";
 
 export default function SettingsView() {
   const navigate = useNavigate();
-
-  const [value1, setValue1] = useState(false);
 
   return (
     <AppShell
@@ -37,10 +34,20 @@ export default function SettingsView() {
             <BooleanSetting
               name="Example boolean setting"
               description="This is an example setting. It does not do anything."
-              value={value1}
-              setValue={setValue1}
+              storeKey="exampleBoolean"
             />
+            <Divider mt="md" />
             <DemoDirsSetting />
+            {import.meta.env.DEV && (
+              /* Dev-only settings */
+              <>
+                <Divider label="Dev-only settings" variant="dashed" />
+                <BooleanSetting
+                  name="Enable location overlay"
+                  storeKey="enableLocationOverlay"
+                />
+              </>
+            )}
           </Stack>
         </Container>
       </ScrollArea>
