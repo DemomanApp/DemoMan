@@ -75,7 +75,7 @@ pub fn delete_demo(
     debug!(target: "IPC", "delete_demo {}", demo_path.display());
     let mut demo_cache = state.demo_cache.lock().expect("Failed to lock mutex");
     let demo = demo_cache
-        .get_mut(demo_path)
+        .get(demo_path)
         .ok_or(DemoCommandError::DemoNotFound)?;
 
     if trash {
