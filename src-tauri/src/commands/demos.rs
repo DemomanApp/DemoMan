@@ -6,7 +6,7 @@ use std::{
     vec::Vec,
 };
 
-use log::info;
+use log::debug;
 
 use tauri::State;
 
@@ -22,6 +22,7 @@ use crate::{
 
 #[tauri::command]
 pub async fn get_demos_in_directory(dir_path: &Path) -> Result<Vec<Demo>, DemoReadError> {
+    debug!(target: "IPC", "get_demos_in_directory {}", dir_path.display());
     Ok(read_demos_in_directory(dir_path)?
         .iter()
         .filter_map(|demo_name| {
@@ -37,6 +38,7 @@ pub fn set_demo_events(
     new_events: Vec<DemoEvent>,
     state: State<'_, AppState>,
 ) -> Result<(), DemoCommandError> {
+    debug!(target: "IPC", "set_demo_events {} {new_events:?}", demo_path.display());
     let mut demo_cache = state.demo_cache.lock().expect("Failed to lock mutex");
     let demo = demo_cache
         .get_mut(demo_path)
@@ -53,6 +55,7 @@ pub fn set_demo_tags(
     new_tags: Vec<String>,
     state: State<'_, AppState>,
 ) -> Result<(), DemoCommandError> {
+    debug!(target: "IPC", "set_demo_tags {} {new_tags:?}", demo_path.display());
     let mut demo_cache = state.demo_cache.lock().expect("Failed to lock mutex");
     let demo = demo_cache
         .get_mut(demo_path)
@@ -69,7 +72,7 @@ pub fn delete_demo(
     trash: bool,
     state: State<'_, AppState>,
 ) -> Result<(), DemoCommandError> {
-    info!("Deleting demo {}", demo_path.display());
+    debug!(target: "IPC", "delete_demo {}", demo_path.display());
     let mut demo_cache = state.demo_cache.lock().expect("Failed to lock mutex");
     let demo = demo_cache
         .get_mut(demo_path)
@@ -109,6 +112,7 @@ pub fn move_demo(
     new_path: &Path,
     state: State<'_, AppState>,
 ) -> Result<(), DemoCommandError> {
+    debug!(target: "IPC", "move_demo {} {}", demo_path.display(), new_path.display());
     let mut demo_cache = state.demo_cache.lock().expect("Failed to lock mutex");
     let mut demo = demo_cache
         .remove(demo_path)
@@ -147,7 +151,7 @@ pub fn move_demo(
 
 #[tauri::command]
 pub fn get_demo(demo_path: &Path, state: State<'_, AppState>) -> Result<Demo, DemoCommandError> {
-    info!("get_demo {}", demo_path.display());
+    debug!(target: "IPC", "get_demo {}", demo_path.display());
     let mut demo_cache = state.demo_cache.lock().expect("Failed to lock mutex");
 
     let demo = match demo_cache.entry(demo_path.into()) {
@@ -162,7 +166,8 @@ pub fn get_demo(demo_path: &Path, state: State<'_, AppState>) -> Result<Demo, De
 }
 
 #[tauri::command]
-pub async fn get_demo_details(demo_path: &str) -> Result<GameSummary, DemoCommandError> {
+pub async fn get_demo_details(demo_path: &Path) -> Result<GameSummary, DemoCommandError> {
+    debug!(target: "IPC", "get_demo_details {}", demo_path.display());
     let file = std::fs::read(demo_path).or(Err(DemoCommandError::FileReadFailed))?;
     let demo = tf_demo_parser::Demo::new(&file);
 
