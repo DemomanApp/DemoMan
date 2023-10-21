@@ -21,13 +21,24 @@ use crate::{
 };
 
 #[tauri::command]
-pub async fn get_demos_in_directory(dir_path: &Path) -> Result<Vec<Demo>, DemoReadError> {
+pub async fn get_demos_in_directory(
+    dir_path: &Path,
+    state: State<'_, AppState>,
+) -> Result<Vec<Demo>, DemoReadError> {
     debug!(target: "IPC", "get_demos_in_directory {}", dir_path.display());
+    let mut demo_cache = state.demo_cache.lock().expect("Failed to lock mutex");
     Ok(read_demos_in_directory(dir_path)?
         .iter()
         .filter_map(|demo_name| {
             let demo_path = dir_path.join(demo_name).with_extension("dem");
-            read_demo(&demo_path).ok()
+            let demo = match demo_cache.entry(demo_path.clone()) {
+                Entry::Occupied(entry) => entry.get().clone(),
+                Entry::Vacant(entry) => {
+                    let demo = read_demo(&demo_path).ok()?;
+                    entry.insert(demo).clone()
+                }
+            };
+            Some(demo)
         })
         .collect())
 }
