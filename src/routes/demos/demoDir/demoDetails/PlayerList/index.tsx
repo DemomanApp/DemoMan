@@ -8,6 +8,7 @@ import { ScoreboardTable } from "./ScoreboardTable";
 import { TableHeader } from "./TableHeader";
 
 import classes from "./PlayerList.module.css";
+import ClassPlaytimeIndicator from "./ClassPlaytimeIndicator";
 
 export type PlayerListProps = {
   gameSummary: GameSummary;
@@ -103,7 +104,11 @@ export default function PlayerList({ gameSummary }: PlayerListProps) {
           {/* Divider above the scoreboard*/}
           <Divider />
           <div className={classes.scoreboardPlayerNameHeader}>
-            <Title>{currentPlayer.name}</Title>
+            <Title order={2}>{currentPlayer.name}</Title>
+            <ClassPlaytimeIndicator
+              player={currentPlayer}
+              intervalPerTick={gameSummary.interval_per_tick}
+            />
           </div>
           <div>
             <Tabs defaultValue={"match"} value={currentTab.toString()}>

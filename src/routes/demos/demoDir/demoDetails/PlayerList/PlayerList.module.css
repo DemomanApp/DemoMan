@@ -31,5 +31,6 @@
 }
 
 .scoreboard-player-name-header {
-  padding-left: 8px;
+  padding-left: var(--mantine-spacing-xs);
+  padding-right: var(--mantine-spacing-xs);
 }
