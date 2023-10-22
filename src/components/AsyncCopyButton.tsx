@@ -26,9 +26,9 @@ export default function AsyncCopyButton({ text }: AsyncCopyButtonProps) {
         }
       >
         {asyncWriteText.status == "success" ? (
-          <IconCheck size={16} stroke={1.5} />
+          <IconCheck size={16} />
         ) : (
-          <IconCopy size={16} stroke={1.5} />
+          <IconCopy size={16} />
         )}
       </ActionIcon>
     </Tooltip>

@@ -31,7 +31,7 @@ export default function BottomBar({
         className={classes.icon}
         data-selection-mode={selectionMode}
       >
-        <IconListCheck stroke={1.5} />
+        <IconListCheck />
       </ActionIcon>
       <Text inline ml="sm">
         {totalDemoCount} Demos ({formatFileSize(totalFileSize)})

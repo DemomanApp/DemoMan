@@ -56,7 +56,7 @@ function HoverMenuItem({
         variant="transparent"
         color="gray"
       >
-        <Icon size={20} stroke={1.5} />
+        <Icon size={20} />
       </ActionIcon>
     </Tooltip>
   );
@@ -80,19 +80,19 @@ function DemoListRow({ demo, selected, onClick }: DemoListRowProps) {
           </Title>
           {isStvDemo(demo) && (
             <Tooltip label="STV Demo">
-              <IconDeviceTv stroke={1.5} />
+              <IconDeviceTv />
             </Tooltip>
           )}
           <Badges items={demo.tags} max={3} />
         </Group>
         {!isStvDemo(demo) && (
           <Group gap={4}>
-            <IconUser stroke={1.5} />
+            <IconUser />
             <Text c="dimmed">{demo.clientName}</Text>
           </Group>
         )}
         <Group gap={4}>
-          <IconCalendarEvent stroke={1.5} />
+          <IconCalendarEvent />
           <Text c="dimmed">{birthtime.toLocaleString()}</Text>
         </Group>
         {demo.events.length !== 0 && (
@@ -108,7 +108,7 @@ function DemoListRow({ demo, selected, onClick }: DemoListRowProps) {
           >
             <HoverCard.Target>
               <Group gap={4}>
-                <IconBookmarks stroke={1.5} />
+                <IconBookmarks />
                 <Text c="dimmed">
                   {demo.events.length}{" "}
                   {demo.events.length === 1 ? "Bookmark" : "Bookmarks"}
@@ -131,9 +131,9 @@ function DemoListRow({ demo, selected, onClick }: DemoListRowProps) {
                   {demo.events.map((event, idx) => (
                     <Group key={idx} align="center" justify="left" gap={0}>
                       {event.name === "Bookmark" ? (
-                        <IconBookmark stroke={1.5} />
+                        <IconBookmark />
                       ) : (
-                        <IconKillstreak stroke={1.5} />
+                        <IconKillstreak />
                       )}
                       <Text
                         style={{

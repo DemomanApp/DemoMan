@@ -38,7 +38,7 @@ export const HeaderButton = forwardRef<HTMLButtonElement, HeaderButtonProps>(
         className={classes.navbarButton}
         ref={ref}
       >
-        <Icon stroke={1.5} />
+        <Icon />
       </UnstyledButton>
     );
   }

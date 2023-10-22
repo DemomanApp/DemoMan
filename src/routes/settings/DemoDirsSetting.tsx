@@ -64,7 +64,7 @@ export default function DemoDirsSetting() {
                 setDialogOpen(true);
               }}
             >
-              <IconPlus stroke={1.5} />
+              <IconPlus />
             </ActionIcon>
           </Tooltip>
         </div>
@@ -85,7 +85,7 @@ export default function DemoDirsSetting() {
                     className={classes.demoDirAction}
                     onClick={() => setDemoDirs(drop(key))}
                   >
-                    <IconTrash stroke={1.5} />
+                    <IconTrash />
                   </ActionIcon>
                 </div>
                 <Text c="dimmed" style={{ wordBreak: "break-all" }}>
