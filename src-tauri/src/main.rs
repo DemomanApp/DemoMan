@@ -6,7 +6,10 @@
 use std::{collections::HashMap, path::PathBuf, sync::Mutex};
 
 use tauri::async_runtime::Mutex as AsyncMutex;
-use tauri_plugin_log::LogTarget;
+use tauri_plugin_log::{
+    fern::colors::{Color, ColoredLevelConfig},
+    LogTarget,
+};
 
 use rcon::Connection;
 use tokio::net::TcpStream;
@@ -38,6 +41,13 @@ fn main() {
         .plugin(
             tauri_plugin_log::Builder::default()
                 .targets([LogTarget::LogDir, LogTarget::Stdout])
+                .with_colors(ColoredLevelConfig {
+                    error: Color::Red,
+                    warn: Color::Yellow,
+                    debug: Color::Blue,
+                    info: Color::Green,
+                    trace: Color::BrightBlack,
+                })
                 .build(),
         )
         .manage(state)
