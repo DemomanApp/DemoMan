@@ -6,10 +6,14 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
+    "typecheck": "tsc --noEmit",
+    "test:rust": "cargo test",
+    "test": "npm run test:rust",
     "lint:rust": "cargo clippy",
     "lint:js": "eslint . --cache",
     "lint:css": "stylelint --cache src/**/*.css",
     "lint": "npm run lint:js && npm run lint:css && npm run lint:rust",
+    "check": "npm run typecheck && npm run lint && npm run test",
     "preview": "vite preview",
     "tauri": "tauri"
   },
