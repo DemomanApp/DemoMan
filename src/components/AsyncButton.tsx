@@ -1,11 +1,11 @@
 import { Button, ButtonProps } from "@mantine/core";
-import { ComponentPropsWithRef, forwardRef } from "react";
+import { ComponentPropsWithoutRef, forwardRef } from "react";
 import { useAsyncCallback } from "react-async-hook";
 
 export type AsyncButtonProps = {
   onClick(): Promise<unknown>;
 } & ButtonProps &
-  ComponentPropsWithRef<"button">;
+  ComponentPropsWithoutRef<"button">;
 
 export default forwardRef<HTMLButtonElement, AsyncButtonProps>(
   ({ onClick, children, ...other }: AsyncButtonProps, ref) => {
