@@ -45,17 +45,7 @@ export default () => {
             shadow="md"
             position="bottom-end"
             transitionProps={{
-              // This should just be transition: "pop-top-right",
-              // but that's not working as intended at the time of writing.
-              transition: {
-                in: { opacity: 1, transform: "scale(1)" },
-                out: {
-                  opacity: 0,
-                  transform: "scale(.9)",
-                },
-                common: { transformOrigin: "top right" },
-                transitionProperty: "transform, opacity",
-              },
+              transition: "pop-top-right",
             }}
           >
             <Menu.Target>
