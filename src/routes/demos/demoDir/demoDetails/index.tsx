@@ -19,7 +19,6 @@ import {
   Container,
   Group,
   List,
-  Loader,
   Paper,
   Stack,
   Tabs,
@@ -43,7 +42,7 @@ import {
 
 import { getDemo, getDemoDetails, sendCommand } from "@/api";
 import AppShell, { HeaderButton } from "@/AppShell";
-import { AsyncButton, Fill, MapThumbnail } from "@/components";
+import { AsyncButton, MapThumbnail, LoaderFallback } from "@/components";
 import { formatFileSize, formatDuration } from "@/util";
 import PlayerList from "./PlayerList";
 import { Demo, GameSummary } from "@/demo";
@@ -89,13 +88,7 @@ export default function DemoDetailsView() {
         ),
       }}
     >
-      <Suspense
-        fallback={
-          <Fill>
-            <Loader />
-          </Fill>
-        }
-      >
+      <Suspense fallback={<LoaderFallback />}>
         <Await resolve={demo} errorElement={<ErrorElement />}>
           {(demo: Demo) => (
             <Container className={classes.container}>
@@ -156,13 +149,7 @@ export default function DemoDetailsView() {
                   </Stack>
                 </Group>
                 <div style={{ flexGrow: 1 }}>
-                  <Suspense
-                    fallback={
-                      <Fill>
-                        <Loader size="lg" type="dots" />
-                      </Fill>
-                    }
-                  >
+                  <Suspense fallback={<LoaderFallback />}>
                     <Await resolve={details} errorElement={<ErrorElement />}>
                       {(gameSummary: GameSummary) => (
                         <Tabs
