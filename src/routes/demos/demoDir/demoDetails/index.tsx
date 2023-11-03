@@ -1,10 +1,15 @@
-import { useState } from "react";
+import { Suspense } from "react";
 import {
+  Await,
   LoaderFunction,
+  defer,
   useLoaderData,
   useNavigate,
   useRouteError,
+  useParams,
 } from "react-router-dom";
+
+import { join } from "@tauri-apps/api/path";
 
 import {
   ActionIcon,
@@ -16,17 +21,14 @@ import {
   List,
   Loader,
   Paper,
-  Popover,
   Stack,
   Tabs,
   Text,
-  TextInput,
   Tooltip,
 } from "@mantine/core";
 import {
   IconAlertCircle,
   IconCalendarEvent,
-  IconCheck,
   IconChevronLeft,
   IconClock,
   IconFileAnalytics,
@@ -41,21 +43,24 @@ import {
 
 import { getDemo, getDemoDetails, sendCommand } from "@/api";
 import AppShell, { HeaderButton } from "@/AppShell";
-import { Async, AsyncButton, Fill, MapThumbnail } from "@/components";
+import { AsyncButton, Fill, MapThumbnail } from "@/components";
 import { formatFileSize, formatDuration } from "@/util";
 import PlayerList from "./PlayerList";
-import { Demo } from "@/demo";
+import { Demo, GameSummary } from "@/demo";
+import { getStoreValue } from "@/store";
 import Highlights from "./Highlights";
 
 import classes from "./demoDetails.module.css";
-import { getStoreValue } from "@/store";
-import { join } from "@tauri-apps/api/path";
 
 export default function DemoDetailsView() {
-  const demo = useLoaderData() as Demo;
+  // I'm not sure if this is the correct type. Sadly,
+  // the type is not documented by react-router.
+  const { demo, details } = useLoaderData() as {
+    demo: Promise<Demo>;
+    details: Promise<GameSummary>;
+  };
   const navigate = useNavigate();
-
-  const [renamePopoverOpen, setRenamePopoverOpen] = useState(false);
+  const { demoName } = useParams();
 
   return (
     <AppShell
@@ -65,44 +70,18 @@ export default function DemoDetailsView() {
         ),
         center: (
           <>
-            <Popover
-              trapFocus
-              opened={renamePopoverOpen}
-              arrowSize={16}
-              withArrow
-              onClose={() => setRenamePopoverOpen(false)}
+            <Text
+              ta="center"
+              fw={700}
+              size="xl"
+              inline
+              style={{ cursor: "default", whiteSpace: "nowrap" }}
+              c="white"
             >
-              <Popover.Target>
-                <Text
-                  ta="center"
-                  fw={700}
-                  size="xl"
-                  inline
-                  style={{ cursor: "default", whiteSpace: "nowrap" }}
-                  c="white"
-                >
-                  {demo.name}
-                </Text>
-              </Popover.Target>
-              <Popover.Dropdown>
-                <div style={{ display: "flex", alignItems: "center" }}>
-                  <TextInput
-                    placeholder="New name"
-                    size="sm"
-                    defaultValue={demo.name}
-                  />
-                  <ActionIcon variant="transparent" ml="xs" color="gray">
-                    <IconCheck />
-                  </ActionIcon>
-                </div>
-              </Popover.Dropdown>
-            </Popover>
+              {demoName}
+            </Text>
             <Tooltip label="Rename demo">
-              <ActionIcon
-                variant="transparent"
-                size="sm"
-                onClick={() => setRenamePopoverOpen(!renamePopoverOpen)}
-              >
+              <ActionIcon variant="transparent" size="sm">
                 <IconPencil color="gray" />
               </ActionIcon>
             </Tooltip>
@@ -110,133 +89,141 @@ export default function DemoDetailsView() {
         ),
       }}
     >
-      <Container className={classes.container}>
-        <Stack style={{ height: "100%" }}>
-          <Group>
-            <Paper radius="md" withBorder style={{ overflow: "hidden" }}>
-              <MapThumbnail
-                mapName={demo.mapName}
-                fallback={
+      <Suspense
+        fallback={
+          <Fill>
+            <Loader />
+          </Fill>
+        }
+      >
+        <Await resolve={demo} errorElement={<ErrorElement />}>
+          {(demo: Demo) => (
+            <Container className={classes.container}>
+              <Stack style={{ height: "100%" }}>
+                <Group>
+                  <Paper radius="md" withBorder style={{ overflow: "hidden" }}>
+                    <MapThumbnail
+                      mapName={demo.mapName}
+                      fallback={
+                        <Stack
+                          align="center"
+                          justify="center"
+                          gap="xs"
+                          style={{ width: "100%", height: "100%" }}
+                        >
+                          No thumbnail available.
+                          <Button variant="subtle">Contribute</Button>
+                        </Stack>
+                      }
+                      className={classes.mapThumbnail}
+                    />
+                    <Text ta="center" size="lg">
+                      {demo.mapName}
+                    </Text>
+                  </Paper>
                   <Stack
-                    align="center"
-                    justify="center"
-                    gap="xs"
-                    style={{ width: "100%", height: "100%" }}
-                  >
-                    No thumbnail available.
-                    <Button variant="subtle">Contribute</Button>
-                  </Stack>
-                }
-                className={classes.mapThumbnail}
-              />
-              <Text ta="center" size="lg">
-                {demo.mapName}
-              </Text>
-            </Paper>
-            <Stack
-              style={{
-                height: "100%",
-                justifyContent: "space-between",
-                alignItems: "flex-start",
-              }}
-            >
-              <List>
-                <List.Item icon={<IconUser />}>{demo.clientName}</List.Item>
-                <List.Item icon={<IconServer />}>
-                  <span style={{ fontFamily: "monospace, monospace" }}>
-                    {demo.serverName}
-                  </span>
-                </List.Item>
-                <List.Item icon={<IconCalendarEvent />}>
-                  {new Date(demo.birthtime * 1000).toLocaleString()}
-                </List.Item>
-                <List.Item icon={<IconFileAnalytics />}>
-                  {formatFileSize(demo.filesize)}
-                </List.Item>
-                <List.Item icon={<IconClock />}>
-                  {formatDuration(demo.playbackTime)}
-                </List.Item>
-              </List>
-              <AsyncButton
-                rightSection={<IconPlayerPlay />}
-                onClick={() => sendCommand(`playdemo "${demo.path}"`)}
-              >
-                Play demo
-              </AsyncButton>
-            </Stack>
-          </Group>
-          <div style={{ flexGrow: 1 }}>
-            <Async
-              promiseFn={getDemoDetails}
-              args={[demo.path]}
-              loading={
-                <Fill>
-                  <Loader size="lg" type="dots" />
-                </Fill>
-              }
-              error={(error) => (
-                <Fill>
-                  <Alert color="red">
-                    An error occured while loading this demo: {String(error)}
-                  </Alert>
-                </Fill>
-              )}
-              success={(gameSummary) => (
-                <Tabs
-                  defaultValue="players"
-                  // These styles prevent tall tab panels (mainly the timeline tab)
-                  // from overflowing. I want the panel to take up exactly
-                  // the remaining vertical space on the page,
-                  // keeping eventual overflow to itself.
-                  // minHeight: 0 is necessary due to a quirk of FlexBox,
-                  // See https://stackoverflow.com/q/36230944/13118494
-                  styles={{
-                    root: {
+                    style={{
                       height: "100%",
-                      display: "flex",
-                      flexDirection: "column",
-                    },
-                    panel: { flexGrow: 1, minHeight: 0 },
-                  }}
-                >
-                  <Tabs.List>
-                    <Tabs.Tab
-                      value="players"
-                      leftSection={<IconUsers size={14} />}
+                      justifyContent: "space-between",
+                      alignItems: "flex-start",
+                    }}
+                  >
+                    <List>
+                      <List.Item icon={<IconUser />}>
+                        {demo.clientName}
+                      </List.Item>
+                      <List.Item icon={<IconServer />}>
+                        <span style={{ fontFamily: "monospace, monospace" }}>
+                          {demo.serverName}
+                        </span>
+                      </List.Item>
+                      <List.Item icon={<IconCalendarEvent />}>
+                        {new Date(demo.birthtime * 1000).toLocaleString()}
+                      </List.Item>
+                      <List.Item icon={<IconFileAnalytics />}>
+                        {formatFileSize(demo.filesize)}
+                      </List.Item>
+                      <List.Item icon={<IconClock />}>
+                        {formatDuration(demo.playbackTime)}
+                      </List.Item>
+                    </List>
+                    <AsyncButton
+                      rightSection={<IconPlayerPlay />}
+                      onClick={() => sendCommand(`playdemo "${demo.path}"`)}
                     >
-                      Players
-                    </Tabs.Tab>
-                    <Tabs.Tab
-                      value="timeline"
-                      leftSection={<IconTimeline size={14} />}
-                    >
-                      Timeline
-                    </Tabs.Tab>
-                    <Tabs.Tab
-                      value="info"
-                      leftSection={<IconFileInfo size={14} />}
-                    >
-                      Info
-                    </Tabs.Tab>
-                  </Tabs.List>
+                      Play demo
+                    </AsyncButton>
+                  </Stack>
+                </Group>
+                <div style={{ flexGrow: 1 }}>
+                  <Suspense
+                    fallback={
+                      <Fill>
+                        <Loader size="lg" type="dots" />
+                      </Fill>
+                    }
+                  >
+                    <Await resolve={details} errorElement={<ErrorElement />}>
+                      {(gameSummary: GameSummary) => (
+                        <Tabs
+                          defaultValue="players"
+                          // These styles prevent tall tab panels (mainly the timeline tab)
+                          // from overflowing. I want the panel to take up exactly
+                          // the remaining vertical space on the page,
+                          // keeping eventual overflow to itself.
+                          // minHeight: 0 is necessary due to a quirk of FlexBox,
+                          // See https://stackoverflow.com/q/36230944/13118494
+                          styles={{
+                            root: {
+                              height: "100%",
+                              display: "flex",
+                              flexDirection: "column",
+                            },
+                            panel: { flexGrow: 1, minHeight: 0 },
+                          }}
+                        >
+                          <Tabs.List>
+                            <Tabs.Tab
+                              value="players"
+                              leftSection={<IconUsers size={14} />}
+                            >
+                              Players
+                            </Tabs.Tab>
+                            <Tabs.Tab
+                              value="timeline"
+                              leftSection={<IconTimeline size={14} />}
+                            >
+                              Timeline
+                            </Tabs.Tab>
+                            <Tabs.Tab
+                              value="info"
+                              leftSection={<IconFileInfo size={14} />}
+                            >
+                              Info
+                            </Tabs.Tab>
+                          </Tabs.List>
 
-                  <Tabs.Panel value="players" pt="xs">
-                    <PlayerList gameSummary={gameSummary} />
-                  </Tabs.Panel>
+                          <Tabs.Panel value="players" pt="xs">
+                            <PlayerList gameSummary={gameSummary} />
+                          </Tabs.Panel>
 
-                  <Tabs.Panel value="timeline" pt="xs">
-                    <Highlights gameSummary={gameSummary} />
-                  </Tabs.Panel>
+                          <Tabs.Panel value="timeline" pt="xs">
+                            <Highlights gameSummary={gameSummary} />
+                          </Tabs.Panel>
 
-                  <Tabs.Panel value="info" pt="xs">
-                    TODO
-                  </Tabs.Panel>
-                </Tabs>
-              )}
-            />
-          </div>
-        </Stack>
-      </Container>
+                          <Tabs.Panel value="info" pt="xs">
+                            TODO
+                          </Tabs.Panel>
+                        </Tabs>
+                      )}
+                    </Await>
+                  </Suspense>
+                </div>
+              </Stack>
+            </Container>
+          )}
+        </Await>
+      </Suspense>
     </AppShell>
   );
 }
@@ -256,7 +243,7 @@ export function ErrorElement() {
   );
 }
 
-export const loader: LoaderFunction = async ({ params }): Promise<Demo> => {
+export const loader: LoaderFunction = async ({ params }) => {
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const demoDirId = params.demoDirId!;
   const demoDirs = getStoreValue("demoDirs");
@@ -266,5 +253,8 @@ export const loader: LoaderFunction = async ({ params }): Promise<Demo> => {
   const demoName = decodeURIComponent(params.demoName!);
 
   const demoPath = await join(demoDirPath, `${demoName}.dem`);
-  return getDemo(demoPath);
+  return defer({
+    demo: getDemo(demoPath),
+    details: getDemoDetails(demoPath),
+  });
 };

@@ -1,4 +1,3 @@
-export { default as Async } from "./Async";
 export { default as AsyncButton } from "./AsyncButton";
 export { default as AsyncCopyButton } from "./AsyncCopyButton";
 export { default as ClassIcon } from "./ClassIcon";
