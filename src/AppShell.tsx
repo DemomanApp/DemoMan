@@ -1,7 +1,6 @@
 import { ReactNode, forwardRef } from "react";
 
 import { AppShell, UnstyledButton } from "@mantine/core";
-import { Icon } from "@tabler/icons-react";
 
 import classes from "./AppShell.module.css";
 
@@ -26,19 +25,19 @@ export default ({ children, header }: AppShellProps) => (
 );
 
 type HeaderButtonProps = {
-  icon: Icon;
   onClick?(): void;
+  children: ReactNode;
 };
 
 export const HeaderButton = forwardRef<HTMLButtonElement, HeaderButtonProps>(
-  function _HeaderButton({ icon: Icon, onClick }: HeaderButtonProps, ref) {
+  function _HeaderButton({ onClick, children }: HeaderButtonProps, ref) {
     return (
       <UnstyledButton
         onClick={onClick}
         className={classes.navbarButton}
         ref={ref}
       >
-        <Icon />
+        {children}
       </UnstyledButton>
     );
   }

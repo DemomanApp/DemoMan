@@ -49,7 +49,9 @@ export default () => {
             }}
           >
             <Menu.Target>
-              <HeaderButton icon={IconDots} />
+              <HeaderButton>
+                <IconDots />
+              </HeaderButton>
             </Menu.Target>
             <Menu.Dropdown>
               <Menu.Item

@@ -65,7 +65,9 @@ export default function DemoDetailsView() {
     <AppShell
       header={{
         left: (
-          <HeaderButton icon={IconChevronLeft} onClick={() => navigate(-1)} />
+          <HeaderButton onClick={() => navigate(-1)}>
+            <IconChevronLeft />
+          </HeaderButton>
         ),
         center: (
           <>
