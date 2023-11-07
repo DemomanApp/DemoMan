@@ -19,7 +19,6 @@
 .header-left,
 .header-center,
 .header-right {
-  flex-grow: 1;
   flex-basis: 0;
   display: flex;
   align-items: center;
@@ -27,14 +26,17 @@
 
 .header-left {
   justify-content: left;
+  flex-grow: 1;
 }
 
 .header-center {
   justify-content: center;
+  flex-grow: 2;
 }
 
 .header-right {
   justify-content: right;
+  flex-grow: 1;
 }
 
 .navbar-button {
