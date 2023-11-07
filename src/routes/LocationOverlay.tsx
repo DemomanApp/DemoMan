@@ -17,6 +17,7 @@ export default function LocationOverlay() {
             gap: "var(--mantine-spacing-xs)",
             justifyContent: "center",
             zIndex: 9999,
+            pointerEvents: "none",
           }}
         >
           <div
