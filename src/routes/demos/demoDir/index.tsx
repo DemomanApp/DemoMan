@@ -7,11 +7,11 @@ import {
   redirect,
   useLoaderData,
   useRouteError,
+  useSearchParams,
 } from "react-router-dom";
 
-import { Alert, Input, Menu } from "@mantine/core";
+import { Alert, Menu } from "@mantine/core";
 import {
-  IconSearch,
   IconDots,
   IconSettings,
   IconPlug,
@@ -23,62 +23,95 @@ import AppShell, { HeaderButton } from "@/AppShell";
 import { getDemosInDirectory } from "@/api";
 import { Fill, LoaderFallback } from "@/components";
 import { getStoreValue } from "@/store";
-import DemoList from "./DemoList";
+import DemoList, { SortOrder, SortKey } from "./DemoList";
+import SearchInput from "./SearchInput";
+import { SortControl } from "./SortControl";
+
+function useSearchParam<T extends string>(
+  name: string,
+  fallback: T
+): [T, (newValue: T) => void] {
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  const value = (searchParams.get(name) ?? fallback) as T;
+
+  const setValue = (newValue: T) =>
+    setSearchParams((prev) => ({
+      ...Object.fromEntries(prev.entries()),
+      [name]: newValue,
+    }));
+
+  return [value, setValue];
+}
 
 export default () => {
   const { demos } = useLoaderData() as { demos: Promise<Demo[]> };
+
+  const [query, setQuery] = useSearchParam("query", "");
+  const [sortKey, setSortKey] = useSearchParam<SortKey>("sort-by", "birthtime");
+  const [sortOrder, setSortOrder] = useSearchParam<SortOrder>(
+    "sort",
+    "ascending"
+  );
 
   return (
     <AppShell
       header={{
         center: (
-          <Input
-            variant="filled"
-            placeholder="Search"
-            style={{ width: "100%" }}
-            size="sm"
-            leftSection={<IconSearch size={18} />}
-          />
+          <>
+            <SearchInput query={query} setQuery={setQuery} />
+          </>
         ),
         right: (
-          <Menu
-            shadow="md"
-            position="bottom-end"
-            transitionProps={{
-              transition: "pop-top-right",
-            }}
-          >
-            <Menu.Target>
-              <HeaderButton>
-                <IconDots />
-              </HeaderButton>
-            </Menu.Target>
-            <Menu.Dropdown>
-              <Menu.Item
-                leftSection={<IconSettings size={14} />}
-                component={Link}
-                to="/settings"
-              >
-                Settings
-              </Menu.Item>
-              <Menu.Item
-                leftSection={<IconPlug size={14} />}
-                component={Link}
-                to="/rcon-setup"
-              >
-                Set up RCON
-              </Menu.Item>
-              <Menu.Item leftSection={<IconFolder size={14} />}>
-                Open demos folder
-              </Menu.Item>
-            </Menu.Dropdown>
-          </Menu>
+          <>
+            <SortControl
+              sortKey={sortKey}
+              setSortKey={setSortKey}
+              sortOrder={sortOrder}
+              setSortOrder={setSortOrder}
+            />
+            <div style={{ margin: "auto" }} />
+            <Menu
+              shadow="md"
+              position="bottom-end"
+              transitionProps={{
+                transition: "pop-top-right",
+              }}
+            >
+              <Menu.Target>
+                <HeaderButton>
+                  <IconDots />
+                </HeaderButton>
+              </Menu.Target>
+              <Menu.Dropdown>
+                <Menu.Item
+                  leftSection={<IconSettings size={14} />}
+                  component={Link}
+                  to="/settings"
+                >
+                  Settings
+                </Menu.Item>
+                <Menu.Item
+                  leftSection={<IconPlug size={14} />}
+                  component={Link}
+                  to="/rcon-setup"
+                >
+                  Set up RCON
+                </Menu.Item>
+                <Menu.Item leftSection={<IconFolder size={14} />}>
+                  Open demos folder
+                </Menu.Item>
+              </Menu.Dropdown>
+            </Menu>
+          </>
         ),
       }}
     >
       <Suspense fallback={<LoaderFallback />}>
         <Await resolve={demos} errorElement={<ErrorElement />}>
-          {(demos) => <DemoList demos={demos} />}
+          {(demos) => (
+            <DemoList demos={demos} sortKey={sortKey} sortOrder={sortOrder} />
+          )}
         </Await>
       </Suspense>
     </AppShell>

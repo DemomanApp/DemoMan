@@ -57,11 +57,47 @@ const createItemData = memoize(
   })
 );
 
-type DemoListProps = {
-  demos: Demo[];
+export const sortKeys = {
+  birthtime: "File creation time",
+  filesize: "File size",
+  name: "File name",
+  mapName: "Map name",
+  events: "Number of events",
+  playbackTime: "Playback time",
+} as const;
+
+export type SortKey = keyof typeof sortKeys;
+
+export type SortOrder = "ascending" | "descending";
+
+type CompareFn = (a: Demo, b: Demo) => number;
+
+const compareFns: Record<SortKey, CompareFn> = {
+  birthtime: (a, b) => a.birthtime - b.birthtime,
+  filesize: (a, b) => a.filesize - b.filesize,
+  name: (a, b) => a.name.localeCompare(b.name),
+  mapName: (a, b) => a.mapName.localeCompare(b.mapName),
+  events: (a, b) => a.events.length - b.events.length,
+  playbackTime: (a, b) => a.playbackTime - b.playbackTime,
 };
 
-export default function DemoList({ demos }: DemoListProps) {
+type DemoListProps = {
+  demos: Demo[];
+  sortKey: SortKey;
+  sortOrder: SortOrder;
+};
+
+const reverse =
+  (compareFn: CompareFn): CompareFn =>
+  (a, b) =>
+    -compareFn(a, b);
+
+const getCompareFn = (sortKey: SortKey, sortOrder: SortOrder) =>
+  sortOrder === "ascending"
+    ? compareFns[sortKey]
+    : reverse(compareFns[sortKey]);
+
+export default function DemoList({ demos, sortKey, sortOrder }: DemoListProps) {
   const navigate = useNavigate();
   const listRef = useRef<FixedSizeList>(null);
 
@@ -70,9 +106,9 @@ export default function DemoList({ demos }: DemoListProps) {
 
   const sortedDemos = useMemo(() => {
     const newSortedDemos = [...demos];
-    newSortedDemos.sort((a, b) => b.birthtime - a.birthtime);
+    newSortedDemos.sort(getCompareFn(sortKey, sortOrder));
     return newSortedDemos;
-  }, [demos]);
+  }, [demos, sortKey, sortOrder]);
 
   // Reset the selected rows every time the demos are changed or selection mode is toggled
   useEffect(() => {
