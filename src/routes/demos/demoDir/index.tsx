@@ -10,6 +10,8 @@ import {
   useSearchParams,
 } from "react-router-dom";
 
+import { shell } from "@tauri-apps/api";
+
 import { Alert, Menu } from "@mantine/core";
 import {
   IconDots,
@@ -22,7 +24,7 @@ import { Demo } from "@/demo";
 import AppShell, { HeaderButton } from "@/AppShell";
 import { getDemosInDirectory } from "@/api";
 import { Fill, LoaderFallback } from "@/components";
-import { getStoreValue } from "@/store";
+import { DemoDir, getStoreValue } from "@/store";
 import DemoList, { SortOrder, SortKey } from "./DemoList";
 import SearchInput from "./SearchInput";
 import { SortControl } from "./SortControl";
@@ -45,7 +47,10 @@ function useSearchParam<T extends string>(
 }
 
 export default () => {
-  const { demos } = useLoaderData() as { demos: Promise<Demo[]> };
+  const { demoDir, demos } = useLoaderData() as {
+    demoDir: DemoDir;
+    demos: Promise<Demo[]>;
+  };
 
   const [query, setQuery] = useSearchParam("query", "");
   const [sortKey, setSortKey] = useSearchParam<SortKey>("sort-by", "birthtime");
@@ -98,8 +103,11 @@ export default () => {
                 >
                   Set up RCON
                 </Menu.Item>
-                <Menu.Item leftSection={<IconFolder size={14} />}>
-                  Open demos folder
+                <Menu.Item
+                  leftSection={<IconFolder size={14} />}
+                  onClick={() => shell.open(demoDir.path)}
+                >
+                  Show in explorer
                 </Menu.Item>
               </Menu.Dropdown>
             </Menu>
@@ -145,5 +153,8 @@ export const loader: LoaderFunction = async ({ params }) => {
     return redirect("/demos");
   }
 
-  return defer({ demos: getDemosInDirectory(demoDir.path) });
+  return defer({
+    demoDir: demoDir,
+    demos: getDemosInDirectory(demoDir.path),
+  });
 };
