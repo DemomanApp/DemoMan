@@ -7,7 +7,7 @@ export default function LocationOverlay() {
 
   return (
     <>
-      {enableLocationOverlay! && (
+      {enableLocationOverlay && (
         <div
           style={{
             position: "absolute",

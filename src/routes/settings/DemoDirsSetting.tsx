@@ -38,9 +38,7 @@ export default function DemoDirsSetting() {
         // TODO: remove the assertion after this is fixed:
         //       https://github.com/mantinedev/mantine/issues/4827
         //       The fix should land in v7.2.0
-        if (
-          Object.values(demoDirs!).some((value) => value.label === newLabel)
-        ) {
+        if (Object.values(demoDirs).some((value) => value.label === newLabel)) {
           return "A demo directory with this label already exists";
         }
         return null;
@@ -72,27 +70,26 @@ export default function DemoDirsSetting() {
           These are the locations where DemoMan searches for demo files.
         </Text>
         <Stack align="stretch" pt="md" gap="sm">
-          {demoDirs !== undefined &&
-            Object.entries(demoDirs).map(([key, { label, path }]) => (
-              <div key={key} className={classes.demoDir}>
-                <div className={classes.labelRow}>
-                  <Text size="lg" fw={600} style={{ flex: 1 }}>
-                    {label}
-                  </Text>
-                  <ActionIcon
-                    variant="subtle"
-                    color="red.9"
-                    className={classes.demoDirAction}
-                    onClick={() => setDemoDirs(drop(key))}
-                  >
-                    <IconTrash />
-                  </ActionIcon>
-                </div>
-                <Text c="dimmed" style={{ wordBreak: "break-all" }}>
-                  {path}
+          {Object.entries(demoDirs).map(([key, { label, path }]) => (
+            <div key={key} className={classes.demoDir}>
+              <div className={classes.labelRow}>
+                <Text size="lg" fw={600} style={{ flex: 1 }}>
+                  {label}
                 </Text>
+                <ActionIcon
+                  variant="subtle"
+                  color="red.9"
+                  className={classes.demoDirAction}
+                  onClick={() => setDemoDirs(drop(key))}
+                >
+                  <IconTrash />
+                </ActionIcon>
               </div>
-            ))}
+              <Text c="dimmed" style={{ wordBreak: "break-all" }}>
+                {path}
+              </Text>
+            </div>
+          ))}
         </Stack>
       </div>
       <Modal

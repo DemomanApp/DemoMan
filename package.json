@@ -18,9 +18,9 @@
     "tauri": "tauri"
   },
   "dependencies": {
-    "@mantine/core": "^7.1.7",
-    "@mantine/form": "^7.1.7",
-    "@mantine/hooks": "^7.1.7",
+    "@mantine/core": "^7.2.1 ",
+    "@mantine/form": "^7.2.1 ",
+    "@mantine/hooks": "^7.2.1 ",
     "@tabler/icons-react": "^2.0.0",
     "@tauri-apps/api": "^1.4",
     "memoize-one": "^6.0.0",

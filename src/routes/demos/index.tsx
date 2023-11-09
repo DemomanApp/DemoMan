@@ -7,7 +7,7 @@ import { Link } from "react-router-dom";
 export default () => {
   const [demoDirs] = useStore("demoDirs");
 
-  const demoDirIds = Object.keys(demoDirs!);
+  const demoDirIds = Object.keys(demoDirs);
   return (
     <Fill>
       <Stack gap="sm">
@@ -18,7 +18,7 @@ export default () => {
           <Text ta="center">No demo directories set.</Text>
         ) : (
           demoDirIds.map((id) => {
-            const demoDir = demoDirs![id];
+            const demoDir = demoDirs[id];
             return <DemoDirButton id={id} demoDir={demoDir} key={id} />;
           })
         )}
