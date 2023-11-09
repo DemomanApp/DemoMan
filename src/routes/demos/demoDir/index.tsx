@@ -56,7 +56,7 @@ export default () => {
   const [sortKey, setSortKey] = useSearchParam<SortKey>("sort-by", "birthtime");
   const [sortOrder, setSortOrder] = useSearchParam<SortOrder>(
     "sort",
-    "ascending"
+    "descending"
   );
 
   return (
