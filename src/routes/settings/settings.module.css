@@ -14,7 +14,7 @@
 }
 
 .label {
-  flex: 1
+  flex: 1;
 }
 
 .switch {
@@ -26,7 +26,7 @@
   padding: var(--mantine-spacing-xs);
 
   & .demo-dir-action {
-    visibility: hidden;    
+    visibility: hidden;
   }
 
   @mixin hover {
@@ -37,4 +37,3 @@
     }
   }
 }
-
