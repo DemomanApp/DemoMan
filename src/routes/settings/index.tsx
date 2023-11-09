@@ -34,9 +34,9 @@ export default function SettingsView() {
         <Container size="xs" pt="md">
           <Stack>
             <BooleanSetting
-              name="Example boolean setting"
-              description="This is an example setting. It does not do anything."
-              storeKey="exampleBoolean"
+              name="Skip trash"
+              description="Delete demos permanently instead of moving them to trash"
+              storeKey="skipTrash"
             />
             <Divider mt="md" />
             <DemoDirsSetting />
