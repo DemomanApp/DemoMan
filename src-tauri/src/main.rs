@@ -3,7 +3,11 @@
     windows_subsystem = "windows"
 )]
 
-use std::{collections::HashMap, path::PathBuf, sync::Mutex};
+use std::{
+    collections::HashMap,
+    path::PathBuf,
+    sync::{Arc, Mutex},
+};
 
 use tauri::async_runtime::Mutex as AsyncMutex;
 use tauri_plugin_log::{
@@ -22,7 +26,7 @@ mod demo;
 #[cfg(test)]
 mod tests;
 
-pub type DemoCache = HashMap<PathBuf, Demo>;
+pub type DemoCache = HashMap<PathBuf, Arc<Demo>>;
 
 #[derive(Default)]
 pub struct AppState {

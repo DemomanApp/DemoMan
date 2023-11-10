@@ -3,6 +3,7 @@ use std::{
     ffi::OsStr,
     fs::{copy, remove_file},
     path::Path,
+    sync::Arc,
     vec::Vec,
 };
 
@@ -23,28 +24,56 @@ macro_rules! log_command {
     ($($arg:tt)+) => (log::trace!(target: "IPC", $($arg)+))
 }
 
+// This can be removed once unwrap_or_clone lands in stable
+// https://github.com/rust-lang/rust/issues/93610
+trait UnwrapOrClone<T> {
+    fn unwrap_or_clone(this: Self) -> T;
+}
+
+impl<T: Clone> UnwrapOrClone<T> for Arc<T> {
+    fn unwrap_or_clone(this: Self) -> T {
+        Arc::try_unwrap(this).unwrap_or_else(|arc| (*arc).clone())
+    }
+}
+
+/// Fallible variant of [or_insert_with](std::collections::hash_map::Entry::or_insert_with)
+trait OrTryInsertWith<'a, V, F: FnOnce() -> Result<V, E>, E> {
+    fn or_try_insert_with(self, default: F) -> Result<&'a mut V, E>;
+}
+
+impl<'a, K, V, F, E> OrTryInsertWith<'a, V, F, E> for Entry<'a, K, V>
+where
+    F: FnOnce() -> Result<V, E>,
+{
+    fn or_try_insert_with(self, default: F) -> Result<&'a mut V, E> {
+        match self {
+            Entry::Occupied(entry) => Ok(entry.into_mut()),
+            Entry::Vacant(entry) => Ok(entry.insert(default()?)),
+        }
+    }
+}
+
 #[tauri::command]
 pub async fn get_demos_in_directory(
     dir_path: &Path,
     state: State<'_, AppState>,
-) -> Result<Vec<Demo>, DemoReadError> {
+) -> Result<Vec<Arc<Demo>>, DemoReadError> {
     log_command!("get_demos_in_directory {}", dir_path.display());
 
     let mut demo_cache = state.demo_cache.lock().expect("Failed to lock mutex");
-    Ok(read_demos_in_directory(dir_path)?
+    let demos = read_demos_in_directory(dir_path)?
         .iter()
         .filter_map(|demo_name| {
             let demo_path = dir_path.join(demo_name).with_extension("dem");
-            let demo = match demo_cache.entry(demo_path.clone()) {
-                Entry::Occupied(entry) => entry.get().clone(),
-                Entry::Vacant(entry) => {
-                    let demo = read_demo(&demo_path).ok()?;
-                    entry.insert(demo).clone()
-                }
-            };
-            Some(demo)
+            let demo = demo_cache
+                .entry(demo_path.clone())
+                .or_try_insert_with(|| read_demo(&demo_path).map(Arc::new))
+                .ok()?;
+            Some(Arc::clone(demo))
         })
-        .collect())
+        .collect();
+
+    Ok(demos)
 }
 
 #[tauri::command]
@@ -56,9 +85,12 @@ pub async fn set_demo_events(
     log_command!("set_demo_events {} {new_events:?}", demo_path.display());
 
     let mut demo_cache = state.demo_cache.lock().expect("Failed to lock mutex");
-    let demo = demo_cache
-        .get_mut(demo_path)
-        .ok_or(DemoCommandError::DemoNotFound)?;
+    let demo = Arc::make_mut(
+        demo_cache
+            .get_mut(demo_path)
+            .ok_or(DemoCommandError::DemoNotFound)?,
+    );
+
     let json_path = demo.path.with_extension("json");
     write_events_and_tags(&json_path, &new_events, &demo.tags)?;
     demo.events = new_events;
@@ -74,9 +106,12 @@ pub async fn set_demo_tags(
     log_command!("set_demo_tags {} {new_tags:?}", demo_path.display());
 
     let mut demo_cache = state.demo_cache.lock().expect("Failed to lock mutex");
-    let demo = demo_cache
-        .get_mut(demo_path)
-        .ok_or(DemoCommandError::DemoNotFound)?;
+    let demo = Arc::make_mut(
+        demo_cache
+            .get_mut(demo_path)
+            .ok_or(DemoCommandError::DemoNotFound)?,
+    );
+
     let json_path = demo.path.with_extension("json");
     write_events_and_tags(&json_path, &demo.events, &new_tags)?;
     demo.tags = new_tags;
@@ -133,9 +168,11 @@ pub async fn move_demo(
     log_command!("move_demo {} {}", demo_path.display(), new_path.display());
 
     let mut demo_cache = state.demo_cache.lock().expect("Failed to lock mutex");
-    let mut demo = demo_cache
-        .remove(demo_path)
-        .ok_or(DemoCommandError::DemoNotFound)?;
+    let mut demo = UnwrapOrClone::unwrap_or_clone(
+        demo_cache
+            .remove(demo_path)
+            .ok_or(DemoCommandError::DemoNotFound)?,
+    );
 
     let new_name = new_path
         .file_stem()
@@ -163,7 +200,7 @@ pub async fn move_demo(
     demo.name = new_name.into();
     demo.path = new_path.into();
 
-    demo_cache.insert(new_path.into(), demo);
+    demo_cache.insert(new_path.into(), Arc::new(demo));
 
     Ok(())
 }
@@ -172,20 +209,18 @@ pub async fn move_demo(
 pub async fn get_demo(
     demo_path: &Path,
     state: State<'_, AppState>,
-) -> Result<Demo, DemoCommandError> {
+) -> Result<Arc<Demo>, DemoCommandError> {
     log_command!("get_demo {}", demo_path.display());
 
     let mut demo_cache = state.demo_cache.lock().expect("Failed to lock mutex");
 
-    let demo = match demo_cache.entry(demo_path.into()) {
-        Entry::Occupied(entry) => entry.get().clone(),
-        Entry::Vacant(entry) => {
-            let demo = read_demo(demo_path).or(Err(DemoCommandError::FileReadFailed))?;
-            entry.insert(demo).clone()
-        }
-    };
+    let demo = demo_cache.entry(demo_path.into()).or_try_insert_with(|| {
+        read_demo(demo_path)
+            .map(Arc::new)
+            .or(Err(DemoCommandError::FileReadFailed))
+    })?;
 
-    Ok(demo)
+    Ok(Arc::clone(demo))
 }
 
 #[tauri::command]
