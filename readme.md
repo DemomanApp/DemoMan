@@ -40,14 +40,20 @@ on the project's [Discord server](https://discord.gg/GduKxhYFhR).
 Development is organized [here](https://github.com/users/Narcha/projects/2).
 
 If you can't contribute code, you can still help:
+
 - Give the repo a star on GitHub 😉
 - Contribute map thumbnails
-- Report issues you come across
+- Report any issues you encounter
 - Let the devs know if you have any ideas/suggestions
 
 # 🛠️ Developing
 
-Prerequisites: install Rust and npm.
+Prerequisites:
+
+- Install Rust and npm.
+- Follow [this guide](https://tauri.app/v1/guides/getting-started/prerequisites) to be able to build tauri apps.
+
+Once that's done:
 
 1. Clone the repository and run `npm install`.
 2. Start the program by running `npm run tauri dev`.
