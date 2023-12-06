@@ -42,7 +42,7 @@
     "@types/react-window": "^1.8.5",
     "@typescript-eslint/eslint-plugin": "^6.7.0",
     "@typescript-eslint/parser": "^6.7.0",
-    "@vitejs/plugin-react": "^4.1.0",
+    "@vitejs/plugin-react": "^4.2.1",
     "autoprefixer": "^10.4.16",
     "eslint": "^8.25.0",
     "eslint-config-prettier": "^8.5.0",
@@ -55,7 +55,7 @@
     "stylelint": "^15.10.3",
     "stylelint-config-standard": "^34.0.0",
     "typescript": "^5.2.2",
-    "vite": "^4.4.12",
+    "vite": "^5.0",
     "vite-plugin-eslint": "^1.8.1"
   },
   "postcss": {
