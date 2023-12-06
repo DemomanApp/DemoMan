@@ -55,7 +55,7 @@
     "stylelint": "^15.10.3",
     "stylelint-config-standard": "^34.0.0",
     "typescript": "^5.2.2",
-    "vite": "^4.4.4",
+    "vite": "^4.4.12",
     "vite-plugin-eslint": "^1.8.1"
   },
   "postcss": {
