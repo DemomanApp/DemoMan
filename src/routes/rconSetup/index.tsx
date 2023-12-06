@@ -1,20 +1,14 @@
 import { useState } from "react";
 
-import { Alert, Center, Paper, Stack, Text } from "@mantine/core";
-import {
-  IconAlertCircle,
-  IconChevronLeft,
-  IconCircleCheck,
-} from "@tabler/icons-react";
+import { Alert, AppShell, Center, Paper, Stack, Text } from "@mantine/core";
+import { IconAlertCircle, IconCircleCheck } from "@tabler/icons-react";
 
 import useStore from "@/hooks/useStore";
 import { initRcon, sendCommand } from "@/api";
 import { AsyncButton, AsyncCopyButton } from "@/components";
-import AppShell, { HeaderButton } from "@/AppShell";
-import { useNavigate } from "react-router-dom";
+import { HeaderBar } from "@/AppShell";
 
 export default function RconSetup() {
-  const navigate = useNavigate();
   const [rconPassword, setRconPassword] = useStore("rconPassword");
 
   const [error, setError] = useState<string | null>(null);
@@ -29,86 +23,83 @@ export default function RconSetup() {
   const launchFlags = `-usercon +rcon_password ${rconPassword} +ip 0.0.0.0 +hostport 27969 +net_start`;
 
   return (
-    <AppShell
-      header={{
-        left: (
-          <HeaderButton onClick={() => navigate(-1)}>
-            <IconChevronLeft />
-          </HeaderButton>
-        ),
-      }}
-    >
-      <Center style={{ height: "100%" }}>
-        <Stack>
-          <div>Add this to your launch options:</div>
-          <Paper
-            withBorder
-            p="xs"
-            style={{
-              display: "flex",
-              alignItems: "center",
-              fontFamily: "monospace",
-              gap: 8,
-            }}
-          >
-            <Text
+    <AppShell header={{ height: 50 }}>
+      <AppShell.Header>
+        <HeaderBar />
+      </AppShell.Header>
+      <AppShell.Main>
+        <Center style={{ height: "100%" }}>
+          <Stack>
+            <div>Add this to your launch options:</div>
+            <Paper
+              withBorder
+              p="xs"
               style={{
-                userSelect: "text",
-                WebkitUserSelect: "text",
+                display: "flex",
+                alignItems: "center",
+                fontFamily: "monospace",
+                gap: 8,
               }}
             >
-              {launchFlags}
-            </Text>
-            <AsyncCopyButton text={launchFlags} />
-          </Paper>
-          <div>
-            <AsyncButton
-              onClick={async () => {
-                try {
-                  await initRcon(rconPassword);
-                } catch {
-                  setError(
-                    "Connection refused. Make sure TF2 is running and has the correct launch options set."
-                  );
-                  setSuccess(false);
-                  return;
-                }
-                let response;
-                try {
-                  response = await sendCommand("echo test");
-                } catch {
-                  setError("RCON command failed.");
-                  setSuccess(false);
-                  return;
-                }
-                if (response.trim() === "test") {
-                  setError(null);
-                  setSuccess(true);
-                } else {
-                  setError(`Unexpected RCON response: "${response}"`);
-                  setSuccess(false);
-                }
-              }}
-            >
-              Test connection
-            </AsyncButton>
-          </div>
-          {error !== null && (
-            <Alert
-              icon={<IconAlertCircle size={16} />}
-              title="Error"
-              color="red"
-            >
-              {error}
-            </Alert>
-          )}
-          {success && (
-            <Alert icon={<IconCircleCheck size={16} />} title="Success!">
-              Connection established.
-            </Alert>
-          )}
-        </Stack>
-      </Center>
+              <Text
+                style={{
+                  userSelect: "text",
+                  WebkitUserSelect: "text",
+                }}
+              >
+                {launchFlags}
+              </Text>
+              <AsyncCopyButton text={launchFlags} />
+            </Paper>
+            <div>
+              <AsyncButton
+                onClick={async () => {
+                  try {
+                    await initRcon(rconPassword);
+                  } catch {
+                    setError(
+                      "Connection refused. Make sure TF2 is running and has the correct launch options set."
+                    );
+                    setSuccess(false);
+                    return;
+                  }
+                  let response;
+                  try {
+                    response = await sendCommand("echo test");
+                  } catch {
+                    setError("RCON command failed.");
+                    setSuccess(false);
+                    return;
+                  }
+                  if (response.trim() === "test") {
+                    setError(null);
+                    setSuccess(true);
+                  } else {
+                    setError(`Unexpected RCON response: "${response}"`);
+                    setSuccess(false);
+                  }
+                }}
+              >
+                Test connection
+              </AsyncButton>
+            </div>
+            {error !== null && (
+              <Alert
+                icon={<IconAlertCircle size={16} />}
+                title="Error"
+                color="red"
+              >
+                {error}
+              </Alert>
+            )}
+            {success && (
+              <Alert icon={<IconCircleCheck size={16} />} title="Success!">
+                Connection established.
+              </Alert>
+            )}
+          </Stack>
+        </Center>
+      </AppShell.Main>
     </AppShell>
   );
 }

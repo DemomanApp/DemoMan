@@ -12,7 +12,7 @@ import {
 
 import { shell } from "@tauri-apps/api";
 
-import { Alert, Menu } from "@mantine/core";
+import { Alert, AppShell, Menu } from "@mantine/core";
 import {
   IconDots,
   IconSettings,
@@ -21,7 +21,7 @@ import {
 } from "@tabler/icons-react";
 
 import { Demo } from "@/demo";
-import AppShell, { HeaderButton } from "@/AppShell";
+import { HeaderButton, HeaderBar } from "@/AppShell";
 import { getDemosInDirectory } from "@/api";
 import { Fill, LoaderFallback } from "@/components";
 import { DemoDir, getStoreValue } from "@/store";
@@ -60,68 +60,71 @@ export default () => {
   );
 
   return (
-    <AppShell
-      header={{
-        center: (
-          <>
-            <SearchInput query={query} setQuery={setQuery} />
-          </>
-        ),
-        right: (
-          <>
-            <SortControl
-              sortKey={sortKey}
-              setSortKey={setSortKey}
-              sortOrder={sortOrder}
-              setSortOrder={setSortOrder}
-            />
-            <div style={{ margin: "auto" }} />
-            <Menu
-              shadow="md"
-              position="bottom-end"
-              transitionProps={{
-                transition: "pop-top-right",
-              }}
-            >
-              <Menu.Target>
-                <HeaderButton>
-                  <IconDots />
-                </HeaderButton>
-              </Menu.Target>
-              <Menu.Dropdown>
-                <Menu.Item
-                  leftSection={<IconSettings size={14} />}
-                  component={Link}
-                  to="/settings"
-                >
-                  Settings
-                </Menu.Item>
-                <Menu.Item
-                  leftSection={<IconPlug size={14} />}
-                  component={Link}
-                  to="/rcon-setup"
-                >
-                  Set up RCON
-                </Menu.Item>
-                <Menu.Item
-                  leftSection={<IconFolder size={14} />}
-                  onClick={() => shell.open(demoDir.path)}
-                >
-                  Show in explorer
-                </Menu.Item>
-              </Menu.Dropdown>
-            </Menu>
-          </>
-        ),
-      }}
-    >
-      <Suspense fallback={<LoaderFallback />}>
-        <Await resolve={demos} errorElement={<ErrorElement />}>
-          {(demos) => (
-            <DemoList demos={demos} sortKey={sortKey} sortOrder={sortOrder} />
-          )}
-        </Await>
-      </Suspense>
+    <AppShell header={{ height: 50 }}>
+      <AppShell.Header>
+        <HeaderBar
+          center={
+            <>
+              <SearchInput query={query} setQuery={setQuery} />
+            </>
+          }
+          right={
+            <>
+              <SortControl
+                sortKey={sortKey}
+                setSortKey={setSortKey}
+                sortOrder={sortOrder}
+                setSortOrder={setSortOrder}
+              />
+              <div style={{ margin: "auto" }} />
+              <Menu
+                shadow="md"
+                position="bottom-end"
+                transitionProps={{
+                  transition: "pop-top-right",
+                }}
+              >
+                <Menu.Target>
+                  <HeaderButton>
+                    <IconDots />
+                  </HeaderButton>
+                </Menu.Target>
+                <Menu.Dropdown>
+                  <Menu.Item
+                    leftSection={<IconSettings size={14} />}
+                    component={Link}
+                    to="/settings"
+                  >
+                    Settings
+                  </Menu.Item>
+                  <Menu.Item
+                    leftSection={<IconPlug size={14} />}
+                    component={Link}
+                    to="/rcon-setup"
+                  >
+                    Set up RCON
+                  </Menu.Item>
+                  <Menu.Item
+                    leftSection={<IconFolder size={14} />}
+                    onClick={() => shell.open(demoDir.path)}
+                  >
+                    Show in explorer
+                  </Menu.Item>
+                </Menu.Dropdown>
+              </Menu>
+            </>
+          }
+        />
+      </AppShell.Header>
+      <AppShell.Main>
+        <Suspense fallback={<LoaderFallback />}>
+          <Await resolve={demos} errorElement={<ErrorElement />}>
+            {(demos) => (
+              <DemoList demos={demos} sortKey={sortKey} sortOrder={sortOrder} />
+            )}
+          </Await>
+        </Suspense>
+      </AppShell.Main>
     </AppShell>
   );
 };

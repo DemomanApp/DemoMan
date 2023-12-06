@@ -8,6 +8,20 @@ body {
   width: 100vw;
 }
 
+/* stylelint-disable-next-line selector-class-pattern */
+.mantine-AppShell-main {
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  background-color: var(--mantine-color-dark-8);
+}
+
+/* stylelint-disable-next-line selector-class-pattern */
+.mantine-AppShell-header {
+  display: flex;
+  background-color: var(--mantine-color-dark-6);
+}
+
 svg.tabler-icon {
   stroke-width: 1.5px;
 }
