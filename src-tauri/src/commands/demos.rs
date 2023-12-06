@@ -12,12 +12,13 @@ use tauri::State;
 use crate::{
     demo::{
         analyser::{GameDetailsAnalyser, GameSummary},
-        errors::DemoReadError,
         read_demo, read_demos_in_directory, write_events_and_tags, Demo, DemoCommandError,
         DemoEvent,
     },
     AppState,
 };
+
+type DemoCommandResult<T> = Result<T, DemoCommandError>;
 
 /// Log the invocation of a tauri command
 macro_rules! log_command {
@@ -57,11 +58,12 @@ where
 pub async fn get_demos_in_directory(
     dir_path: &Path,
     state: State<'_, AppState>,
-) -> Result<Vec<Arc<Demo>>, DemoReadError> {
+) -> DemoCommandResult<Vec<Arc<Demo>>> {
     log_command!("get_demos_in_directory {}", dir_path.display());
 
     let mut demo_cache = state.demo_cache.lock().expect("Failed to lock mutex");
-    let demos = read_demos_in_directory(dir_path)?
+    let demos = read_demos_in_directory(dir_path)
+        .or(Err(DemoCommandError::DirReadFailed))?
         .iter()
         .filter_map(|demo_name| {
             let demo_path = dir_path.join(demo_name).with_extension("dem");
@@ -81,7 +83,7 @@ pub async fn set_demo_events(
     demo_path: &Path,
     new_events: Vec<DemoEvent>,
     state: State<'_, AppState>,
-) -> Result<(), DemoCommandError> {
+) -> DemoCommandResult<()> {
     log_command!("set_demo_events {} {new_events:?}", demo_path.display());
 
     let mut demo_cache = state.demo_cache.lock().expect("Failed to lock mutex");
@@ -102,7 +104,7 @@ pub async fn set_demo_tags(
     demo_path: &Path,
     new_tags: Vec<String>,
     state: State<'_, AppState>,
-) -> Result<(), DemoCommandError> {
+) -> DemoCommandResult<()> {
     log_command!("set_demo_tags {} {new_tags:?}", demo_path.display());
 
     let mut demo_cache = state.demo_cache.lock().expect("Failed to lock mutex");
@@ -123,7 +125,7 @@ pub async fn delete_demo(
     demo_path: &Path,
     trash: bool,
     state: State<'_, AppState>,
-) -> Result<(), DemoCommandError> {
+) -> DemoCommandResult<()> {
     log_command!("delete_demo {}", demo_path.display());
 
     let mut demo_cache = state.demo_cache.lock().expect("Failed to lock mutex");
@@ -164,7 +166,7 @@ pub async fn move_demo(
     demo_path: &Path,
     new_path: &Path,
     state: State<'_, AppState>,
-) -> Result<(), DemoCommandError> {
+) -> DemoCommandResult<()> {
     log_command!("move_demo {} {}", demo_path.display(), new_path.display());
 
     let mut demo_cache = state.demo_cache.lock().expect("Failed to lock mutex");
@@ -209,7 +211,7 @@ pub async fn move_demo(
 pub async fn get_demo(
     demo_path: &Path,
     state: State<'_, AppState>,
-) -> Result<Arc<Demo>, DemoCommandError> {
+) -> DemoCommandResult<Arc<Demo>> {
     log_command!("get_demo {}", demo_path.display());
 
     let mut demo_cache = state.demo_cache.lock().expect("Failed to lock mutex");
@@ -224,7 +226,7 @@ pub async fn get_demo(
 }
 
 #[tauri::command]
-pub async fn get_demo_details(demo_path: &Path) -> Result<GameSummary, DemoCommandError> {
+pub async fn get_demo_details(demo_path: &Path) -> DemoCommandResult<GameSummary> {
     log_command!("get_demo_details {}", demo_path.display());
 
     let file = std::fs::read(demo_path).or(Err(DemoCommandError::FileReadFailed))?;
