@@ -24,10 +24,11 @@ import { Demo } from "@/demo";
 import { HeaderButton, HeaderBar } from "@/AppShell";
 import { getDemosInDirectory } from "@/api";
 import { Fill, LoaderFallback } from "@/components";
-import { DemoDir, getStoreValue } from "@/store";
 import DemoList, { SortOrder, SortKey } from "./DemoList";
 import SearchInput from "./SearchInput";
 import { SortControl } from "./SortControl";
+import { decodeParam } from "@/util";
+import { Path } from "@/store";
 
 function useSearchParam<T extends string>(
   name: string,
@@ -46,11 +47,13 @@ function useSearchParam<T extends string>(
   return [value, setValue];
 }
 
+type LoaderData = {
+  demos: Promise<Demo[]>;
+  path: Path;
+};
+
 export default () => {
-  const { demoDir, demos } = useLoaderData() as {
-    demoDir: DemoDir;
-    demos: Promise<Demo[]>;
-  };
+  const { demos, path } = useLoaderData() as LoaderData;
 
   const [query, setQuery] = useSearchParam("query", "");
   const [sortKey, setSortKey] = useSearchParam<SortKey>("sort-by", "birthtime");
@@ -106,7 +109,7 @@ export default () => {
                   </Menu.Item>
                   <Menu.Item
                     leftSection={<IconFolder size={14} />}
-                    onClick={() => shell.open(demoDir.path)}
+                    onClick={() => shell.open(path)}
                   >
                     Show in explorer
                   </Menu.Item>
@@ -143,21 +146,17 @@ export function ErrorElement() {
 }
 
 export const loader: LoaderFunction = async ({ params }) => {
-  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-  const demoDirId = params.demoDirId!;
+  const demoDirPath = decodeParam(params.demoDirPath);
 
-  const demoDirs = getStoreValue("demoDirs");
-
-  const demoDir = demoDirs[demoDirId];
-
-  if (demoDir === undefined) {
-    // TODO redirect to a dedicated error page, like "/demos/invalid-id",
-    //      that displays an error messages and offers to redirect
+  if (demoDirPath === undefined) {
+    console.error(
+      "demoDirPath was undefined in demoDirRoute. This should not happen."
+    );
     return redirect("/demos");
   }
 
   return defer({
-    demoDir: demoDir,
-    demos: getDemosInDirectory(demoDir.path),
-  });
+    path: demoDirPath,
+    demos: getDemosInDirectory(demoDirPath),
+  } satisfies LoaderData);
 };

@@ -124,7 +124,7 @@ export default function DemoList({ demos, sortKey, sortOrder }: DemoListProps) {
           return newSelectedIndices;
         });
       } else {
-        navigate(`${encodeURIComponent(sortedDemos[index].name)}`);
+        navigate(`../show/${encodeURIComponent(sortedDemos[index].path)}`);
       }
     },
     [navigate, selectionMode, sortedDemos]

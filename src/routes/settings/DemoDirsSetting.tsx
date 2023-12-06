@@ -1,8 +1,6 @@
 import { useState } from "react";
 
-import { nanoid } from "nanoid";
-
-import { isNotEmpty, useForm } from "@mantine/form";
+import { useForm } from "@mantine/form";
 import {
   ActionIcon,
   Button,
@@ -35,15 +33,20 @@ export default function DemoDirsSetting() {
         if (newLabel.length == 0) {
           return "Label cannot be empty";
         }
-        // TODO: remove the assertion after this is fixed:
-        //       https://github.com/mantinedev/mantine/issues/4827
-        //       The fix should land in v7.2.0
-        if (Object.values(demoDirs).some((value) => value.label === newLabel)) {
+        if (Object.values(demoDirs).some((label) => label === newLabel)) {
           return "A demo directory with this label already exists";
         }
         return null;
       },
-      path: isNotEmpty("Path cannot be empty"),
+      path: (newPath: string) => {
+        if (newPath.length == 0) {
+          return "Path cannot be empty";
+        }
+        if (Object.keys(demoDirs).some((path) => path === newPath)) {
+          return "A demo directory with this path already exists";
+        }
+        return null;
+      },
     },
     validateInputOnBlur: true,
   });
@@ -70,8 +73,8 @@ export default function DemoDirsSetting() {
           These are the locations where DemoMan searches for demo files.
         </Text>
         <Stack align="stretch" pt="md" gap="sm">
-          {Object.entries(demoDirs).map(([key, { label, path }]) => (
-            <div key={key} className={classes.demoDir}>
+          {Object.entries(demoDirs).map(([path, label]) => (
+            <div key={path} className={classes.demoDir}>
               <div className={classes.labelRow}>
                 <Text size="lg" fw={600} style={{ flex: 1 }}>
                   {label}
@@ -80,7 +83,7 @@ export default function DemoDirsSetting() {
                   variant="subtle"
                   color="red.9"
                   className={classes.demoDirAction}
-                  onClick={() => setDemoDirs(drop(key))}
+                  onClick={() => setDemoDirs(drop(path))}
                 >
                   <IconTrash />
                 </ActionIcon>
@@ -103,7 +106,7 @@ export default function DemoDirsSetting() {
           onSubmit={form.onSubmit(({ label, path }) => {
             setDemoDirs((previousDemoDirs) => ({
               ...previousDemoDirs,
-              [nanoid()]: { label, path },
+              [path]: label,
             }));
             setDialogOpen(false);
           })}

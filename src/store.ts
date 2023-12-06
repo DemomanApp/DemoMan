@@ -1,13 +1,8 @@
-type DemoDirId = string;
-type Path = string;
-
-export type DemoDir = {
-  label: string;
-  path: Path;
-};
+export type Path = string;
+export type Label = string;
 
 export type StoreSchema = {
-  demoDirs: Record<DemoDirId, DemoDir>;
+  demoDirs: Record<Path, Label>;
   rconPassword: string | undefined;
   enableLocationOverlay: boolean;
   skipTrash: boolean;

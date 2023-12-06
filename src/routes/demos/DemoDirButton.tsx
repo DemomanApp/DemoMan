@@ -1,27 +1,27 @@
 import { Link } from "react-router-dom";
 
-import { DemoDir } from "@/store";
 import { Text, UnstyledButton } from "@mantine/core";
 
 import classes from "./DemoDirButton.module.css";
+import { Label, Path } from "@/store";
 
 export default function DemoDirButton({
-  id,
-  demoDir,
+  path,
+  label,
 }: {
-  id: string;
-  demoDir: DemoDir;
+  path: Path;
+  label: Label;
 }) {
   return (
     <UnstyledButton
       component={Link}
-      to={id}
+      to={`dir/${encodeURIComponent(path)}`}
       variant="default"
       className={classes.root}
     >
-      <Text>{demoDir.label}</Text>
+      <Text>{label}</Text>
       <Text size="sm" c="dimmed">
-        {demoDir.path}
+        {path}
       </Text>
     </UnstyledButton>
   );

@@ -31,13 +31,13 @@ export default createBrowserRouter([
             element: <DemosRoute />,
           },
           {
-            path: ":demoDirId",
+            path: "dir/:demoDirPath",
             element: <DemoDirRoute />,
             loader: demoDirLoader,
             errorElement: <DemoDirErrorElement />,
           },
           {
-            path: ":demoDirId/:demoName",
+            path: "show/:demoPath",
             element: <DemoDetailsRoute />,
             loader: demoDetailsLoader,
             errorElement: <DemoDetailsErrorElement />,

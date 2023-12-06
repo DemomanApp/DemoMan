@@ -8,7 +8,7 @@ import { HeaderBar } from "@/AppShell";
 export default () => {
   const [demoDirs] = useStore("demoDirs");
 
-  const demoDirIds = Object.keys(demoDirs);
+  const demoDirEntries = Object.entries(demoDirs);
   return (
     <AppShell>
       <AppShell.Header>
@@ -20,13 +20,12 @@ export default () => {
             <Title order={2} ta="center">
               Select a demo directory
             </Title>
-            {demoDirIds.length === 0 ? (
+            {demoDirEntries.length === 0 ? (
               <Text ta="center">No demo directories set.</Text>
             ) : (
-              demoDirIds.map((id) => {
-                const demoDir = demoDirs[id];
-                return <DemoDirButton id={id} demoDir={demoDir} key={id} />;
-              })
+              demoDirEntries.map(([path, label]) => (
+                <DemoDirButton path={path} label={label} key={path} />
+              ))
             )}
 
             <Text ta="center">

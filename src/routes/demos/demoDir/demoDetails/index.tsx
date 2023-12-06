@@ -5,10 +5,8 @@ import {
   defer,
   useLoaderData,
   useRouteError,
-  useParams,
+  redirect,
 } from "react-router-dom";
-
-import { join } from "@tauri-apps/api/path";
 
 import {
   ActionIcon,
@@ -42,29 +40,29 @@ import {
 import { getDemo, getDemoDetails, sendCommand } from "@/api";
 import { HeaderBar } from "@/AppShell";
 import { AsyncButton, MapThumbnail, LoaderFallback } from "@/components";
-import { formatFileSize, formatDuration } from "@/util";
+import { formatFileSize, formatDuration, decodeParam } from "@/util";
 import PlayerList from "./PlayerList";
 import { Demo, GameSummary } from "@/demo";
-import { getStoreValue } from "@/store";
 import Highlights from "./Highlights";
 
 import classes from "./demoDetails.module.css";
 
+type LoaderData = {
+  demo: Promise<Demo>;
+  details: Promise<GameSummary>;
+};
+
 export default function DemoDetailsView() {
   // I'm not sure if this is the correct type. Sadly,
   // the type is not documented by react-router.
-  const { demo, details } = useLoaderData() as {
-    demo: Promise<Demo>;
-    details: Promise<GameSummary>;
-  };
-  const { demoName } = useParams();
+  const { demo, details } = useLoaderData() as LoaderData;
 
   return (
     <AppShell header={{ height: 50 }}>
       <AppShell.Header>
         <HeaderBar
           center={
-            <>
+            <Suspense fallback={<Text c="dimmed">loading...</Text>}>
               <Text
                 ta="center"
                 fw={700}
@@ -73,14 +71,14 @@ export default function DemoDetailsView() {
                 style={{ cursor: "default", whiteSpace: "nowrap" }}
                 c="white"
               >
-                {demoName}
+                <Await resolve={demo}>{(demo) => demo.name}</Await>
               </Text>
               <Tooltip label="Rename demo">
                 <ActionIcon variant="transparent" size="sm">
                   <IconPencil color="gray" />
                 </ActionIcon>
               </Tooltip>
-            </>
+            </Suspense>
           }
         />
       </AppShell.Header>
@@ -233,17 +231,17 @@ export function ErrorElement() {
 }
 
 export const loader: LoaderFunction = async ({ params }) => {
-  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-  const demoDirId = params.demoDirId!;
-  const demoDirs = getStoreValue("demoDirs");
-  const demoDirPath = demoDirs[demoDirId].path;
+  const demoPath = decodeParam(params.demoPath);
 
-  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-  const demoName = decodeURIComponent(params.demoName!);
+  if (demoPath === undefined) {
+    console.error(
+      "demoPath was undefined in demoDetailsRoute. This should not happen."
+    );
+    return redirect("/demos");
+  }
 
-  const demoPath = await join(demoDirPath, `${demoName}.dem`);
   return defer({
     demo: getDemo(demoPath),
     details: getDemoDetails(demoPath),
-  });
+  } satisfies LoaderData);
 };
