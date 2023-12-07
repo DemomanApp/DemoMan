@@ -1,8 +1,5 @@
 use serde::Serialize;
 use steamlocate::SteamDir;
-use tauri::State;
-
-use crate::AppState;
 
 #[derive(Clone, Debug, Serialize)]
 pub enum TF2DirError {
@@ -13,7 +10,7 @@ pub enum TF2DirError {
 }
 
 #[tauri::command]
-pub fn get_tf2_dir(_state: State<'_, AppState>) -> Result<String, TF2DirError> {
+pub fn get_tf2_dir() -> Result<String, TF2DirError> {
     const TF2_ID: u32 = 440;
 
     let mut steam_dir = SteamDir::locate().ok_or(TF2DirError::SteamNotFound)?;
