@@ -15,7 +15,7 @@ use crate::{
         read_demo, read_demos_in_directory, write_events_and_tags, Demo, DemoCommandError,
         DemoEvent,
     },
-    AppState,
+    DemoCache,
 };
 
 type DemoCommandResult<T> = Result<T, DemoCommandError>;
@@ -57,11 +57,11 @@ where
 #[tauri::command]
 pub async fn get_demos_in_directory(
     dir_path: &Path,
-    state: State<'_, AppState>,
+    demo_cache: State<'_, DemoCache>,
 ) -> DemoCommandResult<Vec<Arc<Demo>>> {
     log_command!("get_demos_in_directory {}", dir_path.display());
 
-    let mut demo_cache = state.demo_cache.lock().expect("Failed to lock mutex");
+    let mut demo_cache = demo_cache.lock().expect("Failed to lock mutex");
     let demos = read_demos_in_directory(dir_path)
         .or(Err(DemoCommandError::DirReadFailed))?
         .iter()
@@ -82,11 +82,11 @@ pub async fn get_demos_in_directory(
 pub async fn set_demo_events(
     demo_path: &Path,
     new_events: Vec<DemoEvent>,
-    state: State<'_, AppState>,
+    demo_cache: State<'_, DemoCache>,
 ) -> DemoCommandResult<()> {
     log_command!("set_demo_events {} {new_events:?}", demo_path.display());
 
-    let mut demo_cache = state.demo_cache.lock().expect("Failed to lock mutex");
+    let mut demo_cache = demo_cache.lock().expect("Failed to lock mutex");
     let demo = Arc::make_mut(
         demo_cache
             .get_mut(demo_path)
@@ -103,11 +103,11 @@ pub async fn set_demo_events(
 pub async fn set_demo_tags(
     demo_path: &Path,
     new_tags: Vec<String>,
-    state: State<'_, AppState>,
+    demo_cache: State<'_, DemoCache>,
 ) -> DemoCommandResult<()> {
     log_command!("set_demo_tags {} {new_tags:?}", demo_path.display());
 
-    let mut demo_cache = state.demo_cache.lock().expect("Failed to lock mutex");
+    let mut demo_cache = demo_cache.lock().expect("Failed to lock mutex");
     let demo = Arc::make_mut(
         demo_cache
             .get_mut(demo_path)
@@ -124,11 +124,11 @@ pub async fn set_demo_tags(
 pub async fn delete_demo(
     demo_path: &Path,
     trash: bool,
-    state: State<'_, AppState>,
+    demo_cache: State<'_, DemoCache>,
 ) -> DemoCommandResult<()> {
     log_command!("delete_demo {}", demo_path.display());
 
-    let mut demo_cache = state.demo_cache.lock().expect("Failed to lock mutex");
+    let mut demo_cache = demo_cache.lock().expect("Failed to lock mutex");
     let demo = demo_cache
         .get(demo_path)
         .ok_or(DemoCommandError::DemoNotFound)?;
@@ -165,11 +165,11 @@ pub async fn delete_demo(
 pub async fn move_demo(
     demo_path: &Path,
     new_path: &Path,
-    state: State<'_, AppState>,
+    demo_cache: State<'_, DemoCache>,
 ) -> DemoCommandResult<()> {
     log_command!("move_demo {} {}", demo_path.display(), new_path.display());
 
-    let mut demo_cache = state.demo_cache.lock().expect("Failed to lock mutex");
+    let mut demo_cache = demo_cache.lock().expect("Failed to lock mutex");
     let mut demo = UnwrapOrClone::unwrap_or_clone(
         demo_cache
             .remove(demo_path)
@@ -210,11 +210,11 @@ pub async fn move_demo(
 #[tauri::command]
 pub async fn get_demo(
     demo_path: &Path,
-    state: State<'_, AppState>,
+    demo_cache: State<'_, DemoCache>,
 ) -> DemoCommandResult<Arc<Demo>> {
     log_command!("get_demo {}", demo_path.display());
 
-    let mut demo_cache = state.demo_cache.lock().expect("Failed to lock mutex");
+    let mut demo_cache = demo_cache.lock().expect("Failed to lock mutex");
 
     let demo = demo_cache.entry(demo_path.into()).or_try_insert_with(|| {
         read_demo(demo_path)

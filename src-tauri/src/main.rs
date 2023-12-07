@@ -26,21 +26,14 @@ mod demo;
 #[cfg(test)]
 mod tests;
 
-pub type DemoCache = HashMap<PathBuf, Arc<Demo>>;
+pub type DemoCache = Mutex<HashMap<PathBuf, Arc<Demo>>>;
 
-#[derive(Default)]
-pub struct AppState {
-    pub demo_cache: Mutex<DemoCache>,
-
-    // We use the Mutex type provided by the tauri async runtime here
-    // because we need to hold its content across an .await point.
-    // The Mutex in std::sync will not work in this situation.
-    pub rcon_connection: AsyncMutex<Option<Connection<TcpStream>>>,
-}
+// We use the Mutex type provided by the tauri async runtime here
+// because we need to hold its content across an .await point.
+// The Mutex in std::sync will not work in this situation.
+pub type RconConnection = AsyncMutex<Option<Connection<TcpStream>>>;
 
 fn main() {
-    let state = AppState::default();
-
     tauri::Builder::default()
         .plugin(
             tauri_plugin_log::Builder::default()
@@ -54,7 +47,8 @@ fn main() {
                 })
                 .build(),
         )
-        .manage(state)
+        .manage(DemoCache::default())
+        .manage(RconConnection::default())
         .invoke_handler(tauri::generate_handler![
             commands::demos::delete_demo,
             commands::demos::get_demo_details,
