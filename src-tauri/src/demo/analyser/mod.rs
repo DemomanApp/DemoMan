@@ -80,7 +80,6 @@ pub struct HighlightPlayerSnapshot {
 }
 
 #[derive(Debug, Serialize, PartialEq)]
-#[serde(tag = "t", content = "c")]
 pub enum Highlight {
     Kill {
         killer: HighlightPlayerSnapshot,

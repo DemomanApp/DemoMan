@@ -26,7 +26,6 @@ import KillstreakIcon from "@/components/KillstreakIcon";
 import CapturePoints from "@/assets/translations/capture_points.json";
 
 import classes from "./HighlightBox.module.css";
-import { ReactNode } from "react";
 
 type HighlightProps = {
   event: Highlight;
@@ -372,35 +371,60 @@ function PauseHighlightBox({ pause }: PauseHighlight) {
   );
 }
 
+// Awful hack to get around using #[serde(tag = "...")],
+// which is unsupported by bincode.
+export type TaggedHighlight =
+  | { type: "Kill"; highlight: KillHighlight }
+  | { type: "KillStreak"; highlight: KillStreakHighlight }
+  | { type: "KillStreakEnded"; highlight: KillStreakEndedHighlight }
+  | { type: "ChatMessage"; highlight: ChatMessageHighlight }
+  | { type: "Airshot"; highlight: AirshotHighlight }
+  | { type: "CrossbowAirshot"; highlight: CrossbowAirshotHighlight }
+  | { type: "PointCaptured"; highlight: PointCapturedHighlight }
+  | { type: "RoundStalemate"; highlight: RoundStalemateHighlight }
+  | { type: "RoundStart"; highlight: RoundStartHighlight }
+  | { type: "RoundWin"; highlight: RoundWinHighlight }
+  | { type: "PlayerConnected"; highlight: PlayerConnectedHighlight }
+  | { type: "PlayerDisconnected"; highlight: PlayerDisconnectedHighlight }
+  | { type: "Pause"; highlight: PauseHighlight };
+
+function destructure(hl: Highlight): TaggedHighlight {
+  const [type, highlight] = Object.entries(hl)[0];
+  return { type, highlight } as TaggedHighlight;
+}
+
 export default function HighlightBox({ event, playerMap }: HighlightProps) {
-  if (event.t === "Kill") {
-    return KillHighlightBox(event.c);
-  } else if (event.t === "KillStreak") {
-    return KillStreakHighlightBox(event.c);
-  } else if (event.t === "KillStreakEnded") {
-    return KillStreakEndedHighlightBox(event.c);
-  } else if (event.t === "ChatMessage") {
-    return ChatMessageHighlightBox(event.c);
-  } else if (event.t === "Airshot") {
-    return AirshotHighlightBox(event.c);
-  } else if (event.t === "CrossbowAirshot") {
-    return CrossbowAirshotHighlightBox(event.c);
-  } else if (event.t === "PointCaptured") {
-    return PointCapturedHighlightBox(event.c, playerMap);
-  } else if (event.t === "RoundStalemate") {
-    return RoundStalemateHighlightBox(event.c);
-  } else if (event.t === "RoundStart") {
-    return RoundStartHighlightBox(event.c);
-  } else if (event.t === "RoundWin") {
-    return RoundWinHighlightBox(event.c);
-  } else if (event.t === "PlayerConnected") {
-    return PlayerConnectedHighlightBox(event.c, playerMap);
-  } else if (event.t === "PlayerDisconnected") {
-    return PlayerDisconnectedHighlightBox(event.c, playerMap);
-  } else if (event.t === "Pause") {
-    return PauseHighlightBox(event.c);
-  } else {
-    console.error("unknown highlight:", event);
-    return null;
+  const { type, highlight } = destructure(event);
+
+  switch (type) {
+    case "Kill":
+      return KillHighlightBox(highlight);
+    case "KillStreak":
+      return KillStreakHighlightBox(highlight);
+    case "KillStreakEnded":
+      return KillStreakEndedHighlightBox(highlight);
+    case "ChatMessage":
+      return ChatMessageHighlightBox(highlight);
+    case "Airshot":
+      return AirshotHighlightBox(highlight);
+    case "CrossbowAirshot":
+      return CrossbowAirshotHighlightBox(highlight);
+    case "PointCaptured":
+      return PointCapturedHighlightBox(highlight, playerMap);
+    case "RoundStalemate":
+      return RoundStalemateHighlightBox(highlight);
+    case "RoundStart":
+      return RoundStartHighlightBox(highlight);
+    case "RoundWin":
+      return RoundWinHighlightBox(highlight);
+    case "PlayerConnected":
+      return PlayerConnectedHighlightBox(highlight, playerMap);
+    case "PlayerDisconnected":
+      return PlayerDisconnectedHighlightBox(highlight, playerMap);
+    case "Pause":
+      return PauseHighlightBox(highlight);
+    default:
+      console.error("unknown highlight:", event);
+      return null;
   }
 }

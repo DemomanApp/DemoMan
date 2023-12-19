@@ -118,19 +118,19 @@ export type PauseHighlight = {
 };
 
 export type Highlight =
-  | { t: "Kill"; c: KillHighlight }
-  | { t: "KillStreak"; c: KillStreakHighlight }
-  | { t: "KillStreakEnded"; c: KillStreakEndedHighlight }
-  | { t: "ChatMessage"; c: ChatMessageHighlight }
-  | { t: "Airshot"; c: AirshotHighlight }
-  | { t: "CrossbowAirshot"; c: CrossbowAirshotHighlight }
-  | { t: "PointCaptured"; c: PointCapturedHighlight }
-  | { t: "RoundStalemate"; c: RoundStalemateHighlight }
-  | { t: "RoundStart"; c: RoundStartHighlight }
-  | { t: "RoundWin"; c: RoundWinHighlight }
-  | { t: "PlayerConnected"; c: PlayerConnectedHighlight }
-  | { t: "PlayerDisconnected"; c: PlayerDisconnectedHighlight }
-  | { t: "Pause"; c: PauseHighlight };
+  | { Kill: KillHighlight }
+  | { KillStreak: KillStreakHighlight }
+  | { KillStreakEnded: KillStreakEndedHighlight }
+  | { ChatMessage: ChatMessageHighlight }
+  | { Airshot: AirshotHighlight }
+  | { CrossbowAirshot: CrossbowAirshotHighlight }
+  | { PointCaptured: PointCapturedHighlight }
+  | { RoundStalemate: RoundStalemateHighlight }
+  | { RoundStart: RoundStartHighlight }
+  | { RoundWin: RoundWinHighlight }
+  | { PlayerConnected: PlayerConnectedHighlight }
+  | { PlayerDisconnected: PlayerDisconnectedHighlight }
+  | { Pause: PauseHighlight };
 
 export type HighlightEvent = {
   tick: number;
