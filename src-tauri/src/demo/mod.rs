@@ -101,6 +101,7 @@ pub struct DemoJsonFileDe {
 pub enum DemoCommandError {
     BadFilename,
     DemoNotFound,
+    DirReadFailed,
     FileCopyFailed,
     FileDeleteFailed,
     FileExists,
