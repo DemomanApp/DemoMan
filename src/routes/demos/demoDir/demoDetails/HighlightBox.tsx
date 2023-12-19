@@ -17,12 +17,16 @@ import {
   Team,
   KillStreakHighlight,
   KillStreakEndedHighlight,
+  PauseHighlight,
+  RoundStalemateHighlight,
+  RoundStartHighlight,
 } from "@/demo";
 import { KillIcon } from "@/components";
 import KillstreakIcon from "@/components/KillstreakIcon";
 import CapturePoints from "@/assets/translations/capture_points.json";
 
 import classes from "./HighlightBox.module.css";
+import { ReactNode } from "react";
 
 type HighlightProps = {
   event: Highlight;
@@ -305,13 +309,19 @@ function PointCapturedHighlightBox(
   );
 }
 
-function RoundStalemateHighlightBox() {
+function RoundStalemateHighlightBox({
+  reason: _reason,
+}: RoundStalemateHighlight) {
+  // TODO: show reason
   return (
     <div className={classes.highlightCenter}>Round ended in a stalemate</div>
   );
 }
 
-function RoundStartHighlightBox() {
+function RoundStartHighlightBox({
+  full_reset: _full_reset,
+}: RoundStartHighlight) {
+  // TODO: show full reset
   return <div className={classes.highlightCenter}>New round started</div>;
 }
 
@@ -354,12 +364,12 @@ function PlayerDisconnectedHighlightBox(
   );
 }
 
-function PauseHighlightBox() {
-  return <div className={classes.highlightCenter}>Game paused.</div>;
-}
-
-function UnpauseHighlightBox() {
-  return <div className={classes.highlightCenter}>Game resumed.</div>;
+function PauseHighlightBox({ pause }: PauseHighlight) {
+  return (
+    <div className={classes.highlightCenter}>
+      Game {pause ? "paused" : "resumed"}.
+    </div>
+  );
 }
 
 export default function HighlightBox({ event, playerMap }: HighlightProps) {
@@ -378,9 +388,9 @@ export default function HighlightBox({ event, playerMap }: HighlightProps) {
   } else if (event.t === "PointCaptured") {
     return PointCapturedHighlightBox(event.c, playerMap);
   } else if (event.t === "RoundStalemate") {
-    return RoundStalemateHighlightBox();
+    return RoundStalemateHighlightBox(event.c);
   } else if (event.t === "RoundStart") {
-    return RoundStartHighlightBox();
+    return RoundStartHighlightBox(event.c);
   } else if (event.t === "RoundWin") {
     return RoundWinHighlightBox(event.c);
   } else if (event.t === "PlayerConnected") {
@@ -388,9 +398,7 @@ export default function HighlightBox({ event, playerMap }: HighlightProps) {
   } else if (event.t === "PlayerDisconnected") {
     return PlayerDisconnectedHighlightBox(event.c, playerMap);
   } else if (event.t === "Pause") {
-    return PauseHighlightBox();
-  } else if (event.t === "Unpause") {
-    return UnpauseHighlightBox();
+    return PauseHighlightBox(event.c);
   } else {
     console.error("unknown highlight:", event);
     return null;

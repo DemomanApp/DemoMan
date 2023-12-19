@@ -118,8 +118,12 @@ pub enum Highlight {
         capturing_team: u8,
         cappers: Vec<UserId>, // snapshots aren't needed since we already know the team as part of the event
     },
-    RoundStalemate,
-    RoundStart,
+    RoundStalemate {
+        reason: u8,
+    },
+    RoundStart {
+        full_reset: bool,
+    },
     RoundWin {
         winner: u8,
         // TODO: Win reason?
@@ -131,8 +135,9 @@ pub enum Highlight {
         user_id: UserId,
         reason: String,
     },
-    Pause,
-    Unpause,
+    Pause {
+        pause: bool,
+    },
     // TODO:
     // Multikill?
     // Midair kills?
@@ -346,12 +351,12 @@ impl MessageHandler for GameDetailsAnalyser {
                 self.handle_usermessage(message, tick);
             }
             Message::SetPause(message) => {
-                let event = if message.pause {
-                    Highlight::Pause
-                } else {
-                    Highlight::Unpause
-                };
-                self.add_highlight(event, tick);
+                self.add_highlight(
+                    Highlight::Pause {
+                        pause: message.pause,
+                    },
+                    tick,
+                );
             }
             Message::ServerInfo(message) => {
                 self.local_entity_id = EntityId::from((message.player_slot as u32) + 1);
@@ -1079,14 +1084,24 @@ impl GameDetailsAnalyser {
 
     fn handle_round_stalemate_event(
         &mut self,
-        _event: &TeamPlayRoundStalemateEvent,
+        event: &TeamPlayRoundStalemateEvent,
         tick: DemoTick,
     ) {
-        self.add_highlight(Highlight::RoundStalemate, tick)
+        self.add_highlight(
+            Highlight::RoundStalemate {
+                reason: event.reason,
+            },
+            tick,
+        )
     }
 
-    fn handle_round_start_event(&mut self, _event: &TeamPlayRoundStartEvent, tick: DemoTick) {
-        self.add_highlight(Highlight::RoundStart, tick)
+    fn handle_round_start_event(&mut self, event: &TeamPlayRoundStartEvent, tick: DemoTick) {
+        self.add_highlight(
+            Highlight::RoundStart {
+                full_reset: event.full_reset,
+            },
+            tick,
+        )
     }
 
     fn handle_round_win_event(&mut self, event: &TeamPlayRoundWinEvent, tick: DemoTick) {

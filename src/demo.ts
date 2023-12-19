@@ -91,6 +91,14 @@ export type PointCapturedHighlight = {
   cappers: UserId[];
 };
 
+export type RoundStalemateHighlight = {
+  reason: number;
+};
+
+export type RoundStartHighlight = {
+  full_reset: boolean;
+};
+
 export type RoundWinHighlight = {
   winner: number;
   // TODO: Win reason?
@@ -105,6 +113,10 @@ export type PlayerDisconnectedHighlight = {
   reason: string;
 };
 
+export type PauseHighlight = {
+  pause: boolean;
+};
+
 export type Highlight =
   | { t: "Kill"; c: KillHighlight }
   | { t: "KillStreak"; c: KillStreakHighlight }
@@ -113,13 +125,12 @@ export type Highlight =
   | { t: "Airshot"; c: AirshotHighlight }
   | { t: "CrossbowAirshot"; c: CrossbowAirshotHighlight }
   | { t: "PointCaptured"; c: PointCapturedHighlight }
-  | { t: "RoundStalemate" }
-  | { t: "RoundStart" }
+  | { t: "RoundStalemate"; c: RoundStalemateHighlight }
+  | { t: "RoundStart"; c: RoundStartHighlight }
   | { t: "RoundWin"; c: RoundWinHighlight }
   | { t: "PlayerConnected"; c: PlayerConnectedHighlight }
   | { t: "PlayerDisconnected"; c: PlayerDisconnectedHighlight }
-  | { t: "Pause" }
-  | { t: "Unpause" };
+  | { t: "Pause"; c: PauseHighlight };
 
 export type HighlightEvent = {
   tick: number;
