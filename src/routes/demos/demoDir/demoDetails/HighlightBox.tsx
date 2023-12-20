@@ -1,3 +1,5 @@
+import * as log from "tauri-plugin-log-api";
+
 import { useMantineTheme } from "@mantine/core";
 
 import {
@@ -424,7 +426,7 @@ export default function HighlightBox({ event, playerMap }: HighlightProps) {
     case "Pause":
       return PauseHighlightBox(highlight);
     default:
-      console.error("unknown highlight:", event);
+      log.error(`unknown highlight: ${event}`);
       return null;
   }
 }

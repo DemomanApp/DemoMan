@@ -1,4 +1,5 @@
 import { open as openFilePicker } from "@tauri-apps/api/dialog";
+import * as log from "tauri-plugin-log-api";
 
 import { Button } from "@mantine/core";
 
@@ -36,7 +37,9 @@ export default function PathPicker({
               }
               return;
             })
-            .catch((error) => console.error(error))
+            .catch((error) =>
+              log.error(`An error occurred in openFilePicker: ${error}`)
+            )
         }
       >
         Browse...

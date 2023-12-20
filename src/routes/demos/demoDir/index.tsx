@@ -11,6 +11,7 @@ import {
 } from "react-router-dom";
 
 import { shell } from "@tauri-apps/api";
+import * as log from "tauri-plugin-log-api";
 
 import { Alert, AppShell, Menu } from "@mantine/core";
 import {
@@ -149,7 +150,7 @@ export const loader: LoaderFunction = async ({ params }) => {
   const demoDirPath = decodeParam(params.demoDirPath);
 
   if (demoDirPath === undefined) {
-    console.error(
+    log.error(
       "demoDirPath was undefined in demoDirRoute. This should not happen."
     );
     return redirect("/demos");

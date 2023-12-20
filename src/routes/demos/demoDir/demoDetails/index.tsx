@@ -8,6 +8,8 @@ import {
   redirect,
 } from "react-router-dom";
 
+import * as log from "tauri-plugin-log-api";
+
 import {
   ActionIcon,
   Alert,
@@ -234,7 +236,7 @@ export const loader: LoaderFunction = async ({ params }) => {
   const demoPath = decodeParam(params.demoPath);
 
   if (demoPath === undefined) {
-    console.error(
+    log.error(
       "demoPath was undefined in demoDetailsRoute. This should not happen."
     );
     return redirect("/demos");
