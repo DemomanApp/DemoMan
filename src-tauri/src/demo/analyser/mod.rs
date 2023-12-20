@@ -58,7 +58,7 @@ pub enum PlayerLifeState {
     Respawnable = 3,
 }
 
-#[derive(Debug, Serialize, PartialEq)]
+#[derive(Debug, Serialize, Deserialize, PartialEq)]
 pub struct HighlightEvent {
     tick: DemoTick,
     event: Highlight,
@@ -66,7 +66,7 @@ pub struct HighlightEvent {
 
 /// Snapshot of a player at the time a highlight occurred so highlights will display using the
 /// correct team colors.
-#[derive(Debug, Serialize, PartialEq)]
+#[derive(Debug, Serialize, Deserialize, PartialEq)]
 pub struct HighlightPlayerSnapshot {
     /// The ID of the player.
     user_id: UserId,
@@ -79,7 +79,7 @@ pub struct HighlightPlayerSnapshot {
     team: Team,
 }
 
-#[derive(Debug, Serialize, PartialEq)]
+#[derive(Debug, Serialize, Deserialize, PartialEq)]
 pub enum Highlight {
     Kill {
         killer: HighlightPlayerSnapshot,
@@ -143,7 +143,7 @@ pub enum Highlight {
     // Flicks?
 }
 
-#[derive(Default, Debug, Serialize)]
+#[derive(Default, Debug, Deserialize, Serialize, PartialEq)]
 pub struct GameSummary {
     pub local_user_id: UserId,
     pub highlights: Vec<HighlightEvent>,
@@ -181,7 +181,7 @@ pub struct Scoreboard {
 #[derive(Debug, Default)]
 pub struct PlayerState {
     name: String,
-    steam_id: SteamID,
+    steam_id: u64,
     user_id: UserId,
 
     team: Team,
@@ -260,10 +260,10 @@ impl PlayerState {
     }
 }
 
-#[derive(Debug, Default, Serialize)]
+#[derive(Debug, Default, Deserialize, Serialize, PartialEq)]
 pub struct PlayerSummary {
     name: String,
-    steam_id: SteamID,
+    steam_id: u64,
     user_id: UserId,
 
     team: Team,
@@ -832,8 +832,9 @@ impl GameDetailsAnalyser {
                 .or_default();
 
             player.name = user_info.player_info.name;
-            player.steam_id =
-                SteamID::from_steam3(&user_info.player_info.steam_id).unwrap_or_default();
+            player.steam_id = SteamID::from_steam3(&user_info.player_info.steam_id)
+                .unwrap_or_default()
+                .into();
             player.user_id = user_info.player_info.user_id;
         }
     }

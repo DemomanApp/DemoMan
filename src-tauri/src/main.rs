@@ -9,7 +9,7 @@ use std::{
     sync::{Arc, Mutex},
 };
 
-use tauri::async_runtime::Mutex as AsyncMutex;
+use tauri::{async_runtime::Mutex as AsyncMutex, Manager};
 use tauri_plugin_log::{
     fern::colors::{Color, ColoredLevelConfig},
     LogTarget,
@@ -18,7 +18,7 @@ use tauri_plugin_log::{
 use rcon::Connection;
 use tokio::net::TcpStream;
 
-use demo::Demo;
+use demo::{analyser::GameSummary, cache::DiskCache, Demo};
 
 mod commands;
 mod demo;
@@ -49,6 +49,16 @@ fn main() {
         )
         .manage(DemoCache::default())
         .manage(RconConnection::default())
+        .setup(|app| {
+            let cache_path = app
+                .path_resolver()
+                .app_cache_dir()
+                .ok_or("Failed to resolve cache directory")?;
+
+            app.manage(DiskCache::<GameSummary>::at_path(cache_path.join("parsed")));
+
+            Ok(())
+        })
         .invoke_handler(tauri::generate_handler![
             commands::demos::delete_demo,
             commands::demos::get_demo_details,

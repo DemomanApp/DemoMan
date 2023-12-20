@@ -7,18 +7,18 @@ use std::{
     vec::Vec,
 };
 
+use log::info;
 use tauri::State;
 
 use crate::{
     demo::{
-        analyser::{GameDetailsAnalyser, GameSummary},
-        read_demo, read_demos_in_directory, write_events_and_tags, Demo, DemoCommandError,
-        DemoEvent,
+        analyser::GameSummary, cache::DiskCache, read_demo, read_demo_details,
+        read_demos_in_directory, write_events_and_tags, Demo, DemoCommandError, DemoEvent,
     },
     DemoCache,
 };
 
-type DemoCommandResult<T> = Result<T, DemoCommandError>;
+pub type DemoCommandResult<T> = Result<T, DemoCommandError>;
 
 /// Log the invocation of a tauri command
 macro_rules! log_command {
@@ -226,20 +226,21 @@ pub async fn get_demo(
 }
 
 #[tauri::command]
-pub async fn get_demo_details(demo_path: &Path) -> DemoCommandResult<GameSummary> {
-    log_command!("get_demo_details {}", demo_path.display());
+pub async fn get_demo_details(
+    demo_path: &str,
+    disk_cache: State<'_, DiskCache<GameSummary>>,
+) -> DemoCommandResult<GameSummary> {
+    log_command!("get_demo_details {}", demo_path);
 
-    let file = std::fs::read(demo_path).or(Err(DemoCommandError::FileReadFailed))?;
-    let demo = tf_demo_parser::Demo::new(&file);
+    match disk_cache.get(demo_path).await {
+        Some(game_summary) => Ok(game_summary),
+        None => {
+            info!("Cache miss");
+            let game_summary = read_demo_details(Path::new(demo_path))?;
 
-    // TODO:
-    // Construct the parser with arguments from the frontend
-    // which specify the type of events to look for, or other options.
+            disk_cache.set(demo_path, &game_summary).await;
 
-    let analyser = GameDetailsAnalyser::default();
-
-    let parser = tf_demo_parser::DemoParser::new_all_with_analyser(demo.get_stream(), analyser);
-    let (_header, state) = parser.parse().or(Err(DemoCommandError::ParsingFailed))?;
-
-    Ok(state)
+            Ok(game_summary)
+        }
+    }
 }

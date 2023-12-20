@@ -10,9 +10,15 @@ use bitbuffer::BitRead;
 use log::warn;
 use serde::{Deserialize, Serialize};
 
-use self::errors::DemoReadError;
+use crate::commands::demos::DemoCommandResult;
+
+use self::{
+    analyser::{GameDetailsAnalyser, GameSummary},
+    errors::DemoReadError,
+};
 
 pub mod analyser;
+pub mod cache;
 pub mod errors;
 
 pub const HEADER_SIZE: usize = 8 + 4 + 4 + 260 + 260 + 260 + 260 + 4 + 4 + 4 + 4;
@@ -32,7 +38,7 @@ pub struct DemoEvent {
     pub tick: u64,
 }
 
-#[derive(Clone, Debug, Serialize)]
+#[derive(Clone, Debug, Deserialize, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Demo {
     pub name: String,
@@ -213,7 +219,7 @@ pub fn write_events_and_tags(
     json_path: &Path,
     events: &Vec<DemoEvent>,
     tags: &Vec<String>,
-) -> Result<(), DemoCommandError> {
+) -> DemoCommandResult<()> {
     if events.is_empty() && tags.is_empty() {
         fs::remove_file(json_path).or(Err(DemoCommandError::FileWriteFailed))?;
         return Ok(());
@@ -237,4 +243,16 @@ pub fn write_events_and_tags(
     file.write_all(&serializer.into_inner())
         .or(Err(DemoCommandError::FileWriteFailed))?;
     Ok(())
+}
+
+pub fn read_demo_details(path: &Path) -> DemoCommandResult<GameSummary> {
+    let file = std::fs::read(path).or(Err(DemoCommandError::FileReadFailed))?;
+    let demo = tf_demo_parser::Demo::new(&file);
+
+    let analyser = GameDetailsAnalyser::default();
+
+    let parser = tf_demo_parser::DemoParser::new_all_with_analyser(demo.get_stream(), analyser);
+    let (_header, state) = parser.parse().or(Err(DemoCommandError::ParsingFailed))?;
+
+    Ok(state)
 }

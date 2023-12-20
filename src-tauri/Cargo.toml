@@ -13,7 +13,9 @@ rust-version = "1.71"
 tauri-build = { version = "1.5", features = [] }
 
 [dependencies]
+bincode = "1.3.3"
 bitbuffer = "0.10"
+cacache = { version = "12.0.0", default-features = false, features = ["tokio-runtime", "mmap"] }
 log = "0.4"
 num-derive = "0.4"
 num-traits = "0.2"
