@@ -1219,3 +1219,27 @@ fn test_parser() {
     let (header, state) = parser.parse().expect("Parsing failed");
     println!("HEADER: {header:#?}\nSTATE: {state:#?}");
 }
+
+#[test]
+fn test_bincode() {
+    let fallback_path: String = "src/tests/data/demos/test_demo.dem".into();
+    let args: Vec<String> = std::env::args().collect();
+    let path = args
+        .iter()
+        .enumerate()
+        .find(|(_index, arg)| *arg == "--path")
+        .and_then(|(index, _arg)| args.get(index + 1))
+        .unwrap_or(&fallback_path);
+    let file = std::fs::read(path).expect("Failed to read file");
+    let demo = tf_demo_parser::Demo::new(&file);
+    let parser = tf_demo_parser::DemoParser::new_all_with_analyser(
+        demo.get_stream(),
+        GameDetailsAnalyser::default(),
+    );
+    let (_header, state) = parser.parse().expect("Parsing failed");
+
+    let bytes = bincode::serialize(&state).unwrap();
+    let decoded: GameSummary = bincode::deserialize(&bytes).unwrap();
+
+    assert_eq!(decoded, state);
+}

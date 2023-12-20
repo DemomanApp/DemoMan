@@ -90,3 +90,34 @@ impl<T: DeserializeOwned + Serialize> DiskCache<T> {
         cacache::write(&self.cache_path, key, bytes).await.unwrap();
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::DiskCache;
+    use serde::{Deserialize, Serialize};
+
+    #[derive(Debug, Default, Deserialize, Serialize, PartialEq)]
+    struct TestStruct {
+        int: usize,
+        string: String,
+        array: [usize; 3],
+        hashmap: std::collections::HashMap<String, String>,
+        tuple: (usize, usize),
+    }
+
+    #[tokio::test]
+    async fn test_cache_roundtrip() {
+        let path = std::env::temp_dir().join("demoman_cache_test");
+        let cache = DiskCache::at_path(path.clone());
+
+        let original = TestStruct::default();
+        cache.set("test_key", &original).await;
+        let read_back = cache.get("test_key").await;
+
+        // Clean up even if the test fails
+        tokio::fs::remove_dir_all(path).await.unwrap();
+        let read_back = read_back.expect("get failed");
+
+        assert_eq!(original, read_back);
+    }
+}
