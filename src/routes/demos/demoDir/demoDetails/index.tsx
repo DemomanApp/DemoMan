@@ -90,7 +90,7 @@ export default function DemoDetailsView() {
             {(demo: Demo) => (
               <Container className={classes.container}>
                 <Stack style={{ height: "100%" }}>
-                  <Group>
+                  <Group align="stretch">
                     <Paper
                       radius="md"
                       withBorder
@@ -117,7 +117,6 @@ export default function DemoDetailsView() {
                     </Paper>
                     <Stack
                       style={{
-                        height: "100%",
                         justifyContent: "space-between",
                         alignItems: "flex-start",
                       }}
