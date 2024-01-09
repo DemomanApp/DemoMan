@@ -1,13 +1,9 @@
 import { createBrowserRouter } from "react-router-dom";
 
 import DemosRoute from "./demos";
-import DemoDirRoute, {
-  loader as demoDirLoader,
-  ErrorElement as DemoDirErrorElement,
-} from "./demos/demoDir";
+import DemoDirRoute, { loader as demoDirLoader } from "./demos/demoDir";
 import DemoDetailsRoute, {
   loader as demoDetailsLoader,
-  ErrorElement as DemoDetailsErrorElement,
 } from "./demos/demoDir/demoDetails";
 import SettingsView from "./settings";
 import RconSetup from "./rconSetup";
@@ -34,13 +30,11 @@ export default createBrowserRouter([
             path: "dir/:demoDirPath",
             element: <DemoDirRoute />,
             loader: demoDirLoader,
-            errorElement: <DemoDirErrorElement />,
           },
           {
             path: "show/:demoPath",
             element: <DemoDetailsRoute />,
             loader: demoDetailsLoader,
-            errorElement: <DemoDetailsErrorElement />,
           },
         ],
       },

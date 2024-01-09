@@ -5,8 +5,8 @@ import {
   LoaderFunction,
   defer,
   redirect,
+  useAsyncError,
   useLoaderData,
-  useRouteError,
   useSearchParams,
 } from "react-router-dom";
 
@@ -19,6 +19,7 @@ import {
   IconSettings,
   IconPlug,
   IconFolder,
+  IconAlertCircle,
 } from "@tabler/icons-react";
 
 import { Demo } from "@/demo";
@@ -133,14 +134,16 @@ export default () => {
   );
 };
 
-export function ErrorElement() {
-  const error = useRouteError();
+function ErrorElement() {
+  const error = useAsyncError();
   return (
     <Fill>
-      <Alert color="red">
-        An error occurred while scanning for demo files. Is the demo storage
-        directory set?
-        <div>Error: {String(error)}</div>
+      <Alert
+        icon={<IconAlertCircle size={16} />}
+        title="An error occurred while scanning for demo files"
+        color="red"
+      >
+        {String(error)}
       </Alert>
     </Fill>
   );

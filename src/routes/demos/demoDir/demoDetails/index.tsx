@@ -4,8 +4,8 @@ import {
   LoaderFunction,
   defer,
   useLoaderData,
-  useRouteError,
   redirect,
+  useAsyncError,
 } from "react-router-dom";
 
 import * as log from "tauri-plugin-log-api";
@@ -15,7 +15,6 @@ import {
   Alert,
   AppShell,
   Button,
-  Center,
   Container,
   Group,
   List,
@@ -41,7 +40,7 @@ import {
 
 import { getDemo, getDemoDetails, sendCommand } from "@/api";
 import { HeaderBar } from "@/AppShell";
-import { AsyncButton, MapThumbnail, LoaderFallback } from "@/components";
+import { AsyncButton, MapThumbnail, LoaderFallback, Fill } from "@/components";
 import { formatFileSize, formatDuration, decodeParam } from "@/util";
 import PlayerList from "./PlayerList";
 import { Demo, GameSummary } from "@/demo";
@@ -216,18 +215,18 @@ export default function DemoDetailsView() {
   );
 }
 
-export function ErrorElement() {
-  const error = useRouteError();
+function ErrorElement() {
+  const error = useAsyncError();
   return (
-    <Center style={{ height: "100%" }}>
+    <Fill>
       <Alert
         icon={<IconAlertCircle size={16} />}
-        title="Error loading demo"
+        title="An error occured while loading this demo"
         color="red"
       >
-        An error occured while loading this demo: {String(error)}
+        {String(error)}
       </Alert>
-    </Center>
+    </Fill>
   );
 }
 
