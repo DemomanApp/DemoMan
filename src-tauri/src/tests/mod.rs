@@ -31,11 +31,11 @@ fn test_demo_loading() {
     let demo = &demos[0];
 
     assert_eq!(demo.name, "test_demo");
-    assert_eq!(demo.filesize, 56583563);
+    assert_eq!(demo.filesize, 56_583_563);
     assert_eq!(demo.server_name, "kroket.fakkelbrigade.eu:27115".to_owned());
     assert_eq!(demo.client_name, "Narcha".to_owned());
     assert_eq!(demo.map_name, "cp_process_f5".to_owned());
-    assert_eq!(demo.num_ticks, 182206);
+    assert_eq!(demo.num_ticks, 182_206);
     assert_eq!(
         demo.events,
         vec![DemoEvent {
