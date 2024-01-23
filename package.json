@@ -9,7 +9,7 @@
     "typecheck": "tsc --noEmit",
     "test:rust": "cargo test",
     "test": "npm run test:rust",
-    "lint:rust": "cargo clippy",
+    "lint:rust": "cargo clippy -- -D warnings",
     "lint:js": "eslint . --cache",
     "lint:css": "stylelint --cache src/**/*.css",
     "lint": "npm run lint:js && npm run lint:css && npm run lint:rust",
