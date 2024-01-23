@@ -6,6 +6,7 @@
 #![deny(clippy::needless_pass_by_value)]
 #![deny(clippy::trivially_copy_pass_by_ref)]
 #![deny(clippy::semicolon_if_nothing_returned)]
+#![deny(clippy::redundant_closure_for_method_calls)]
 
 use std::{
     collections::HashMap,

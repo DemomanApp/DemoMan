@@ -374,7 +374,7 @@ impl MessageHandler for GameDetailsAnalyser {
         if table == "userinfo" {
             self.parse_user_info(
                 index,
-                entry.text.as_ref().map(|s| s.as_ref()),
+                entry.text.as_ref().map(AsRef::as_ref),
                 entry.extra_data.as_ref().map(|data| data.data.clone()),
             );
         }
@@ -488,7 +488,7 @@ impl GameDetailsAnalyser {
         let class_name: &str = self
             .class_names
             .get(usize::from(entity.server_class))
-            .map(|class_name| class_name.as_str())
+            .map(ServerClassName::as_str)
             .unwrap_or("");
         match class_name {
             "CTFPlayer" => self.handle_player_entity(entity, parser_state, tick),
