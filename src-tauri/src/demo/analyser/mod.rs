@@ -46,7 +46,6 @@ use tf_demo_parser::{
 pub use custom_damage::CustomDamage;
 pub use damage_flag::DamageFlag;
 pub use player_condition::PlayerCondition;
-pub use player_flag::PlayerFlag;
 pub use weapon_class::WeaponClass;
 
 #[derive(Debug, Default, Clone, Copy, Serialize, Deserialize, PartialEq, FromPrimitive)]
