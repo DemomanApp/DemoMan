@@ -37,7 +37,7 @@ impl<T: Clone> UnwrapOrClone<T> for Arc<T> {
     }
 }
 
-/// Fallible variant of [or_insert_with](std::collections::hash_map::Entry::or_insert_with)
+/// Fallible variant of [`or_insert_with`](std::collections::hash_map::Entry::or_insert_with)
 trait OrTryInsertWith<'a, V, F: FnOnce() -> Result<V, E>, E> {
     fn or_try_insert_with(self, default: F) -> Result<&'a mut V, E>;
 }

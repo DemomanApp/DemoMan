@@ -8,7 +8,7 @@ use std::cmp::Ordering;
 use std::str::FromStr;
 use std::{collections::HashMap, convert::TryFrom};
 
-use log::info;
+use log::{info, warn};
 use num_derive::FromPrimitive;
 use num_traits::FromPrimitive;
 use serde::{Deserialize, Serialize};
@@ -564,6 +564,7 @@ impl GameDetailsAnalyser {
             if let Some((table_name, prop_name)) = prop.identifier.names() {
                 if let Ok(entity_id) = u32::from_str(prop_name.as_str()) {
                     if let Some(player) = self.get_player_of_entity_mut(EntityId::from(entity_id)) {
+                        #[allow(clippy::match_same_arms)]
                         match table_name.as_str() {
                             "m_iTeam" => {
                                 let new_team =
@@ -595,6 +596,7 @@ impl GameDetailsAnalyser {
         }
     }
 
+    #[allow(clippy::too_many_lines)]
     pub fn handle_player_entity(
         &mut self,
         entity: &PacketEntity,
@@ -666,6 +668,7 @@ impl GameDetailsAnalyser {
                 SendPropIdentifier::new("DT_TFPlayerScoringDataExclusive", "m_iPoints");
 
             for prop in entity.props(parser_state) {
+                #[allow(clippy::cast_sign_loss, clippy::cast_possible_truncation)]
                 match prop.identifier {
                     LIFE_STATE_PROP => {
                         player.life_state = PlayerLifeState::from_i64(
@@ -757,6 +760,7 @@ impl GameDetailsAnalyser {
             SendPropIdentifier::new("DT_BaseCombatWeapon", "m_hOwner");
 
         for prop in entity.props(parser_state) {
+            #[allow(clippy::cast_sign_loss, clippy::cast_possible_truncation)]
             match prop.identifier {
                 CHARGE_PROP | LOCAL_CHARGE_PROP => {
                     let charge = f32::try_from(&prop.value).unwrap_or_default();
@@ -784,6 +788,7 @@ impl GameDetailsAnalyser {
         const TEAM_SCORE_PROP: SendPropIdentifier = SendPropIdentifier::new("DT_Team", "m_iScore");
 
         for prop in entity.props(parser_state) {
+            #[allow(clippy::cast_sign_loss, clippy::cast_possible_truncation)]
             match prop.identifier {
                 TEAM_NUM_PROP => {
                     let team_num = i64::try_from(&prop.value).unwrap_or_default() as u8;
@@ -812,8 +817,12 @@ impl GameDetailsAnalyser {
     }
 
     fn parse_user_info(&mut self, index: usize, text: Option<&str>, data: Option<Stream>) {
+        let Ok(index) = index.try_into() else {
+            warn!("Index out of bounds in parse_user_info");
+            return;
+        };
         if let Ok(Some(user_info)) =
-            tf_demo_parser::demo::data::UserInfo::parse_from_string_table(index as u16, text, data)
+            tf_demo_parser::demo::data::UserInfo::parse_from_string_table(index, text, data)
         {
             // Remember who this player entity belongs to.
             // If a player leaves and someone else joins,
@@ -882,6 +891,8 @@ impl GameDetailsAnalyser {
         }
     }
 
+    // TODO: refactor to remove the following line
+    #[allow(clippy::too_many_lines)]
     fn handle_player_death_event(&mut self, event: &PlayerDeathEvent, tick: DemoTick) {
         let killer_id = UserId::from(event.attacker);
         let maybe_assister_id = if event.assister == u16::MAX {

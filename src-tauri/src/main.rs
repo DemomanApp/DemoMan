@@ -2,17 +2,10 @@
     all(not(debug_assertions), target_os = "windows"),
     windows_subsystem = "windows"
 )]
-#![deny(clippy::enum_glob_use)]
-#![deny(clippy::needless_pass_by_value)]
-#![deny(clippy::trivially_copy_pass_by_ref)]
-#![deny(clippy::semicolon_if_nothing_returned)]
-#![deny(clippy::redundant_closure_for_method_calls)]
-#![deny(clippy::map_unwrap_or)]
-#![deny(clippy::redundant_else)]
-#![deny(clippy::cloned_instead_of_copied)]
-#![deny(clippy::cast_lossless)]
-#![deny(clippy::cast_possible_wrap)]
-#![deny(clippy::single_match_else)]
+#![deny(clippy::pedantic)]
+#![allow(clippy::module_name_repetitions)]
+// Disabled because of false positives inside tauri macros
+#![allow(clippy::used_underscore_binding)]
 
 use std::{
     collections::HashMap,
