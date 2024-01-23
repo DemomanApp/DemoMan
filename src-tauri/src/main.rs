@@ -11,6 +11,7 @@
 #![deny(clippy::redundant_else)]
 #![deny(clippy::cloned_instead_of_copied)]
 #![deny(clippy::cast_lossless)]
+#![deny(clippy::cast_possible_wrap)]
 
 use std::{
     collections::HashMap,

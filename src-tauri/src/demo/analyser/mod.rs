@@ -884,7 +884,7 @@ impl GameDetailsAnalyser {
 
     fn handle_player_death_event(&mut self, event: &PlayerDeathEvent, tick: DemoTick) {
         let killer_id = UserId::from(event.attacker);
-        let maybe_assister_id = if (event.assister as i16) == -1 {
+        let maybe_assister_id = if event.assister == u16::MAX {
             None
         } else {
             Some(UserId::from(event.assister))
