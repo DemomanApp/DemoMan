@@ -232,15 +232,14 @@ pub async fn get_demo_details(
 ) -> DemoCommandResult<GameSummary> {
     log_command!("get_demo_details {}", demo_path);
 
-    match disk_cache.get(demo_path).await {
-        Some(game_summary) => Ok(game_summary),
-        None => {
-            info!("Cache miss");
-            let game_summary = read_demo_details(Path::new(demo_path))?;
+    if let Some(game_summary) = disk_cache.get(demo_path).await {
+        Ok(game_summary)
+    } else {
+        info!("Cache miss");
+        let game_summary = read_demo_details(Path::new(demo_path))?;
 
-            disk_cache.set(demo_path, &game_summary).await;
+        disk_cache.set(demo_path, &game_summary).await;
 
-            Ok(game_summary)
-        }
+        Ok(game_summary)
     }
 }

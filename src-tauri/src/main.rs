@@ -12,6 +12,7 @@
 #![deny(clippy::cloned_instead_of_copied)]
 #![deny(clippy::cast_lossless)]
 #![deny(clippy::cast_possible_wrap)]
+#![deny(clippy::single_match_else)]
 
 use std::{
     collections::HashMap,
