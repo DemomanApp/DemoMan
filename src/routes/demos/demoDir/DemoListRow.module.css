@@ -36,7 +36,7 @@
 
   &[data-selected="true"] {
     box-shadow: 0 0 0 2px
-      light-dark(var(--mantine-color-blue-6), var(--mantine-color-blue-5));
+      light-dark(var(--mantine-primary-color-6), var(--mantine-primary-color-5));
     background-color: var(--mantine-primary-color-light);
   }
 }
