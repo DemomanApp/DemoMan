@@ -357,7 +357,7 @@ impl MessageHandler for GameDetailsAnalyser {
                 );
             }
             Message::ServerInfo(message) => {
-                self.local_entity_id = EntityId::from((message.player_slot as u32) + 1);
+                self.local_entity_id = EntityId::from(u32::from(message.player_slot) + 1);
                 self.interval_per_tick = message.interval_per_tick;
             }
             _ => {}
@@ -768,7 +768,7 @@ impl GameDetailsAnalyser {
                     }
                 }
                 OWNER_PROP => {
-                    let owner_id = i64::try_from(&prop.value).unwrap_or_default() as u8 as u32;
+                    let owner_id = u32::from(i64::try_from(&prop.value).unwrap_or_default() as u8);
                     if self.mediguns.get(&entity.entity_index.into()).is_none() {
                         self.mediguns
                             .insert(entity.entity_index.into(), EntityId::from(owner_id));
@@ -1056,14 +1056,14 @@ impl GameDetailsAnalyser {
 
         // TODO: reconsider if we need this at all.
 
-        let target_id = UserId::from(event.target as u16);
+        let target_id = UserId::from(u16::from(event.target));
 
         if let Some(target_player) = self.players.get(&target_id) {
             if target_player.has_cond(PlayerCondition::TF_COND_BLASTJUMPING) {
                 self.add_highlight(
                     Highlight::CrossbowAirshot {
-                        healer: self.player_snapshot(UserId::from(event.healer as u16)),
-                        target: self.player_snapshot(UserId::from(event.target as u16)),
+                        healer: self.player_snapshot(UserId::from(u16::from(event.healer))),
+                        target: self.player_snapshot(UserId::from(u16::from(event.target))),
                     },
                     tick,
                 );
