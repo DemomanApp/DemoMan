@@ -61,7 +61,7 @@ impl Demo {
         header: tf_demo_parser::demo::header::Header,
         events: Vec<DemoEvent>,
         tags: Vec<String>,
-        metadata: fs::Metadata,
+        metadata: &fs::Metadata,
     ) -> Self {
         Self {
             name,
@@ -189,7 +189,7 @@ pub fn read_demo(path: &Path) -> Result<Demo, DemoReadError> {
         header,
         events,
         tags,
-        metadata,
+        &metadata,
     ))
 }
 
