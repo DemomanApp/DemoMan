@@ -215,8 +215,8 @@ pub struct PlayerState {
 
 #[allow(dead_code)]
 impl PlayerState {
-    pub fn has_cond(&self, cond: &PlayerCondition) -> bool {
-        let cond = *cond as u32;
+    pub fn has_cond(&self, cond: PlayerCondition) -> bool {
+        let cond = cond as u32;
         if cond < 32 {
             // All conditions with index <32 are stored in `player_cond`,
             // except for TF_COND_CRITBOOSTED, which is stored in bit 11
@@ -237,7 +237,7 @@ impl PlayerState {
         let mut conditions = Vec::new();
         for i in 0..128u32 {
             if let Some(cond) = PlayerCondition::from_u32(i) {
-                if self.has_cond(&cond) {
+                if self.has_cond(cond) {
                     conditions.push(cond);
                 }
             }
@@ -473,9 +473,9 @@ impl GameDetailsAnalyser {
     //     self.player_entities.get(entity_id).and_then(|user_id| self.players.get(user_id))
     // }
 
-    fn get_player_of_entity_mut(&mut self, entity_id: &EntityId) -> Option<&mut PlayerState> {
+    fn get_player_of_entity_mut(&mut self, entity_id: EntityId) -> Option<&mut PlayerState> {
         self.player_entities
-            .get(entity_id)
+            .get(&entity_id)
             .and_then(|user_id| self.players.get_mut(user_id))
     }
 
@@ -564,8 +564,7 @@ impl GameDetailsAnalyser {
         for prop in entity.props(parser_state) {
             if let Some((table_name, prop_name)) = prop.identifier.names() {
                 if let Ok(entity_id) = u32::from_str(prop_name.as_str()) {
-                    if let Some(player) = self.get_player_of_entity_mut(&EntityId::from(entity_id))
-                    {
+                    if let Some(player) = self.get_player_of_entity_mut(EntityId::from(entity_id)) {
                         match table_name.as_str() {
                             "m_iTeam" => {
                                 let new_team =
@@ -605,7 +604,7 @@ impl GameDetailsAnalyser {
     ) {
         let current_round = self.current_round;
 
-        if let Some(player) = self.get_player_of_entity_mut(&entity.entity_index) {
+        if let Some(player) = self.get_player_of_entity_mut(entity.entity_index) {
             const LIFE_STATE_PROP: SendPropIdentifier =
                 SendPropIdentifier::new("DT_BasePlayer", "m_lifeState");
 
@@ -764,7 +763,7 @@ impl GameDetailsAnalyser {
                     let charge = f32::try_from(&prop.value).unwrap_or_default();
                     if let Some(owner_id) = self.mediguns.get(&entity.entity_index.into()).copied()
                     {
-                        if let Some(owner) = self.get_player_of_entity_mut(&owner_id) {
+                        if let Some(owner) = self.get_player_of_entity_mut(owner_id) {
                             owner.charge = (charge * 100.0).round() as u8;
                         }
                     }
@@ -862,7 +861,7 @@ impl GameDetailsAnalyser {
         (self.is_stv ||
                 self.player_entities.get(&self.local_entity_id) == Some(&attacker_id)) &&
             // Victim is currently blastjumping
-            victim.has_cond(&PlayerCondition::TF_COND_BLASTJUMPING) &&
+            victim.has_cond(PlayerCondition::TF_COND_BLASTJUMPING) &&
             victim_id != attacker_id &&
             // Only count hits with certain weapons
             matches!(
@@ -901,7 +900,7 @@ impl GameDetailsAnalyser {
 
         if let Some(victim) = victim {
             drop = victim.charge == 100;
-            airshot = victim.has_cond(&PlayerCondition::TF_COND_BLASTJUMPING);
+            airshot = victim.has_cond(PlayerCondition::TF_COND_BLASTJUMPING);
             victim.handle_life_end(tick);
         } else {
             drop = false;
@@ -1062,7 +1061,7 @@ impl GameDetailsAnalyser {
         let target_id = UserId::from(event.target as u16);
 
         if let Some(target_player) = self.players.get(&target_id) {
-            if target_player.has_cond(&PlayerCondition::TF_COND_BLASTJUMPING) {
+            if target_player.has_cond(PlayerCondition::TF_COND_BLASTJUMPING) {
                 self.add_highlight(
                     Highlight::CrossbowAirshot {
                         healer: self.player_snapshot(UserId::from(event.healer as u16)),

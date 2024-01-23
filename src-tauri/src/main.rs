@@ -2,6 +2,7 @@
     all(not(debug_assertions), target_os = "windows"),
     windows_subsystem = "windows"
 )]
+#![deny(clippy::trivially_copy_pass_by_ref)]
 
 use std::{
     collections::HashMap,

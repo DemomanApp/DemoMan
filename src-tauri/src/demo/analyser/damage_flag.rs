@@ -36,7 +36,7 @@ pub enum DamageFlag {
 }
 
 impl DamageFlag {
-    pub const fn bitmask(&self) -> u32 {
-        1 << (*self as u32)
+    pub const fn bitmask(self) -> u32 {
+        1 << (self as u32)
     }
 }
