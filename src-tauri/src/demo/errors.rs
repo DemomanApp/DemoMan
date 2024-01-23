@@ -1,4 +1,4 @@
-use std::io;
+use std::io::{self, ErrorKind};
 
 use serde::Serialize;
 
@@ -15,11 +15,10 @@ pub enum DemoReadError {
 
 impl From<io::Error> for DemoReadError {
     fn from(e: io::Error) -> Self {
-        use std::io::ErrorKind::*;
         match e.kind() {
-            NotFound => Self::FileNotFound,
-            PermissionDenied => Self::FileNotReadable,
-            UnexpectedEof => Self::InvalidHeader,
+            ErrorKind::NotFound => Self::FileNotFound,
+            ErrorKind::PermissionDenied => Self::FileNotReadable,
+            ErrorKind::UnexpectedEof => Self::InvalidHeader,
             _ => Self::OtherIOError,
         }
     }

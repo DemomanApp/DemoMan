@@ -855,7 +855,6 @@ impl GameDetailsAnalyser {
 
         let weapon = WeaponClass::from_u16(event.weapon_id).unwrap_or_default();
 
-        use WeaponClass::*;
         if
         // In POV demos, only record airshots performed by the local player.
         (self.is_stv ||
@@ -866,12 +865,12 @@ impl GameDetailsAnalyser {
             // Only count hits with certain weapons
             matches!(
                 weapon,
-                TF_WEAPON_ROCKETLAUNCHER |
-                    TF_WEAPON_ROCKETLAUNCHER_DIRECTHIT |
-                    TF_WEAPON_PARTICLE_CANNON | // Cow mangler
-                    TF_WEAPON_GRENADELAUNCHER |
-                    TF_WEAPON_CANNON | // Loose cannon
-                    TF_WEAPON_CROSSBOW
+                WeaponClass::TF_WEAPON_ROCKETLAUNCHER |
+                    WeaponClass::TF_WEAPON_ROCKETLAUNCHER_DIRECTHIT |
+                    WeaponClass::TF_WEAPON_PARTICLE_CANNON | // Cow mangler
+                    WeaponClass::TF_WEAPON_GRENADELAUNCHER |
+                    WeaponClass::TF_WEAPON_CANNON | // Loose cannon
+                    WeaponClass::TF_WEAPON_CROSSBOW
             )
         {
             self.add_highlight(
@@ -912,16 +911,16 @@ impl GameDetailsAnalyser {
 
         // Substitute the kill icon according to the kill flags, if necessary.
         if let Some(custom_kill) = CustomDamage::from_u16(event.custom_kill) {
-            use CustomDamage::*;
             match custom_kill {
-                TF_DMG_CUSTOM_BACKSTAB => {
+                CustomDamage::TF_DMG_CUSTOM_BACKSTAB => {
                     if kill_icon == "sharp_dresser" {
                         kill_icon = "sharp_dresser_backstab";
                     } else {
                         kill_icon = "backstab";
                     }
                 }
-                TF_DMG_CUSTOM_HEADSHOT | TF_DMG_CUSTOM_HEADSHOT_DECAPITATION => {
+                CustomDamage::TF_DMG_CUSTOM_HEADSHOT
+                | CustomDamage::TF_DMG_CUSTOM_HEADSHOT_DECAPITATION => {
                     if kill_icon == "ambassador" {
                         kill_icon = "ambassador_headshot";
                     } else if kill_icon == "huntsman" {
@@ -932,18 +931,18 @@ impl GameDetailsAnalyser {
                         kill_icon = "headshot";
                     }
                 }
-                TF_DMG_CUSTOM_BURNING => {
+                CustomDamage::TF_DMG_CUSTOM_BURNING => {
                     if killer_id == victim_id {
                         kill_icon = "firedeath";
                     }
                 }
-                TF_DMG_CUSTOM_BURNING_ARROW => {
+                CustomDamage::TF_DMG_CUSTOM_BURNING_ARROW => {
                     kill_icon = "huntsman_burning";
                 }
-                TF_DMG_CUSTOM_FLYINGBURN => {
+                CustomDamage::TF_DMG_CUSTOM_FLYINGBURN => {
                     kill_icon = "huntsman_flyingburn";
                 }
-                TF_DMG_CUSTOM_PUMPKIN_BOMB => {
+                CustomDamage::TF_DMG_CUSTOM_PUMPKIN_BOMB => {
                     kill_icon = "pumpkindeath";
                 }
                 // This value is only given to custom_kill if
@@ -951,34 +950,34 @@ impl GameDetailsAnalyser {
                 // 2) The player kills himself, with another
                 //    player being awarded the kill because of
                 //    recent damage.
-                TF_DMG_CUSTOM_SUICIDE => {
+                CustomDamage::TF_DMG_CUSTOM_SUICIDE => {
                     if killer_id == victim_id {
                         kill_icon = "#suicide";
                     } else {
                         kill_icon = "#assisted_suicide";
                     }
                 }
-                TF_DMG_CUSTOM_EYEBALL_ROCKET => {
+                CustomDamage::TF_DMG_CUSTOM_EYEBALL_ROCKET => {
                     if killer_id == 0 {
                         killer_name_override = Some("MONOCULUS!".into());
                     }
                 }
-                TF_DMG_CUSTOM_MERASMUS_ZAP
-                | TF_DMG_CUSTOM_MERASMUS_GRENADE
-                | TF_DMG_CUSTOM_MERASMUS_DECAPITATION => {
+                CustomDamage::TF_DMG_CUSTOM_MERASMUS_ZAP
+                | CustomDamage::TF_DMG_CUSTOM_MERASMUS_GRENADE
+                | CustomDamage::TF_DMG_CUSTOM_MERASMUS_DECAPITATION => {
                     if killer_id == 0 {
                         killer_name_override = Some("MERASMUS!".into());
                     }
                 }
-                TF_DMG_CUSTOM_SPELL_SKELETON => {
+                CustomDamage::TF_DMG_CUSTOM_SPELL_SKELETON => {
                     if killer_id == 0 {
                         killer_name_override = Some("SKELETON".into());
                     }
                 }
-                TF_DMG_CUSTOM_KART => {
+                CustomDamage::TF_DMG_CUSTOM_KART => {
                     kill_icon = "bumper_kart";
                 }
-                TF_DMG_CUSTOM_GIANT_HAMMER => {
+                CustomDamage::TF_DMG_CUSTOM_GIANT_HAMMER => {
                     kill_icon = "necro_smasher";
                 }
                 _ => {}
