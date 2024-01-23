@@ -546,7 +546,7 @@ impl GameDetailsAnalyser {
             let player_id = self
                 .player_entities
                 .get(&message.client)
-                .cloned()
+                .copied()
                 .unwrap_or_default();
 
             self.add_highlight(

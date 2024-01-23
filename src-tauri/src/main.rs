@@ -9,6 +9,7 @@
 #![deny(clippy::redundant_closure_for_method_calls)]
 #![deny(clippy::map_unwrap_or)]
 #![deny(clippy::redundant_else)]
+#![deny(clippy::cloned_instead_of_copied)]
 
 use std::{
     collections::HashMap,
