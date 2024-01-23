@@ -158,9 +158,8 @@ pub fn read_events_and_tags(json_path: &Path) -> (Vec<DemoEvent>, Vec<String>) {
                 deserialized.events.unwrap_or_default(),
                 deserialized.tags.unwrap_or_default(),
             );
-        } else {
-            warn!("Invalid JSON file at {}", &json_path.display());
         }
+        warn!("Invalid JSON file at {}", &json_path.display());
     }
 
     // If the JSON file does not exist or contains invalid content,
