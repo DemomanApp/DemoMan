@@ -488,8 +488,7 @@ impl GameDetailsAnalyser {
         let class_name: &str = self
             .class_names
             .get(usize::from(entity.server_class))
-            .map(ServerClassName::as_str)
-            .unwrap_or("");
+            .map_or("", ServerClassName::as_str);
         match class_name {
             "CTFPlayer" => self.handle_player_entity(entity, parser_state, tick),
             "CTFPlayerResource" => self.handle_player_resource(entity, parser_state),
