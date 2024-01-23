@@ -5,6 +5,7 @@
 #![deny(clippy::enum_glob_use)]
 #![deny(clippy::needless_pass_by_value)]
 #![deny(clippy::trivially_copy_pass_by_ref)]
+#![deny(clippy::semicolon_if_nothing_returned)]
 
 use std::{
     collections::HashMap,

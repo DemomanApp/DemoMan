@@ -466,7 +466,7 @@ macro_rules! process_score_prop {
 
 impl GameDetailsAnalyser {
     fn add_highlight(&mut self, event: Highlight, tick: DemoTick) {
-        self.highlights.push(HighlightEvent { tick, event })
+        self.highlights.push(HighlightEvent { tick, event });
     }
 
     // fn get_player_of_entity(&self, entity_id: &EntityId) -> Option<&PlayerState> {
@@ -1089,7 +1089,7 @@ impl GameDetailsAnalyser {
                 reason: event.reason,
             },
             tick,
-        )
+        );
     }
 
     fn handle_round_start_event(&mut self, event: &TeamPlayRoundStartEvent, tick: DemoTick) {
@@ -1098,11 +1098,11 @@ impl GameDetailsAnalyser {
                 full_reset: event.full_reset,
             },
             tick,
-        )
+        );
     }
 
     fn handle_round_win_event(&mut self, event: &TeamPlayRoundWinEvent, tick: DemoTick) {
-        self.add_highlight(Highlight::RoundWin { winner: event.team }, tick)
+        self.add_highlight(Highlight::RoundWin { winner: event.team }, tick);
     }
 
     fn handle_round_end(&mut self, tick: DemoTick) {
