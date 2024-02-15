@@ -19,6 +19,7 @@
   },
   "dependencies": {
     "@mantine/core": "^7.4",
+    "@mantine/dates": "^7.4",
     "@mantine/form": "^7.4",
     "@mantine/hooks": "^7.4",
     "@tabler/icons-react": "^2.0.0",
