@@ -13,6 +13,7 @@ use std::{
     sync::{Arc, Mutex},
 };
 
+use log::LevelFilter;
 use tauri::{async_runtime::Mutex as AsyncMutex, Manager};
 use tauri_plugin_log::{
     fern::colors::{Color, ColoredLevelConfig},
@@ -37,20 +38,37 @@ pub type DemoCache = Mutex<HashMap<PathBuf, Arc<Demo>>>;
 // The Mutex in std::sync will not work in this situation.
 pub type RconConnection = AsyncMutex<Option<Connection<TcpStream>>>;
 
+fn build_log_plugin<R: tauri::Runtime>() -> tauri::plugin::TauriPlugin<R> {
+    const COLORS: ColoredLevelConfig = ColoredLevelConfig {
+        error: Color::Red,
+        warn: Color::Yellow,
+        debug: Color::Blue,
+        info: Color::Green,
+        trace: Color::BrightBlack,
+    };
+    const LEVEL_FILTER: LevelFilter = if cfg!(debug_assertions) {
+        LevelFilter::Trace
+    } else {
+        LevelFilter::Info
+    };
+
+    tauri_plugin_log::Builder::default()
+        .targets([LogTarget::LogDir, LogTarget::Stdout])
+        .level(LEVEL_FILTER)
+        .format(move |out, message, record| {
+            out.finish(format_args!(
+                "[{:^5}][{}] {}",
+                COLORS.color(record.level()),
+                record.target(),
+                message
+            ))
+        })
+        .build()
+}
+
 fn main() {
     tauri::Builder::default()
-        .plugin(
-            tauri_plugin_log::Builder::default()
-                .targets([LogTarget::LogDir, LogTarget::Stdout])
-                .with_colors(ColoredLevelConfig {
-                    error: Color::Red,
-                    warn: Color::Yellow,
-                    debug: Color::Blue,
-                    info: Color::Green,
-                    trace: Color::BrightBlack,
-                })
-                .build(),
-        )
+        .plugin(build_log_plugin())
         .manage(DemoCache::default())
         .manage(RconConnection::default())
         .setup(|app| {
