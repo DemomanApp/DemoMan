@@ -25,18 +25,6 @@ macro_rules! log_command {
     ($($arg:tt)+) => (log::trace!(target: "IPC", $($arg)+))
 }
 
-// This can be removed once unwrap_or_clone lands in stable
-// https://github.com/rust-lang/rust/issues/93610
-trait UnwrapOrClone<T> {
-    fn unwrap_or_clone(this: Self) -> T;
-}
-
-impl<T: Clone> UnwrapOrClone<T> for Arc<T> {
-    fn unwrap_or_clone(this: Self) -> T {
-        Arc::try_unwrap(this).unwrap_or_else(|arc| (*arc).clone())
-    }
-}
-
 /// Fallible variant of [`or_insert_with`](std::collections::hash_map::Entry::or_insert_with)
 trait OrTryInsertWith<'a, V, F: FnOnce() -> Result<V, E>, E> {
     fn or_try_insert_with(self, default: F) -> Result<&'a mut V, E>;
@@ -170,7 +158,7 @@ pub async fn move_demo(
     log_command!("move_demo {} {}", demo_path.display(), new_path.display());
 
     let mut demo_cache = demo_cache.lock().expect("Failed to lock mutex");
-    let mut demo = UnwrapOrClone::unwrap_or_clone(
+    let mut demo = Arc::unwrap_or_clone(
         demo_cache
             .remove(demo_path)
             .ok_or(DemoCommandError::DemoNotFound)?,

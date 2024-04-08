@@ -7,7 +7,7 @@ license = "GPL-3.0-only"
 repository = "https://github.com/Narcha/DemoMan-tauri"
 default-run = "demoman"
 edition = "2021"
-rust-version = "1.71"
+rust-version = "1.76"
 
 [build-dependencies]
 tauri-build = { version = "1.5", features = [] }
