@@ -27,6 +27,7 @@ use demo::{analyser::GameSummary, cache::DiskCache, Demo};
 
 mod commands;
 mod demo;
+mod std_ext;
 
 #[cfg(test)]
 mod tests;
