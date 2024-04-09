@@ -2,7 +2,7 @@ use std::{
     ffi::OsStr,
     fs::{copy, remove_file},
     path::Path,
-    sync::Arc,
+    sync::{Arc, Mutex},
     vec::Vec,
 };
 
@@ -28,7 +28,7 @@ macro_rules! log_command {
 #[tauri::command]
 pub async fn get_demos_in_directory(
     dir_path: &Path,
-    demo_cache: State<'_, DemoCache>,
+    demo_cache: State<'_, Mutex<DemoCache>>,
 ) -> DemoCommandResult<Vec<Arc<Demo>>> {
     log_command!("get_demos_in_directory {}", dir_path.display());
 
@@ -53,7 +53,7 @@ pub async fn get_demos_in_directory(
 pub async fn set_demo_events(
     demo_path: &Path,
     new_events: Vec<DemoEvent>,
-    demo_cache: State<'_, DemoCache>,
+    demo_cache: State<'_, Mutex<DemoCache>>,
 ) -> DemoCommandResult<()> {
     log_command!("set_demo_events {} {new_events:?}", demo_path.display());
 
@@ -74,7 +74,7 @@ pub async fn set_demo_events(
 pub async fn set_demo_tags(
     demo_path: &Path,
     new_tags: Vec<String>,
-    demo_cache: State<'_, DemoCache>,
+    demo_cache: State<'_, Mutex<DemoCache>>,
 ) -> DemoCommandResult<()> {
     log_command!("set_demo_tags {} {new_tags:?}", demo_path.display());
 
@@ -95,7 +95,7 @@ pub async fn set_demo_tags(
 pub async fn delete_demo(
     demo_path: &Path,
     trash: bool,
-    demo_cache: State<'_, DemoCache>,
+    demo_cache: State<'_, Mutex<DemoCache>>,
 ) -> DemoCommandResult<()> {
     log_command!("delete_demo {}", demo_path.display());
 
@@ -136,7 +136,7 @@ pub async fn delete_demo(
 pub async fn move_demo(
     demo_path: &Path,
     new_path: &Path,
-    demo_cache: State<'_, DemoCache>,
+    demo_cache: State<'_, Mutex<DemoCache>>,
 ) -> DemoCommandResult<()> {
     log_command!("move_demo {} {}", demo_path.display(), new_path.display());
 
@@ -181,7 +181,7 @@ pub async fn move_demo(
 #[tauri::command]
 pub async fn get_demo(
     demo_path: &Path,
-    demo_cache: State<'_, DemoCache>,
+    demo_cache: State<'_, Mutex<DemoCache>>,
 ) -> DemoCommandResult<Arc<Demo>> {
     log_command!("get_demo {}", demo_path.display());
 

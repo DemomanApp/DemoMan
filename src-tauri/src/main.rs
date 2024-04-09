@@ -32,7 +32,7 @@ mod std_ext;
 #[cfg(test)]
 mod tests;
 
-pub type DemoCache = Mutex<HashMap<PathBuf, Arc<Demo>>>;
+pub type DemoCache = HashMap<PathBuf, Arc<Demo>>;
 
 // We use the Mutex type provided by the tauri async runtime here
 // because we need to hold its content across an .await point.
@@ -62,7 +62,7 @@ fn build_log_plugin<R: tauri::Runtime>() -> tauri::plugin::TauriPlugin<R> {
                 COLORS.color(record.level()),
                 record.target(),
                 message
-            ))
+            ));
         })
         .build()
 }
@@ -70,7 +70,7 @@ fn build_log_plugin<R: tauri::Runtime>() -> tauri::plugin::TauriPlugin<R> {
 fn main() {
     tauri::Builder::default()
         .plugin(build_log_plugin())
-        .manage(DemoCache::default())
+        .manage(Mutex::<DemoCache>::default())
         .manage(RconConnection::default())
         .setup(|app| {
             let cache_path = app
