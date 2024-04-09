@@ -49,7 +49,7 @@ fn compare_demos_by(key: SortKey, reverse: bool, d1: &Demo, d2: &Demo) -> Orderi
     }
 }
 
-fn filter_by(filters: &[Filter], demo: &Demo) -> bool {
+fn filter_matches(demo: &Demo, filters: &[Filter]) -> bool {
     if filters.is_empty() {
         true
     } else {
@@ -59,6 +59,34 @@ fn filter_by(filters: &[Filter], demo: &Demo) -> bool {
             Filter::MapName(map_name) => demo.map_name.contains(map_name),
         })
     }
+}
+
+fn query_matches(demo: &Demo, query: &str) -> bool {
+    if query.is_empty() {
+        return true;
+    }
+
+    let query = query.to_ascii_lowercase();
+
+    let Demo {
+        name,
+        events,
+        tags,
+        server_name,
+        client_name,
+        map_name,
+        ..
+    } = demo;
+
+    [name, server_name, client_name, map_name]
+        .iter()
+        .any(|field| field.to_ascii_lowercase().contains(&query))
+        || events
+            .iter()
+            .any(|event| event.value.to_ascii_lowercase().contains(&query))
+        || tags
+            .iter()
+            .any(|tag| tag.to_ascii_lowercase().contains(&query))
 }
 
 #[derive(PartialEq, Deserialize)]
@@ -80,13 +108,20 @@ pub struct DemoListCache {
     filtered_demos: Vec<Arc<Demo>>,
 
     filters: Vec<Filter>,
+    query: String,
     sort_key: SortKey,
     reverse: bool,
 }
 
 impl DemoListCache {
     // TODO: optimize
-    fn filter_and_sort(&mut self, sort_key: SortKey, reverse: bool, filters: Vec<Filter>) {
+    fn filter_and_sort(
+        &mut self,
+        sort_key: SortKey,
+        reverse: bool,
+        filters: Vec<Filter>,
+        query: String,
+    ) {
         if self.sort_key != sort_key {
             self.sort_by(sort_key, reverse);
         } else if self.reverse != reverse {
@@ -94,18 +129,20 @@ impl DemoListCache {
             self.reverse = reverse;
         }
 
-        self.filter_by(filters);
+        self.filter_by(filters, query);
     }
 
-    fn filter_by(&mut self, filters: Vec<Filter>) {
+    fn filter_by(&mut self, filters: Vec<Filter>, query: String) {
         self.filtered_demos = self
             .demos
             .iter()
-            .filter(|demo| filter_by(&filters, demo))
+            .filter(|demo| filter_matches(demo, &filters))
+            .filter(|demo| query_matches(demo, &query))
             .cloned()
             .collect();
 
         self.filters = filters;
+        self.query = query;
     }
 
     fn sort_by(&mut self, sort_key: SortKey, reverse: bool) {
@@ -137,16 +174,17 @@ impl DemoCache {
         sort_key: SortKey,
         reverse: bool,
         filters: Vec<Filter>,
+        query: String,
     ) -> Result<Vec<Arc<Demo>>> {
         let list_cache = self.list_cache.get_or_insert_with(DemoListCache::default);
 
         if list_cache.path == path {
-            list_cache.filter_and_sort(sort_key, reverse, filters);
+            list_cache.filter_and_sort(sort_key, reverse, filters, query);
         } else {
             list_cache.demos = read_demos_in_directory(path, &mut self.cache)?;
             list_cache.path = path.to_path_buf();
             list_cache.sort_by(sort_key, reverse);
-            list_cache.filter_by(filters);
+            list_cache.filter_by(filters, query);
         }
 
         Ok(list_cache.filtered_demos.clone())

@@ -6,13 +6,15 @@ export async function getDemosInDirectory(
   dirPath: string,
   sortKey: SortKey,
   reverse: boolean,
-  filters: DemoFilter[]
+  filters: DemoFilter[],
+  query: string
 ) {
   return invoke<Demo[]>("get_demos_in_directory", {
     dirPath,
     sortKey,
     reverse,
     filters,
+    query,
   });
 }
 

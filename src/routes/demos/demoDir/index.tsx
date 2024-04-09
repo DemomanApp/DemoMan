@@ -27,6 +27,7 @@ type DemoListLoaderArgs = {
   sortKey: SortKey;
   reverse: boolean;
   filters: DemoFilter[];
+  query: string;
 };
 
 function ErrorBox({ error }: { error: string }) {
@@ -48,15 +49,16 @@ function DemoListLoader({
   sortKey,
   reverse,
   filters,
+  query,
 }: DemoListLoaderArgs) {
   const [demos, setDemos] = useState<Demo[] | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    getDemosInDirectory(path, sortKey, reverse, filters)
+    getDemosInDirectory(path, sortKey, reverse, filters, query)
       .then(setDemos)
       .catch(setError);
-  }, [path, sortKey, reverse, filters]);
+  }, [path, sortKey, reverse, filters, query]);
 
   if (demos !== null) {
     return <DemoList demos={demos} />;
@@ -85,12 +87,11 @@ export default () => {
       <AppShell.Header>
         <HeaderBar
           center={
-            <>
-              <SearchInput
-                query={locationState.query}
-                setQuery={setLocationState("query")}
-              />
-            </>
+            <SearchInput
+              initialQuery={locationState.query}
+              setDebouncedQuery={setLocationState("query")}
+              debounceInterval={500}
+            />
           }
           right={
             <>
@@ -146,6 +147,7 @@ export default () => {
           sortKey={locationState.sortKey}
           reverse={locationState.sortOrder === "descending"}
           filters={filters}
+          query={locationState.query}
         />
       </AppShell.Main>
     </AppShell>

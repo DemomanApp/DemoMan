@@ -18,13 +18,15 @@ pub async fn get_demos_in_directory(
     sort_key: SortKey,
     reverse: bool,
     filters: Vec<Filter>,
+    query: String,
     demo_list_cache: State<'_, Mutex<DemoCache>>,
 ) -> Result<Vec<Arc<Demo>>> {
     log_command!("get_demos_in_directory {}", dir_path.display());
 
     let mut demo_cache = demo_list_cache.lock().await;
 
-    demo_cache.get_sorted_and_filtered_demos_in_directory(dir_path, sort_key, reverse, filters)
+    demo_cache
+        .get_sorted_and_filtered_demos_in_directory(dir_path, sort_key, reverse, filters, query)
 }
 
 #[tauri::command]
