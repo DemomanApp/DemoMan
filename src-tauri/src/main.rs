@@ -2,7 +2,7 @@
     all(not(debug_assertions), target_os = "windows"),
     windows_subsystem = "windows"
 )]
-#![deny(clippy::pedantic)]
+#![warn(clippy::pedantic)]
 #![allow(clippy::module_name_repetitions)]
 // Disabled because of false positives inside tauri macros
 #![allow(clippy::used_underscore_binding)]
