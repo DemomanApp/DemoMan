@@ -4,26 +4,24 @@ mod player_condition;
 mod player_flag;
 mod weapon_class;
 
-use std::cmp::Ordering;
-use std::str::FromStr;
-use std::{collections::HashMap, convert::TryFrom};
+use std::{cmp::Ordering, collections::HashMap, convert::TryFrom, str::FromStr};
 
-use log::{info, warn};
+use log::{info, trace, warn};
 use num_derive::FromPrimitive;
 use num_traits::FromPrimitive;
 use serde::{Deserialize, Serialize};
 
 use steamid_ng::SteamID;
-use tf_demo_parser::demo::header::Header;
 use tf_demo_parser::{
     demo::{
-        data::DemoTick,
+        data::{DemoTick, ServerTick},
         gameevent_gen::{
             CrossbowHealEvent, PlayerConnectClientEvent, PlayerDeathEvent, PlayerDisconnectEvent,
             PlayerHurtEvent, PlayerSpawnEvent, PlayerTeamEvent, TeamPlayPointCapturedEvent,
             TeamPlayRoundStalemateEvent, TeamPlayRoundStartEvent, TeamPlayRoundWinEvent,
         },
         gamevent::GameEvent,
+        header::Header,
         message::{
             gameevent::GameEventMessage,
             packetentities::{EntityId, PacketEntity},
@@ -318,6 +316,9 @@ pub struct GameDetailsAnalyser {
     /// The current round being played.  Increments while parsing
     current_round: u32,
 
+    server_tick: ServerTick,
+    demo_tick: DemoTick,
+
     player_entities: HashMap<EntityId, UserId>,
 }
 
@@ -332,29 +333,31 @@ impl MessageHandler for GameDetailsAnalyser {
                 | MessageType::SetPause
                 | MessageType::ServerInfo
                 | MessageType::UserMessage
+                | MessageType::NetTick
         )
     }
 
     fn handle_message(&mut self, message: &Message, tick: DemoTick, parser_state: &ParserState) {
+        self.demo_tick = tick;
         match message {
+            Message::NetTick(message) => {
+                self.server_tick = message.tick;
+            }
             Message::PacketEntities(message) => {
                 for entity in &message.entities {
-                    self.handle_entity(entity, tick, parser_state);
+                    self.handle_entity(entity, parser_state);
                 }
             }
             Message::GameEvent(GameEventMessage { event, .. }) => {
-                self.handle_game_event(event, tick);
+                self.handle_game_event(event);
             }
             Message::UserMessage(message) => {
-                self.handle_usermessage(message, tick);
+                self.handle_usermessage(message);
             }
             Message::SetPause(message) => {
-                self.add_highlight(
-                    Highlight::Pause {
-                        pause: message.pause,
-                    },
-                    tick,
-                );
+                self.add_highlight(Highlight::Pause {
+                    pause: message.pause,
+                });
             }
             Message::ServerInfo(message) => {
                 self.local_entity_id = EntityId::from(u32::from(message.player_slot) + 1);
@@ -465,7 +468,8 @@ macro_rules! process_score_prop {
 }
 
 impl GameDetailsAnalyser {
-    fn add_highlight(&mut self, event: Highlight, tick: DemoTick) {
+    fn add_highlight(&mut self, event: Highlight) {
+        let tick = self.demo_tick;
         self.highlights.push(HighlightEvent { tick, event });
     }
 
@@ -479,18 +483,13 @@ impl GameDetailsAnalyser {
             .and_then(|user_id| self.players.get_mut(user_id))
     }
 
-    pub fn handle_entity(
-        &mut self,
-        entity: &PacketEntity,
-        tick: DemoTick,
-        parser_state: &ParserState,
-    ) {
+    pub fn handle_entity(&mut self, entity: &PacketEntity, parser_state: &ParserState) {
         let class_name: &str = self
             .class_names
             .get(usize::from(entity.server_class))
             .map_or("", ServerClassName::as_str);
         match class_name {
-            "CTFPlayer" => self.handle_player_entity(entity, parser_state, tick),
+            "CTFPlayer" => self.handle_player_entity(entity, parser_state),
             "CTFPlayerResource" => self.handle_player_resource(entity, parser_state),
             "CTFTeam" => self.handle_team(entity, parser_state),
             "CWeaponMedigun" => self.handle_medigun(entity, parser_state),
@@ -499,49 +498,49 @@ impl GameDetailsAnalyser {
         }
     }
 
-    pub fn handle_game_event(&mut self, event: &GameEvent, tick: DemoTick) {
+    pub fn handle_game_event(&mut self, event: &GameEvent) {
         match event {
             GameEvent::PlayerDeath(event) => {
-                self.handle_player_death_event(event, tick);
+                self.handle_player_death_event(event);
             }
             GameEvent::PlayerHurt(event) => {
-                self.handle_player_hurt_event(event, tick);
+                self.handle_player_hurt_event(event);
             }
             GameEvent::PlayerTeam(event) => {
                 // Player changed teams (game assigned on join, manually changed, or autobalanced)
-                self.handle_player_team_event(event, tick);
+                self.handle_player_team_event(event);
             }
             GameEvent::PlayerSpawn(event) => {
-                self.handle_player_spawn_event(event, tick);
+                self.handle_player_spawn_event(event);
             }
             GameEvent::TeamPlayRoundStalemate(event) => {
-                self.handle_round_stalemate_event(event, tick);
-                self.handle_round_end(tick);
+                self.handle_round_stalemate_event(event);
+                self.handle_round_end();
             }
             GameEvent::TeamPlayRoundStart(event) => {
-                self.handle_round_start_event(event, tick);
+                self.handle_round_start_event(event);
             }
             GameEvent::TeamPlayRoundWin(event) => {
-                self.handle_round_win_event(event, tick);
-                self.handle_round_end(tick);
+                self.handle_round_win_event(event);
+                self.handle_round_end();
             }
             GameEvent::PlayerConnectClient(event) => {
-                self.handle_player_connect_event(event, tick);
+                self.handle_player_connect_event(event);
             }
             GameEvent::PlayerDisconnect(event) => {
-                self.handle_player_disconnect_event(event, tick);
+                self.handle_player_disconnect_event(event);
             }
             GameEvent::TeamPlayPointCaptured(event) => {
-                self.handle_point_captured_event(event, tick);
+                self.handle_point_captured_event(event);
             }
             GameEvent::CrossbowHeal(event) => {
-                self.handle_crossbow_heal_event(event, tick);
+                self.handle_crossbow_heal_event(event);
             }
             _ => {}
         }
     }
 
-    fn handle_usermessage(&mut self, message: &UserMessage, tick: DemoTick) {
+    fn handle_usermessage(&mut self, message: &UserMessage) {
         if let UserMessage::SayText2(message) = message {
             let player_id = self
                 .player_entities
@@ -549,13 +548,10 @@ impl GameDetailsAnalyser {
                 .copied()
                 .unwrap_or_default();
 
-            self.add_highlight(
-                Highlight::ChatMessage {
-                    sender: self.player_snapshot(player_id),
-                    text: message.plain_text(),
-                },
-                tick,
-            );
+            self.add_highlight(Highlight::ChatMessage {
+                sender: self.player_snapshot(player_id),
+                text: message.plain_text(),
+            });
         }
     }
 
@@ -597,12 +593,7 @@ impl GameDetailsAnalyser {
     }
 
     #[allow(clippy::too_many_lines)]
-    pub fn handle_player_entity(
-        &mut self,
-        entity: &PacketEntity,
-        parser_state: &ParserState,
-        _tick: DemoTick,
-    ) {
+    pub fn handle_player_entity(&mut self, entity: &PacketEntity, parser_state: &ParserState) {
         let current_round = self.current_round;
 
         if let Some(player) = self.get_player_of_entity_mut(entity.entity_index) {
@@ -845,7 +836,7 @@ impl GameDetailsAnalyser {
         }
     }
 
-    fn handle_player_team_event(&mut self, event: &PlayerTeamEvent, _tick: DemoTick) {
+    fn handle_player_team_event(&mut self, event: &PlayerTeamEvent) {
         let player_id = event.user_id;
 
         if let Ok(team) = Team::try_from(event.team) {
@@ -855,7 +846,7 @@ impl GameDetailsAnalyser {
         }
     }
 
-    fn handle_player_hurt_event(&mut self, event: &PlayerHurtEvent, tick: DemoTick) {
+    fn handle_player_hurt_event(&mut self, event: &PlayerHurtEvent) {
         let victim_id = UserId::from(event.user_id);
         let attacker_id = UserId::from(event.attacker);
 
@@ -881,19 +872,16 @@ impl GameDetailsAnalyser {
                     WeaponClass::TF_WEAPON_CROSSBOW
             )
         {
-            self.add_highlight(
-                Highlight::Airshot {
-                    attacker: self.player_snapshot(attacker_id),
-                    victim: self.player_snapshot(victim_id),
-                },
-                tick,
-            );
+            self.add_highlight(Highlight::Airshot {
+                attacker: self.player_snapshot(attacker_id),
+                victim: self.player_snapshot(victim_id),
+            });
         }
     }
 
     // TODO: refactor to remove the following line
     #[allow(clippy::too_many_lines)]
-    fn handle_player_death_event(&mut self, event: &PlayerDeathEvent, tick: DemoTick) {
+    fn handle_player_death_event(&mut self, event: &PlayerDeathEvent) {
         let killer_id = UserId::from(event.attacker);
         let maybe_assister_id = if event.assister == u16::MAX {
             None
@@ -910,7 +898,7 @@ impl GameDetailsAnalyser {
         if let Some(victim) = victim {
             drop = victim.charge == 100;
             airshot = victim.has_cond(PlayerCondition::TF_COND_BLASTJUMPING);
-            victim.handle_life_end(tick);
+            victim.handle_life_end(self.demo_tick);
         } else {
             drop = false;
             airshot = false;
@@ -1008,28 +996,22 @@ impl GameDetailsAnalyser {
             }
         }
 
-        self.add_highlight(
-            Highlight::Kill {
-                killer: self.player_snapshot_with_name(killer_id, killer_name_override),
-                assister: maybe_assister_id.map(|assister_id| self.player_snapshot(assister_id)),
-                victim: self.player_snapshot(victim_id),
-                weapon: event.weapon.to_string(),
-                kill_icon: kill_icon.to_string(),
-                streak: event.kill_streak_total as usize,
-                drop,
-                airshot,
-            },
-            tick,
-        );
+        self.add_highlight(Highlight::Kill {
+            killer: self.player_snapshot_with_name(killer_id, killer_name_override),
+            assister: maybe_assister_id.map(|assister_id| self.player_snapshot(assister_id)),
+            victim: self.player_snapshot(victim_id),
+            weapon: event.weapon.to_string(),
+            kill_icon: kill_icon.to_string(),
+            streak: event.kill_streak_total as usize,
+            drop,
+            airshot,
+        });
 
         if event.kill_streak_total > 0 && event.kill_streak_total % 5 == 0 {
-            self.add_highlight(
-                Highlight::KillStreak {
-                    player: self.player_snapshot(killer_id),
-                    streak: event.kill_streak_total,
-                },
-                tick,
-            );
+            self.add_highlight(Highlight::KillStreak {
+                player: self.player_snapshot(killer_id),
+                streak: event.kill_streak_total,
+            });
         }
 
         // Note: kill_streak_assist is only incremented when a medic gets an assist while their
@@ -1037,30 +1019,24 @@ impl GameDetailsAnalyser {
         if event.kill_streak_assist > 0 && event.kill_streak_assist % 5 == 0 {
             if let Some(assister_id) = maybe_assister_id {
                 if self.players.contains_key(&assister_id) {
-                    self.add_highlight(
-                        Highlight::KillStreak {
-                            player: self.player_snapshot(assister_id),
-                            streak: event.kill_streak_assist,
-                        },
-                        tick,
-                    );
+                    self.add_highlight(Highlight::KillStreak {
+                        player: self.player_snapshot(assister_id),
+                        streak: event.kill_streak_assist,
+                    });
                 }
             }
         }
 
         if event.kill_streak_victim >= 10 {
-            self.add_highlight(
-                Highlight::KillStreakEnded {
-                    killer: self.player_snapshot(killer_id),
-                    victim: self.player_snapshot(victim_id),
-                    streak: event.kill_streak_victim,
-                },
-                tick,
-            );
+            self.add_highlight(Highlight::KillStreakEnded {
+                killer: self.player_snapshot(killer_id),
+                victim: self.player_snapshot(victim_id),
+                streak: event.kill_streak_victim,
+            });
         }
     }
 
-    fn handle_crossbow_heal_event(&mut self, event: &CrossbowHealEvent, tick: DemoTick) {
+    fn handle_crossbow_heal_event(&mut self, event: &CrossbowHealEvent) {
         // This event seems to only be present in STV demos.
         // Also, the UserIds in the event use u8s instead of u16s,
         // which will cause attribution errors.
@@ -1071,60 +1047,47 @@ impl GameDetailsAnalyser {
 
         if let Some(target_player) = self.players.get(&target_id) {
             if target_player.has_cond(PlayerCondition::TF_COND_BLASTJUMPING) {
-                self.add_highlight(
-                    Highlight::CrossbowAirshot {
-                        healer: self.player_snapshot(UserId::from(u16::from(event.healer))),
-                        target: self.player_snapshot(UserId::from(u16::from(event.target))),
-                    },
-                    tick,
-                );
+                self.add_highlight(Highlight::CrossbowAirshot {
+                    healer: self.player_snapshot(UserId::from(u16::from(event.healer))),
+                    target: self.player_snapshot(UserId::from(u16::from(event.target))),
+                });
             }
         }
     }
 
-    fn handle_player_spawn_event(&mut self, event: &PlayerSpawnEvent, tick: DemoTick) {
+    fn handle_player_spawn_event(&mut self, event: &PlayerSpawnEvent) {
         if let Some(player) = self.players.get_mut(&UserId::from(event.user_id)) {
             player.class = Class::new(event.class);
-            player.last_spawn_tick = Some(tick);
+            player.last_spawn_tick = Some(self.demo_tick);
         }
     }
 
-    fn handle_round_stalemate_event(
-        &mut self,
-        event: &TeamPlayRoundStalemateEvent,
-        tick: DemoTick,
-    ) {
-        self.add_highlight(
-            Highlight::RoundStalemate {
-                reason: event.reason,
-            },
-            tick,
-        );
+    fn handle_round_stalemate_event(&mut self, event: &TeamPlayRoundStalemateEvent) {
+        self.add_highlight(Highlight::RoundStalemate {
+            reason: event.reason,
+        });
     }
 
-    fn handle_round_start_event(&mut self, event: &TeamPlayRoundStartEvent, tick: DemoTick) {
-        self.add_highlight(
-            Highlight::RoundStart {
-                full_reset: event.full_reset,
-            },
-            tick,
-        );
+    fn handle_round_start_event(&mut self, event: &TeamPlayRoundStartEvent) {
+        self.add_highlight(Highlight::RoundStart {
+            full_reset: event.full_reset,
+        });
     }
 
-    fn handle_round_win_event(&mut self, event: &TeamPlayRoundWinEvent, tick: DemoTick) {
-        self.add_highlight(Highlight::RoundWin { winner: event.team }, tick);
+    fn handle_round_win_event(&mut self, event: &TeamPlayRoundWinEvent) {
+        self.add_highlight(Highlight::RoundWin { winner: event.team });
     }
 
-    fn handle_round_end(&mut self, tick: DemoTick) {
+    fn handle_round_end(&mut self) {
         self.current_round += 1;
         for player in self.players.values_mut() {
             if player.life_state == PlayerLifeState::Alive {
-                player.handle_life_end(tick);
+                player.handle_life_end(self.demo_tick);
             }
         }
     }
 
-    fn handle_point_captured_event(&mut self, event: &TeamPlayPointCapturedEvent, tick: DemoTick) {
+    fn handle_point_captured_event(&mut self, event: &TeamPlayPointCapturedEvent) {
         // No more than 8 players are recorded in the `cappers`
         // field of the teamplay_point_captured event.
         let mut cappers = Vec::with_capacity(8);
@@ -1136,37 +1099,28 @@ impl GameDetailsAnalyser {
             }
         }
 
-        self.add_highlight(
-            Highlight::PointCaptured {
-                point_name: event.cp_name.to_string(),
-                capturing_team: event.team,
-                cappers,
-            },
-            tick,
-        );
+        self.add_highlight(Highlight::PointCaptured {
+            point_name: event.cp_name.to_string(),
+            capturing_team: event.team,
+            cappers,
+        });
     }
 
-    fn handle_player_connect_event(&mut self, event: &PlayerConnectClientEvent, tick: DemoTick) {
-        self.add_highlight(
-            Highlight::PlayerConnected {
-                user_id: UserId::from(event.user_id),
-            },
-            tick,
-        );
+    fn handle_player_connect_event(&mut self, event: &PlayerConnectClientEvent) {
+        self.add_highlight(Highlight::PlayerConnected {
+            user_id: UserId::from(event.user_id),
+        });
     }
 
-    fn handle_player_disconnect_event(&mut self, event: &PlayerDisconnectEvent, tick: DemoTick) {
+    fn handle_player_disconnect_event(&mut self, event: &PlayerDisconnectEvent) {
         let user_id = UserId::from(event.user_id);
-        self.add_highlight(
-            Highlight::PlayerDisconnected {
-                user_id,
-                reason: event.reason.to_string(),
-            },
-            tick,
-        );
+        self.add_highlight(Highlight::PlayerDisconnected {
+            user_id,
+            reason: event.reason.to_string(),
+        });
 
         if let Some(player) = self.players.get_mut(&user_id) {
-            player.handle_life_end(tick);
+            player.handle_life_end(self.demo_tick);
         }
     }
 
