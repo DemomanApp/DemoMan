@@ -6,7 +6,7 @@ mod weapon_class;
 
 use std::{cmp::Ordering, collections::HashMap, convert::TryFrom, str::FromStr};
 
-use log::{info, trace, warn};
+use log::{info, warn};
 use num_derive::FromPrimitive;
 use num_traits::FromPrimitive;
 use serde::{Deserialize, Serialize};

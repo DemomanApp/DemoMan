@@ -4,12 +4,12 @@ import * as log from "tauri-plugin-log-api";
 import { Button } from "@mantine/core";
 
 type PathPickerProps = Omit<React.ComponentProps<"input">, "value"> & {
-  value: string;
+  value?: string;
   setValue(value: string): void;
 };
 
 export default function PathPicker({
-  value,
+  value = "",
   setValue,
   ...otherProps
 }: PathPickerProps) {
