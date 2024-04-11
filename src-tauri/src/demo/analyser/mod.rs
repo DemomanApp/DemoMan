@@ -4,7 +4,13 @@ mod player_condition;
 mod player_flag;
 mod weapon_class;
 
-use std::{cmp::Ordering, collections::HashMap, convert::TryFrom, str::FromStr};
+use std::{
+    cmp::Ordering,
+    collections::HashMap,
+    convert::TryFrom,
+    ops::{Index, IndexMut},
+    str::FromStr,
+};
 
 use log::{info, warn};
 use num_derive::FromPrimitive;
@@ -175,13 +181,63 @@ pub struct Scoreboard {
     pub damage_dealt: u32,
 }
 
+/// Store something for each of the nine classes, and the "other" class
+#[derive(Debug, Default, PartialEq)]
+pub struct Classes<T>([T; 10]);
+
+impl<T> Classes<T> {
+    pub fn into_real_classes(self) -> [T; 9] {
+        let [_other, real_classes @ ..] = self.0;
+
+        real_classes
+    }
+}
+
+impl<T> Index<Class> for Classes<T> {
+    type Output = T;
+
+    fn index(&self, index: Class) -> &Self::Output {
+        &self.0[index as usize]
+    }
+}
+
+impl<T> IndexMut<Class> for Classes<T> {
+    fn index_mut(&mut self, index: Class) -> &mut Self::Output {
+        &mut self.0[index as usize]
+    }
+}
+
+/// Store something for each of the "real" teams, and the two other teams
+#[derive(Debug, Default, PartialEq)]
+pub struct Teams<T>([T; 4]);
+
+impl<T> Teams<T> {
+    pub fn into_real_teams(self) -> [T; 2] {
+        let [_other, _spectator, real_teams @ ..] = self.0;
+
+        real_teams
+    }
+}
+
+impl<T> Index<Team> for Teams<T> {
+    type Output = T;
+
+    fn index(&self, index: Team) -> &Self::Output {
+        &self.0[index as usize]
+    }
+}
+
+impl<T> IndexMut<Team> for Teams<T> {
+    fn index_mut(&mut self, index: Team) -> &mut Self::Output {
+        &mut self.0[index as usize]
+    }
+}
+
 #[derive(Debug, Default)]
 pub struct PlayerState {
     name: String,
     steam_id: u64,
     user_id: UserId,
-
-    team: Team,
 
     /// The scoreboard for the entire match
     scoreboard: Scoreboard,
@@ -191,6 +247,7 @@ pub struct PlayerState {
 
     // Temporary state data
     class: Class,
+    team: Team,
     life_state: PlayerLifeState,
     charge: u8,
 
@@ -204,11 +261,14 @@ pub struct PlayerState {
     // in this variable (bit 11), everything else is in player_cond.
     condition_bits: u32,
 
-    // TODO use server tick instead,
-    // demo ticks continue running while the game is paused,
+    // TODO use server tick instead
+    // Demo ticks continue running while the game is paused,
     // making the class play durations inaccurate
     last_spawn_tick: Option<DemoTick>,
-    time_on_class: [usize; 9],
+
+    // Track time (ticks) spent on each class/team
+    time_on_class: Classes<usize>,
+    time_on_team: Teams<usize>,
 }
 
 #[allow(dead_code)]
@@ -244,16 +304,21 @@ impl PlayerState {
     }
 
     fn handle_life_end(&mut self, tick: DemoTick) {
-        if self.class != Class::Other {
-            if let Some(last_spawn_tick) = self.last_spawn_tick {
-                self.time_on_class[(self.class as usize) - 1] +=
-                    u32::from(tick - last_spawn_tick) as usize;
+        if let Some(last_spawn_tick) = self.last_spawn_tick {
+            if last_spawn_tick > tick {
+                // Some demos contain bogus packets at the start
+                return;
             }
-        }
 
-        // Prevent this life from contributing to class playtime a
-        // second time, for example by dying after a round ended
-        self.last_spawn_tick = None;
+            let life_duration = u32::from(tick - last_spawn_tick) as usize;
+
+            self.time_on_class[self.class] += life_duration;
+            self.time_on_team[self.team] += life_duration;
+
+            // Prevent this life from contributing to class playtime a
+            // second time, for example by dying after a round ended
+            self.last_spawn_tick = None;
+        }
     }
 }
 
@@ -263,8 +328,8 @@ pub struct PlayerSummary {
     steam_id: u64,
     user_id: UserId,
 
-    team: Team,
     time_on_class: [usize; 9],
+    time_on_team: [usize; 2],
 
     /// The scoreboard for the entire match
     scoreboard: Scoreboard,
@@ -279,19 +344,22 @@ impl From<PlayerState> for PlayerSummary {
             name,
             steam_id,
             user_id,
-            team,
             scoreboard,
             round_scoreboards,
             time_on_class,
+            time_on_team,
             ..
         } = state;
+
+        let time_on_team = time_on_team.into_real_teams();
+        let time_on_class = time_on_class.into_real_classes();
 
         Self {
             name,
             steam_id,
             user_id,
-            team,
             time_on_class,
+            time_on_team,
             scoreboard,
             round_scoreboards,
         }
@@ -556,6 +624,8 @@ impl GameDetailsAnalyser {
     }
 
     pub fn handle_player_resource(&mut self, entity: &PacketEntity, parser_state: &ParserState) {
+        let tick = self.demo_tick;
+
         for prop in entity.props(parser_state) {
             if let Some((table_name, prop_name)) = prop.identifier.names() {
                 if let Ok(entity_id) = u32::from_str(prop_name.as_str()) {
@@ -566,18 +636,29 @@ impl GameDetailsAnalyser {
                                 let new_team =
                                     Team::new(i64::try_from(&prop.value).unwrap_or_default());
 
-                                player.team = new_team;
+                                if player.team == Team::Other {
+                                    if player.last_spawn_tick.is_none() {
+                                        player.last_spawn_tick = Some(tick);
+                                    }
+                                    player.team = new_team;
+                                }
                             }
-                            // We currently use player spawn events as our source of truth
-                            // for determining the current player class. This is a second
-                            // possible method to determine the player class, which does *not*
-                            // always match with the first method.
-                            // TODO: Investigate what the differences are,
-                            //       maybe one is better than the other?
-                            // "m_iPlayerClass" => {
-                            //     player.class =
-                            //         Class::new(i64::try_from(&prop.value).unwrap_or_default());
-                            // }
+                            // We only use the player resource to determine the player class
+                            // initially, right after the start of the demo (when player.class == Class::Other).
+                            // After that, we only consider player spawn events.
+                            "m_iPlayerClass" => {
+                                let new_class =
+                                    Class::new(i64::try_from(&prop.value).unwrap_or_default());
+
+                                if player.class == Class::Other {
+                                    // Not quite accurate, but it's the best we can do.
+                                    // This player was already alive when we started recording the demo.
+                                    if player.last_spawn_tick.is_none() {
+                                        player.last_spawn_tick = Some(tick);
+                                    }
+                                    player.class = new_class;
+                                }
+                            }
                             "m_iChargeLevel" => {
                                 // This is only networked in tournament mode
                                 // player.charge = i64
@@ -836,6 +917,10 @@ impl GameDetailsAnalyser {
         }
     }
 
+    // TODO:
+    // Evaluate if we need this at all.
+    // Currently, we track time on team using spawn events,
+    // just like time on class.
     fn handle_player_team_event(&mut self, event: &PlayerTeamEvent) {
         let player_id = event.user_id;
 
@@ -1058,6 +1143,7 @@ impl GameDetailsAnalyser {
     fn handle_player_spawn_event(&mut self, event: &PlayerSpawnEvent) {
         if let Some(player) = self.players.get_mut(&UserId::from(event.user_id)) {
             player.class = Class::new(event.class);
+            player.team = Team::new(event.team);
             player.last_spawn_tick = Some(self.demo_tick);
         }
     }
@@ -1114,6 +1200,7 @@ impl GameDetailsAnalyser {
 
     fn handle_player_disconnect_event(&mut self, event: &PlayerDisconnectEvent) {
         let user_id = UserId::from(event.user_id);
+
         self.add_highlight(Highlight::PlayerDisconnected {
             user_id,
             reason: event.reason.to_string(),

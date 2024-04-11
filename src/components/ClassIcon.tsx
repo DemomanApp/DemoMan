@@ -47,8 +47,8 @@ export default function ClassIcon({ cls, size = 32 }: ClassIconProps) {
       alt={stringifyClass(cls)}
       src={classIconMap[cls]}
       style={{
-        width: size ?? 32,
-        height: size ?? 32,
+        width: size,
+        height: size,
       }}
     />
   );

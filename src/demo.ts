@@ -146,7 +146,10 @@ export type PlayerSummary = {
   steam_id: SteamID;
   user_id: UserId;
 
-  team: Team;
+  time_on_team: [
+    number, number
+  ];
+
   time_on_class: [
     number,
     number,
