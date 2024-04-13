@@ -12,7 +12,7 @@ use std::{
     str::FromStr,
 };
 
-use log::{info, warn};
+use log::{trace, warn};
 use num_derive::FromPrimitive;
 use num_traits::FromPrimitive;
 use serde::{Deserialize, Serialize};
@@ -20,7 +20,7 @@ use serde::{Deserialize, Serialize};
 use steamid_ng::SteamID;
 use tf_demo_parser::{
     demo::{
-        data::{DemoTick, ServerTick},
+        data::{DemoTick, ServerTick, UserInfo},
         gameevent_gen::{
             CrossbowHealEvent, PlayerConnectClientEvent, PlayerDeathEvent, PlayerDisconnectEvent,
             PlayerHurtEvent, PlayerSpawnEvent, PlayerTeamEvent, TeamPlayPointCapturedEvent,
@@ -82,6 +82,16 @@ pub struct HighlightPlayerSnapshot {
     team: Team,
 }
 
+impl Default for HighlightPlayerSnapshot {
+    fn default() -> Self {
+        Self {
+            user_id: 0u16.into(),
+            name: "<unknown>".into(),
+            team: Team::Other,
+        }
+    }
+}
+
 #[derive(Debug, Serialize, Deserialize, PartialEq)]
 pub enum Highlight {
     Kill {
@@ -118,7 +128,7 @@ pub enum Highlight {
     PointCaptured {
         point_name: String,
         capturing_team: u8,
-        cappers: Vec<UserId>, // snapshots aren't needed since we already know the team as part of the event
+        cappers: Vec<HighlightPlayerSnapshot>,
     },
     RoundStalemate {
         reason: u8,
@@ -131,10 +141,10 @@ pub enum Highlight {
         // TODO: Win reason?
     },
     PlayerConnected {
-        user_id: UserId, // can't use snapshots here because there's no team yet
+        player: HighlightPlayerSnapshot,
     },
     PlayerDisconnected {
-        user_id: UserId,
+        player: HighlightPlayerSnapshot,
         reason: String,
     },
     Pause {
@@ -155,6 +165,7 @@ pub struct GameSummary {
     pub interval_per_tick: f32,
     pub num_rounds: u32,
     pub players: Vec<PlayerSummary>,
+    pub aliases: HashMap<UserId, UserId>,
 }
 
 /**
@@ -238,6 +249,7 @@ pub struct PlayerState {
     name: String,
     steam_id: u64,
     user_id: UserId,
+    entity_id: EntityId,
 
     /// The scoreboard for the entire match
     scoreboard: Scoreboard,
@@ -250,6 +262,7 @@ pub struct PlayerState {
     team: Team,
     life_state: PlayerLifeState,
     charge: u8,
+    is_connected: bool,
 
     player_cond: u32,
     player_cond_ex: u32,
@@ -271,7 +284,6 @@ pub struct PlayerState {
     time_on_team: Teams<usize>,
 }
 
-#[allow(dead_code)]
 impl PlayerState {
     pub fn has_cond(&self, cond: PlayerCondition) -> bool {
         let cond = cond as u32;
@@ -291,6 +303,7 @@ impl PlayerState {
         }
     }
 
+    #[allow(dead_code)]
     fn format_conditions(&self) -> Vec<PlayerCondition> {
         let mut conditions = Vec::new();
         for i in 0..128u32 {
@@ -318,6 +331,14 @@ impl PlayerState {
             // Prevent this life from contributing to class playtime a
             // second time, for example by dying after a round ended
             self.last_spawn_tick = None;
+        }
+    }
+
+    fn snapshot(&self) -> HighlightPlayerSnapshot {
+        HighlightPlayerSnapshot {
+            user_id: self.user_id,
+            name: self.name.clone(),
+            team: self.team,
         }
     }
 }
@@ -368,12 +389,183 @@ impl From<PlayerState> for PlayerSummary {
 }
 
 #[derive(Default, Debug)]
+pub struct Players {
+    // Indexed by steam ID
+    players: HashMap<UserId, PlayerState>,
+
+    // Players are assigned userIDs when joining the server.
+    // This ID is not reused after the player disconnects.
+    // Thus, if someone leaves and reconnects, he now has two
+    // user IDs throughout the game. This map keeps track of
+    // these "aliases".
+    // Key: old, unused user ID
+    // Value: new user ID
+    aliases: HashMap<UserId, UserId>,
+}
+
+impl Players {
+    pub fn get(&self, user_id: UserId) -> Option<&PlayerState> {
+        self.players.get(&user_id)
+    }
+
+    pub fn get_mut(&mut self, user_id: UserId) -> Option<&mut PlayerState> {
+        self.players.get_mut(&user_id)
+    }
+
+    // These getters do linear searches at the moment.
+    // TODO: Benchmark and determine if we need an index of some sort
+    pub fn get_by_entity_id(&self, entity_id: EntityId) -> Option<&PlayerState> {
+        self.players
+            .values()
+            .find(|player| player.entity_id == entity_id)
+    }
+
+    pub fn get_by_entity_id_mut(&mut self, entity_id: EntityId) -> Option<&mut PlayerState> {
+        self.players
+            .values_mut()
+            .find(|player| player.entity_id == entity_id)
+    }
+
+    pub fn snapshot(&self, user_id: UserId) -> Option<HighlightPlayerSnapshot> {
+        self.get(user_id).map(PlayerState::snapshot)
+    }
+
+    pub fn snapshot_or_fallback(&self, user_id: UserId) -> HighlightPlayerSnapshot {
+        self.snapshot(user_id).unwrap_or_default()
+    }
+
+    pub fn snapshot_by_entity_id(&self, entity_id: EntityId) -> HighlightPlayerSnapshot {
+        self.get_by_entity_id(entity_id)
+            .map(PlayerState::snapshot)
+            .unwrap_or_default()
+    }
+
+    pub fn inner(&self) -> &HashMap<UserId, PlayerState> {
+        &self.players
+    }
+
+    pub fn summary(self) -> (Vec<PlayerSummary>, HashMap<UserId, UserId>) {
+        let Self { players, aliases } = self;
+
+        let player_summaries = players.into_values().map(PlayerSummary::from).collect();
+
+        (player_summaries, aliases)
+    }
+
+    pub fn player_leave(&mut self, user_id: UserId, tick: DemoTick) {
+        if let Some(player) = self.get_mut(user_id) {
+            player.handle_life_end(tick);
+            player.is_connected = false;
+        }
+    }
+
+    pub fn alive_players_mut(&mut self) -> impl Iterator<Item = &mut PlayerState> {
+        self.players
+            .values_mut()
+            .filter(|player| player.is_connected && player.life_state == PlayerLifeState::Alive)
+    }
+
+    pub fn insert_or_update_player(&mut self, user_info: UserInfo) {
+        let steam_id: u64 = SteamID::from_steam3(&user_info.player_info.steam_id)
+            .unwrap_or_default()
+            .into();
+        let name = user_info.player_info.name;
+        let user_id = user_info.player_info.user_id;
+        let entity_id = user_info.entity_id;
+
+        if let Some(player) = self.players.get_mut(&user_id) {
+            // Not sure if these can ever change during a game.
+            // I put logging in here to find cases where this happens,
+            // and to enable us to investigate what best to do in these cases.
+
+            if player.name != name {
+                trace!("{user_id:?}: name changed from {} to {name}", player.name);
+                player.name = name;
+            }
+            if player.user_id != user_id {
+                trace!(
+                    "{user_id:?}: user_id changed from {:?} to {user_id:?}",
+                    player.user_id
+                );
+                self.aliases.insert(user_id, player.user_id);
+                player.user_id = user_id;
+            }
+            if player.entity_id != entity_id {
+                trace!(
+                    "{user_id:?}: entity_id changed from {:?} to {entity_id:?}",
+                    player.entity_id
+                );
+                player.entity_id = entity_id;
+            }
+            if player.steam_id != steam_id {
+                trace!(
+                    "{user_id:?}: steamID changed from {} to {steam_id}",
+                    player.steam_id
+                );
+                player.steam_id = steam_id;
+            }
+        } else if let (true, Some(old_user_id)) = (
+            // This is a bit ugly, and should be refactored once
+            // let-chains are stabilized.
+            steam_id != 0,
+            self.players
+                .iter()
+                .find_map(|(old_user_id, player)| {
+                    if player.steam_id == steam_id {
+                        Some(old_user_id)
+                    } else {
+                        None
+                    }
+                })
+                .copied(),
+        ) {
+            let mut player = self.players.remove(&old_user_id).unwrap();
+
+            if player.name != name {
+                trace!("{user_id:?}: name changed from {} to {name}", player.name);
+                player.name = name;
+            }
+            if player.steam_id != steam_id {
+                trace!(
+                    "{user_id:?}: steamID changed from {} to {steam_id}",
+                    player.steam_id
+                );
+                player.steam_id = steam_id;
+            }
+
+            player.user_id = user_id;
+            player.entity_id = entity_id;
+
+            self.players.insert(user_id, player);
+            self.aliases.insert(old_user_id, user_id);
+
+            // In case this user already has aliases, update them
+            for alias_target in self.aliases.values_mut() {
+                if *alias_target == old_user_id {
+                    *alias_target = user_id;
+                }
+            }
+        } else {
+            self.players.insert(
+                user_id,
+                PlayerState {
+                    name,
+                    steam_id,
+                    user_id,
+                    entity_id,
+                    ..Default::default()
+                },
+            );
+        }
+    }
+}
+
+#[derive(Default, Debug)]
 pub struct GameDetailsAnalyser {
     highlights: Vec<HighlightEvent>,
     interval_per_tick: f32,
     is_stv: bool,
-    players: HashMap<UserId, PlayerState>,
-    /// indexed by `ClassId`
+    players: Players,
     class_names: Vec<ServerClassName>,
     mediguns: HashMap<u32, EntityId>,
     red_team_entity_id: EntityId,
@@ -382,13 +574,10 @@ pub struct GameDetailsAnalyser {
     blue_team_score: u32,
     local_entity_id: EntityId,
 
-    /// The current round being played.  Increments while parsing
     current_round: u32,
 
     server_tick: ServerTick,
     demo_tick: DemoTick,
-
-    player_entities: HashMap<EntityId, UserId>,
 }
 
 impl MessageHandler for GameDetailsAnalyser {
@@ -471,21 +660,33 @@ impl MessageHandler for GameDetailsAnalyser {
     }
 
     fn into_output(self, _state: &ParserState) -> Self::Output {
+        let Self {
+            highlights,
+            interval_per_tick,
+            players,
+            red_team_score,
+            blue_team_score,
+            local_entity_id,
+            current_round,
+            ..
+        } = self;
+
+        let local_user_id = players
+            .get_by_entity_id(local_entity_id)
+            .map(|player| player.user_id)
+            .unwrap_or_default();
+
+        let (players, aliases) = players.summary();
+
         Self::Output {
-            local_user_id: *self
-                .player_entities
-                .get(&self.local_entity_id)
-                .unwrap_or(&UserId::default()),
-            highlights: self.highlights,
-            red_team_score: self.red_team_score,
-            blue_team_score: self.blue_team_score,
-            interval_per_tick: self.interval_per_tick,
-            players: self
-                .players
-                .into_values()
-                .map(PlayerSummary::from)
-                .collect(),
-            num_rounds: self.current_round,
+            local_user_id,
+            highlights,
+            red_team_score,
+            blue_team_score,
+            interval_per_tick,
+            players,
+            num_rounds: current_round,
+            aliases,
         }
     }
 }
@@ -540,16 +741,6 @@ impl GameDetailsAnalyser {
     fn add_highlight(&mut self, event: Highlight) {
         let tick = self.demo_tick;
         self.highlights.push(HighlightEvent { tick, event });
-    }
-
-    // fn get_player_of_entity(&self, entity_id: &EntityId) -> Option<&PlayerState> {
-    //     self.player_entities.get(entity_id).and_then(|user_id| self.players.get(user_id))
-    // }
-
-    fn get_player_of_entity_mut(&mut self, entity_id: EntityId) -> Option<&mut PlayerState> {
-        self.player_entities
-            .get(&entity_id)
-            .and_then(|user_id| self.players.get_mut(user_id))
     }
 
     pub fn handle_entity(&mut self, entity: &PacketEntity, parser_state: &ParserState) {
@@ -611,14 +802,8 @@ impl GameDetailsAnalyser {
 
     fn handle_usermessage(&mut self, message: &UserMessage) {
         if let UserMessage::SayText2(message) = message {
-            let player_id = self
-                .player_entities
-                .get(&message.client)
-                .copied()
-                .unwrap_or_default();
-
             self.add_highlight(Highlight::ChatMessage {
-                sender: self.player_snapshot(player_id),
+                sender: self.players.snapshot_by_entity_id(message.client),
                 text: message.plain_text(),
             });
         }
@@ -630,7 +815,9 @@ impl GameDetailsAnalyser {
         for prop in entity.props(parser_state) {
             if let Some((table_name, prop_name)) = prop.identifier.names() {
                 if let Ok(entity_id) = u32::from_str(prop_name.as_str()) {
-                    if let Some(player) = self.get_player_of_entity_mut(EntityId::from(entity_id)) {
+                    if let Some(player) =
+                        self.players.get_by_entity_id_mut(EntityId::from(entity_id))
+                    {
                         #[allow(clippy::match_same_arms)]
                         match table_name.as_str() {
                             "m_iTeam" => {
@@ -678,7 +865,7 @@ impl GameDetailsAnalyser {
     pub fn handle_player_entity(&mut self, entity: &PacketEntity, parser_state: &ParserState) {
         let current_round = self.current_round;
 
-        if let Some(player) = self.get_player_of_entity_mut(entity.entity_index) {
+        if let Some(player) = self.players.get_by_entity_id_mut(entity.entity_index) {
             const LIFE_STATE_PROP: SendPropIdentifier =
                 SendPropIdentifier::new("DT_BasePlayer", "m_lifeState");
 
@@ -820,7 +1007,10 @@ impl GameDetailsAnalyser {
                 }
             }
         } else {
-            info!("player not known in handle_player_entity");
+            trace!(
+                "player for entity ID {} not known in handle_player_entity",
+                u32::from(entity.entity_index)
+            );
         }
     }
 
@@ -839,7 +1029,7 @@ impl GameDetailsAnalyser {
                     let charge = f32::try_from(&prop.value).unwrap_or_default();
                     if let Some(owner_id) = self.mediguns.get(&entity.entity_index.into()).copied()
                     {
-                        if let Some(owner) = self.get_player_of_entity_mut(owner_id) {
+                        if let Some(owner) = self.players.get_by_entity_id_mut(owner_id) {
                             owner.charge = (charge * 100.0).round() as u8;
                         }
                     }
@@ -897,24 +1087,7 @@ impl GameDetailsAnalyser {
         if let Ok(Some(user_info)) =
             tf_demo_parser::demo::data::UserInfo::parse_from_string_table(index, text, data)
         {
-            // Remember who this player entity belongs to.
-            // If a player leaves and someone else joins,
-            // the new player can get the EntityId previously
-            // used by the player who left.
-            self.player_entities
-                .insert(user_info.entity_id, user_info.player_info.user_id);
-
-            // Remember this user's name/steamID
-            let player = self
-                .players
-                .entry(user_info.player_info.user_id)
-                .or_default();
-
-            player.name = user_info.player_info.name;
-            player.steam_id = SteamID::from_steam3(&user_info.player_info.steam_id)
-                .unwrap_or_default()
-                .into();
-            player.user_id = user_info.player_info.user_id;
+            self.players.insert_or_update_player(user_info);
         }
     }
 
@@ -923,27 +1096,23 @@ impl GameDetailsAnalyser {
     // Currently, we track time on team using spawn events,
     // just like time on class.
     fn handle_player_team_event(&mut self, event: &PlayerTeamEvent) {
-        let player_id = event.user_id;
-
-        if let Ok(team) = Team::try_from(event.team) {
-            if let Some(player) = self.players.get_mut(&player_id.into()) {
-                player.team = team;
-            }
-        }
+        // TODO
     }
 
     fn handle_player_hurt_event(&mut self, event: &PlayerHurtEvent) {
         let victim_id = UserId::from(event.user_id);
         let attacker_id = UserId::from(event.attacker);
 
-        let victim = self.players.get(&victim_id).expect("failed to find victim");
+        let Some(victim) = self.players.get(victim_id) else {
+            trace!("Unknown victim with id {victim_id:?}");
+            return;
+        };
 
         let weapon = WeaponClass::from_u16(event.weapon_id).unwrap_or_default();
 
-        if
         // In POV demos, only record airshots performed by the local player.
-        (self.is_stv ||
-                self.player_entities.get(&self.local_entity_id) == Some(&attacker_id)) &&
+        if (self.is_stv || self.players
+                .get_by_entity_id(self.local_entity_id).map(|player|&player.user_id) == Some(&attacker_id)) &&
             // Victim is currently blastjumping
             victim.has_cond(PlayerCondition::TF_COND_BLASTJUMPING) &&
             victim_id != attacker_id &&
@@ -959,8 +1128,8 @@ impl GameDetailsAnalyser {
             )
         {
             self.add_highlight(Highlight::Airshot {
-                attacker: self.player_snapshot(attacker_id),
-                victim: self.player_snapshot(victim_id),
+                attacker: self.players.snapshot_or_fallback(attacker_id),
+                victim: self.players.snapshot_or_fallback(victim_id),
             });
         }
     }
@@ -976,7 +1145,7 @@ impl GameDetailsAnalyser {
         };
         let victim_id = UserId::from(event.user_id);
 
-        let victim = self.players.get_mut(&victim_id);
+        let victim = self.players.get_mut(victim_id);
 
         let drop: bool;
         let airshot: bool;
@@ -1083,9 +1252,17 @@ impl GameDetailsAnalyser {
         }
 
         self.add_highlight(Highlight::Kill {
-            killer: self.player_snapshot_with_name(killer_id, killer_name_override),
-            assister: maybe_assister_id.map(|assister_id| self.player_snapshot(assister_id)),
-            victim: self.player_snapshot(victim_id),
+            killer: {
+                let mut snapshot = self.players.snapshot_or_fallback(killer_id);
+                if let Some(name_override) = killer_name_override {
+                    snapshot.name = name_override;
+                }
+
+                snapshot
+            },
+            assister: maybe_assister_id
+                .map(|assister_id| self.players.snapshot_or_fallback(assister_id)),
+            victim: self.players.snapshot_or_fallback(victim_id),
             weapon: event.weapon.to_string(),
             kill_icon: kill_icon.to_string(),
             streak: event.kill_streak_total as usize,
@@ -1095,7 +1272,7 @@ impl GameDetailsAnalyser {
 
         if event.kill_streak_total > 0 && event.kill_streak_total % 5 == 0 {
             self.add_highlight(Highlight::KillStreak {
-                player: self.player_snapshot(killer_id),
+                player: self.players.snapshot_or_fallback(killer_id),
                 streak: event.kill_streak_total,
             });
         }
@@ -1104,9 +1281,9 @@ impl GameDetailsAnalyser {
         // medigun is active (which isn't always when their heal target gets a kill!)
         if event.kill_streak_assist > 0 && event.kill_streak_assist % 5 == 0 {
             if let Some(assister_id) = maybe_assister_id {
-                if self.players.contains_key(&assister_id) {
+                if let Some(player) = self.players.snapshot(assister_id) {
                     self.add_highlight(Highlight::KillStreak {
-                        player: self.player_snapshot(assister_id),
+                        player,
                         streak: event.kill_streak_assist,
                     });
                 }
@@ -1115,8 +1292,8 @@ impl GameDetailsAnalyser {
 
         if event.kill_streak_victim >= 10 {
             self.add_highlight(Highlight::KillStreakEnded {
-                killer: self.player_snapshot(killer_id),
-                victim: self.player_snapshot(victim_id),
+                killer: self.players.snapshot_or_fallback(killer_id),
+                victim: self.players.snapshot_or_fallback(victim_id),
                 streak: event.kill_streak_victim,
             });
         }
@@ -1130,22 +1307,25 @@ impl GameDetailsAnalyser {
         // TODO: reconsider if we need this at all.
 
         let target_id = UserId::from(u16::from(event.target));
+        let healer_id = UserId::from(u16::from(event.healer));
 
-        if let Some(target_player) = self.players.get(&target_id) {
+        if let Some(target_player) = self.players.get(target_id) {
             if target_player.has_cond(PlayerCondition::TF_COND_BLASTJUMPING) {
                 self.add_highlight(Highlight::CrossbowAirshot {
-                    healer: self.player_snapshot(UserId::from(u16::from(event.healer))),
-                    target: self.player_snapshot(UserId::from(u16::from(event.target))),
+                    healer: self.players.snapshot_or_fallback(healer_id),
+                    target: self.players.snapshot_or_fallback(target_id),
                 });
             }
         }
     }
 
     fn handle_player_spawn_event(&mut self, event: &PlayerSpawnEvent) {
-        if let Some(player) = self.players.get_mut(&UserId::from(event.user_id)) {
+        if let Some(player) = self.players.get_mut(UserId::from(event.user_id)) {
             player.class = Class::new(event.class);
             player.team = Team::new(event.team);
             player.last_spawn_tick = Some(self.demo_tick);
+        } else {
+            trace!("Unknow player with user id {} spawned", event.user_id);
         }
     }
 
@@ -1167,10 +1347,8 @@ impl GameDetailsAnalyser {
 
     fn handle_round_end(&mut self) {
         self.current_round += 1;
-        for player in self.players.values_mut() {
-            if player.life_state == PlayerLifeState::Alive {
-                player.handle_life_end(self.demo_tick);
-            }
+        for player in self.players.alive_players_mut() {
+            player.handle_life_end(self.demo_tick);
         }
     }
 
@@ -1181,8 +1359,8 @@ impl GameDetailsAnalyser {
 
         for capper_entity_id in event.cappers.as_bytes() {
             let capper_entity_id = EntityId::from(*capper_entity_id as usize);
-            if let Some(capper_user_id) = self.player_entities.get(&capper_entity_id) {
-                cappers.push(*capper_user_id);
+            if let Some(capper) = self.players.get_by_entity_id(capper_entity_id) {
+                cappers.push(capper.snapshot());
             }
         }
 
@@ -1195,7 +1373,11 @@ impl GameDetailsAnalyser {
 
     fn handle_player_connect_event(&mut self, event: &PlayerConnectClientEvent) {
         self.add_highlight(Highlight::PlayerConnected {
-            user_id: UserId::from(event.user_id),
+            player: HighlightPlayerSnapshot {
+                user_id: event.user_id.into(),
+                name: event.name.as_ref().into(),
+                team: Team::Other,
+            },
         });
     }
 
@@ -1203,49 +1385,11 @@ impl GameDetailsAnalyser {
         let user_id = UserId::from(event.user_id);
 
         self.add_highlight(Highlight::PlayerDisconnected {
-            user_id,
+            player: self.players.snapshot_or_fallback(user_id),
             reason: event.reason.to_string(),
         });
 
-        if let Some(player) = self.players.get_mut(&user_id) {
-            player.handle_life_end(self.demo_tick);
-        }
-    }
-
-    /// Creates a snapshot for a player with the given user ID.
-    fn player_snapshot(&self, user_id: UserId) -> HighlightPlayerSnapshot {
-        self.player_snapshot_with_name(user_id, None)
-    }
-
-    /// Creates a snapshot for a player with the given user ID and an optional specified name.
-    /// If a name isn't provided, the player's current name will be taken from the current demo
-    /// state.
-    fn player_snapshot_with_name(
-        &self,
-        user_id: UserId,
-        name_override: Option<String>,
-    ) -> HighlightPlayerSnapshot {
-        match self.players.get(&user_id) {
-            Some(player) => HighlightPlayerSnapshot {
-                user_id: player.user_id,
-                name: name_override.unwrap_or_else(|| player.name.clone()),
-                team: player.team,
-            },
-            None => {
-                // Most likely UserId(0)
-                HighlightPlayerSnapshot {
-                    user_id,
-                    name: name_override.unwrap_or_else(|| {
-                        if user_id == 0 {
-                            "WORLD".to_string()
-                        } else {
-                            "<unknown>".to_string()
-                        }
-                    }),
-                    team: Team::Other,
-                }
-            }
-        }
+        self.players.player_leave(user_id, self.demo_tick);
     }
 }
 

@@ -1,11 +1,11 @@
-import { useMemo, useRef } from "react";
+import { useRef } from "react";
 
 import AutoSizer from "react-virtualized-auto-sizer";
 import { FixedSizeList } from "react-window";
 
 import { ScrollArea, Text } from "@mantine/core";
 
-import { GameSummary, UserId, PlayerSummary } from "@/demo";
+import { GameSummary } from "@/demo";
 import HighlightBox from "./HighlightBox";
 
 export type TimelineProps = {
@@ -14,14 +14,6 @@ export type TimelineProps = {
 
 export default function HighlightsList({ gameSummary }: TimelineProps) {
   const listRef = useRef<FixedSizeList>(null);
-
-  const playerMap = useMemo(() => {
-    const result = new Map<UserId, PlayerSummary>();
-    gameSummary.players.forEach((player) => {
-      result.set(player.user_id, player);
-    });
-    return result;
-  }, [gameSummary.players]);
 
   return (
     <AutoSizer>
@@ -56,7 +48,7 @@ export default function HighlightsList({ gameSummary }: TimelineProps) {
                   >
                     {tick}
                   </Text>
-                  <HighlightBox event={event} playerMap={playerMap} />
+                  <HighlightBox event={event} />
                 </div>
               );
             }}

@@ -1,7 +1,5 @@
 import * as log from "tauri-plugin-log-api";
 
-import { useMantineTheme } from "@mantine/core";
-
 import {
   ChatMessageHighlight,
   AirshotHighlight,
@@ -12,8 +10,6 @@ import {
   RoundWinHighlight,
   PlayerConnectedHighlight,
   PlayerDisconnectedHighlight,
-  UserId,
-  PlayerSummary,
   TEAM_NAMES,
   HighlightPlayerSnapshot,
   Team,
@@ -31,62 +27,37 @@ import classes from "./HighlightBox.module.css";
 
 type HighlightProps = {
   event: Highlight;
-  playerMap: Map<UserId, PlayerSummary>;
 };
 
 type PlayerNameProps = {
-  player: PlayerSummary | HighlightPlayerSnapshot | undefined;
-  /**
-   * The team the player is on.  Used to override the team color on the player object.
-   * This can be helpful in the uncommon cases where the player's team is set to "other".
-   */
-  team?: Team | number;
+  player: HighlightPlayerSnapshot | undefined;
 };
 
-function PlayerName({ player, team = undefined }: PlayerNameProps) {
-  const theme = useMantineTheme();
-  let color = "unset";
+function PlayerName({ player }: PlayerNameProps) {
   const name = player?.name ?? "<unknown>";
+  const team = player?.team ?? "other";
 
-  if (team !== undefined) {
-    switch (team) {
-      case "red":
-      case 2: // red team number
-        color = theme.colors.red[6];
-        break;
-      case "blue":
-      case 3: // blue team number
-        color = theme.colors.blue[6];
-        break;
-      default: // no team specified
-        break;
-    }
-  }
-
-  if (color === "unset") {
-    if (player !== undefined) {
-      if (player.team === "red") {
-        color = theme.colors.red[6];
-      } else if (player.team === "blue") {
-        color = theme.colors.blue[6];
-      } else {
-        // No team was specified and the player isn't associated with a team (did we miss an m_iTeam update?)
-      }
-    }
-  }
+  const color = teamColor(team);
   return <span style={{ color }}>{name}</span>;
 }
 
-/**
- * Returns an array equivalent to the given one, but with filler objects between every original value.
- *
- * @param array
- * @param filler
- */
-const injectBetween = function <T>(
-  array: T[],
-  filler: (index: number) => T
-): T[] {
+function teamColor(team: Team): string {
+  let color;
+  switch (team) {
+    case "red":
+      color = "var(--mantine-color-red-filled)";
+      break;
+    case "blue":
+      color = "var(--mantine-color-blue-filled)";
+      break;
+    default:
+      color = "var(--mantine-color-text)";
+      break;
+  }
+  return color;
+}
+
+function intersperse<T>(array: T[], filler: (index: number) => T): T[] {
   const output: T[] = [];
   array.forEach((value, i) => {
     output.push(value);
@@ -95,26 +66,18 @@ const injectBetween = function <T>(
     }
   });
   return output;
-};
+}
 
-function PlayerNames({
-  players,
-  team,
-}: {
-  players: (PlayerSummary | undefined)[];
-  team: number;
-}) {
+function PlayerNames({ players }: { players: HighlightPlayerSnapshot[] }) {
   if (players.length === 0) {
     return <></>;
   }
 
   return (
     <>
-      {injectBetween(
+      {intersperse(
         players.map((player) => {
-          return (
-            <PlayerName key={player?.user_id} player={player} team={team} />
-          );
+          return <PlayerName key={player?.user_id} player={player} />;
         }),
         (index) => {
           return <span key={index}>&nbsp;+&nbsp;</span>;
@@ -274,12 +237,7 @@ function CrossbowAirshotHighlightBox(highlight: CrossbowAirshotHighlight) {
   );
 }
 
-function PointCapturedHighlightBox(
-  highlight: PointCapturedHighlight,
-  playerMap: Map<UserId, PlayerSummary>
-) {
-  const cappers = highlight.cappers.map((capper) => playerMap.get(capper));
-
+function PointCapturedHighlightBox(highlight: PointCapturedHighlight) {
   let icon;
 
   // For some reason the two capture icons are slightly
@@ -302,7 +260,7 @@ function PointCapturedHighlightBox(
 
   return (
     <div className={classes.highlightRight}>
-      <PlayerNames players={cappers} team={highlight.capturing_team} />
+      <PlayerNames players={highlight.cappers} />
       &nbsp;
       {icon !== undefined && <KillIcon killIcon={icon} />}
       captured {pointName}
@@ -334,24 +292,17 @@ function RoundWinHighlightBox(highlight: RoundWinHighlight) {
   );
 }
 
-function PlayerConnectedHighlightBox(
-  highlight: PlayerConnectedHighlight,
-  playerMap: Map<UserId, PlayerSummary>
-) {
-  const playerName = playerMap.get(highlight.user_id)?.name ?? "<unknown>";
-
+function PlayerConnectedHighlightBox(highlight: PlayerConnectedHighlight) {
   return (
     <div className={classes.highlightLeft}>
-      {playerName} has joined the game
+      {highlight.player.name} has joined the game
     </div>
   );
 }
 
 function PlayerDisconnectedHighlightBox(
-  highlight: PlayerDisconnectedHighlight,
-  playerMap: Map<UserId, PlayerSummary>
+  highlight: PlayerDisconnectedHighlight
 ) {
-  const playerName = playerMap.get(highlight.user_id)?.name ?? "<unknown>";
   let reason = highlight.reason;
   if (reason === "#TF_MM_Generic_Kicked") {
     reason = "Removed from match by system";
@@ -360,7 +311,7 @@ function PlayerDisconnectedHighlightBox(
   }
   return (
     <div className={classes.highlightLeft}>
-      {playerName} left the game ({reason})
+      {highlight.player.name} left the game ({reason})
     </div>
   );
 }
@@ -395,7 +346,7 @@ function destructure(hl: Highlight): TaggedHighlight {
   return { type, highlight } as TaggedHighlight;
 }
 
-export default function HighlightBox({ event, playerMap }: HighlightProps) {
+export default function HighlightBox({ event }: HighlightProps) {
   const { type, highlight } = destructure(event);
 
   switch (type) {
@@ -412,7 +363,7 @@ export default function HighlightBox({ event, playerMap }: HighlightProps) {
     case "CrossbowAirshot":
       return CrossbowAirshotHighlightBox(highlight);
     case "PointCaptured":
-      return PointCapturedHighlightBox(highlight, playerMap);
+      return PointCapturedHighlightBox(highlight);
     case "RoundStalemate":
       return RoundStalemateHighlightBox(highlight);
     case "RoundStart":
@@ -420,9 +371,9 @@ export default function HighlightBox({ event, playerMap }: HighlightProps) {
     case "RoundWin":
       return RoundWinHighlightBox(highlight);
     case "PlayerConnected":
-      return PlayerConnectedHighlightBox(highlight, playerMap);
+      return PlayerConnectedHighlightBox(highlight);
     case "PlayerDisconnected":
-      return PlayerDisconnectedHighlightBox(highlight, playerMap);
+      return PlayerDisconnectedHighlightBox(highlight);
     case "Pause":
       return PauseHighlightBox(highlight);
     default:

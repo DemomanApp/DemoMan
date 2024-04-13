@@ -3,7 +3,7 @@ import { useMemo, useState } from "react";
 import { Divider, Paper, ScrollArea, Tabs, Text, Title } from "@mantine/core";
 import { IconBrandSteam } from "@tabler/icons-react";
 
-import { GameSummary, PlayerSummary, Team } from "@/demo";
+import { GameSummary, PlayerSummary, primaryTeam } from "@/demo";
 import { PlayerBox } from "./PlayerBox";
 import { ScoreboardTable } from "./ScoreboardTable";
 import { TableHeader } from "./TableHeader";
@@ -15,18 +15,6 @@ export type PlayerListProps = {
   gameSummary: GameSummary;
 };
 
-function primary_team(player: PlayerSummary): Team {
-  const [time_on_red, time_on_blue] = player.time_on_team;
-
-  if (time_on_blue > time_on_red) {
-    return "blue";
-  } else if (time_on_red > time_on_blue) {
-    return "red";
-  } else {
-    return "other";
-  }
-}
-
 export default function PlayerList({ gameSummary }: PlayerListProps) {
   const [redPlayers, bluPlayers, _others] = useMemo(() => {
     const redPlayers: PlayerSummary[] = [];
@@ -34,7 +22,7 @@ export default function PlayerList({ gameSummary }: PlayerListProps) {
     const others: PlayerSummary[] = [];
 
     gameSummary.players.forEach((player) => {
-      const team = primary_team(player);
+      const team = primaryTeam(player);
       if (team === "red") {
         redPlayers.push(player);
       } else if (team === "blue") {

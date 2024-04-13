@@ -49,7 +49,7 @@ export type SteamID = string;
 export type HighlightPlayerSnapshot = {
   user_id: UserId;
   name: string;
-  team: string;
+  team: Team;
 };
 
 export type KillHighlight = {
@@ -92,7 +92,7 @@ export type CrossbowAirshotHighlight = {
 export type PointCapturedHighlight = {
   point_name: string;
   capturing_team: number;
-  cappers: UserId[];
+  cappers: HighlightPlayerSnapshot[];
 };
 
 export type RoundStalemateHighlight = {
@@ -109,11 +109,11 @@ export type RoundWinHighlight = {
 };
 
 export type PlayerConnectedHighlight = {
-  user_id: UserId;
+  player: HighlightPlayerSnapshot;
 };
 
 export type PlayerDisconnectedHighlight = {
-  user_id: UserId;
+  player: HighlightPlayerSnapshot;
   reason: string;
 };
 
@@ -150,9 +150,7 @@ export type PlayerSummary = {
   steam_id: SteamID;
   user_id: UserId;
 
-  time_on_team: [
-    number, number
-  ];
+  time_on_team: [number, number];
 
   time_on_class: [
     number,
@@ -163,13 +161,25 @@ export type PlayerSummary = {
     number,
     number,
     number,
-    number
+    number,
   ];
 
   scoreboard: Scoreboard;
 
   round_scoreboards: ScoreboardMap;
 };
+
+export function primaryTeam(player: PlayerSummary): Team {
+  const [time_on_red, time_on_blue] = player.time_on_team;
+
+  if (time_on_blue > time_on_red) {
+    return "blue";
+  } else if (time_on_red > time_on_blue) {
+    return "red";
+  } else {
+    return "other";
+  }
+}
 
 export type GameSummary = {
   local_user_id: UserId;
@@ -179,6 +189,7 @@ export type GameSummary = {
   interval_per_tick: number;
   players: PlayerSummary[];
   num_rounds: number;
+  aliases: Record<number, number>;
 };
 
 export type Scoreboard = {

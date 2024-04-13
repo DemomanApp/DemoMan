@@ -6,7 +6,7 @@ use std::{
     vec::Vec,
 };
 
-use log::info;
+use log::trace;
 use tauri::State;
 
 use crate::{
@@ -206,7 +206,7 @@ pub async fn get_demo_details(
     if let Some(game_summary) = disk_cache.get(demo_path).await {
         Ok(game_summary)
     } else {
-        info!("Cache miss");
+        trace!("Cache miss");
         let game_summary = read_demo_details(Path::new(demo_path))?;
 
         disk_cache.set(demo_path, &game_summary).await;
