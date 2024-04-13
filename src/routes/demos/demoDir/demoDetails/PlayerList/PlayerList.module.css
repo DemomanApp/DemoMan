@@ -34,3 +34,8 @@
   padding-left: var(--mantine-spacing-xs);
   padding-right: var(--mantine-spacing-xs);
 }
+
+.steam-icon {
+  margin-left: var(--mantine-spacing-xs);
+  color: var(--mantine-color-text);
+}

@@ -1,14 +1,15 @@
 import { useMemo, useState } from "react";
 
 import { Divider, Paper, ScrollArea, Tabs, Text, Title } from "@mantine/core";
+import { IconBrandSteam } from "@tabler/icons-react";
 
 import { GameSummary, PlayerSummary, Team } from "@/demo";
 import { PlayerBox } from "./PlayerBox";
 import { ScoreboardTable } from "./ScoreboardTable";
 import { TableHeader } from "./TableHeader";
+import ClassPlaytimeIndicator from "./ClassPlaytimeIndicator";
 
 import classes from "./PlayerList.module.css";
-import ClassPlaytimeIndicator from "./ClassPlaytimeIndicator";
 
 export type PlayerListProps = {
   gameSummary: GameSummary;
@@ -117,7 +118,18 @@ export default function PlayerList({ gameSummary }: PlayerListProps) {
           {/* Divider above the scoreboard*/}
           <Divider />
           <div className={classes.scoreboardPlayerNameHeader}>
-            <Title order={2}>{currentPlayer.name}</Title>
+            <Title order={2}>
+              {currentPlayer.name}
+              {currentPlayer.steam_id !== "0" && (
+                <a
+                  href={`https://steamcommunity.com/profiles/${currentPlayer.steam_id}`}
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  <IconBrandSteam className={classes.steamIcon} />
+                </a>
+              )}
+            </Title>
             <ClassPlaytimeIndicator
               player={currentPlayer}
               intervalPerTick={gameSummary.interval_per_tick}

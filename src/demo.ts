@@ -40,7 +40,11 @@ export function stringifyClass(cls: Class) {
 
 export type UserId = number;
 
-export type SteamID = number;
+// Sigh...
+// This was once a number, before I realized that
+// JS converts these to floats and thus loses
+// precision (steamID64s are quite large)
+export type SteamID = string;
 
 export type HighlightPlayerSnapshot = {
   user_id: UserId;

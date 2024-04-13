@@ -325,7 +325,7 @@ impl PlayerState {
 #[derive(Debug, Default, Deserialize, Serialize, PartialEq)]
 pub struct PlayerSummary {
     name: String,
-    steam_id: u64,
+    steam_id: String,
     user_id: UserId,
 
     time_on_class: [usize; 9],
@@ -353,6 +353,7 @@ impl From<PlayerState> for PlayerSummary {
 
         let time_on_team = time_on_team.into_real_teams();
         let time_on_class = time_on_class.into_real_classes();
+        let steam_id = steam_id.to_string();
 
         Self {
             name,
