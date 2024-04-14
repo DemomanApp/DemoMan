@@ -137,7 +137,7 @@ pub enum Highlight {
         full_reset: bool,
     },
     RoundWin {
-        winner: u8,
+        winner: Team,
         // TODO: Win reason?
     },
     PlayerConnected {
@@ -146,6 +146,10 @@ pub enum Highlight {
     PlayerDisconnected {
         player: HighlightPlayerSnapshot,
         reason: String,
+    },
+    PlayerTeamChange {
+        player: HighlightPlayerSnapshot,
+        team: Team,
     },
     Pause {
         pause: bool,
@@ -438,10 +442,6 @@ impl Players {
         self.get_by_entity_id(entity_id)
             .map(PlayerState::snapshot)
             .unwrap_or_default()
-    }
-
-    pub fn inner(&self) -> &HashMap<UserId, PlayerState> {
-        &self.players
     }
 
     pub fn summary(self) -> (Vec<PlayerSummary>, HashMap<UserId, UserId>) {
@@ -1091,12 +1091,27 @@ impl GameDetailsAnalyser {
         }
     }
 
-    // TODO:
-    // Evaluate if we need this at all.
-    // Currently, we track time on team using spawn events,
-    // just like time on class.
     fn handle_player_team_event(&mut self, event: &PlayerTeamEvent) {
-        // TODO
+        let Ok(team) = Team::try_from(event.team) else {
+            return;
+        };
+        let user_id = UserId::from(event.user_id);
+        let name = event.name.as_ref().to_string();
+
+        // After a player disconnects, a game event is triggered
+        // changing them to team Other.
+        if team == Team::Other {
+            return;
+        }
+
+        self.add_highlight(Highlight::PlayerTeamChange {
+            player: HighlightPlayerSnapshot {
+                user_id,
+                name,
+                team,
+            },
+            team,
+        });
     }
 
     fn handle_player_hurt_event(&mut self, event: &PlayerHurtEvent) {
@@ -1342,7 +1357,9 @@ impl GameDetailsAnalyser {
     }
 
     fn handle_round_win_event(&mut self, event: &TeamPlayRoundWinEvent) {
-        self.add_highlight(Highlight::RoundWin { winner: event.team });
+        self.add_highlight(Highlight::RoundWin {
+            winner: Team::try_from(event.team).unwrap_or_default(),
+        });
     }
 
     fn handle_round_end(&mut self) {

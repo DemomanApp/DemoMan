@@ -10,7 +10,6 @@ import {
   RoundWinHighlight,
   PlayerConnectedHighlight,
   PlayerDisconnectedHighlight,
-  TEAM_NAMES,
   HighlightPlayerSnapshot,
   Team,
   KillStreakHighlight,
@@ -18,6 +17,7 @@ import {
   PauseHighlight,
   RoundStalemateHighlight,
   RoundStartHighlight,
+  PlayerTeamChangeHighlight,
 } from "@/demo";
 import { KillIcon } from "@/components";
 import KillstreakIcon from "@/components/KillstreakIcon";
@@ -39,6 +39,25 @@ function PlayerName({ player }: PlayerNameProps) {
 
   const color = teamColor(team);
   return <span style={{ color }}>{name}</span>;
+}
+
+function TeamName({ team }: { team: Team }) {
+  let teamName;
+  switch (team) {
+    case "red":
+      teamName = "RED";
+      break;
+    case "blue":
+      teamName = "BLU";
+      break;
+    case "spectator":
+      teamName = "SPECTATOR";
+      break;
+    case "other":
+      teamName = "OTHER";
+      break;
+  }
+  return <span style={{ color: teamColor(team) }}>{teamName}</span>;
 }
 
 function teamColor(team: Team): string {
@@ -115,9 +134,7 @@ function KillHighlightBox(highlight: KillHighlight) {
             <PlayerName player={assister} />
           </>
         )}
-        &nbsp;
-        <b>finished off</b>
-        &nbsp;
+        &nbsp; finished off &nbsp;
         <PlayerName player={victim} />
       </div>
     );
@@ -285,10 +302,11 @@ function RoundStartHighlightBox({
 }
 
 function RoundWinHighlightBox(highlight: RoundWinHighlight) {
-  const team_number = highlight.winner;
-  const teamName = TEAM_NAMES[team_number] ?? TEAM_NAMES[0];
   return (
-    <div className={classes.highlightCenter}>{teamName} won the round</div>
+    <div className={classes.highlightCenter}>
+      <TeamName team={highlight.winner} />
+      &nbsp;won the round
+    </div>
   );
 }
 
@@ -316,6 +334,15 @@ function PlayerDisconnectedHighlightBox(
   );
 }
 
+function PlayerTeamChangeHighlightBox(highlight: PlayerTeamChangeHighlight) {
+  return (
+    <div className={classes.highlightLeft}>
+      {highlight.player.name} has joined team&nbsp;
+      <TeamName team={highlight.team} />
+    </div>
+  );
+}
+
 function PauseHighlightBox({ pause }: PauseHighlight) {
   return (
     <div className={classes.highlightCenter}>
@@ -339,6 +366,7 @@ export type TaggedHighlight =
   | { type: "RoundWin"; highlight: RoundWinHighlight }
   | { type: "PlayerConnected"; highlight: PlayerConnectedHighlight }
   | { type: "PlayerDisconnected"; highlight: PlayerDisconnectedHighlight }
+  | { type: "PlayerTeamChange"; highlight: PlayerTeamChangeHighlight }
   | { type: "Pause"; highlight: PauseHighlight };
 
 function destructure(hl: Highlight): TaggedHighlight {
@@ -374,6 +402,8 @@ export default function HighlightBox({ event }: HighlightProps) {
       return PlayerConnectedHighlightBox(highlight);
     case "PlayerDisconnected":
       return PlayerDisconnectedHighlightBox(highlight);
+    case "PlayerTeamChange":
+      return PlayerTeamChangeHighlightBox(highlight);
     case "Pause":
       return PauseHighlightBox(highlight);
     default:

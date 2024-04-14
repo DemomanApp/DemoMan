@@ -20,8 +20,6 @@ export type Demo = {
 
 export type Team = "red" | "blue" | "spectator" | "other";
 
-export const TEAM_NAMES = ["UNASSIGNED", "SPECTATOR", "RED", "BLU"] as const;
-
 export enum Class {
   Scout,
   Sniper,
@@ -104,7 +102,7 @@ export type RoundStartHighlight = {
 };
 
 export type RoundWinHighlight = {
-  winner: number;
+  winner: Team;
   // TODO: Win reason?
 };
 
@@ -115,6 +113,11 @@ export type PlayerConnectedHighlight = {
 export type PlayerDisconnectedHighlight = {
   player: HighlightPlayerSnapshot;
   reason: string;
+};
+
+export type PlayerTeamChangeHighlight = {
+  player: HighlightPlayerSnapshot;
+  team: Team;
 };
 
 export type PauseHighlight = {
@@ -134,6 +137,7 @@ export type Highlight =
   | { RoundWin: RoundWinHighlight }
   | { PlayerConnected: PlayerConnectedHighlight }
   | { PlayerDisconnected: PlayerDisconnectedHighlight }
+  | { PlayerTeamChange: PlayerTeamChangeHighlight }
   | { Pause: PauseHighlight };
 
 export type HighlightEvent = {
