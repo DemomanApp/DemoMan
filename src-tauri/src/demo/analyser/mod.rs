@@ -322,11 +322,6 @@ impl PlayerState {
 
     fn handle_life_end(&mut self, tick: DemoTick) {
         if let Some(last_spawn_tick) = self.last_spawn_tick {
-            if last_spawn_tick > tick {
-                // Some demos contain bogus packets at the start
-                return;
-            }
-
             let life_duration = u32::from(tick - last_spawn_tick) as usize;
 
             self.time_on_class[self.class] += life_duration;
@@ -574,6 +569,8 @@ pub struct GameDetailsAnalyser {
     blue_team_score: u32,
     local_entity_id: EntityId,
 
+    initial_packet_entities_parsed: bool,
+
     current_round: u32,
 
     server_tick: ServerTick,
@@ -602,12 +599,22 @@ impl MessageHandler for GameDetailsAnalyser {
                 self.server_tick = message.tick;
             }
             Message::PacketEntities(message) => {
+                self.initial_packet_entities_parsed = true;
                 for entity in &message.entities {
                     self.handle_entity(entity, parser_state);
                 }
             }
             Message::GameEvent(GameEventMessage { event, .. }) => {
-                self.handle_game_event(event);
+                // Sigh...
+                // On some demos, there are garbage game events that occur
+                // before the first PacketEntities message.
+                // These have incorrect demo ticks, probably carried over from previous rounds,
+                // and bogus content: On one of the demos I tested, there were a bunch of
+                // player spawn events with class=Other. We just ignore every game event that
+                // came before the initial PacketEntities message.
+                if self.initial_packet_entities_parsed {
+                    self.handle_game_event(event);
+                }
             }
             Message::UserMessage(message) => {
                 self.handle_usermessage(message);
