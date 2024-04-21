@@ -42,7 +42,7 @@ use tf_demo_parser::{
             analyser::{Class, Team, UserId},
             MessageHandler,
         },
-        sendprop::SendPropIdentifier,
+        sendprop::{SendPropIdentifier, SendPropValue},
     },
     MessageType, ParserState, Stream,
 };
@@ -59,6 +59,13 @@ pub enum PlayerLifeState {
     Dying = 1,
     Death = 2,
     Respawnable = 3,
+}
+impl TryFrom<&SendPropValue> for PlayerLifeState {
+    type Error = ();
+
+    fn try_from(value: &SendPropValue) -> Result<Self, Self::Error> {
+        Self::from_i64(i64::try_from(value).or(Err(()))?).ok_or(())
+    }
 }
 
 #[derive(Debug, Serialize, Deserialize, PartialEq)]
@@ -266,7 +273,6 @@ pub struct PlayerState {
     team: Team,
     life_state: PlayerLifeState,
     charge: u8,
-    is_connected: bool,
 
     player_cond: u32,
     player_cond_ex: u32,
@@ -439,9 +445,12 @@ impl Players {
             .unwrap_or_default()
     }
 
-    pub fn summary(self) -> (Vec<PlayerSummary>, HashMap<UserId, UserId>) {
-        let Self { players, aliases } = self;
+    pub fn finish(mut self, tick: DemoTick) -> (Vec<PlayerSummary>, HashMap<UserId, UserId>) {
+        for player in self.alive_players_mut() {
+            player.handle_life_end(tick);
+        }
 
+        let Self { players, aliases } = self;
         let player_summaries = players.into_values().map(PlayerSummary::from).collect();
 
         (player_summaries, aliases)
@@ -450,14 +459,31 @@ impl Players {
     pub fn player_leave(&mut self, user_id: UserId, tick: DemoTick) {
         if let Some(player) = self.get_mut(user_id) {
             player.handle_life_end(tick);
-            player.is_connected = false;
         }
     }
 
     pub fn alive_players_mut(&mut self) -> impl Iterator<Item = &mut PlayerState> {
         self.players
             .values_mut()
-            .filter(|player| player.is_connected && player.life_state == PlayerLifeState::Alive)
+            .filter(|player| player.life_state == PlayerLifeState::Alive)
+    }
+
+    fn find_previous_user_id(&self, steam_id: u64) -> Option<UserId> {
+        // Bot accounts all have the same steamID (0)
+        if steam_id == 0 {
+            return None;
+        }
+
+        self.players
+            .iter()
+            .find_map(|(old_user_id, player)| {
+                if player.steam_id == steam_id {
+                    Some(old_user_id)
+                } else {
+                    None
+                }
+            })
+            .copied()
     }
 
     pub fn insert_or_update_player(&mut self, user_info: UserInfo) {
@@ -499,37 +525,20 @@ impl Players {
                 );
                 player.steam_id = steam_id;
             }
-        } else if let (true, Some(old_user_id)) = (
-            // This is a bit ugly, and should be refactored once
-            // let-chains are stabilized.
-            steam_id != 0,
-            self.players
-                .iter()
-                .find_map(|(old_user_id, player)| {
-                    if player.steam_id == steam_id {
-                        Some(old_user_id)
-                    } else {
-                        None
-                    }
-                })
-                .copied(),
-        ) {
+        } else if let Some(old_user_id) = self.find_previous_user_id(steam_id) {
             let mut player = self.players.remove(&old_user_id).unwrap();
 
             if player.name != name {
-                trace!("{user_id:?}: name changed from {} to {name}", player.name);
-                player.name = name;
-            }
-            if player.steam_id != steam_id {
                 trace!(
-                    "{user_id:?}: steamID changed from {} to {steam_id}",
-                    player.steam_id
+                    "Player reconnected with a different name: {} -> {name}",
+                    player.name
                 );
-                player.steam_id = steam_id;
+                player.name = name;
             }
 
             player.user_id = user_id;
             player.entity_id = entity_id;
+            player.life_state = PlayerLifeState::Death;
 
             self.players.insert(user_id, player);
             self.aliases.insert(old_user_id, user_id);
@@ -541,6 +550,8 @@ impl Players {
                 }
             }
         } else {
+            trace!("New player: {name} with {:?}", user_id);
+
             self.players.insert(
                 user_id,
                 PlayerState {
@@ -548,6 +559,7 @@ impl Players {
                     steam_id,
                     user_id,
                     entity_id,
+                    life_state: PlayerLifeState::Death,
                     ..Default::default()
                 },
             );
@@ -675,6 +687,7 @@ impl MessageHandler for GameDetailsAnalyser {
             blue_team_score,
             local_entity_id,
             current_round,
+            demo_tick,
             ..
         } = self;
 
@@ -683,7 +696,7 @@ impl MessageHandler for GameDetailsAnalyser {
             .map(|player| player.user_id)
             .unwrap_or_default();
 
-        let (players, aliases) = players.summary();
+        let (players, aliases) = players.finish(demo_tick);
 
         Self::Output {
             local_user_id,
@@ -825,7 +838,6 @@ impl GameDetailsAnalyser {
                     if let Some(player) =
                         self.players.get_by_entity_id_mut(EntityId::from(entity_id))
                     {
-                        #[allow(clippy::match_same_arms)]
                         match table_name.as_str() {
                             "m_iTeam" => {
                                 let new_team =
@@ -853,12 +865,6 @@ impl GameDetailsAnalyser {
                                     }
                                     player.class = new_class;
                                 }
-                            }
-                            "m_iChargeLevel" => {
-                                // This is only networked in tournament mode
-                                // player.charge = i64
-                                //     ::try_from(&prop.value)
-                                //     .unwrap_or_default() as u8;
                             }
                             _ => {}
                         }
@@ -938,10 +944,15 @@ impl GameDetailsAnalyser {
                 #[allow(clippy::cast_sign_loss, clippy::cast_possible_truncation)]
                 match prop.identifier {
                     LIFE_STATE_PROP => {
-                        player.life_state = PlayerLifeState::from_i64(
-                            i64::try_from(&prop.value).unwrap_or_default(),
-                        )
-                        .unwrap_or_default();
+                        let life_state = PlayerLifeState::try_from(&prop.value).unwrap_or_default();
+
+                        if player.life_state != life_state {
+                            if life_state == PlayerLifeState::Alive {
+                                player.last_spawn_tick = Some(self.demo_tick);
+                            }
+
+                            player.life_state = life_state;
+                        }
                     }
                     PLAYER_COND_PROP => {
                         player.player_cond = i64::try_from(&prop.value).unwrap_or_default() as u32;
@@ -1343,11 +1354,12 @@ impl GameDetailsAnalyser {
 
     fn handle_player_spawn_event(&mut self, event: &PlayerSpawnEvent) {
         if let Some(player) = self.players.get_mut(UserId::from(event.user_id)) {
+            trace!("Spawn event: {}", player.name);
             player.class = Class::new(event.class);
             player.team = Team::new(event.team);
             player.last_spawn_tick = Some(self.demo_tick);
         } else {
-            trace!("Unknow player with user id {} spawned", event.user_id);
+            trace!("Unknown player with user id {} spawned", event.user_id);
         }
     }
 
@@ -1396,6 +1408,7 @@ impl GameDetailsAnalyser {
     }
 
     fn handle_player_connect_event(&mut self, event: &PlayerConnectClientEvent) {
+        trace!("Connect event: {}", event.name);
         self.add_highlight(Highlight::PlayerConnected {
             player: HighlightPlayerSnapshot {
                 user_id: event.user_id.into(),
@@ -1407,6 +1420,8 @@ impl GameDetailsAnalyser {
 
     fn handle_player_disconnect_event(&mut self, event: &PlayerDisconnectEvent) {
         let user_id = UserId::from(event.user_id);
+
+        trace!("Disconnect event: {}", event.name);
 
         self.add_highlight(Highlight::PlayerDisconnected {
             player: self.players.snapshot_or_fallback(user_id),
