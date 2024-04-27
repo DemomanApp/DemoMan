@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Link, useParams, useSearchParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 
 import { shell } from "@tauri-apps/api";
 
@@ -20,26 +20,7 @@ import SearchInput from "./SearchInput";
 import { SortControl } from "./SortControl";
 import { Path } from "@/store";
 import { Fill, LoaderFallback } from "@/components";
-
-function useSearchParam<T extends string>(
-  name: string,
-  fallback: T
-): [T, (newValue: T) => void] {
-  const [searchParams, setSearchParams] = useSearchParams();
-
-  const value = (searchParams.get(name) ?? fallback) as T;
-
-  const setValue = (newValue: T) =>
-    setSearchParams(
-      (prev) => ({
-        ...Object.fromEntries(prev.entries()),
-        [name]: newValue,
-      }),
-      { replace: true }
-    );
-
-  return [value, setValue];
-}
+import useLocationState from "@/hooks/useLocationState";
 
 type DemoListLoaderArgs = {
   path: string;
@@ -89,15 +70,15 @@ function DemoListLoader({
 export default () => {
   const { path } = useParams() as { path: Path };
 
-  const [query, setQuery] = useSearchParam("query", "");
-  const [sortKey, setSortKey] = useSearchParam<SortKey>("sort-by", "birthtime");
-  const [sortOrder, setSortOrder] = useSearchParam<SortOrder>(
-    "sort",
-    "descending"
-  );
+  const [locationState, setLocationState] = useLocationState({
+    query: "",
+    sortKey: "birthtime" as SortKey,
+    sortOrder: "descending" as SortOrder,
+  });
+
+  console.log(locationState);
 
   const filters: DemoFilter[] = [];
-
 
   return (
     <AppShell header={{ height: 50 }}>
@@ -105,16 +86,19 @@ export default () => {
         <HeaderBar
           center={
             <>
-              <SearchInput query={query} setQuery={setQuery} />
+              <SearchInput
+                query={locationState.query}
+                setQuery={setLocationState("query")}
+              />
             </>
           }
           right={
             <>
               <SortControl
-                sortKey={sortKey}
-                setSortKey={setSortKey}
-                sortOrder={sortOrder}
-                setSortOrder={setSortOrder}
+                sortKey={locationState.sortKey}
+                setSortKey={setLocationState("sortKey")}
+                sortOrder={locationState.sortOrder}
+                setSortOrder={setLocationState("sortOrder")}
               />
               <div style={{ margin: "auto" }} />
               <Menu
@@ -159,8 +143,8 @@ export default () => {
       <AppShell.Main>
         <DemoListLoader
           path={path}
-          sortKey={sortKey}
-          reverse={sortOrder === "descending"}
+          sortKey={locationState.sortKey}
+          reverse={locationState.sortOrder === "descending"}
           filters={filters}
         />
       </AppShell.Main>
