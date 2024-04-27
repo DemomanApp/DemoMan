@@ -208,6 +208,8 @@ export function primaryTeam(player: PlayerSummary): Team {
   }
 }
 
+export type UserIdAliases = Record<number, number>;
+
 export type GameSummary = {
   local_user_id: UserId;
   highlights: HighlightEvent[];
@@ -216,7 +218,7 @@ export type GameSummary = {
   interval_per_tick: number;
   players: PlayerSummary[];
   num_rounds: number;
-  aliases: Record<number, number>;
+  aliases: UserIdAliases;
 };
 
 export type Scoreboard = {

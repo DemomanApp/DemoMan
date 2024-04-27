@@ -12,6 +12,7 @@ import {
   HighlightPlayerSnapshot,
   PlayerSummary,
   TaggedHighlight,
+  UserIdAliases,
   destructureHighlight,
 } from "@/demo";
 import HighlightBox from "./HighlightBox";
@@ -23,51 +24,57 @@ export type TimelineProps = {
 
 function samePlayer(
   playerId: number,
-  player: PlayerSummary | HighlightPlayerSnapshot | null
+  player: PlayerSummary | HighlightPlayerSnapshot | null,
+  aliases: UserIdAliases
 ): boolean {
-  return playerId === player?.user_id;
+  if (player === null) {
+    return false;
+  } else {
+    return playerId === player.user_id || playerId === aliases[player.user_id];
+  }
 }
 
 function doesHighlightIncludePlayer(
   highlight: TaggedHighlight,
-  playerId: number
+  playerId: number,
+  aliases: UserIdAliases
 ): boolean {
   switch (highlight.type) {
     case "Airshot":
       return (
-        samePlayer(playerId, highlight.highlight.victim) ||
-        samePlayer(playerId, highlight.highlight.attacker)
+        samePlayer(playerId, highlight.highlight.victim, aliases) ||
+        samePlayer(playerId, highlight.highlight.attacker, aliases)
       );
     case "ChatMessage":
-      return samePlayer(playerId, highlight.highlight.sender);
+      return samePlayer(playerId, highlight.highlight.sender, aliases);
     case "CrossbowAirshot":
       return (
-        samePlayer(playerId, highlight.highlight.healer) ||
-        samePlayer(playerId, highlight.highlight.target)
+        samePlayer(playerId, highlight.highlight.healer, aliases) ||
+        samePlayer(playerId, highlight.highlight.target, aliases)
       );
     case "Kill":
       return (
-        samePlayer(playerId, highlight.highlight.killer) ||
-        samePlayer(playerId, highlight.highlight.assister) ||
-        samePlayer(playerId, highlight.highlight.victim)
+        samePlayer(playerId, highlight.highlight.killer, aliases) ||
+        samePlayer(playerId, highlight.highlight.assister, aliases) ||
+        samePlayer(playerId, highlight.highlight.victim, aliases)
       );
     case "KillStreak":
-      return samePlayer(playerId, highlight.highlight.player);
+      return samePlayer(playerId, highlight.highlight.player, aliases);
     case "KillStreakEnded":
       return (
-        samePlayer(playerId, highlight.highlight.killer) ||
-        samePlayer(playerId, highlight.highlight.victim)
+        samePlayer(playerId, highlight.highlight.killer, aliases) ||
+        samePlayer(playerId, highlight.highlight.victim, aliases)
       );
     case "PlayerConnected":
-      return samePlayer(playerId, highlight.highlight.player);
+      return samePlayer(playerId, highlight.highlight.player, aliases);
     case "PlayerDisconnected":
-      return samePlayer(playerId, highlight.highlight.player);
+      return samePlayer(playerId, highlight.highlight.player, aliases);
     case "PointCaptured":
       return highlight.highlight.cappers.some((capper) =>
-        samePlayer(playerId, capper)
+        samePlayer(playerId, capper, aliases)
       );
     case "PlayerTeamChange":
-      return samePlayer(playerId, highlight.highlight.player);
+      return samePlayer(playerId, highlight.highlight.player, aliases);
     default:
       return true;
   }
@@ -75,14 +82,16 @@ function doesHighlightIncludePlayer(
 
 function filterHighlights(
   highlights: HighlightEvent[],
-  filters: Filters
+  filters: Filters,
+  aliases: UserIdAliases
 ): HighlightEvent[] {
   if (filters.playerIds.length > 0) {
     highlights = highlights.filter((h) =>
       filters.playerIds.find((p) =>
         doesHighlightIncludePlayer(
           destructureHighlight(h.event),
-          Number.parseInt(p, 10)
+          Number.parseInt(p, 10),
+          aliases
         )
       )
     );
@@ -182,7 +191,8 @@ export default function HighlightsList({ gameSummary }: TimelineProps) {
   });
 
   const highlights = useMemo(
-    () => filterHighlights(gameSummary.highlights, filters),
+    () =>
+      filterHighlights(gameSummary.highlights, filters, gameSummary.aliases),
     [gameSummary.highlights, filters]
   );
 
