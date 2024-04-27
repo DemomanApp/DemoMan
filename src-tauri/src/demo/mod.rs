@@ -1,8 +1,10 @@
 use std::{
+    collections::HashMap,
     ffi::OsStr,
     fs::{self, read_dir, File},
     io::{Read, Write},
     path::{Path, PathBuf},
+    sync::Arc,
     time::UNIX_EPOCH,
 };
 
@@ -10,16 +12,18 @@ use bitbuffer::BitRead;
 use log::warn;
 use serde::{Deserialize, Serialize};
 
-use crate::commands::demos::DemoCommandResult;
+use crate::std_ext::OrTryInsertWith;
 
 use self::{
     analyser::{GameDetailsAnalyser, GameSummary},
-    errors::DemoReadError,
+    error::Result,
 };
+
+pub use self::error::Error;
 
 pub mod analyser;
 pub mod cache;
-pub mod errors;
+pub mod error;
 
 pub const HEADER_SIZE: usize = 8 + 4 + 4 + 260 + 260 + 260 + 260 + 4 + 4 + 4 + 4;
 
@@ -103,22 +107,6 @@ pub struct DemoJsonFileDe {
     pub tags: Option<Vec<String>>,
 }
 
-#[derive(Debug, Serialize)]
-pub enum DemoCommandError {
-    BadFilename,
-    DemoNotFound,
-    DirReadFailed,
-    FileCopyFailed,
-    FileDeleteFailed,
-    FileExists,
-    FileOpenFailed,
-    FileReadFailed,
-    FileWriteFailed,
-    OtherIOError,
-    ParsingFailed,
-    SerializationFailed,
-}
-
 /// Read the header of the demo file at `path`.
 ///
 /// # Errors
@@ -126,9 +114,7 @@ pub enum DemoCommandError {
 /// - The file is not able to be opened, possibly because it doesn't exist or the user has insufficient permissions
 /// - The file is incomplete or has an invalid header
 /// - The file header indicates that this demo was recorded for a game that is not TF2
-pub fn read_demo_header(
-    path: &Path,
-) -> Result<tf_demo_parser::demo::header::Header, DemoReadError> {
+pub fn read_demo_header(path: &Path) -> Result<tf_demo_parser::demo::header::Header> {
     let mut file = File::open(path)?;
 
     let mut buf = [0u8; HEADER_SIZE];
@@ -137,11 +123,11 @@ pub fn read_demo_header(
     let demo = tf_demo_parser::Demo::new(&buf);
 
     let mut stream = demo.get_stream();
-    let header = tf_demo_parser::demo::header::Header::read(&mut stream)
-        .or(Err(DemoReadError::InvalidHeader))?;
+    let header =
+        tf_demo_parser::demo::header::Header::read(&mut stream).or(Err(Error::ParsingFailed))?;
 
     if header.game != *"tf" {
-        return Err(DemoReadError::NotTF2);
+        return Err(Error::NotTf2);
     }
 
     Ok(header)
@@ -169,16 +155,16 @@ pub fn read_events_and_tags(json_path: &Path) -> (Vec<DemoEvent>, Vec<String>) {
 
 /// Read the demo at `path`.
 /// This will also read events and tags from the associated JSON file, if it exists.
-pub fn read_demo(path: &Path) -> Result<Demo, DemoReadError> {
+pub fn read_demo(path: &Path) -> Result<Demo> {
     let name: String = path
         .file_stem()
-        .ok_or(DemoReadError::InvalidFilename)?
+        .ok_or(Error::BadFilename)?
         .to_str()
-        .ok_or(DemoReadError::InvalidFilename)?
+        .ok_or(Error::BadFilename)?
         .to_owned();
     let metadata = path.metadata()?;
     if !metadata.is_file() {
-        return Err(DemoReadError::NotAFile);
+        return Err(Error::NotAFile);
     }
     let header = read_demo_header(path)?;
     let (events, tags) = read_events_and_tags(&path.with_extension("json"));
@@ -194,7 +180,7 @@ pub fn read_demo(path: &Path) -> Result<Demo, DemoReadError> {
 
 /// Find all .dem files in the directory at `dir_path`
 /// and return their file stem (name without extension)
-pub fn read_demos_in_directory(dir_path: &Path) -> Result<Vec<String>, DemoReadError> {
+pub fn read_demo_names_in_directory(dir_path: &Path) -> Result<Vec<String>> {
     let dir_iterator = read_dir(dir_path)?;
 
     let mut demos = Vec::new();
@@ -214,13 +200,32 @@ pub fn read_demos_in_directory(dir_path: &Path) -> Result<Vec<String>, DemoReadE
     Ok(demos)
 }
 
+pub fn read_demos_in_directory(
+    dir_path: &Path,
+    demo_cache: &mut HashMap<PathBuf, Arc<Demo>>,
+) -> Result<Vec<Arc<Demo>>> {
+    read_demo_names_in_directory(dir_path).map(|demos| {
+        demos
+            .iter()
+            .filter_map(|demo_name| {
+                let demo_path = dir_path.join(demo_name).with_extension("dem");
+                let demo = demo_cache
+                    .entry(demo_path.clone())
+                    .or_try_insert_with(|| read_demo(&demo_path).map(Arc::new))
+                    .ok()?;
+                Some(Arc::clone(demo))
+            })
+            .collect()
+    })
+}
+
 pub fn write_events_and_tags(
     json_path: &Path,
     events: &Vec<DemoEvent>,
     tags: &Vec<String>,
-) -> DemoCommandResult<()> {
+) -> Result<()> {
     if events.is_empty() && tags.is_empty() {
-        fs::remove_file(json_path).or(Err(DemoCommandError::FileWriteFailed))?;
+        fs::remove_file(json_path).or(Err(Error::FileWriteFailed))?;
         return Ok(());
     }
 
@@ -229,29 +234,29 @@ pub fn write_events_and_tags(
         .truncate(true)
         .create(true)
         .open(json_path)
-        .or(Err(DemoCommandError::FileOpenFailed))?;
+        .or(Err(Error::FileOpenFailed))?;
 
     // Use tabs for indentation to reproduce the style TF2 produces
     let formatter = serde_json::ser::PrettyFormatter::with_indent(b"\t");
     let mut serializer = serde_json::Serializer::with_formatter(Vec::new(), formatter);
     let new_content = DemoJsonFileSer { events, tags };
     if new_content.serialize(&mut serializer).is_err() {
-        return Err(DemoCommandError::SerializationFailed);
+        return Err(Error::SerializationFailed);
     }
 
     file.write_all(&serializer.into_inner())
-        .or(Err(DemoCommandError::FileWriteFailed))?;
+        .or(Err(Error::FileWriteFailed))?;
     Ok(())
 }
 
-pub fn read_demo_details(path: &Path) -> DemoCommandResult<GameSummary> {
-    let file = std::fs::read(path).or(Err(DemoCommandError::FileReadFailed))?;
+pub fn read_demo_details(path: &Path) -> Result<GameSummary> {
+    let file = std::fs::read(path).or(Err(Error::FileReadFailed))?;
     let demo = tf_demo_parser::Demo::new(&file);
 
     let analyser = GameDetailsAnalyser::default();
 
     let parser = tf_demo_parser::DemoParser::new_all_with_analyser(demo.get_stream(), analyser);
-    let (_header, state) = parser.parse().or(Err(DemoCommandError::ParsingFailed))?;
+    let (_header, state) = parser.parse().or(Err(Error::ParsingFailed))?;
 
     Ok(state)
 }

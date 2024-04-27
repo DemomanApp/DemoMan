@@ -1,8 +1,8 @@
 import { Menu } from "@mantine/core";
 import { IconArrowsSort, IconCheck } from "@tabler/icons-react";
 
-import { SortKey, SortOrder, sortKeys } from "./DemoList";
 import { HeaderButton } from "@/AppShell";
+import { SortKey, SortOrder, sortKeys } from "@/demo";
 
 type SortControlProps = {
   sortKey: SortKey;

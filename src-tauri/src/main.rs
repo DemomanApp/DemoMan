@@ -4,17 +4,12 @@
 )]
 #![warn(clippy::pedantic)]
 #![allow(clippy::module_name_repetitions)]
+#![allow(clippy::enum_variant_names)]
 // Disabled because of false positives inside tauri macros
 #![allow(clippy::used_underscore_binding)]
 
-use std::{
-    collections::HashMap,
-    path::PathBuf,
-    sync::{Arc, Mutex},
-};
-
 use log::LevelFilter;
-use tauri::{async_runtime::Mutex as AsyncMutex, Manager};
+use tauri::{async_runtime::Mutex, Manager};
 use tauri_plugin_log::{
     fern::colors::{Color, ColoredLevelConfig},
     LogTarget,
@@ -23,21 +18,17 @@ use tauri_plugin_log::{
 use rcon::Connection;
 use tokio::net::TcpStream;
 
-use demo::{analyser::GameSummary, cache::DiskCache, Demo};
+use demo_cache::DemoCache;
 
 mod commands;
 mod demo;
+mod demo_cache;
 mod std_ext;
 
 #[cfg(test)]
 mod tests;
 
-pub type DemoCache = HashMap<PathBuf, Arc<Demo>>;
-
-// We use the Mutex type provided by the tauri async runtime here
-// because we need to hold its content across an .await point.
-// The Mutex in std::sync will not work in this situation.
-pub type RconConnection = AsyncMutex<Option<Connection<TcpStream>>>;
+pub type RconConnection = Mutex<Option<Connection<TcpStream>>>;
 
 fn build_log_plugin<R: tauri::Runtime>() -> tauri::plugin::TauriPlugin<R> {
     const COLORS: ColoredLevelConfig = ColoredLevelConfig {
@@ -70,7 +61,6 @@ fn build_log_plugin<R: tauri::Runtime>() -> tauri::plugin::TauriPlugin<R> {
 fn main() {
     tauri::Builder::default()
         .plugin(build_log_plugin())
-        .manage(Mutex::<DemoCache>::default())
         .manage(RconConnection::default())
         .setup(|app| {
             let cache_path = app
@@ -78,7 +68,7 @@ fn main() {
                 .app_cache_dir()
                 .ok_or("Failed to resolve cache directory")?;
 
-            app.manage(DiskCache::<GameSummary>::at_path(cache_path.join("parsed")));
+            app.manage(Mutex::new(DemoCache::new(cache_path.join("parsed"))));
 
             Ok(())
         })
@@ -87,7 +77,7 @@ fn main() {
             commands::demos::get_demo_details,
             commands::demos::get_demos_in_directory,
             commands::demos::get_demo,
-            commands::demos::move_demo,
+            commands::demos::rename_demo,
             commands::demos::set_demo_events,
             commands::demos::set_demo_tags,
             commands::files::get_tf2_dir,

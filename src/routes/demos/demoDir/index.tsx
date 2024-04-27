@@ -1,17 +1,7 @@
-import { Suspense } from "react";
-import {
-  Await,
-  Link,
-  LoaderFunction,
-  defer,
-  redirect,
-  useAsyncError,
-  useLoaderData,
-  useSearchParams,
-} from "react-router-dom";
+import { useEffect, useState } from "react";
+import { Link, useParams, useSearchParams } from "react-router-dom";
 
 import { shell } from "@tauri-apps/api";
-import * as log from "tauri-plugin-log-api";
 
 import { Alert, AppShell, Menu } from "@mantine/core";
 import {
@@ -22,15 +12,14 @@ import {
   IconAlertCircle,
 } from "@tabler/icons-react";
 
-import { Demo } from "@/demo";
+import { Demo, DemoFilter, SortKey, SortOrder } from "@/demo";
 import { HeaderButton, HeaderBar } from "@/AppShell";
 import { getDemosInDirectory } from "@/api";
-import { Fill, LoaderFallback } from "@/components";
-import DemoList, { SortOrder, SortKey } from "./DemoList";
+import DemoList from "./DemoList";
 import SearchInput from "./SearchInput";
 import { SortControl } from "./SortControl";
-import { decodeParam } from "@/util";
 import { Path } from "@/store";
+import { Fill, LoaderFallback } from "@/components";
 
 function useSearchParam<T extends string>(
   name: string,
@@ -41,21 +30,64 @@ function useSearchParam<T extends string>(
   const value = (searchParams.get(name) ?? fallback) as T;
 
   const setValue = (newValue: T) =>
-    setSearchParams((prev) => ({
-      ...Object.fromEntries(prev.entries()),
-      [name]: newValue,
-    }));
+    setSearchParams(
+      (prev) => ({
+        ...Object.fromEntries(prev.entries()),
+        [name]: newValue,
+      }),
+      { replace: true }
+    );
 
   return [value, setValue];
 }
 
-type LoaderData = {
-  demos: Promise<Demo[]>;
-  path: Path;
+type DemoListLoaderArgs = {
+  path: string;
+  sortKey: SortKey;
+  reverse: boolean;
+  filters: DemoFilter[];
 };
 
+function ErrorBox({ error }: { error: string }) {
+  return (
+    <Fill>
+      <Alert
+        icon={<IconAlertCircle size={16} />}
+        title="An error occurred while scanning for demo files"
+        color="red"
+      >
+        {String(error)}
+      </Alert>
+    </Fill>
+  );
+}
+
+function DemoListLoader({
+  path,
+  sortKey,
+  reverse,
+  filters,
+}: DemoListLoaderArgs) {
+  const [demos, setDemos] = useState<Demo[] | null>(null);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    getDemosInDirectory(path, sortKey, reverse, filters)
+      .then(setDemos)
+      .catch(setError);
+  }, [path, sortKey, reverse, filters]);
+
+  if (demos !== null) {
+    return <DemoList demos={demos} />;
+  } else if (error !== null) {
+    return <ErrorBox error={error} />;
+  } else {
+    return <LoaderFallback />;
+  }
+}
+
 export default () => {
-  const { demos, path } = useLoaderData() as LoaderData;
+  const { path } = useParams() as { path: Path };
 
   const [query, setQuery] = useSearchParam("query", "");
   const [sortKey, setSortKey] = useSearchParam<SortKey>("sort-by", "birthtime");
@@ -63,6 +95,9 @@ export default () => {
     "sort",
     "descending"
   );
+
+  const filters: DemoFilter[] = [];
+
 
   return (
     <AppShell header={{ height: 50 }}>
@@ -122,45 +157,13 @@ export default () => {
         />
       </AppShell.Header>
       <AppShell.Main>
-        <Suspense fallback={<LoaderFallback />}>
-          <Await resolve={demos} errorElement={<ErrorElement />}>
-            {(demos) => (
-              <DemoList demos={demos} sortKey={sortKey} sortOrder={sortOrder} />
-            )}
-          </Await>
-        </Suspense>
+        <DemoListLoader
+          path={path}
+          sortKey={sortKey}
+          reverse={sortOrder === "descending"}
+          filters={filters}
+        />
       </AppShell.Main>
     </AppShell>
   );
-};
-
-function ErrorElement() {
-  const error = useAsyncError();
-  return (
-    <Fill>
-      <Alert
-        icon={<IconAlertCircle size={16} />}
-        title="An error occurred while scanning for demo files"
-        color="red"
-      >
-        {String(error)}
-      </Alert>
-    </Fill>
-  );
-}
-
-export const loader: LoaderFunction = async ({ params }) => {
-  const demoDirPath = decodeParam(params.demoDirPath);
-
-  if (demoDirPath === undefined) {
-    log.error(
-      "demoDirPath was undefined in demoDirRoute. This should not happen."
-    );
-    return redirect("/demos");
-  }
-
-  return defer({
-    path: demoDirPath,
-    demos: getDemosInDirectory(demoDirPath),
-  } satisfies LoaderData);
 };

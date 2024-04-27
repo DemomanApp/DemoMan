@@ -1,10 +1,18 @@
 import { invoke } from "@tauri-apps/api/tauri";
 
-import { Demo, DemoEvent, GameSummary } from "./demo";
+import { Demo, DemoEvent, DemoFilter, GameSummary, SortKey } from "./demo";
 
-export async function getDemosInDirectory(dirPath: string) {
+export async function getDemosInDirectory(
+  dirPath: string,
+  sortKey: SortKey,
+  reverse: boolean,
+  filters: DemoFilter[]
+) {
   return invoke<Demo[]>("get_demos_in_directory", {
     dirPath,
+    sortKey,
+    reverse,
+    filters,
   });
 }
 
@@ -29,8 +37,8 @@ export async function deleteDemo(demoPath: string, trash: boolean) {
   });
 }
 
-export async function moveDemo(demoPath: string, newPath: string) {
-  return invoke<void>("move_demo", {
+export async function renameDemo(demoPath: string, newPath: string) {
+  return invoke<void>("rename_demo", {
     demoPath,
     newPath,
   });

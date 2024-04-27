@@ -1,7 +1,7 @@
 import { createBrowserRouter } from "react-router-dom";
 
 import DemosRoute from "./demos";
-import DemoDirRoute, { loader as demoDirLoader } from "./demos/demoDir";
+import DemoDirRoute from "./demos/demoDir";
 import DemoDetailsRoute, {
   loader as demoDetailsLoader,
 } from "./demos/demoDir/demoDetails";
@@ -27,9 +27,8 @@ export default createBrowserRouter([
             element: <DemosRoute />,
           },
           {
-            path: "dir/:demoDirPath",
+            path: "dir/:path",
             element: <DemoDirRoute />,
-            loader: demoDirLoader,
           },
           {
             path: "show/:demoPath",

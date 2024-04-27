@@ -57,63 +57,21 @@ const createItemData = memoize(
   })
 );
 
-export const sortKeys = {
-  birthtime: "File creation time",
-  filesize: "File size",
-  name: "File name",
-  mapName: "Map name",
-  events: "Number of events",
-  playbackTime: "Playback time",
-} as const;
-
-export type SortKey = keyof typeof sortKeys;
-
-export type SortOrder = "ascending" | "descending";
-
-type CompareFn = (a: Demo, b: Demo) => number;
-
-const compareFns: Record<SortKey, CompareFn> = {
-  birthtime: (a, b) => a.birthtime - b.birthtime,
-  filesize: (a, b) => a.filesize - b.filesize,
-  name: (a, b) => a.name.localeCompare(b.name),
-  mapName: (a, b) => a.mapName.localeCompare(b.mapName),
-  events: (a, b) => a.events.length - b.events.length,
-  playbackTime: (a, b) => a.playbackTime - b.playbackTime,
-};
-
 type DemoListProps = {
   demos: Demo[];
-  sortKey: SortKey;
-  sortOrder: SortOrder;
 };
 
-const reverse =
-  (compareFn: CompareFn): CompareFn =>
-  (a, b) =>
-    -compareFn(a, b);
-
-const getCompareFn = (sortKey: SortKey, sortOrder: SortOrder) =>
-  sortOrder === "ascending"
-    ? compareFns[sortKey]
-    : reverse(compareFns[sortKey]);
-
-export default function DemoList({ demos, sortKey, sortOrder }: DemoListProps) {
+export default function DemoList({ demos }: DemoListProps) {
   const navigate = useNavigate();
   const listRef = useRef<FixedSizeList>(null);
 
   const [selectedRows, setSelectedRows] = useState<boolean[]>([]);
   const [selectionMode, setSelectionMode] = useState(false);
 
-  const sortedDemos = useMemo(() => {
-    const newSortedDemos = [...demos];
-    newSortedDemos.sort(getCompareFn(sortKey, sortOrder));
-    return newSortedDemos;
-  }, [demos, sortKey, sortOrder]);
-
   // Reset the selected rows every time the demos are changed or selection mode is toggled
   useEffect(() => {
-    setSelectedRows(Array(sortedDemos.length).fill(false));
-  }, [sortedDemos, selectionMode]);
+    setSelectedRows(Array(demos.length).fill(false));
+  }, [demos, selectionMode]);
 
   const handleRowClick = useCallback(
     (index: number) => {
@@ -124,25 +82,25 @@ export default function DemoList({ demos, sortKey, sortOrder }: DemoListProps) {
           return newSelectedIndices;
         });
       } else {
-        navigate(`../show/${encodeURIComponent(sortedDemos[index].path)}`);
+        navigate(`../show/${encodeURIComponent(demos[index].path)}`);
       }
     },
-    [navigate, selectionMode, sortedDemos]
+    [navigate, selectionMode, demos]
   );
 
   const totalFileSize = useMemo(
-    () => sortedDemos.reduce((total, demo) => total + demo.filesize, 0),
-    [sortedDemos]
+    () => demos.reduce((total, demo) => total + demo.filesize, 0),
+    [demos]
   );
 
   const selectedFileSize = useMemo(
     () =>
-      sortedDemos.reduce(
+      demos.reduce(
         (total, demo, index) =>
           selectedRows[index] ? total + demo.filesize : total,
         0
       ),
-    [sortedDemos, selectedRows]
+    [demos, selectedRows]
   );
 
   const selectedDemoCount = useMemo(
@@ -150,7 +108,7 @@ export default function DemoList({ demos, sortKey, sortOrder }: DemoListProps) {
     [selectedRows]
   );
 
-  const itemData = createItemData(sortedDemos, selectedRows, handleRowClick);
+  const itemData = createItemData(demos, selectedRows, handleRowClick);
   return (
     <div
       style={{
@@ -172,7 +130,7 @@ export default function DemoList({ demos, sortKey, sortOrder }: DemoListProps) {
                 height={height}
                 width={width}
                 style={{ overflow: "visible" }}
-                itemCount={sortedDemos.length}
+                itemCount={demos.length}
                 itemSize={120 + PADDING_SIZE}
                 itemData={itemData}
                 innerElementType={innerElementType}
@@ -205,7 +163,7 @@ export default function DemoList({ demos, sortKey, sortOrder }: DemoListProps) {
         </AutoSizer>
       </div>
       <BottomBar
-        totalDemoCount={sortedDemos.length}
+        totalDemoCount={demos.length}
         totalFileSize={totalFileSize}
         selectedDemoCount={selectedDemoCount}
         selectedFileSize={selectedFileSize}

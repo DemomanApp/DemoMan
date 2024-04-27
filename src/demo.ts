@@ -216,6 +216,24 @@ export type Scoreboard = {
   damage_dealt: number;
 };
 
+export const sortKeys = {
+  birthtime: "File creation time",
+  file_size: "File size",
+  name: "File name",
+  map_name: "Map name",
+  event_count: "Number of events",
+  playback_time: "Playback time",
+} as const;
+
+export type SortKey = keyof typeof sortKeys;
+
+export type SortOrder = "ascending" | "descending";
+
+export type DemoFilter =
+  | { Name: string }
+  | { PlayerName: string }
+  | { MapName: string };
+
 export function isStvDemo(demo: Demo) {
   return demo.serverName === "";
 }

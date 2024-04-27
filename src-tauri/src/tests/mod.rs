@@ -2,12 +2,12 @@ use crate::demo::{read_demo, Demo};
 
 #[test]
 fn test_demo_loading() {
-    use crate::demo::{read_demos_in_directory, DemoEvent, DemoEventType};
+    use crate::demo::{read_demo_names_in_directory, DemoEvent, DemoEventType};
     use std::path::Path;
 
     let demo_dir_path = Path::new("src/tests/data/demos");
 
-    let demo_names = read_demos_in_directory(demo_dir_path).expect("Failed to read directory");
+    let demo_names = read_demo_names_in_directory(demo_dir_path).expect("Failed to read directory");
 
     // Out of the four directory entries with the `.dem` extension,
     // one is a directory and should be ignored.
