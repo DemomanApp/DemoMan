@@ -1,7 +1,4 @@
-import { ReactNode, useState } from "react";
-
-import { Button, MultiSelect, TextInput } from "@mantine/core";
-import { useToggle } from "@mantine/hooks";
+import { Checkbox, MultiSelect, TextInput } from "@mantine/core";
 
 import { GameSummary, PlayerSummary } from "@/demo";
 
@@ -10,22 +7,21 @@ import classes from "./TimelineFilters.module.css";
 export type Filters = {
   playerIds: string[];
   chatSearch: string;
-  visibleKillfeed: boolean;
-  visibleCaptures: boolean;
-  visibleChat: boolean;
-  visibleConnectionMessages: boolean;
-  visibleKillstreaks: boolean;
-  visibleRounds: boolean;
-  visibleAirshots: boolean;
+  visibleHighlights: {
+    killfeed: boolean;
+    captures: boolean;
+    chat: boolean;
+    connectionMessages: boolean;
+    killstreaks: boolean;
+    rounds: boolean;
+    airshots: boolean;
+  };
 };
-
-type BooleanFilter = {
-  [key in keyof Filters]: Filters[key] extends boolean ? key : never;
-}[keyof Filters];
 
 export type TimelineFiltersProps = {
   gameSummary: GameSummary;
-  onChange: (values: Filters) => void;
+  filters: Filters;
+  setFilters: (filters: Filters) => void;
 };
 
 type SelectItem = {
@@ -41,100 +37,117 @@ function playerToSelectItem(player: PlayerSummary): SelectItem {
 }
 
 type ToggleButtonProps = {
-  children?: ReactNode;
-  onSelect: (selected: boolean) => void;
+  label: string;
+  checked: boolean;
+  indeterminate?: boolean;
+  onChange: (selected: boolean) => void;
 };
 
-function ToggleButton({ children, onSelect }: ToggleButtonProps) {
-  const [checked, toggle] = useToggle<boolean>([true, false]);
-
+function ToggleButton({
+  label,
+  checked,
+  indeterminate,
+  onChange,
+}: ToggleButtonProps) {
   return (
-    <Button
-      className={classes.toggleButton}
-      data-checked={checked}
-      onClick={() => {
-        // Have to negate when invoking the callback to keep consistency with the UI,
-        // since the toggle will change the checked value AFTER this callback runs
-        onSelect(!checked);
-        toggle();
+    <Checkbox
+      classNames={{ root: classes.toggleButton }}
+      label={label}
+      checked={checked}
+      indeterminate={indeterminate}
+      onChange={(event) => {
+        onChange(event.currentTarget.checked);
       }}
-    >
-      {children}
-    </Button>
+      wrapperProps={{
+        onClick: () => onChange(!checked),
+      }}
+    />
   );
 }
 
 export default function TimelineFilters({
   gameSummary,
-  onChange,
+  filters,
+  setFilters,
 }: TimelineFiltersProps) {
-  const [filters, setFilters] = useState({
-    playerIds: [],
-    chatSearch: "",
-    visibleKillfeed: true,
-    visibleCaptures: true,
-    visibleChat: true,
-    visibleConnectionMessages: true,
-    visibleKillstreaks: true,
-    visibleRounds: true,
-    visibleAirshots: true,
-  } as Filters);
+  function handleChange(filter: keyof Filters["visibleHighlights"]) {
+    return (checked: boolean) => {
+      setFilters({
+        ...filters,
+        visibleHighlights: { ...filters.visibleHighlights, [filter]: checked },
+      });
+    };
+  }
 
-  const setVisibility = function (prop: BooleanFilter, visible: boolean) {
-    filters[prop] = visible;
-    setFilters(filters);
-    onChange(filters);
-  };
+  const values = Object.values(filters.visibleHighlights);
+
+  const allChecked = values.every((value) => value);
+  const indeterminate = values.some((value) => value) && !allChecked;
 
   return (
     <div className={classes.root}>
       <div className={classes.buttonBar}>
         <ToggleButton
-          onSelect={(visible) => setVisibility("visibleKillfeed", visible)}
-        >
-          Killfeed
-        </ToggleButton>
+          label="All"
+          checked={allChecked}
+          indeterminate={indeterminate}
+          onChange={(checked) => {
+            setFilters({
+              ...filters,
+              visibleHighlights: {
+                killfeed: checked,
+                captures: checked,
+                chat: checked,
+                connectionMessages: checked,
+                killstreaks: checked,
+                rounds: checked,
+                airshots: checked,
+              },
+            });
+          }}
+        />
         <ToggleButton
-          onSelect={(visible) => setVisibility("visibleKillstreaks", visible)}
-        >
-          Killstreaks
-        </ToggleButton>
+          label="Killfeed"
+          checked={filters.visibleHighlights.killfeed}
+          onChange={handleChange("killfeed")}
+        />
         <ToggleButton
-          onSelect={(visible) => setVisibility("visibleCaptures", visible)}
-        >
-          Captures
-        </ToggleButton>
+          label="Killstreaks"
+          checked={filters.visibleHighlights.killstreaks}
+          onChange={handleChange("killstreaks")}
+        />
         <ToggleButton
-          onSelect={(visible) => setVisibility("visibleChat", visible)}
-        >
-          Chat
-        </ToggleButton>
+          label="Captures"
+          checked={filters.visibleHighlights.captures}
+          onChange={handleChange("captures")}
+        />
         <ToggleButton
-          onSelect={(visible) =>
-            setVisibility("visibleConnectionMessages", visible)
-          }
-        >
-          Player Joins
-        </ToggleButton>
+          label="Chat"
+          checked={filters.visibleHighlights.chat}
+          onChange={handleChange("chat")}
+        />
         <ToggleButton
-          onSelect={(visible) => setVisibility("visibleRounds", visible)}
-        >
-          Rounds
-        </ToggleButton>
+          label="Player Joins"
+          checked={filters.visibleHighlights.connectionMessages}
+          onChange={handleChange("connectionMessages")}
+        />
         <ToggleButton
-          onSelect={(visible) => setVisibility("visibleAirshots", visible)}
-        >
-          Airshots
-        </ToggleButton>
+          label="Rounds"
+          checked={filters.visibleHighlights.rounds}
+          onChange={handleChange("rounds")}
+        />
+        <ToggleButton
+          label="Airshots"
+          checked={filters.visibleHighlights.airshots}
+          onChange={handleChange("airshots")}
+        />
       </div>
 
       <TextInput
         label={"Search Chat"}
         placeholder={"Chat search.  Case insensitive; regex supported"}
         onChange={(event) => {
-          filters.chatSearch = event.target.value;
-          setFilters(filters);
-          onChange(filters);
+          setFilters({ ...filters, chatSearch: event.target.value });
         }}
       />
       <MultiSelect
@@ -146,9 +159,7 @@ export default function TimelineFilters({
           .map(playerToSelectItem)}
         placeholder={"Select one or more players"}
         onChange={(values) => {
-          filters.playerIds = values;
-          setFilters(filters);
-          onChange(filters);
+          setFilters({ ...filters, playerIds: values });
         }}
         searchable
       />

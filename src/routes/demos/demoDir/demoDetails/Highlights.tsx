@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 
 import AutoSizer from "react-virtualized-auto-sizer";
 import { FixedSizeList } from "react-window";
@@ -8,6 +8,7 @@ import { ScrollArea, Text } from "@mantine/core";
 import {
   GameSummary,
   Highlight,
+  HighlightEvent,
   HighlightPlayerSnapshot,
   PlayerSummary,
   TaggedHighlight,
@@ -72,6 +73,90 @@ function doesHighlightIncludePlayer(
   }
 }
 
+function filterHighlights(
+  highlights: HighlightEvent[],
+  filters: Filters
+): HighlightEvent[] {
+  if (filters.playerIds.length > 0) {
+    highlights = highlights.filter((h) =>
+      filters.playerIds.find((p) =>
+        doesHighlightIncludePlayer(
+          destructureHighlight(h.event),
+          Number.parseInt(p, 10)
+        )
+      )
+    );
+  }
+  if (filters.chatSearch !== "") {
+    // Search chat messages for matches (case-insensitive) for player names or text content
+    const regex = new RegExp(filters.chatSearch, "i");
+    highlights = highlights.filter((highlight) => {
+      const taggedHighlight = destructureHighlight(highlight.event);
+      if (taggedHighlight.type === "ChatMessage") {
+        return (
+          regex.test(taggedHighlight.highlight.sender.name) ||
+          regex.test(taggedHighlight.highlight.text)
+        );
+      } else {
+        return true;
+      }
+    });
+  }
+  if (!filters.visibleHighlights.killfeed) {
+    highlights = highlights.filter((h) => !highlightIsType(h.event, "Kill"));
+  }
+  if (!filters.visibleHighlights.captures) {
+    highlights = highlights.filter(
+      (h) => !highlightIsType(h.event, "PointCaptured")
+    );
+  }
+  if (!filters.visibleHighlights.chat) {
+    highlights = highlights.filter(
+      (h) => !highlightIsType(h.event, "ChatMessage")
+    );
+  }
+  if (!filters.visibleHighlights.connectionMessages) {
+    highlights = highlights.filter(
+      (h) =>
+        !(
+          highlightIsType(h.event, "PlayerConnected") ||
+          highlightIsType(h.event, "PlayerDisconnected") ||
+          highlightIsType(h.event, "PlayerTeamChange")
+        )
+    );
+  }
+  if (!filters.visibleHighlights.killstreaks) {
+    highlights = highlights.filter(
+      (h) =>
+        !(
+          highlightIsType(h.event, "KillStreak") ||
+          highlightIsType(h.event, "KillStreakEnded")
+        )
+    );
+  }
+  if (!filters.visibleHighlights.rounds) {
+    highlights = highlights.filter(
+      (h) =>
+        !(
+          highlightIsType(h.event, "RoundStart") ||
+          highlightIsType(h.event, "RoundWin") ||
+          highlightIsType(h.event, "RoundStalemate")
+        )
+    );
+  }
+  if (!filters.visibleHighlights.airshots) {
+    highlights = highlights.filter(
+      (h) =>
+        !(
+          highlightIsType(h.event, "Airshot") ||
+          highlightIsType(h.event, "CrossbowAirshot")
+        )
+    );
+  }
+
+  return highlights;
+}
+
 function highlightIsType(
   highlight: Highlight,
   type: TaggedHighlight["type"]
@@ -82,89 +167,24 @@ function highlightIsType(
 export default function HighlightsList({ gameSummary }: TimelineProps) {
   const listRef = useRef<FixedSizeList>(null);
 
-  const [highlights, setHighlights] = useState(gameSummary.highlights);
+  const [filters, setFilters] = useState<Filters>({
+    playerIds: [],
+    chatSearch: "",
+    visibleHighlights: {
+      killfeed: true,
+      captures: true,
+      chat: true,
+      connectionMessages: true,
+      killstreaks: true,
+      rounds: true,
+      airshots: true,
+    },
+  });
 
-  const recomputeHighlights = (filters: Filters) => {
-    let highlights = gameSummary.highlights;
-    if (filters.playerIds.length > 0) {
-      highlights = highlights.filter((h) =>
-        filters.playerIds.find((p) =>
-          doesHighlightIncludePlayer(
-            destructureHighlight(h.event),
-            Number.parseInt(p, 10)
-          )
-        )
-      );
-    }
-    if (filters.chatSearch !== "") {
-      // Search chat messages for matches (case-insensitive) for player names or text content
-      const regex = new RegExp(filters.chatSearch, "i");
-      highlights = highlights.filter((highlight) => {
-        const taggedHighlight = destructureHighlight(highlight.event);
-        if (taggedHighlight.type === "ChatMessage") {
-          return (
-            regex.test(taggedHighlight.highlight.sender.name) ||
-            regex.test(taggedHighlight.highlight.text)
-          );
-        } else {
-          return true;
-        }
-      });
-    }
-    if (!filters.visibleKillfeed) {
-      highlights = highlights.filter((h) => !highlightIsType(h.event, "Kill"));
-    }
-    if (!filters.visibleCaptures) {
-      highlights = highlights.filter(
-        (h) => !highlightIsType(h.event, "PointCaptured")
-      );
-    }
-    if (!filters.visibleChat) {
-      highlights = highlights.filter(
-        (h) => !highlightIsType(h.event, "ChatMessage")
-      );
-    }
-    if (!filters.visibleConnectionMessages) {
-      highlights = highlights.filter(
-        (h) =>
-          !(
-            highlightIsType(h.event, "PlayerConnected") ||
-            highlightIsType(h.event, "PlayerDisconnected") ||
-            highlightIsType(h.event, "PlayerTeamChange")
-          )
-      );
-    }
-    if (!filters.visibleKillstreaks) {
-      highlights = highlights.filter(
-        (h) =>
-          !(
-            highlightIsType(h.event, "KillStreak") ||
-            highlightIsType(h.event, "KillStreakEnded")
-          )
-      );
-    }
-    if (!filters.visibleRounds) {
-      highlights = highlights.filter(
-        (h) =>
-          !(
-            highlightIsType(h.event, "RoundStart") ||
-            highlightIsType(h.event, "RoundWin") ||
-            highlightIsType(h.event, "RoundStalemate")
-          )
-      );
-    }
-    if (!filters.visibleAirshots) {
-      highlights = highlights.filter(
-        (h) =>
-          !(
-            highlightIsType(h.event, "Airshot") ||
-            highlightIsType(h.event, "CrossbowAirshot")
-          )
-      );
-    }
-
-    setHighlights(highlights);
-  };
+  const highlights = useMemo(
+    () => filterHighlights(gameSummary.highlights, filters),
+    [gameSummary.highlights, filters]
+  );
 
   return (
     <div
@@ -177,7 +197,8 @@ export default function HighlightsList({ gameSummary }: TimelineProps) {
     >
       <TimelineFilters
         gameSummary={gameSummary}
-        onChange={recomputeHighlights}
+        filters={filters}
+        setFilters={setFilters}
       />
       <div style={{ height: "100%" }}>
         <AutoSizer>
