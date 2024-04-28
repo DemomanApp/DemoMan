@@ -86,11 +86,7 @@ function filterHighlights(
   if (filters.playerIds.length > 0) {
     highlights = highlights.filter((h) =>
       filters.playerIds.find((p) =>
-        doesHighlightIncludePlayer(
-          destructureHighlight(h.event),
-          Number.parseInt(p, 10),
-          aliases
-        )
+        doesHighlightIncludePlayer(destructureHighlight(h.event), p, aliases)
       )
     );
   }

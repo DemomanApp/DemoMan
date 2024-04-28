@@ -1,11 +1,11 @@
 import { Checkbox, MultiSelect, TextInput } from "@mantine/core";
 
-import { GameSummary, PlayerSummary } from "@/demo";
+import { GameSummary } from "@/demo";
 
 import classes from "./TimelineFilters.module.css";
 
 export type Filters = {
-  playerIds: string[];
+  playerIds: number[];
   chatSearch: string;
   visibleHighlights: {
     killfeed: boolean;
@@ -23,18 +23,6 @@ export type TimelineFiltersProps = {
   filters: Filters;
   setFilters: (filters: Filters) => void;
 };
-
-type SelectItem = {
-  label: string;
-  value: string;
-};
-
-function playerToSelectItem(player: PlayerSummary): SelectItem {
-  return {
-    label: player.name,
-    value: player.user_id.toString(10),
-  };
-}
 
 type ToggleButtonProps = {
   label: string;
@@ -156,10 +144,16 @@ export default function TimelineFilters({
           .sort((a, b) =>
             a.name.toLowerCase().localeCompare(b.name.toLowerCase())
           )
-          .map(playerToSelectItem)}
+          .map((player) => ({
+            label: player.name,
+            value: player.user_id.toString(10),
+          }))}
         placeholder={"Select one or more players"}
         onChange={(values) => {
-          setFilters({ ...filters, playerIds: values });
+          setFilters({
+            ...filters,
+            playerIds: values.map((value) => Number.parseInt(value, 10)),
+          });
         }}
         searchable
       />
