@@ -145,7 +145,7 @@ export default function TimelineFilters({
 
       <TextInput
         label={"Search Chat"}
-        placeholder={"Chat search.  Case insensitive; regex supported"}
+        placeholder={"Filter chat messages"}
         onChange={(event) => {
           setFilters({ ...filters, chatSearch: event.target.value });
         }}

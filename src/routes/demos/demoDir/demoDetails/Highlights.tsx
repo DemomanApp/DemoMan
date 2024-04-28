@@ -100,14 +100,13 @@ function filterHighlights(
     );
   }
   if (filters.chatSearch !== "") {
-    // Search chat messages for matches (case-insensitive) for player names or text content
-    const regex = new RegExp(filters.chatSearch, "i");
     highlights = highlights.filter((highlight) => {
       const taggedHighlight = destructureHighlight(highlight.event);
       if (taggedHighlight.type === "ChatMessage") {
+        const query = filters.chatSearch.toLowerCase();
         return (
-          regex.test(taggedHighlight.highlight.sender.name) ||
-          regex.test(taggedHighlight.highlight.text)
+          taggedHighlight.highlight.sender.name.toLowerCase().includes(query) ||
+          taggedHighlight.highlight.text.toLowerCase().includes(query)
         );
       } else {
         return true;
