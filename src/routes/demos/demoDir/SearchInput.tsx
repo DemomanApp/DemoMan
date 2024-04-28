@@ -7,23 +7,25 @@ import { IconSearch } from "@tabler/icons-react";
 import classes from "./SearchInput.module.css";
 
 type SearchInputProps = {
-  initialQuery: string;
-  setDebouncedQuery(newQuery: string): void;
+  query: string;
+  setQuery(newQuery: string): void;
   debounceInterval: number;
 };
 
 export default function SearchInput({
-  initialQuery,
-  setDebouncedQuery,
+  query,
+  setQuery,
   debounceInterval,
 }: SearchInputProps) {
-  const [query, setQuery] = useState(initialQuery);
+  const [rawQuery, setRawQuery] = useState(query);
 
-  const [debouncedQuery] = useDebouncedValue(query, debounceInterval);
+  const [debouncedQuery] = useDebouncedValue(rawQuery, debounceInterval);
 
   useEffect(() => {
-    setDebouncedQuery(debouncedQuery);
-  }, [debouncedQuery]);
+    if (rawQuery != query) {
+      setQuery(debouncedQuery);
+    }
+  }, [setQuery, debouncedQuery, query, rawQuery]);
 
   return (
     <Input
@@ -32,9 +34,9 @@ export default function SearchInput({
       size="sm"
       leftSection={<IconSearch size={18} />}
       classNames={{ input: classes.input, wrapper: classes.wrapper }}
-      value={query}
+      value={rawQuery}
       onChange={(event) => {
-        setQuery(event.currentTarget.value);
+        setRawQuery(event.currentTarget.value);
       }}
     />
   );

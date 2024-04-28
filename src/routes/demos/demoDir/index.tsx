@@ -78,8 +78,6 @@ export default () => {
     sortOrder: "descending" as SortOrder,
   });
 
-  console.log(locationState);
-
   const filters: DemoFilter[] = [];
 
   return (
@@ -88,8 +86,8 @@ export default () => {
         <HeaderBar
           center={
             <SearchInput
-              initialQuery={locationState.query}
-              setDebouncedQuery={setLocationState("query")}
+              query={locationState.query}
+              setQuery={setLocationState("query")}
               debounceInterval={500}
             />
           }

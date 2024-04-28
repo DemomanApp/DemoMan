@@ -193,7 +193,7 @@ export default function HighlightsList({ gameSummary }: TimelineProps) {
   const highlights = useMemo(
     () =>
       filterHighlights(gameSummary.highlights, filters, gameSummary.aliases),
-    [gameSummary.highlights, filters]
+    [gameSummary, filters]
   );
 
   return (
