@@ -34,49 +34,52 @@ function samePlayer(
   }
 }
 
+function involvedPlayers(
+  taggedHighlight: TaggedHighlight
+): HighlightPlayerSnapshot[] {
+  const { type, highlight } = taggedHighlight;
+
+  switch (type) {
+    case "Kill":
+      if (highlight.assister !== null) {
+        return [highlight.assister, highlight.killer, highlight.victim];
+      } else {
+        return [highlight.killer, highlight.victim];
+      }
+    case "KillStreak":
+      return [highlight.player];
+    case "KillStreakEnded":
+      return [highlight.killer, highlight.victim];
+    case "ChatMessage":
+      return [highlight.sender];
+    case "Airshot":
+      return [highlight.attacker, highlight.victim];
+    case "CrossbowAirshot":
+      return [highlight.healer, highlight.target];
+    case "PointCaptured":
+      return highlight.cappers;
+    case "PlayerConnected":
+      return [highlight.player];
+    case "PlayerDisconnected":
+      return [highlight.player];
+    case "PlayerTeamChange":
+      return [highlight.player];
+    default:
+      return [];
+  }
+}
+
 function doesHighlightIncludePlayer(
   highlight: TaggedHighlight,
   playerId: number,
   aliases: UserIdAliases
 ): boolean {
-  switch (highlight.type) {
-    case "Airshot":
-      return (
-        samePlayer(playerId, highlight.highlight.victim, aliases) ||
-        samePlayer(playerId, highlight.highlight.attacker, aliases)
-      );
-    case "ChatMessage":
-      return samePlayer(playerId, highlight.highlight.sender, aliases);
-    case "CrossbowAirshot":
-      return (
-        samePlayer(playerId, highlight.highlight.healer, aliases) ||
-        samePlayer(playerId, highlight.highlight.target, aliases)
-      );
-    case "Kill":
-      return (
-        samePlayer(playerId, highlight.highlight.killer, aliases) ||
-        samePlayer(playerId, highlight.highlight.assister, aliases) ||
-        samePlayer(playerId, highlight.highlight.victim, aliases)
-      );
-    case "KillStreak":
-      return samePlayer(playerId, highlight.highlight.player, aliases);
-    case "KillStreakEnded":
-      return (
-        samePlayer(playerId, highlight.highlight.killer, aliases) ||
-        samePlayer(playerId, highlight.highlight.victim, aliases)
-      );
-    case "PlayerConnected":
-      return samePlayer(playerId, highlight.highlight.player, aliases);
-    case "PlayerDisconnected":
-      return samePlayer(playerId, highlight.highlight.player, aliases);
-    case "PointCaptured":
-      return highlight.highlight.cappers.some((capper) =>
-        samePlayer(playerId, capper, aliases)
-      );
-    case "PlayerTeamChange":
-      return samePlayer(playerId, highlight.highlight.player, aliases);
-    default:
-      return true;
+  const players = involvedPlayers(highlight);
+
+  if (players.length === 0) {
+    return true;
+  } else {
+    return players.some((player) => samePlayer(playerId, player, aliases));
   }
 }
 
