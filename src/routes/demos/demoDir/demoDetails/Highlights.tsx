@@ -10,7 +10,6 @@ import {
   Highlight,
   HighlightEvent,
   HighlightPlayerSnapshot,
-  PlayerSummary,
   TaggedHighlight,
   UserIdAliases,
   destructureHighlight,
@@ -24,14 +23,10 @@ export type TimelineProps = {
 
 function samePlayer(
   playerId: number,
-  player: PlayerSummary | HighlightPlayerSnapshot | null,
+  player: HighlightPlayerSnapshot,
   aliases: UserIdAliases
 ): boolean {
-  if (player === null) {
-    return false;
-  } else {
-    return playerId === player.user_id || playerId === aliases[player.user_id];
-  }
+  return playerId === player.user_id || playerId === aliases[player.user_id];
 }
 
 function involvedPlayers(
