@@ -183,7 +183,6 @@ export default function HighlightsList({ gameSummary }: TimelineProps) {
         height: "100%",
         display: "flex",
         flexDirection: "column",
-        margin: "auto",
       }}
     >
       <TimelineFilters
@@ -191,7 +190,7 @@ export default function HighlightsList({ gameSummary }: TimelineProps) {
         filters={filters}
         setFilters={setFilters}
       />
-      <div style={{ height: "100%" }}>
+      <div style={{ flexGrow: 1 }}>
         <AutoSizer>
           {({ height, width }) => (
             <ScrollArea
