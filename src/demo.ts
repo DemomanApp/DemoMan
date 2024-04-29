@@ -158,6 +158,8 @@ export type TaggedHighlight =
   | { type: "PlayerTeamChange"; highlight: PlayerTeamChangeHighlight }
   | { type: "Pause"; highlight: PauseHighlight };
 
+export type HighlightType = TaggedHighlight["type"];
+
 export function destructureHighlight(hl: Highlight): TaggedHighlight {
   const [type, highlight] = Object.entries(hl)[0];
   return { type, highlight } as TaggedHighlight;
