@@ -32,27 +32,27 @@ pub async fn get_demos_in_directory(
 #[tauri::command]
 pub async fn set_demo_events(
     demo_path: &Path,
-    events: Vec<DemoEvent>,
+    new_events: Vec<DemoEvent>,
     demo_cache: State<'_, Mutex<DemoCache>>,
 ) -> Result<()> {
-    log_command!("set_demo_events {} {events:?}", demo_path.display());
+    log_command!("set_demo_events {} {new_events:?}", demo_path.display());
 
     let mut demo_cache = demo_cache.lock().await;
 
-    demo_cache.set_events(demo_path, events)
+    demo_cache.set_events(demo_path, new_events)
 }
 
 #[tauri::command]
 pub async fn set_demo_tags(
     demo_path: &Path,
-    tags: Vec<String>,
+    new_tags: Vec<String>,
     demo_cache: State<'_, Mutex<DemoCache>>,
 ) -> Result<()> {
-    log_command!("set_demo_tags {} {tags:?}", demo_path.display());
+    log_command!("set_demo_tags {} {new_tags:?}", demo_path.display());
 
     let mut demo_cache = demo_cache.lock().await;
 
-    demo_cache.set_tags(demo_path, tags)
+    demo_cache.set_tags(demo_path, new_tags)
 }
 
 #[tauri::command]

@@ -26,10 +26,10 @@ import {
 } from "@mantine/core";
 import {
   IconAlertCircle,
+  IconBookmarks,
   IconCalendarEvent,
   IconClock,
   IconFileAnalytics,
-  IconFileInfo,
   IconPencil,
   IconPlayerPlay,
   IconServer,
@@ -43,6 +43,7 @@ import { HeaderBar } from "@/AppShell";
 import { AsyncButton, MapThumbnail, LoaderFallback, Fill } from "@/components";
 import { formatFileSize, formatDuration, decodeParam } from "@/util";
 import PlayerList from "./PlayerList";
+import EventsList from "./EventsList";
 import { Demo, GameSummary } from "@/demo";
 import Highlights from "./Highlights";
 
@@ -176,16 +177,16 @@ export default function DemoDetailsView() {
                                 Players
                               </Tabs.Tab>
                               <Tabs.Tab
+                                value="events"
+                                leftSection={<IconBookmarks size={14} />}
+                              >
+                                Bookmarks
+                              </Tabs.Tab>
+                              <Tabs.Tab
                                 value="timeline"
                                 leftSection={<IconTimeline size={14} />}
                               >
                                 Timeline
-                              </Tabs.Tab>
-                              <Tabs.Tab
-                                value="info"
-                                leftSection={<IconFileInfo size={14} />}
-                              >
-                                Info
                               </Tabs.Tab>
                             </Tabs.List>
 
@@ -193,12 +194,12 @@ export default function DemoDetailsView() {
                               <PlayerList gameSummary={gameSummary} />
                             </Tabs.Panel>
 
-                            <Tabs.Panel value="timeline" pt="xs">
-                              <Highlights gameSummary={gameSummary} />
+                            <Tabs.Panel value="events" pt="xs">
+                              <EventsList demo={demo} />
                             </Tabs.Panel>
 
-                            <Tabs.Panel value="info" pt="xs">
-                              TODO
+                            <Tabs.Panel value="timeline" pt="xs">
+                              <Highlights gameSummary={gameSummary} />
                             </Tabs.Panel>
                           </Tabs>
                         )}

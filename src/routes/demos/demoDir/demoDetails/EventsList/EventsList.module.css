@@ -1,0 +1,35 @@
+.event-box {
+  display: flex;
+  height: 40px;
+  width: 100%;
+  gap: var(--mantine-spacing-xs);
+  align-items: center;
+  border-radius: var(--mantine-radius-sm);
+  padding: 8px;
+
+  transition: 50ms background-color ease;
+  
+  @mixin hover {
+    background-color: var(--mantine-color-dark-6);
+
+    & .event-box-button {
+      opacity: 100%;
+    }
+  }
+}
+
+.event-box-tick {
+  font-family: monospace;
+  width: 8ch;
+  text-align: end;
+  text-size: 12;
+}
+
+.event-box-value {
+  flex-grow: 1;
+}
+
+.event-box-button {
+  transition: 50ms opacity ease;
+  opacity: 0%;
+}

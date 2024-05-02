@@ -17,7 +17,7 @@ import {
 import HighlightBox from "./HighlightBox";
 import TimelineFilters, { Filters } from "./TimelineFilters";
 
-export type TimelineProps = {
+type TimelineProps = {
   gameSummary: GameSummary;
 };
 
@@ -219,7 +219,7 @@ export default function HighlightsList({ gameSummary }: TimelineProps) {
                         c="dimmed"
                         size="sm"
                         style={{
-                          width: "7ch",
+                          width: "8ch",
                           fontFamily: "monospace",
                           textAlign: "right",
                           paddingRight: 8,
