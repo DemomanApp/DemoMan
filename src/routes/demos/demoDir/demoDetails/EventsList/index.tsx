@@ -20,12 +20,15 @@ import { Demo, DemoEvent } from "@/demo";
 
 import classes from "./EventsList.module.css";
 import { IconKillstreak } from "@/components/icons";
-import { IconBookmark, IconEdit, IconTrash } from "@tabler/icons-react";
+import {
+  IconBookmark,
+  IconEdit,
+  IconPlus,
+  IconTrash,
+} from "@tabler/icons-react";
 import { useNavigate } from "react-router-dom";
 import { useForm } from "@mantine/form";
 import { setDemoEvents } from "@/api";
-
-const EDIT_MODAL_ID = "edit_modal";
 
 type EventsListProps = {
   demo: Demo;
@@ -89,17 +92,19 @@ function openDeleteModal(event: DemoEvent, onConfirm: () => void) {
 
 type EditModalProps = {
   demo: Demo;
-  index: number;
+  index?: number;
   onConfirm(): void;
 };
 
 function EditModal({ demo, index, onConfirm }: EditModalProps) {
-  const event = demo.events[index];
+  const initialValues: DemoEvent =
+    index === undefined
+      ? { name: "Bookmark", tick: 0, value: "General" }
+      : demo.events[index];
 
-  const form = useForm<{ tick: number; value: string }>({
+  const form = useForm<DemoEvent>({
     initialValues: {
-      tick: event.tick,
-      value: event.value,
+      ...initialValues,
     },
     validate: {
       tick(newTick) {
@@ -118,11 +123,16 @@ function EditModal({ demo, index, onConfirm }: EditModalProps) {
     validateInputOnBlur: true,
   });
 
-  function handleSubmit({ tick, value }: typeof form.values) {
+  function handleSubmit(newEvent: DemoEvent) {
     const newEvents = [...demo.events];
 
-    newEvents[index].tick = tick;
-    newEvents[index].value = value;
+    if (index === undefined) {
+      newEvents.push(newEvent);
+    } else {
+      newEvents[index] = newEvent;
+    }
+
+    newEvents.sort((a, b) => a.tick - b.tick);
 
     setDemoEvents(demo.path, newEvents);
 
@@ -164,9 +174,16 @@ function EditModal({ demo, index, onConfirm }: EditModalProps) {
 function openEditModal(demo: Demo, index: number, onConfirm: () => void) {
   modals.open({
     title: "Edit bookmark",
-    id: EDIT_MODAL_ID,
     centered: true,
     children: <EditModal demo={demo} index={index} onConfirm={onConfirm} />,
+  });
+}
+
+function openAddModal(demo: Demo, onConfirm: () => void) {
+  modals.open({
+    title: "Add bookmark",
+    centered: true,
+    children: <EditModal demo={demo} onConfirm={onConfirm} />,
   });
 }
 
@@ -195,39 +212,52 @@ export default function EventsList({ demo }: EventsListProps) {
     openEditModal(demo, index, reloadPage);
   };
 
+  const handleAdd = () => {
+    openAddModal(demo, reloadPage);
+  };
+
   return (
-    <AutoSizer>
-      {({ height, width }) => (
-        <ScrollArea
-          style={{ width, height }}
-          onScrollPositionChange={({ y }) => listRef.current?.scrollTo(y)}
-        >
-          <FixedSizeList
-            height={height}
-            width={width}
-            style={{ overflow: "visible" }}
-            itemCount={demo.events.length}
-            itemSize={40}
-            ref={listRef}
-          >
-            {({ style, index }) => (
-              <div
-                style={{
-                  ...style,
-                  display: "flex",
-                  alignItems: "center",
-                }}
+    <Stack h="100%">
+      <Group justify="end">
+        <Button onClick={handleAdd} leftSection={<IconPlus />} variant="light">
+          Add Bookmark...
+        </Button>
+      </Group>
+      <div style={{ flexGrow: 1 }}>
+        <AutoSizer>
+          {({ height, width }) => (
+            <ScrollArea
+              style={{ width, height }}
+              onScrollPositionChange={({ y }) => listRef.current?.scrollTo(y)}
+            >
+              <FixedSizeList
+                height={height}
+                width={width}
+                style={{ overflow: "visible" }}
+                itemCount={demo.events.length}
+                itemSize={40}
+                ref={listRef}
               >
-                <EventBox
-                  event={demo.events[index]}
-                  onDelete={() => handleDelete(index)}
-                  onEdit={() => handleEdit(index)}
-                />
-              </div>
-            )}
-          </FixedSizeList>
-        </ScrollArea>
-      )}
-    </AutoSizer>
+                {({ style, index }) => (
+                  <div
+                    style={{
+                      ...style,
+                      display: "flex",
+                      alignItems: "center",
+                    }}
+                  >
+                    <EventBox
+                      event={demo.events[index]}
+                      onDelete={() => handleDelete(index)}
+                      onEdit={() => handleEdit(index)}
+                    />
+                  </div>
+                )}
+              </FixedSizeList>
+            </ScrollArea>
+          )}
+        </AutoSizer>
+      </div>
+    </Stack>
   );
 }
