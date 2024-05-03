@@ -46,6 +46,7 @@ import PlayerList from "./PlayerList";
 import EventsList from "./EventsList";
 import { Demo, GameSummary } from "@/demo";
 import Highlights from "./Highlights";
+import useLocationState from "@/hooks/useLocationState";
 
 import classes from "./demoDetails.module.css";
 
@@ -58,6 +59,10 @@ export default function DemoDetailsView() {
   // I'm not sure if this is the correct type. Sadly,
   // the type is not documented by react-router.
   const { demo, details } = useLoaderData() as LoaderData;
+
+  const [locationState, setLocationState] = useLocationState({
+    currentTab: "players",
+  });
 
   return (
     <AppShell header={{ height: 50 }}>
@@ -153,7 +158,11 @@ export default function DemoDetailsView() {
                       <Await resolve={details} errorElement={<ErrorElement />}>
                         {(gameSummary: GameSummary) => (
                           <Tabs
-                            defaultValue="players"
+                            value={locationState.currentTab}
+                            onChange={(newTab) =>
+                              // newTab cannot be null since `allowTabDeactivation` is not set on `Tabs`
+                              setLocationState("currentTab", newTab!)
+                            }
                             // These styles prevent tall tab panels (mainly the timeline tab)
                             // from overflowing. I want the panel to take up exactly
                             // the remaining vertical space on the page,
