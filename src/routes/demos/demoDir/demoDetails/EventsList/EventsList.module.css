@@ -6,14 +6,13 @@
   align-items: center;
   border-radius: var(--mantine-radius-sm);
   padding: 8px;
-
   transition: 50ms background-color ease;
   
   @mixin hover {
     background-color: var(--mantine-color-dark-6);
 
     & .event-box-button {
-      opacity: 100%;
+      opacity: 1;
     }
   }
 }
@@ -22,7 +21,6 @@
   font-family: monospace;
   width: 8ch;
   text-align: end;
-  text-size: 12;
 }
 
 .event-box-value {
@@ -31,5 +29,5 @@
 
 .event-box-button {
   transition: 50ms opacity ease;
-  opacity: 0%;
+  opacity: 0;
 }
