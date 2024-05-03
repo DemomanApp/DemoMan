@@ -4,7 +4,7 @@ import DemosRoute from "./demos";
 import DemoDirRoute from "./demos/demoDir";
 import DemoDetailsRoute, {
   loader as demoDetailsLoader,
-} from "./demos/demoDir/demoDetails";
+} from "./demos/demoDetails";
 import SettingsView from "./settings";
 import RconSetup from "./rconSetup";
 import IndexRoute from "./IndexRoute";
