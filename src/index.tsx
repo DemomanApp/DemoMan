@@ -20,6 +20,7 @@ createRoot(document.getElementById("root")!).render(
     <MantineProvider
       defaultColorScheme="dark"
       theme={{
+        focusRing: "never",
         components: {
           Tooltip: {
             defaultProps: {
