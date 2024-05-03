@@ -1,6 +1,17 @@
 import { useMemo, useState } from "react";
 
-import { Divider, Paper, ScrollArea, Tabs, Text, Title } from "@mantine/core";
+import { open } from "@tauri-apps/api/shell";
+
+import {
+  ActionIcon,
+  Divider,
+  Paper,
+  ScrollArea,
+  Tabs,
+  Text,
+  Title,
+  Tooltip,
+} from "@mantine/core";
 import { IconBrandSteam } from "@tabler/icons-react";
 
 import { GameSummary, PlayerSummary, primaryTeam } from "@/demo";
@@ -109,13 +120,21 @@ export default function PlayerList({ gameSummary }: PlayerListProps) {
             <Title order={2}>
               {currentPlayer.name}
               {currentPlayer.steam_id !== "0" && (
-                <a
-                  href={`https://steamcommunity.com/profiles/${currentPlayer.steam_id}`}
-                  target="_blank"
-                  rel="noreferrer"
-                >
-                  <IconBrandSteam className={classes.steamIcon} />
-                </a>
+                <Tooltip label="View steam profile">
+                  <ActionIcon
+                    ml="xs"
+                    variant="transparent"
+                    color="gray"
+                    size="lg"
+                    onClick={() =>
+                      open(
+                        `https://steamcommunity.com/profiles/${currentPlayer.steam_id}`
+                      )
+                    }
+                  >
+                    <IconBrandSteam />
+                  </ActionIcon>
+                </Tooltip>
               )}
             </Title>
             <ClassPlaytimeIndicator
