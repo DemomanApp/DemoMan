@@ -1,36 +1,8 @@
 .paper {
+  height: 100%;
   display: flex;
   flex-direction: column;
   align-items: stretch;
   overflow: hidden;
 }
 
-.header {
-  width: 50%;
-  display: inline-flex;
-  justify-content: space-between;
-  padding: 8px;
-}
-
-.divider {
-  height: 4px;
-  width: 100%;
-  background: linear-gradient(
-    90deg,
-    var(--mantine-color-blue-7) 0%,
-    var(--mantine-color-blue-7) 50%,
-    var(--mantine-color-red-7) 50%,
-    var(--mantine-color-red-7) 100%
-  );
-}
-
-.player-list-column {
-  width: 50%;
-  display: inline-block;
-  vertical-align: top;
-}
-
-.scoreboard-player-name-header {
-  padding-left: var(--mantine-spacing-xs);
-  padding-right: var(--mantine-spacing-xs);
-}

@@ -1,0 +1,8 @@
+.scoreboard-player-name-header {
+  padding-left: var(--mantine-spacing-xs);
+  padding-right: var(--mantine-spacing-xs);
+}
+
+.player-details {
+  border-top: 1px solid var(--mantine-color-default-border);
+}
