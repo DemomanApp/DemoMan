@@ -95,7 +95,10 @@ export default function PlayerList({ gameSummary }: PlayerListProps) {
               <PlayerBox
                 key={player.user_id}
                 player={player}
-                onClick={() => setCurrentPlayer(player)}
+                onClick={() => {
+                  setCurrentTab("match");
+                  setCurrentPlayer(player);
+                }}
                 selected={player.user_id === currentPlayer?.user_id}
               />
             ))}
@@ -104,8 +107,11 @@ export default function PlayerList({ gameSummary }: PlayerListProps) {
             {redPlayers.map((player) => (
               <PlayerBox
                 key={player.user_id}
-                onClick={() => setCurrentPlayer(player)}
                 player={player}
+                onClick={() => {
+                  setCurrentTab("match");
+                  setCurrentPlayer(player);
+                }}
                 selected={player.user_id === currentPlayer?.user_id}
               />
             ))}
