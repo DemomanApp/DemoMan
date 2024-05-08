@@ -42,18 +42,18 @@ const innerElementType = forwardRef<HTMLDivElement>(
 type ItemDataType = {
   demos: Demo[];
   selectedRows: boolean[];
-  toggleRowSelected(index: number): void;
+  handleRowClick(index: number): void;
 };
 
 const createItemData = memoize(
   (
     demos: Demo[],
     selectedRows: boolean[],
-    toggleRowSelected: (index: number) => void
+    handleRowClick: (index: number) => void
   ): ItemDataType => ({
     demos,
     selectedRows,
-    toggleRowSelected,
+    handleRowClick,
   })
 );
 
@@ -137,7 +137,7 @@ export default function DemoList({ demos }: DemoListProps) {
                 ref={listRef}
               >
                 {({
-                  data: { demos, selectedRows, toggleRowSelected },
+                  data: { demos, selectedRows, handleRowClick },
                   index,
                   style,
                 }: ListChildComponentProps<ItemDataType>) => (
@@ -153,7 +153,7 @@ export default function DemoList({ demos }: DemoListProps) {
                     <DemoListRow
                       demo={demos[index]}
                       selected={selectedRows[index]}
-                      onClick={() => toggleRowSelected(index)}
+                      onClick={() => handleRowClick(index)}
                     />
                   </div>
                 )}
