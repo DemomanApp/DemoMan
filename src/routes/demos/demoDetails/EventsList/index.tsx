@@ -134,9 +134,7 @@ function EditModal({ demo, index, onConfirm }: EditModalProps) {
 
     newEvents.sort((a, b) => a.tick - b.tick);
 
-    setDemoEvents(demo.path, newEvents);
-
-    onConfirm();
+    setDemoEvents(demo.path, newEvents).catch(console.error).finally(onConfirm);
   }
 
   return (
@@ -202,9 +200,9 @@ export default function EventsList({ demo }: EventsListProps) {
       const newEvents = [...demo.events];
       newEvents.splice(index, 1);
 
-      setDemoEvents(demo.path, newEvents);
-
-      reloadPage();
+      setDemoEvents(demo.path, newEvents)
+        .catch(console.error)
+        .finally(reloadPage);
     });
   };
 
