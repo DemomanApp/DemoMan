@@ -89,6 +89,13 @@ impl<T: DeserializeOwned + Serialize> DiskCache<T> {
 
         cacache::write(&self.cache_path, key, bytes).await.unwrap();
     }
+
+    pub async fn rename(&self, old_key: &str, new_key: &str) -> cacache::Result<()> {
+        cacache::hard_link(&self.cache_path, old_key, new_key).await?;
+        cacache::remove(&self.cache_path, old_key).await?;
+
+        Ok(())
+    }
 }
 
 #[cfg(test)]

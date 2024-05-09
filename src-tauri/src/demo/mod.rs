@@ -46,7 +46,7 @@ pub struct DemoEvent {
 #[serde(rename_all = "camelCase")]
 pub struct Demo {
     pub name: String,
-    pub path: PathBuf,
+    pub path: String,
     pub birthtime: u64,
     pub filesize: u64,
     pub events: Vec<DemoEvent>,
@@ -61,7 +61,7 @@ pub struct Demo {
 impl Demo {
     pub fn new(
         name: String,
-        path: PathBuf,
+        path: String,
         header: tf_demo_parser::demo::header::Header,
         events: Vec<DemoEvent>,
         tags: Vec<String>,
@@ -85,6 +85,10 @@ impl Demo {
             playback_time: header.duration,
             num_ticks: header.ticks,
         }
+    }
+
+    pub fn json_path(&self) -> PathBuf {
+        Path::new(&self.path).with_extension("json")
     }
 }
 
@@ -114,7 +118,7 @@ pub struct DemoJsonFileDe {
 /// - The file is not able to be opened, possibly because it doesn't exist or the user has insufficient permissions
 /// - The file is incomplete or has an invalid header
 /// - The file header indicates that this demo was recorded for a game that is not TF2
-pub fn read_demo_header(path: &Path) -> Result<tf_demo_parser::demo::header::Header> {
+pub fn read_demo_header(path: &str) -> Result<tf_demo_parser::demo::header::Header> {
     let mut file = File::open(path)?;
 
     let mut buf = [0u8; HEADER_SIZE];
@@ -155,22 +159,22 @@ pub fn read_events_and_tags(json_path: &Path) -> (Vec<DemoEvent>, Vec<String>) {
 
 /// Read the demo at `path`.
 /// This will also read events and tags from the associated JSON file, if it exists.
-pub fn read_demo(path: &Path) -> Result<Demo> {
-    let name: String = path
+pub fn read_demo(path: &str) -> Result<Demo> {
+    let name: String = Path::new(path)
         .file_stem()
         .ok_or(Error::BadFilename)?
         .to_str()
         .ok_or(Error::BadFilename)?
         .to_owned();
-    let metadata = path.metadata()?;
+    let metadata = fs::metadata(path)?;
     if !metadata.is_file() {
         return Err(Error::NotAFile);
     }
     let header = read_demo_header(path)?;
-    let (events, tags) = read_events_and_tags(&path.with_extension("json"));
+    let (events, tags) = read_events_and_tags(&Path::new(path).with_extension("json"));
     Ok(Demo::new(
         name,
-        path.to_path_buf(),
+        path.into(),
         header,
         events,
         tags,
@@ -180,7 +184,7 @@ pub fn read_demo(path: &Path) -> Result<Demo> {
 
 /// Find all .dem files in the directory at `dir_path`
 /// and return their file stem (name without extension)
-pub fn read_demo_names_in_directory(dir_path: &Path) -> Result<Vec<String>> {
+pub fn read_demo_names_in_directory(dir_path: &str) -> Result<Vec<String>> {
     let dir_iterator = read_dir(dir_path)?;
 
     let mut demos = Vec::new();
@@ -201,17 +205,24 @@ pub fn read_demo_names_in_directory(dir_path: &Path) -> Result<Vec<String>> {
 }
 
 pub fn read_demos_in_directory(
-    dir_path: &Path,
-    demo_cache: &mut HashMap<PathBuf, Arc<Demo>>,
+    dir_path: &str,
+    demo_cache: &mut HashMap<String, Arc<Demo>>,
 ) -> Result<Vec<Arc<Demo>>> {
     read_demo_names_in_directory(dir_path).map(|demos| {
         demos
             .iter()
             .filter_map(|demo_name| {
-                let demo_path = dir_path.join(demo_name).with_extension("dem");
+                let demo_path = PathBuf::from(dir_path)
+                    .join(demo_name)
+                    .with_extension("dem");
+
+                // Safety: The PathBuf is constructed only from valid UTF-8 strings,
+                // thus as_str will always succeed
+                let demo_path_str = demo_path.to_str().unwrap();
+
                 let demo = demo_cache
-                    .entry(demo_path.clone())
-                    .or_try_insert_with(|| read_demo(&demo_path).map(Arc::new))
+                    .entry(demo_path_str.into())
+                    .or_try_insert_with(|| read_demo(demo_path_str).map(Arc::new))
                     .ok()?;
                 Some(Arc::clone(demo))
             })

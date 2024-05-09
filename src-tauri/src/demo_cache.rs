@@ -99,7 +99,7 @@ pub enum Filter {
 
 #[derive(Default)]
 pub struct DemoListCache {
-    path: PathBuf,
+    path: String,
 
     // Invariant: This should always be sorted by sort_key.
     demos: Vec<Arc<Demo>>,
@@ -154,7 +154,7 @@ impl DemoListCache {
 }
 
 pub struct DemoCache {
-    cache: HashMap<PathBuf, Arc<Demo>>,
+    cache: HashMap<String, Arc<Demo>>,
     list_cache: Option<DemoListCache>,
     disk_cache: DiskCache<GameSummary>,
 }
@@ -170,7 +170,7 @@ impl DemoCache {
 
     pub fn get_sorted_and_filtered_demos_in_directory(
         &mut self,
-        path: &Path,
+        path: &str,
         sort_key: SortKey,
         reverse: bool,
         filters: Vec<Filter>,
@@ -182,7 +182,7 @@ impl DemoCache {
             list_cache.filter_and_sort(sort_key, reverse, filters, query);
         } else {
             list_cache.demos = read_demos_in_directory(path, &mut self.cache)?;
-            list_cache.path = path.to_path_buf();
+            list_cache.path = path.into();
             list_cache.sort_by(sort_key, reverse);
             list_cache.filter_by(filters, query);
         }
@@ -190,14 +190,14 @@ impl DemoCache {
         Ok(list_cache.filtered_demos.clone())
     }
 
-    pub fn get_demo_mut(&mut self, path: &Path) -> Result<&mut Demo> {
+    pub fn get_demo_mut(&mut self, path: &str) -> Result<&mut Demo> {
         self.cache
             .entry(path.into())
             .or_try_insert_with(|| read_demo(path).map(Arc::new))
             .map(Arc::make_mut)
     }
 
-    pub fn get_demo(&mut self, path: &Path) -> Result<Arc<Demo>> {
+    pub fn get_demo(&mut self, path: &str) -> Result<Arc<Demo>> {
         match self.cache.entry(path.into()) {
             Entry::Occupied(entry) => Ok(entry.get().clone()),
             Entry::Vacant(entry) => {
@@ -209,33 +209,35 @@ impl DemoCache {
         }
     }
 
-    pub fn set_events(&mut self, path: &Path, events: Vec<DemoEvent>) -> Result<()> {
+    pub fn set_events(&mut self, path: &str, events: Vec<DemoEvent>) -> Result<()> {
         let demo = self.get_demo_mut(path)?;
 
-        let json_path = demo.path.with_extension("json");
-        write_events_and_tags(&json_path, &events, &demo.tags).or(Err(Error::OtherIOError))?;
+        write_events_and_tags(&demo.json_path(), &events, &demo.tags)
+            .or(Err(Error::OtherIOError))?;
         demo.events = events;
 
         Ok(())
     }
 
-    pub fn set_tags(&mut self, path: &Path, tags: Vec<String>) -> Result<()> {
+    pub fn set_tags(&mut self, path: &str, tags: Vec<String>) -> Result<()> {
         let demo = self.get_demo_mut(path)?;
 
-        let json_path = demo.path.with_extension("json");
-        write_events_and_tags(&json_path, &demo.events, &tags).or(Err(Error::OtherIOError))?;
+        write_events_and_tags(&demo.json_path(), &demo.events, &tags)
+            .or(Err(Error::OtherIOError))?;
         demo.tags = tags;
 
         Ok(())
     }
 
-    pub fn delete(&mut self, path: &Path, trash: bool) -> Result<()> {
+    pub fn delete(&mut self, path: &str, trash: bool) -> Result<()> {
         self.cache.remove(path);
+
+        let json_path = Path::new(path).with_extension("json");
 
         if trash {
             trash::delete(path).or(Err(Error::FileDeleteFailed))?;
 
-            if let Err(e) = trash::delete(path.with_extension("json")) {
+            if let Err(e) = trash::delete(json_path) {
                 if let trash::Error::CouldNotAccess { target: _ } = e {
                     // We don't care if the file was not found
                     // because the demo has no JSON file.
@@ -246,7 +248,7 @@ impl DemoCache {
         } else {
             remove_file(path).or(Err(Error::FileDeleteFailed))?;
 
-            if let Err(e) = remove_file(path.with_extension("json")) {
+            if let Err(e) = remove_file(json_path) {
                 if e.kind() == std::io::ErrorKind::NotFound {
                     // We don't care if the file was not found
                     // because the demo has no JSON file.
@@ -259,19 +261,32 @@ impl DemoCache {
         Ok(())
     }
 
-    pub fn rename(&mut self, path: &Path, new_path: &Path) -> Result<()> {
+    pub async fn rename(&mut self, path: &str, new_path: &str) -> Result<()> {
         std::fs::rename(path, new_path)?;
-        let _ = std::fs::rename(path.with_extension("json"), new_path.with_extension("json"));
+
+        let json_path = Path::new(path).with_extension("json");
+        let new_json_path = Path::new(new_path).with_extension("json");
+
+        let _ = std::fs::rename(json_path, new_json_path);
 
         if let Some(mut cache_entry) = self.cache.remove(path) {
-            Arc::make_mut(&mut cache_entry).name = new_path
+            let demo = Arc::make_mut(&mut cache_entry);
+
+            demo.name = Path::new(new_path)
                 .file_stem()
                 .and_then(OsStr::to_str)
                 .map(String::from)
                 .ok_or(Error::BadFilename)?;
 
+            demo.path = new_path.into();
+
             self.cache.insert(new_path.into(), cache_entry);
         }
+
+        // TODO rename the demo in place instead of invalidating the entire cache
+        self.list_cache = None;
+
+        let _ = self.disk_cache.rename(path, new_path).await;
 
         Ok(())
     }

@@ -7,7 +7,8 @@ fn test_demo_loading() {
 
     let demo_dir_path = Path::new("src/tests/data/demos");
 
-    let demo_names = read_demo_names_in_directory(demo_dir_path).expect("Failed to read directory");
+    let demo_names = read_demo_names_in_directory(demo_dir_path.to_str().unwrap())
+        .expect("Failed to read directory");
 
     // Out of the four directory entries with the `.dem` extension,
     // one is a directory and should be ignored.
@@ -18,7 +19,7 @@ fn test_demo_loading() {
         .filter_map(|demo_name| {
             let demo_path = demo_dir_path.join(demo_name).with_extension("dem");
 
-            read_demo(&demo_path).ok()
+            read_demo(demo_path.to_str().unwrap()).ok()
         })
         .collect::<Vec<Demo>>();
 
