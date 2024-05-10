@@ -151,6 +151,19 @@ impl DemoListCache {
         self.sort_key = sort_key;
         self.reverse = reverse;
     }
+
+    pub fn remove(&mut self, path: &str) {
+        self.demos
+            .iter()
+            .enumerate()
+            .find_map(|(index, demo)| if demo.path == path { Some(index) } else { None })
+            .map(|index| self.demos.remove(index));
+        self.filtered_demos
+            .iter()
+            .enumerate()
+            .find_map(|(index, demo)| if demo.path == path { Some(index) } else { None })
+            .map(|index| self.filtered_demos.remove(index));
+    }
 }
 
 pub struct DemoCache {
@@ -231,30 +244,23 @@ impl DemoCache {
 
     pub fn delete(&mut self, path: &str, trash: bool) -> Result<()> {
         self.cache.remove(path);
+        if let Some(list_cache) = &mut self.list_cache {
+            list_cache.remove(path);
+        }
 
         let json_path = Path::new(path).with_extension("json");
 
         if trash {
             trash::delete(path).or(Err(Error::FileDeleteFailed))?;
 
-            if let Err(e) = trash::delete(json_path) {
-                if let trash::Error::CouldNotAccess { target: _ } = e {
-                    // We don't care if the file was not found
-                    // because the demo has no JSON file.
-                } else {
-                    return Err(Error::OtherIOError);
-                }
+            if json_path.exists() {
+                trash::delete(json_path).or(Err(Error::FileDeleteFailed))?;
             }
         } else {
             remove_file(path).or(Err(Error::FileDeleteFailed))?;
 
-            if let Err(e) = remove_file(json_path) {
-                if e.kind() == std::io::ErrorKind::NotFound {
-                    // We don't care if the file was not found
-                    // because the demo has no JSON file.
-                } else {
-                    return Err(Error::OtherIOError);
-                }
+            if json_path.exists() {
+                remove_file(json_path).or(Err(Error::FileDeleteFailed))?;
             }
         }
 

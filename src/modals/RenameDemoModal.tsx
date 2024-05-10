@@ -13,34 +13,32 @@ export async function openRenameDemoModal(
 ) {
   const parentDirectory = await path.dirname(demo.path);
 
-  async function handleSubmit(newName: string) {
-    const newPath = await path.join(parentDirectory, `${newName}.dem`);
-
-    await renameDemo(demo.path, newPath);
-
-    onConfirm(newPath);
-  }
-
   modals.openContextModal({
     modal: "rename_demo",
     title: `Rename ${demo.name}`,
     centered: true,
     innerProps: {
       oldName: demo.name,
-      handleSubmit,
+      async onConfirm(newName: string) {
+        const newPath = await path.join(parentDirectory, `${newName}.dem`);
+
+        await renameDemo(demo.path, newPath);
+
+        onConfirm(newPath);
+      },
     },
   });
 }
 
 type RenameDemoModalProps = {
   oldName: string;
-  handleSubmit(newName: string): void;
+  onConfirm(newName: string): void;
 };
 
 export const RenameDemoModal = ({
   context,
   id,
-  innerProps: { oldName, handleSubmit },
+  innerProps: { oldName, onConfirm },
 }: ContextModalProps<RenameDemoModalProps>) => {
   console.log(id);
 
@@ -62,7 +60,7 @@ export const RenameDemoModal = ({
   return (
     <form
       onSubmit={form.onSubmit(({ name }) => {
-        handleSubmit(name);
+        onConfirm(name);
         context.closeModal(id);
       })}
     >

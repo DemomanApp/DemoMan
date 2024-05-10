@@ -32,6 +32,7 @@ import MapBox from "./MapBox";
 import Badges from "./Badges";
 
 import classes from "./DemoListRow.module.css";
+import { openDeleteDemoModal } from "@/modals/DeleteDemoModal";
 
 type DemoListRowProps = {
   demo: Demo;
@@ -66,6 +67,8 @@ function HoverMenuItem({
 
 function DemoListRow({ demo, selected, onClick }: DemoListRowProps) {
   const navigate = useNavigate();
+
+  const reloadPage = () => navigate(0);
 
   const birthtime = new Date(demo.birthtime * 1000);
 
@@ -163,15 +166,13 @@ function DemoListRow({ demo, selected, onClick }: DemoListRowProps) {
         <HoverMenuItem
           Icon={IconTrash}
           label="Delete"
-          onClick={() => {
-            console.log("delete");
-          }}
+          onClick={() => openDeleteDemoModal(demo, reloadPage)}
         />
         <HoverMenuItem
           Icon={IconPencil}
           label="Rename"
           // TODO: update the page without reloading
-          onClick={() => openRenameDemoModal(demo, () => navigate(0))}
+          onClick={() => openRenameDemoModal(demo, reloadPage)}
         />
         <HoverMenuItem
           Icon={IconPlayerPlayFilled}
