@@ -1354,7 +1354,6 @@ impl GameDetailsAnalyser {
 
     fn handle_player_spawn_event(&mut self, event: &PlayerSpawnEvent) {
         if let Some(player) = self.players.get_mut(UserId::from(event.user_id)) {
-            trace!("Spawn event: {}", player.name);
             player.class = Class::new(event.class);
             player.team = Team::new(event.team);
             player.last_spawn_tick = Some(self.demo_tick);
@@ -1408,7 +1407,6 @@ impl GameDetailsAnalyser {
     }
 
     fn handle_player_connect_event(&mut self, event: &PlayerConnectClientEvent) {
-        trace!("Connect event: {}", event.name);
         self.add_highlight(Highlight::PlayerConnected {
             player: HighlightPlayerSnapshot {
                 user_id: event.user_id.into(),
@@ -1420,8 +1418,6 @@ impl GameDetailsAnalyser {
 
     fn handle_player_disconnect_event(&mut self, event: &PlayerDisconnectEvent) {
         let user_id = UserId::from(event.user_id);
-
-        trace!("Disconnect event: {}", event.name);
 
         self.add_highlight(Highlight::PlayerDisconnected {
             player: self.players.snapshot_or_fallback(user_id),
