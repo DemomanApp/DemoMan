@@ -1,4 +1,5 @@
 import { memo } from "react";
+import { useNavigate } from "react-router-dom";
 
 import {
   ActionIcon,
@@ -26,6 +27,7 @@ import { areEqual } from "react-window";
 
 import { Demo, isStvDemo } from "@/demo";
 import { IconKillstreak } from "@/components/icons";
+import { openRenameDemoModal } from "@/modals/RenameDemoModal";
 import MapBox from "./MapBox";
 import Badges from "./Badges";
 
@@ -63,7 +65,10 @@ function HoverMenuItem({
 }
 
 function DemoListRow({ demo, selected, onClick }: DemoListRowProps) {
+  const navigate = useNavigate();
+
   const birthtime = new Date(demo.birthtime * 1000);
+
   return (
     <Paper
       className={classes.paper}
@@ -165,9 +170,8 @@ function DemoListRow({ demo, selected, onClick }: DemoListRowProps) {
         <HoverMenuItem
           Icon={IconPencil}
           label="Rename"
-          onClick={() => {
-            console.log("rename");
-          }}
+          // TODO: update the page without reloading
+          onClick={() => openRenameDemoModal(demo, () => navigate(0))}
         />
         <HoverMenuItem
           Icon={IconPlayerPlayFilled}

@@ -10,6 +10,7 @@ import "@mantine/core/styles.css";
 import "@mantine/dates/styles.css";
 
 import router from "./routes/router";
+import modals from "./modals";
 import "./globalExtensions";
 
 import "./index.css";
@@ -32,7 +33,7 @@ createRoot(document.getElementById("root")!).render(
         },
       }}
     >
-      <ModalsProvider>
+      <ModalsProvider modals={modals}>
         <RouterProvider router={router} />
       </ModalsProvider>
     </MantineProvider>

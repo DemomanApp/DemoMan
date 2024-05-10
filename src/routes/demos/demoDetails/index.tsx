@@ -9,10 +9,7 @@ import {
   useNavigate,
 } from "react-router-dom";
 import * as log from "tauri-plugin-log-api";
-import { path } from "@tauri-apps/api";
 
-import { modals } from "@mantine/modals";
-import { useForm } from "@mantine/form";
 import {
   ActionIcon,
   Alert,
@@ -25,7 +22,6 @@ import {
   Stack,
   Tabs,
   Text,
-  TextInput,
   Tooltip,
 } from "@mantine/core";
 import {
@@ -42,7 +38,7 @@ import {
   IconUsers,
 } from "@tabler/icons-react";
 
-import { getDemo, getDemoDetails, renameDemo, sendCommand } from "@/api";
+import { getDemo, getDemoDetails, sendCommand } from "@/api";
 import { HeaderBar } from "@/AppShell";
 import { AsyncButton, MapThumbnail, LoaderFallback, Fill } from "@/components";
 import { formatFileSize, formatDuration, decodeParam } from "@/util";
@@ -53,74 +49,10 @@ import Highlights from "./Highlights";
 import useLocationState from "@/hooks/useLocationState";
 
 import classes from "./demoDetails.module.css";
-
-type RenameDemoModalProps = {
-  oldName: string;
-  handleSubmit(newName: string): void;
-};
-
-function RenameDemoModal({ oldName, handleSubmit }: RenameDemoModalProps) {
-  const form = useForm<{ name: string }>({
-    initialValues: {
-      name: oldName,
-    },
-    validate: {
-      name(value) {
-        if (value.length === 0) {
-          return "This cannot be empty";
-        }
-        return null;
-      },
-    },
-    validateInputOnBlur: true,
-  });
-
-  return (
-    <form onSubmit={form.onSubmit(({ name }) => handleSubmit(name))}>
-      <Stack gap="xs">
-        <TextInput
-          label="Demo name"
-          placeholder="Demo name"
-          data-autofocus
-          {...form.getInputProps("name")}
-        />
-        <Group gap="xs" justify="end">
-          <Button variant="default" onClick={modals.closeAll}>
-            Cancel
-          </Button>
-          <Button type="submit">Confirm</Button>
-        </Group>
-      </Stack>
-    </form>
-  );
-}
+import { openRenameDemoModal } from "@/modals/RenameDemoModal";
 
 function DemoTitle({ demo }: { demo: Demo }) {
   const navigate = useNavigate();
-
-  async function openRenameModal() {
-    const parentDirectory = await path.dirname(demo.path);
-
-    async function handleSubmit(newName: string) {
-      const newPath = await path.join(parentDirectory, `${newName}.dem`);
-
-      await renameDemo(demo.path, newPath);
-
-      modals.closeAll();
-
-      navigate(`/demos/show/${encodeURIComponent(newPath)}`, {
-        replace: true,
-      });
-    }
-
-    modals.open({
-      title: `Rename ${demo.name}`,
-      centered: true,
-      children: (
-        <RenameDemoModal oldName={demo.name} handleSubmit={handleSubmit} />
-      ),
-    });
-  }
 
   return (
     <>
@@ -135,7 +67,17 @@ function DemoTitle({ demo }: { demo: Demo }) {
         {demo.name}
       </Text>
       <Tooltip label="Rename demo">
-        <ActionIcon variant="transparent" size="sm" onClick={openRenameModal}>
+        <ActionIcon
+          variant="transparent"
+          size="sm"
+          onClick={() =>
+            openRenameDemoModal(demo, (newPath) => {
+              navigate(`/demos/show/${encodeURIComponent(newPath)}`, {
+                replace: true,
+              });
+            })
+          }
+        >
           <IconPencil color="gray" />
         </ActionIcon>
       </Tooltip>
