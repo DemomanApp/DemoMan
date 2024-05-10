@@ -34,7 +34,7 @@
       "identifier": "com.narcha.demoman",
       "longDescription": "Easily browse and organize all your demo files, find highlights, and edit bookmarks!",
       "shortDescription": "The TF2 Demo Manager",
-      "targets": "all"
+      "targets": ["deb", "appimage", "nsis"]
     },
     "security": {
       "csp": null
