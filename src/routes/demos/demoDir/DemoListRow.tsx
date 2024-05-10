@@ -28,11 +28,12 @@ import { areEqual } from "react-window";
 import { Demo, isStvDemo } from "@/demo";
 import { IconKillstreak } from "@/components/icons";
 import { openRenameDemoModal } from "@/modals/RenameDemoModal";
+import { openDeleteDemoModal } from "@/modals/DeleteDemoModal";
+import { sendCommand } from "@/api";
 import MapBox from "./MapBox";
 import Badges from "./Badges";
 
 import classes from "./DemoListRow.module.css";
-import { openDeleteDemoModal } from "@/modals/DeleteDemoModal";
 
 type DemoListRowProps = {
   demo: Demo;
@@ -68,6 +69,7 @@ function HoverMenuItem({
 function DemoListRow({ demo, selected, onClick }: DemoListRowProps) {
   const navigate = useNavigate();
 
+  // TODO: update the page without reloading
   const reloadPage = () => navigate(0);
 
   const birthtime = new Date(demo.birthtime * 1000);
@@ -171,15 +173,12 @@ function DemoListRow({ demo, selected, onClick }: DemoListRowProps) {
         <HoverMenuItem
           Icon={IconPencil}
           label="Rename"
-          // TODO: update the page without reloading
           onClick={() => openRenameDemoModal(demo, reloadPage)}
         />
         <HoverMenuItem
           Icon={IconPlayerPlayFilled}
           label="Play"
-          onClick={() => {
-            console.log("play");
-          }}
+          onClick={() => sendCommand(`playdemo "${demo.path}"`)}
         />
       </Paper>
     </Paper>
