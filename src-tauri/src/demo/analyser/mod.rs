@@ -1375,9 +1375,17 @@ impl GameDetailsAnalyser {
     }
 
     fn handle_round_win_event(&mut self, event: &TeamPlayRoundWinEvent) {
-        self.add_highlight(Highlight::RoundWin {
-            winner: Team::try_from(event.team).unwrap_or_default(),
-        });
+        let team = Team::try_from(event.team).unwrap_or_default();
+
+        // In at least one of my demos, a stalemate was represented by team "Other" winning a round,
+        // and handle_round_stalemate_event was not called. I'm not sure if this is always the case.
+        if matches!(team, Team::Red | Team::Blue) {
+            self.add_highlight(Highlight::RoundWin { winner: team });
+        } else {
+            self.add_highlight(Highlight::RoundStalemate {
+                reason: event.win_reason,
+            });
+        }
     }
 
     fn handle_round_end(&mut self) {
