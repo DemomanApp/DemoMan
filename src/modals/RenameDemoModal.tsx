@@ -40,8 +40,6 @@ export const RenameDemoModal = ({
   id,
   innerProps: { oldName, onConfirm },
 }: ContextModalProps<RenameDemoModalProps>) => {
-  console.log(id);
-
   const form = useForm<{ name: string }>({
     initialValues: {
       name: oldName,
