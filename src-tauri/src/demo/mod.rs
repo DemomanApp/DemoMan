@@ -22,7 +22,6 @@ use self::{
 pub use self::error::Error;
 
 pub mod analyser;
-pub mod cache;
 pub mod error;
 
 pub const HEADER_SIZE: usize = 8 + 4 + 4 + 260 + 260 + 260 + 260 + 4 + 4 + 4 + 4;

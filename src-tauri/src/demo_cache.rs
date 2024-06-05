@@ -12,9 +12,10 @@ use serde::Deserialize;
 
 use crate::{
     demo::{
-        analyser::GameSummary, cache::DiskCache, error::Result, read_demo, read_demo_details,
+        analyser::GameSummary, error::Result, read_demo, read_demo_details,
         read_demos_in_directory, write_events_and_tags, Demo, DemoEvent, Error,
     },
+    disk_cache::DiskCache,
     std_ext::OrTryInsertWith,
 };
 

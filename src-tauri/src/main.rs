@@ -23,6 +23,7 @@ use demo_cache::DemoCache;
 mod commands;
 mod demo;
 mod demo_cache;
+mod disk_cache;
 mod std_ext;
 
 #[cfg(test)]
