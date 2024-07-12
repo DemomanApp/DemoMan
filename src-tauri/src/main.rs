@@ -88,9 +88,10 @@ fn main() {
         })
         .invoke_handler(tauri::generate_handler![
             commands::demos::delete_demo,
+            commands::demos::get_demo,
             commands::demos::get_demo_details,
             commands::demos::get_demos_in_directory,
-            commands::demos::get_demo,
+            commands::demos::get_known_tags,
             commands::demos::rename_demo,
             commands::demos::set_demo_events,
             commands::demos::set_demo_tags,

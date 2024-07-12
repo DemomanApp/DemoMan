@@ -38,7 +38,13 @@ import {
   IconUsers,
 } from "@tabler/icons-react";
 
-import { getDemo, getDemoDetails, sendCommand } from "@/api";
+import {
+  getDemo,
+  getDemoDetails,
+  getKnownTags,
+  sendCommand,
+  setDemoTags,
+} from "@/api";
 import { HeaderBar } from "@/AppShell";
 import { AsyncButton, MapThumbnail, LoaderFallback, Fill } from "@/components";
 import { formatFileSize, formatDuration, decodeParam } from "@/util";
@@ -46,10 +52,11 @@ import PlayerList from "./PlayerList";
 import EventsList from "./EventsList";
 import { Demo, GameSummary } from "@/demo";
 import Highlights from "./Highlights";
+import DemoTagsInput from "./DemoTagsInput";
 import useLocationState from "@/hooks/useLocationState";
+import { openRenameDemoModal } from "@/modals/RenameDemoModal";
 
 import classes from "./demoDetails.module.css";
-import { openRenameDemoModal } from "@/modals/RenameDemoModal";
 
 function DemoTitle({ demo }: { demo: Demo }) {
   const navigate = useNavigate();
@@ -88,12 +95,15 @@ function DemoTitle({ demo }: { demo: Demo }) {
 type LoaderData = {
   demo: Promise<Demo>;
   details: Promise<GameSummary>;
+  knownTags: Promise<string[]>;
 };
 
 export default function DemoDetailsView() {
   // I'm not sure if this is the correct type. Sadly,
   // the type is not documented by react-router.
-  const { demo, details } = useLoaderData() as LoaderData;
+  const { demo, details, knownTags } = useLoaderData() as LoaderData;
+
+  const navigate = useNavigate();
 
   const [locationState, setLocationState] = useLocationState({
     currentTab: "players",
@@ -107,6 +117,22 @@ export default function DemoDetailsView() {
             <Suspense fallback={<Text c="dimmed">loading...</Text>}>
               <Await resolve={demo}>
                 {(demo) => <DemoTitle demo={demo} />}
+              </Await>
+            </Suspense>
+          }
+          right={
+            <Suspense>
+              <Await resolve={Promise.all([demo, knownTags])}>
+                {([demo, knownTags]) => (
+                  <DemoTagsInput
+                    tags={demo.tags}
+                    setTags={(tags: string[]) => {
+                      setDemoTags(demo.path, tags);
+                      navigate(0);
+                    }}
+                    knownTags={knownTags}
+                  />
+                )}
               </Await>
             </Suspense>
           }
@@ -276,5 +302,6 @@ export const loader: LoaderFunction = async ({ params }) => {
   return defer({
     demo: getDemo(demoPath),
     details: getDemoDetails(demoPath),
+    knownTags: getKnownTags(),
   } satisfies LoaderData);
 };

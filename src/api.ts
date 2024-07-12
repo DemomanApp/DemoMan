@@ -58,6 +58,10 @@ export async function getDemoDetails(demoPath: string) {
   });
 }
 
+export async function getKnownTags() {
+  return invoke<string[]>("get_known_tags");
+}
+
 export async function getTf2Dir() {
   return invoke<string>("get_tf2_dir");
 }

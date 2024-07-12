@@ -1,4 +1,10 @@
-use std::{collections::HashMap, ffi::OsStr, fs::remove_file, path::Path, sync::Arc};
+use std::{
+    collections::{HashMap, HashSet},
+    ffi::OsStr,
+    fs::remove_file,
+    path::Path,
+    sync::Arc,
+};
 
 use serde::Deserialize;
 
@@ -68,6 +74,16 @@ impl DemoMetadataCache {
         demo.tags = tags;
 
         Ok(())
+    }
+
+    pub fn get_known_tags(&self) -> Vec<String> {
+        self.cache
+            .values()
+            .flat_map(|demo| demo.tags.as_slice())
+            .collect::<HashSet<&String>>()
+            .into_iter()
+            .cloned()
+            .collect()
     }
 
     pub fn delete(&mut self, path: &str, trash: bool) -> Result<()> {
