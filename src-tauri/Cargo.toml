@@ -24,13 +24,13 @@ serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
 steamid-ng = "1.0"
 steamlocate = "1.2"
-tauri = { version = "1.5", features = ["api-all"] }
+tauri = { version = "1.7", features = ["api-all"] }
 tauri-plugin-log = { git = "https://github.com/tauri-apps/plugins-workspace", branch = "v1", features = [
     "colored",
 ] }
-tf-demo-parser = { git = "https://github.com/demostf/parser", rev = "92d9be233ca8b8dc56b891629f67b99ad7883f2a" }
+tf-demo-parser = "0.5.1"
 tokio = "1.31"
-trash = "3.0"
+trash = "5.0"
 
 [features]
 # by default Tauri runs in production mode
