@@ -1,9 +1,13 @@
 import { normalizeMapName } from "@/util";
 
-const MAP_THUMBNAILS = import.meta.glob("../assets/map_thumbnails/*.png", {
-  as: "url",
-  eager: true,
-});
+const MAP_THUMBNAILS = import.meta.glob<true, string, string>(
+  "../assets/map_thumbnails/*.png",
+  {
+    query: "?url",
+    import: "default",
+    eager: true,
+  }
+);
 
 function getThumbnail(mapName: string) {
   return MAP_THUMBNAILS[`../assets/map_thumbnails/${mapName}.png`];
