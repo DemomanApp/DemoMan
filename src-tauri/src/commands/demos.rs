@@ -1,10 +1,12 @@
-use std::{sync::Arc, vec::Vec};
+use std::{path::Path, sync::Arc, vec::Vec};
 
 use tauri::{async_runtime::Mutex, State};
 
 use crate::{
-    demo::{analyser::GameSummary, error::Result, Demo, DemoEvent},
+    demo::{analyser::GameSummary, error::Result, read_demo_details, Demo, DemoEvent},
     demo_cache::{DemoCache, Filter, SortKey},
+    parsed_demo_cache::ParsedDemoCache,
+    traits::Cache,
 };
 
 /// Log the invocation of a tauri command
@@ -96,11 +98,30 @@ pub async fn get_demo(
 #[tauri::command]
 pub async fn get_demo_details(
     demo_path: &str,
-    disk_cache: State<'_, Mutex<DemoCache>>,
+    disk_cache: State<'_, ParsedDemoCache>,
 ) -> Result<GameSummary> {
     log_command!("get_demo_details {}", demo_path);
 
-    let mut disk_cache = disk_cache.lock().await;
+    match disk_cache.get(demo_path).await {
+        Ok(Some(game_summary)) => {
+            log::trace!("cache hit for {demo_path}");
 
-    disk_cache.get_demo_details(demo_path).await
+            return Ok(game_summary);
+        }
+        Ok(None) => {
+            log::trace!("cache miss for {demo_path}");
+        }
+        Err(error) => {
+            log::warn!("could not read demo cache entry for {demo_path}: {error}");
+        }
+    }
+
+    let game_summary = read_demo_details(Path::new(demo_path))?;
+
+    if let Err(error) = disk_cache.insert(demo_path, &game_summary).await {
+        // Log the error, but don't fail the entire operation
+        log::error!("Could not insert cache entry: {error}");
+    }
+
+    Ok(game_summary)
 }

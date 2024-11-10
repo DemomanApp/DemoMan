@@ -1,130 +1,80 @@
-use std::{marker::PhantomData, path::PathBuf};
+use std::{
+    io::ErrorKind,
+    path::{Path, PathBuf},
+};
 
-use log::{error, trace, warn};
-use serde::{de::DeserializeOwned, Deserialize, Serialize};
+use crate::traits::Cache;
 
-pub struct DiskCache<T> {
-    cache_path: PathBuf,
-    phantom: PhantomData<T>,
+#[derive(Debug, thiserror::Error)]
+pub enum Error {
+    #[error("I/O Error: {0}")]
+    Io(#[from] std::io::Error),
+
+    #[error("(de-)serialization error: {0}")]
+    Serde(#[from] bincode::Error),
+
+    #[error("invalid filename: {0}")]
+    InvalidFilename(PathBuf),
 }
 
-#[derive(Deserialize, Serialize)]
-struct Metadata {
-    version: usize,
+pub struct DiskCache {
+    path: PathBuf,
 }
 
-enum CacheReadError {
-    EntryNotFound,
-    IoError,
-    InvalidEntry,
-}
+impl DiskCache {
+    pub fn new(path: PathBuf) -> Self {
+        Self { path }
+    }
 
-impl From<cacache::Error> for CacheReadError {
-    fn from(value: cacache::Error) -> Self {
-        match value {
-            cacache::Error::EntryNotFound(_, _) => Self::EntryNotFound,
-            cacache::Error::IoError(_, _) => Self::IoError,
-            cacache::Error::SizeMismatch(_, _)
-            | cacache::Error::SerdeError(_, _)
-            | cacache::Error::IntegrityError(_) => Self::InvalidEntry,
-        }
+    fn path_of_key(&self, key: impl AsRef<Path>) -> PathBuf {
+        self.path.join(key)
     }
 }
 
-impl From<std::boxed::Box<bincode::ErrorKind>> for CacheReadError {
-    fn from(value: std::boxed::Box<bincode::ErrorKind>) -> Self {
-        match *value {
-            bincode::ErrorKind::Io(_) => Self::IoError,
-            _ => Self::InvalidEntry,
-        }
+impl Cache for DiskCache {
+    type Key = Path;
+    type Value = Vec<u8>;
+    type Error = Error;
+
+    async fn get(&self, key: impl AsRef<Self::Key>) -> Result<Option<Self::Value>, Self::Error> {
+        let path = self.path_of_key(key);
+
+        let bytes = match tokio::fs::read(path).await {
+            Ok(bytes) => bytes,
+            Err(error) => match error.kind() {
+                ErrorKind::NotFound => return Ok(None),
+                _ => return Err(error.into()),
+            },
+        };
+
+        Ok(Some(bytes))
     }
-}
 
-impl<T: DeserializeOwned + Serialize> DiskCache<T> {
-    pub fn at_path(cache_path: PathBuf) -> Self {
-        Self {
-            cache_path,
-            phantom: PhantomData,
-        }
-    }
+    async fn insert(
+        &self,
+        key: impl AsRef<Self::Key>,
+        bytes: &Self::Value,
+    ) -> Result<(), Self::Error> {
+        let path = self.path_of_key(key);
 
-    pub async fn get(&self, key: &str) -> Option<T> {
-        trace!(target: "CACHE", "get {key}");
-        let value: Result<T, CacheReadError> = cacache::read(&self.cache_path, key)
-            .await
-            .map_err(Into::into)
-            .and_then(|bytes| bincode::deserialize(&bytes).map_err(Into::into));
-
-        match value {
-            Ok(value) => Some(value),
-            Err(error) => {
-                match error {
-                    CacheReadError::EntryNotFound => {}
-                    CacheReadError::IoError => {
-                        error!(
-                            "IO error occurred while reading \"{key}\" from cache at {}",
-                            self.cache_path.display()
-                        );
-                    }
-                    CacheReadError::InvalidEntry => {
-                        // Something is wrong with this cache entry,
-                        // we might as well remove it.
-                        let _ = cacache::remove(&self.cache_path, key).await;
-
-                        warn!(
-                            "Invalid entry at key \"{key}\" in cache at {}",
-                            self.cache_path.display()
-                        );
-                    }
+        if let Some(parent) = path.parent() {
+            if let Err(error) = tokio::fs::create_dir_all(parent).await {
+                if error.kind() != ErrorKind::AlreadyExists {
+                    return Err(error.into());
                 }
-
-                None
             }
         }
-    }
 
-    pub async fn set(&self, key: &str, value: &T) {
-        trace!(target: "CACHE", "set {key}");
-        let bytes = bincode::serialize(value).unwrap();
-
-        cacache::write(&self.cache_path, key, bytes).await.unwrap();
-    }
-
-    pub async fn rename(&self, old_key: &str, new_key: &str) -> cacache::Result<()> {
-        cacache::hard_link(&self.cache_path, old_key, new_key).await?;
-        cacache::remove(&self.cache_path, old_key).await?;
+        tokio::fs::write(path, bytes).await?;
 
         Ok(())
     }
-}
 
-#[cfg(test)]
-mod tests {
-    use super::DiskCache;
-    use serde::{Deserialize, Serialize};
+    async fn remove(&self, key: impl AsRef<Self::Key>) -> Result<(), Self::Error> {
+        let path = self.path_of_key(key);
 
-    #[derive(Debug, Default, Deserialize, Serialize, PartialEq)]
-    struct TestStruct {
-        int: usize,
-        string: String,
-        array: [usize; 3],
-        hashmap: std::collections::HashMap<String, String>,
-        tuple: (usize, usize),
-    }
+        tokio::fs::remove_file(path).await?;
 
-    #[tokio::test]
-    async fn test_cache_roundtrip() {
-        let path = std::env::temp_dir().join("demoman_cache_test");
-        let cache = DiskCache::at_path(path.clone());
-
-        let original = TestStruct::default();
-        cache.set("test_key", &original).await;
-        let read_back = cache.get("test_key").await;
-
-        // Clean up even if the test fails
-        tokio::fs::remove_dir_all(path).await.unwrap();
-        let read_back = read_back.expect("get failed");
-
-        assert_eq!(original, read_back);
+        Ok(())
     }
 }

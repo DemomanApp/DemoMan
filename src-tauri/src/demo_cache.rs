@@ -3,19 +3,17 @@ use std::{
     collections::{hash_map::Entry, HashMap},
     ffi::OsStr,
     fs::remove_file,
-    path::{Path, PathBuf},
+    path::Path,
     sync::Arc,
 };
 
-use log::trace;
 use serde::Deserialize;
 
 use crate::{
     demo::{
-        analyser::GameSummary, error::Result, read_demo, read_demo_details,
-        read_demos_in_directory, write_events_and_tags, Demo, DemoEvent, Error,
+        error::Result, read_demo, read_demos_in_directory, write_events_and_tags, Demo, DemoEvent,
+        Error,
     },
-    disk_cache::DiskCache,
     std_ext::OrTryInsertWith,
 };
 
@@ -168,17 +166,15 @@ impl DemoListCache {
 }
 
 pub struct DemoCache {
-    cache: HashMap<String, Arc<Demo>>,
+    metadata_cache: HashMap<String, Arc<Demo>>,
     list_cache: Option<DemoListCache>,
-    disk_cache: DiskCache<GameSummary>,
 }
 
 impl DemoCache {
-    pub fn new(cache_path: PathBuf) -> Self {
+    pub fn new() -> Self {
         Self {
-            cache: HashMap::new(),
+            metadata_cache: HashMap::new(),
             list_cache: None,
-            disk_cache: DiskCache::at_path(cache_path),
         }
     }
 
@@ -195,7 +191,7 @@ impl DemoCache {
         if list_cache.path == path {
             list_cache.filter_and_sort(sort_key, reverse, filters, query);
         } else {
-            list_cache.demos = read_demos_in_directory(path, &mut self.cache)?;
+            list_cache.demos = read_demos_in_directory(path, &mut self.metadata_cache)?;
             list_cache.path = path.into();
             list_cache.sort_by(sort_key, reverse);
             list_cache.filter_by(filters, query);
@@ -205,14 +201,14 @@ impl DemoCache {
     }
 
     pub fn get_demo_mut(&mut self, path: &str) -> Result<&mut Demo> {
-        self.cache
+        self.metadata_cache
             .entry(path.into())
             .or_try_insert_with(|| read_demo(path).map(Arc::new))
             .map(Arc::make_mut)
     }
 
     pub fn get_demo(&mut self, path: &str) -> Result<Arc<Demo>> {
-        match self.cache.entry(path.into()) {
+        match self.metadata_cache.entry(path.into()) {
             Entry::Occupied(entry) => Ok(entry.get().clone()),
             Entry::Vacant(entry) => {
                 let demo = read_demo(path).map(Arc::new)?;
@@ -244,7 +240,7 @@ impl DemoCache {
     }
 
     pub fn delete(&mut self, path: &str, trash: bool) -> Result<()> {
-        self.cache.remove(path);
+        self.metadata_cache.remove(path);
         if let Some(list_cache) = &mut self.list_cache {
             list_cache.remove(path);
         }
@@ -269,14 +265,14 @@ impl DemoCache {
     }
 
     pub async fn rename(&mut self, path: &str, new_path: &str) -> Result<()> {
-        std::fs::rename(path, new_path)?;
+        tokio::fs::rename(path, new_path).await?;
 
         let json_path = Path::new(path).with_extension("json");
         let new_json_path = Path::new(new_path).with_extension("json");
 
         let _ = std::fs::rename(json_path, new_json_path);
 
-        if let Some(mut cache_entry) = self.cache.remove(path) {
+        if let Some(mut cache_entry) = self.metadata_cache.remove(path) {
             let demo = Arc::make_mut(&mut cache_entry);
 
             demo.name = Path::new(new_path)
@@ -287,27 +283,14 @@ impl DemoCache {
 
             demo.path = new_path.into();
 
-            self.cache.insert(new_path.into(), cache_entry);
+            self.metadata_cache.insert(new_path.into(), cache_entry);
         }
 
         // TODO rename the demo in place instead of invalidating the entire cache
         self.list_cache = None;
 
-        let _ = self.disk_cache.rename(path, new_path).await;
+        // let _ = self.disk_cache.rename(path, new_path).await;
 
         Ok(())
-    }
-
-    pub async fn get_demo_details(&mut self, path: &str) -> Result<GameSummary> {
-        if let Some(game_summary) = self.disk_cache.get(path).await {
-            Ok(game_summary)
-        } else {
-            trace!("Cache miss");
-            let game_summary = read_demo_details(Path::new(path))?;
-
-            self.disk_cache.set(path, &game_summary).await;
-
-            Ok(game_summary)
-        }
     }
 }

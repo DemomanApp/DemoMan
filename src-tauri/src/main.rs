@@ -24,7 +24,9 @@ mod commands;
 mod demo;
 mod demo_cache;
 mod disk_cache;
+mod parsed_demo_cache;
 mod std_ext;
+mod traits;
 
 #[cfg(test)]
 mod tests;
@@ -69,7 +71,10 @@ fn main() {
                 .app_cache_dir()
                 .ok_or("Failed to resolve cache directory")?;
 
-            app.manage(Mutex::new(DemoCache::new(cache_path.join("parsed"))));
+            app.manage(parsed_demo_cache::ParsedDemoCache::new(
+                cache_path.join("parsed"),
+            ));
+            app.manage(Mutex::new(DemoCache::new()));
 
             Ok(())
         })
