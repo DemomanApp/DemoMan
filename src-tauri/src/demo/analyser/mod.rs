@@ -85,7 +85,7 @@ pub struct HighlightPlayerSnapshot {
     name: String,
 
     /// What team the player was on at the time.
-    /// NOTE: This can sometimes be Team::Other (probably when an m_iTeam update is missing)
+    /// NOTE: This can sometimes be `Team::Other` (probably when an `m_iTeam` update is missing)
     team: Team,
 }
 
@@ -1054,10 +1054,9 @@ impl GameDetailsAnalyser {
                 }
                 OWNER_PROP => {
                     let owner_id = u32::from(i64::try_from(&prop.value).unwrap_or_default() as u8);
-                    if self.mediguns.get(&entity.entity_index.into()).is_none() {
-                        self.mediguns
-                            .insert(entity.entity_index.into(), EntityId::from(owner_id));
-                    }
+                    self.mediguns
+                        .entry(entity.entity_index.into())
+                        .or_insert_with(|| EntityId::from(owner_id));
                 }
                 _ => {}
             }
