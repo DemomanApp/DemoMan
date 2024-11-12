@@ -1,4 +1,4 @@
-import { open as openFilePicker } from "@tauri-apps/api/dialog";
+import { open as openFilePicker } from "@tauri-apps/plugin-dialog";
 import * as log from "tauri-plugin-log-api";
 
 import { Button } from "@mantine/core";

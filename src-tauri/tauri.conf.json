@@ -3,53 +3,45 @@
   "build": {
     "beforeBuildCommand": "npm run build",
     "beforeDevCommand": "npm run dev",
-    "devPath": "http://localhost:5173",
-    "distDir": "../dist"
+    "frontendDist": "../dist",
+    "devUrl": "http://localhost:5173"
   },
-  "package": {
-    "productName": "demoman"
+  "bundle": {
+    "active": true,
+    "category": "Utility",
+    "copyright": "",
+    "icon": [
+      "icons/32x32.png",
+      "icons/128x128.png",
+      "icons/128x128@2x.png",
+      "icons/icon.icns",
+      "icons/icon.ico"
+    ],
+    "targets": [
+      "deb",
+      "appimage",
+      "nsis"
+    ],
+    "longDescription": "Easily browse and organize all your demo files, find highlights, and edit bookmarks!",
+    "shortDescription": "The TF2 Demo Manager"
   },
-  "tauri": {
-    "allowlist": {
-      "all": true,
-      "path": {
-        "all": true
-      },
-      "fs": {
-        "all": true,
-        "scope": ["**"]
-      }
-    },
-    "bundle": {
-      "active": true,
-      "category": "Utility",
-      "copyright": "",
-      "icon": [
-        "icons/32x32.png",
-        "icons/128x128.png",
-        "icons/128x128@2x.png",
-        "icons/icon.icns",
-        "icons/icon.ico"
-      ],
-      "identifier": "com.narcha.demoman",
-      "longDescription": "Easily browse and organize all your demo files, find highlights, and edit bookmarks!",
-      "shortDescription": "The TF2 Demo Manager",
-      "targets": ["deb", "appimage", "nsis"]
-    },
-    "security": {
-      "csp": null
-    },
-    "updater": {
-      "active": false
-    },
+  "productName": "demoman",
+  "mainBinaryName": "demoman",
+  "identifier": "com.narcha.demoman",
+  "plugins": {},
+  "app": {
     "windows": [
       {
         "fullscreen": false,
         "height": 800,
         "resizable": true,
         "title": "DemoMan",
-        "width": 1200
+        "width": 1200,
+        "useHttpsScheme": true
       }
-    ]
+    ],
+    "security": {
+      "csp": null
+    }
   }
 }

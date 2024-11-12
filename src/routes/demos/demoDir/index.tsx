@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 
-import { shell } from "@tauri-apps/api";
+import { open } from "@tauri-apps/plugin-shell";
 
 import { Alert, AppShell, Menu } from "@mantine/core";
 import {
@@ -129,7 +129,7 @@ export default () => {
                   </Menu.Item>
                   <Menu.Item
                     leftSection={<IconFolder size={14} />}
-                    onClick={() => shell.open(path)}
+                    onClick={() => open(path)}
                   >
                     Show in explorer
                   </Menu.Item>

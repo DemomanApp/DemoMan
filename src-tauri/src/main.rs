@@ -12,7 +12,7 @@ use log::LevelFilter;
 use tauri::{async_runtime::Mutex, Manager};
 use tauri_plugin_log::{
     fern::colors::{Color, ColoredLevelConfig},
-    LogTarget,
+    Target, TargetKind,
 };
 
 use rcon::Connection;
@@ -48,7 +48,12 @@ fn build_log_plugin<R: tauri::Runtime>() -> tauri::plugin::TauriPlugin<R> {
     };
 
     tauri_plugin_log::Builder::default()
-        .targets([LogTarget::LogDir, LogTarget::Stdout])
+        .targets([
+            Target::new(TargetKind::LogDir {
+                file_name: Some("logs".into()),
+            }),
+            Target::new(TargetKind::Stdout),
+        ])
         .level(LEVEL_FILTER)
         .format(move |out, message, record| {
             out.finish(format_args!(
@@ -63,13 +68,16 @@ fn build_log_plugin<R: tauri::Runtime>() -> tauri::plugin::TauriPlugin<R> {
 
 fn main() {
     tauri::Builder::default()
+        .plugin(tauri_plugin_shell::init())
+        .plugin(tauri_plugin_dialog::init())
+        .plugin(tauri_plugin_clipboard_manager::init())
         .plugin(build_log_plugin())
         .manage(RconConnection::default())
         .setup(|app| {
             let cache_path = app
-                .path_resolver()
+                .path()
                 .app_cache_dir()
-                .ok_or("Failed to resolve cache directory")?;
+                .map_err(|error| format!("Failed to resolve cache directory: {error}"))?;
 
             app.manage(parsed_demo_cache::ParsedDemoCache::new(
                 cache_path.join("parsed"),
