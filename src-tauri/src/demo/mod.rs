@@ -1,5 +1,5 @@
 use std::{
-    collections::HashMap,
+    cmp::Ordering,
     ffi::OsStr,
     fs::{self, read_dir, File},
     io::{Read, Write},
@@ -12,7 +12,7 @@ use bitbuffer::BitRead;
 use log::warn;
 use serde::{Deserialize, Serialize};
 
-use crate::std_ext::OrTryInsertWith;
+use crate::demo_cache::{DemoMetadataCache, Filter, SortKey};
 
 use self::{
     analyser::{GameDetailsAnalyser, GameSummary},
@@ -126,8 +126,7 @@ pub fn read_demo_header(path: &str) -> Result<tf_demo_parser::demo::header::Head
     let demo = tf_demo_parser::Demo::new(&buf);
 
     let mut stream = demo.get_stream();
-    let header =
-        tf_demo_parser::demo::header::Header::read(&mut stream).or(Err(Error::ParsingFailed))?;
+    let header = tf_demo_parser::demo::header::Header::read(&mut stream)?;
 
     if header.game != *"tf" {
         return Err(Error::NotTf2);
@@ -205,7 +204,7 @@ pub fn read_demo_names_in_directory(dir_path: &str) -> Result<Vec<String>> {
 
 pub fn read_demos_in_directory(
     dir_path: &str,
-    demo_cache: &mut HashMap<String, Arc<Demo>>,
+    demo_cache: &mut DemoMetadataCache,
 ) -> Result<Vec<Arc<Demo>>> {
     read_demo_names_in_directory(dir_path).map(|demos| {
         demos
@@ -219,14 +218,89 @@ pub fn read_demos_in_directory(
                 // thus as_str will always succeed
                 let demo_path_str = demo_path.to_str().unwrap();
 
-                let demo = demo_cache
-                    .entry(demo_path_str.into())
-                    .or_try_insert_with(|| read_demo(demo_path_str).map(Arc::new))
-                    .ok()?;
-                Some(Arc::clone(demo))
+                match demo_cache.get_demo(demo_path_str) {
+                    Ok(demo) => Some(demo),
+                    Err(error) => {
+                        log::warn!("Could not load demo at {demo_path_str}: {error}");
+
+                        None
+                    }
+                }
             })
             .collect()
     })
+}
+
+fn compare_demos_by(key: SortKey, reverse: bool, d1: &Demo, d2: &Demo) -> Ordering {
+    let ordering = match key {
+        SortKey::Name => Ord::cmp(&d1.name, &d2.name),
+        SortKey::FileSize => Ord::cmp(&d1.filesize, &d2.filesize),
+        SortKey::Birthtime => Ord::cmp(&d1.birthtime, &d2.birthtime),
+        SortKey::MapName => Ord::cmp(&d1.map_name, &d2.map_name),
+        SortKey::EventCount => Ord::cmp(&d1.events.len(), &d2.events.len()),
+        SortKey::PlaybackTime => {
+            PartialOrd::partial_cmp(&d1.playback_time, &d2.playback_time).unwrap_or(Ordering::Equal)
+        }
+    };
+
+    if reverse {
+        ordering.reverse()
+    } else {
+        ordering
+    }
+}
+
+fn filter_matches(demo: &Demo, filters: &[Filter]) -> bool {
+    if filters.is_empty() {
+        true
+    } else {
+        filters.iter().any(|filter| match filter {
+            Filter::Name(name) => demo.name.contains(name),
+            Filter::PlayerName(player_name) => demo.client_name.contains(player_name),
+            Filter::MapName(map_name) => demo.map_name.contains(map_name),
+        })
+    }
+}
+
+fn query_matches(demo: &Demo, query: &str) -> bool {
+    if query.is_empty() {
+        return true;
+    }
+
+    let query = query.to_ascii_lowercase();
+
+    let Demo {
+        name,
+        events,
+        tags,
+        server_name,
+        client_name,
+        map_name,
+        ..
+    } = demo;
+
+    [name, server_name, client_name, map_name]
+        .iter()
+        .any(|field| field.to_ascii_lowercase().contains(&query))
+        || events
+            .iter()
+            .any(|event| event.value.to_ascii_lowercase().contains(&query))
+        || tags
+            .iter()
+            .any(|tag| tag.to_ascii_lowercase().contains(&query))
+}
+
+pub fn sort_demos(demos: &mut [Arc<Demo>], sort_key: SortKey, reverse: bool) {
+    demos.sort_unstable_by(|d1, d2| compare_demos_by(sort_key, reverse, d1, d2));
+}
+
+pub fn filter_demos(demos: &[Arc<Demo>], filters: &[Filter], query: &str) -> Vec<Arc<Demo>> {
+    demos
+        .iter()
+        .filter(|demo| filter_matches(demo, filters))
+        .filter(|demo| query_matches(demo, query))
+        .cloned()
+        .collect()
 }
 
 pub fn write_events_and_tags(
@@ -235,7 +309,7 @@ pub fn write_events_and_tags(
     tags: &Vec<String>,
 ) -> Result<()> {
     if events.is_empty() && tags.is_empty() {
-        fs::remove_file(json_path).or(Err(Error::FileWriteFailed))?;
+        fs::remove_file(json_path)?;
         return Ok(());
     }
 
@@ -243,30 +317,26 @@ pub fn write_events_and_tags(
         .write(true)
         .truncate(true)
         .create(true)
-        .open(json_path)
-        .or(Err(Error::FileOpenFailed))?;
+        .open(json_path)?;
 
     // Use tabs for indentation to reproduce the style TF2 produces
     let formatter = serde_json::ser::PrettyFormatter::with_indent(b"\t");
     let mut serializer = serde_json::Serializer::with_formatter(Vec::new(), formatter);
     let new_content = DemoJsonFileSer { events, tags };
-    if new_content.serialize(&mut serializer).is_err() {
-        return Err(Error::SerializationFailed);
-    }
+    new_content.serialize(&mut serializer)?;
 
-    file.write_all(&serializer.into_inner())
-        .or(Err(Error::FileWriteFailed))?;
+    file.write_all(&serializer.into_inner())?;
     Ok(())
 }
 
 pub fn read_demo_details(path: &Path) -> Result<GameSummary> {
-    let file = std::fs::read(path).or(Err(Error::FileReadFailed))?;
+    let file = fs::read(path)?;
     let demo = tf_demo_parser::Demo::new(&file);
 
     let analyser = GameDetailsAnalyser::default();
 
     let parser = tf_demo_parser::DemoParser::new_all_with_analyser(demo.get_stream(), analyser);
-    let (_header, state) = parser.parse().or(Err(Error::ParsingFailed))?;
+    let (_header, state) = parser.parse()?;
 
     Ok(state)
 }

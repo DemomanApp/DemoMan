@@ -18,7 +18,7 @@ use tauri_plugin_log::{
 use rcon::Connection;
 use tokio::net::TcpStream;
 
-use demo_cache::DemoCache;
+use demo_cache::DemoMetadataCache;
 
 mod commands;
 mod demo;
@@ -82,7 +82,7 @@ fn main() {
             app.manage(parsed_demo_cache::ParsedDemoCache::new(
                 cache_path.join("parsed"),
             ));
-            app.manage(Mutex::new(DemoCache::new()));
+            app.manage(Mutex::new(DemoMetadataCache::new()));
 
             Ok(())
         })

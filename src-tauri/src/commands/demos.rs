@@ -3,8 +3,11 @@ use std::{path::Path, sync::Arc, vec::Vec};
 use tauri::{async_runtime::Mutex, State};
 
 use crate::{
-    demo::{analyser::GameSummary, error::Result, read_demo_details, Demo, DemoEvent},
-    demo_cache::{DemoCache, Filter, SortKey},
+    demo::{
+        analyser::GameSummary, error::Result, filter_demos, read_demo_details,
+        read_demos_in_directory, sort_demos, Demo, DemoEvent,
+    },
+    demo_cache::{DemoMetadataCache, Filter, SortKey},
     parsed_demo_cache::ParsedDemoCache,
     traits::Cache,
 };
@@ -21,21 +24,24 @@ pub async fn get_demos_in_directory(
     reverse: bool,
     filters: Vec<Filter>,
     query: String,
-    demo_list_cache: State<'_, Mutex<DemoCache>>,
+    demo_list_cache: State<'_, Mutex<DemoMetadataCache>>,
 ) -> Result<Vec<Arc<Demo>>> {
     log_command!("get_demos_in_directory {dir_path}");
 
     let mut demo_cache = demo_list_cache.lock().await;
 
-    demo_cache
-        .get_sorted_and_filtered_demos_in_directory(dir_path, sort_key, reverse, filters, query)
+    let mut demos = read_demos_in_directory(dir_path, &mut demo_cache)?;
+    sort_demos(demos.as_mut_slice(), sort_key, reverse);
+    let filtered_demos = filter_demos(&demos, &filters, &query);
+
+    Ok(filtered_demos)
 }
 
 #[tauri::command]
 pub async fn set_demo_events(
     demo_path: &str,
     new_events: Vec<DemoEvent>,
-    demo_cache: State<'_, Mutex<DemoCache>>,
+    demo_cache: State<'_, Mutex<DemoMetadataCache>>,
 ) -> Result<()> {
     log_command!("set_demo_events {demo_path} {new_events:?}");
 
@@ -48,7 +54,7 @@ pub async fn set_demo_events(
 pub async fn set_demo_tags(
     demo_path: &str,
     new_tags: Vec<String>,
-    demo_cache: State<'_, Mutex<DemoCache>>,
+    demo_cache: State<'_, Mutex<DemoMetadataCache>>,
 ) -> Result<()> {
     log_command!("set_demo_tags {demo_path} {new_tags:?}");
 
@@ -61,7 +67,7 @@ pub async fn set_demo_tags(
 pub async fn delete_demo(
     demo_path: &str,
     trash: bool,
-    demo_cache: State<'_, Mutex<DemoCache>>,
+    demo_cache: State<'_, Mutex<DemoMetadataCache>>,
 ) -> Result<()> {
     log_command!("delete_demo {demo_path}");
 
@@ -74,19 +80,23 @@ pub async fn delete_demo(
 pub async fn rename_demo(
     demo_path: &str,
     new_path: &str,
-    demo_cache: State<'_, Mutex<DemoCache>>,
+    demo_cache: State<'_, Mutex<DemoMetadataCache>>,
+    disk_cache: State<'_, ParsedDemoCache>,
 ) -> Result<()> {
     log_command!("rename_demo {demo_path} {new_path}");
 
     let mut demo_cache = demo_cache.lock().await;
 
-    demo_cache.rename(demo_path, new_path).await
+    demo_cache.rename(demo_path, new_path).await?;
+    disk_cache.remove(demo_path).await?;
+
+    Ok(())
 }
 
 #[tauri::command]
 pub async fn get_demo(
     demo_path: &str,
-    demo_cache: State<'_, Mutex<DemoCache>>,
+    demo_cache: State<'_, Mutex<DemoMetadataCache>>,
 ) -> Result<Arc<Demo>> {
     log_command!("get_demo {demo_path}");
 
