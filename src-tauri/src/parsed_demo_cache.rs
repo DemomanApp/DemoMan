@@ -2,7 +2,6 @@ use std::{
     hash::{Hash, Hasher},
     io,
     path::{Path, PathBuf},
-    sync::Arc,
     time::SystemTime,
 };
 
@@ -27,18 +26,6 @@ struct Header {
 struct RawEntry<'a> {
     header: Header,
     content: &'a [u8],
-}
-
-#[derive(Hash, Serialize, Deserialize)]
-struct CacheEntryHeader {
-    path: PathBuf,
-    mtime: SystemTime,
-}
-
-#[derive(Serialize, Deserialize)]
-struct CacheEntry {
-    header: CacheEntryHeader,
-    game_summary: Arc<GameSummary>,
 }
 
 pub struct ParsedDemoCache {
