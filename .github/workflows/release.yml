@@ -31,8 +31,7 @@ jobs:
         if: matrix.platform == 'ubuntu-latest'
         run: |
           sudo apt-get update
-          # For tauri v2, we need libwebkit2gtk-4.1. Remember to change this...
-          sudo apt-get install -y libwebkit2gtk-4.0-dev libappindicator3-dev librsvg2-dev patchelf
+          sudo apt-get install -y libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf
 
       - name: install frontend dependencies
         run: npm install
@@ -42,7 +41,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           tagName: __VERSION__
-          releaseName: Release __VERSION__
+          releaseName: DemoMan __VERSION__
           releaseBody: See the assets to download and install this version.
           releaseDraft: true
           # Change this to false once we have a stable release
