@@ -92,7 +92,7 @@ impl DemoMetadataCache {
         let json_path = Path::new(path).with_extension("json");
         let new_json_path = Path::new(new_path).with_extension("json");
 
-        let _ = std::fs::rename(json_path, new_json_path);
+        let _ = tokio::fs::rename(json_path, new_json_path).await;
 
         if let Some(mut cache_entry) = self.cache.remove(path) {
             let demo = Arc::make_mut(&mut cache_entry);
