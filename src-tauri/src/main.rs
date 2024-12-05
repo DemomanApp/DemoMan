@@ -8,6 +8,7 @@
 // Disabled because of false positives inside tauri macros
 #![allow(clippy::used_underscore_binding)]
 
+use clap::Parser;
 use log::LevelFilter;
 use tauri::{async_runtime::Mutex, Manager};
 use tauri_plugin_log::{
@@ -18,8 +19,10 @@ use tauri_plugin_log::{
 use rcon::Connection;
 use tokio::net::TcpStream;
 
+use cli::Args;
 use demo_cache::DemoMetadataCache;
 
+mod cli;
 mod commands;
 mod demo;
 mod demo_cache;
@@ -67,12 +70,15 @@ fn build_log_plugin<R: tauri::Runtime>() -> tauri::plugin::TauriPlugin<R> {
 }
 
 fn main() {
+    let args = Args::parse();
+
     tauri::Builder::default()
         .plugin(tauri_plugin_shell::init())
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_clipboard_manager::init())
         .plugin(build_log_plugin())
         .manage(RconConnection::default())
+        .manage(args)
         .setup(|app| {
             let cache_path = app
                 .path()
@@ -87,6 +93,7 @@ fn main() {
             Ok(())
         })
         .invoke_handler(tauri::generate_handler![
+            commands::cli::get_file_argument,
             commands::demos::delete_demo,
             commands::demos::get_demo,
             commands::demos::get_demo_details,

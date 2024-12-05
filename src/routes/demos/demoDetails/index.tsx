@@ -115,14 +115,17 @@ export default function DemoDetailsView() {
         <HeaderBar
           center={
             <Suspense fallback={<Text c="dimmed">loading...</Text>}>
-              <Await resolve={demo}>
+              <Await resolve={demo} errorElement={<></>}>
                 {(demo) => <DemoTitle demo={demo} />}
               </Await>
             </Suspense>
           }
           right={
             <Suspense>
-              <Await resolve={Promise.all([demo, knownTags])}>
+              <Await
+                resolve={Promise.all([demo, knownTags])}
+                errorElement={<></>}
+              >
                 {([demo, knownTags]) => (
                   <DemoTagsInput
                     tags={demo.tags}

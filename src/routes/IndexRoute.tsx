@@ -1,8 +1,27 @@
-import { Navigate } from "react-router-dom";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+
+import { getFileArgument } from "@/api";
 
 export default () => {
   // This is the first route the app loads.
   // TODO: Check the store first, then redirect to an
   //       appropriate destination (e.g. setup page if necessary)
-  return <Navigate to="/demos" replace />;
+
+  const [fileArgument, setFileArgument] = useState<string | null | undefined>(
+    undefined
+  );
+
+  const navigate = useNavigate();
+
+  getFileArgument().then(setFileArgument);
+
+  if (fileArgument === null) {
+    navigate("/demos", { replace: true });
+  } else if (typeof fileArgument == "string") {
+    navigate("/demos", { replace: true });
+    navigate(`/demos/show/${encodeURIComponent(fileArgument)}`);
+  }
+
+  return null;
 };

@@ -23,7 +23,14 @@
       "nsis"
     ],
     "longDescription": "Easily browse and organize all your demo files, find highlights, and edit bookmarks!",
-    "shortDescription": "The TF2 Demo Manager"
+    "shortDescription": "The TF2 Demo Manager",
+    "fileAssociations": [
+      {
+        "ext": ["dem"],
+        "description": "Source engine demo file",
+        "mimeType": "application/x.source-engine.demo"
+      }
+    ]
   },
   "productName": "demoman",
   "mainBinaryName": "demoman",
