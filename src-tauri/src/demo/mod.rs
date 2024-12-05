@@ -12,7 +12,7 @@ use bitbuffer::BitRead;
 use log::warn;
 use serde::{Deserialize, Serialize};
 
-use crate::demo_cache::{DemoMetadataCache, Filter, SortKey};
+use crate::demo_cache::DemoMetadataCache;
 
 use self::{
     analyser::{GameDetailsAnalyser, GameSummary},
@@ -231,6 +231,18 @@ pub fn read_demos_in_directory(
     })
 }
 
+#[derive(Default, Clone, Copy, PartialEq, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum SortKey {
+    #[default]
+    Name,
+    FileSize,
+    Birthtime,
+    MapName,
+    EventCount,
+    PlaybackTime,
+}
+
 fn compare_demos_by(key: SortKey, reverse: bool, d1: &Demo, d2: &Demo) -> Ordering {
     let ordering = match key {
         SortKey::Name => Ord::cmp(&d1.name, &d2.name),
@@ -248,6 +260,14 @@ fn compare_demos_by(key: SortKey, reverse: bool, d1: &Demo, d2: &Demo) -> Orderi
     } else {
         ordering
     }
+}
+
+#[derive(PartialEq, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum Filter {
+    Name(String),
+    PlayerName(String),
+    MapName(String),
 }
 
 fn filter_matches(demo: &Demo, filters: &[Filter]) -> bool {

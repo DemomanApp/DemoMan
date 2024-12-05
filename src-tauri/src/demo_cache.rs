@@ -6,32 +6,10 @@ use std::{
     sync::Arc,
 };
 
-use serde::Deserialize;
-
 use crate::{
     demo::{error::Result, read_demo, write_events_and_tags, Demo, DemoEvent, Error},
     std_ext::OrTryInsertWith,
 };
-
-#[derive(Default, Clone, Copy, PartialEq, Deserialize)]
-#[serde(rename_all = "snake_case")]
-pub enum SortKey {
-    #[default]
-    Name,
-    FileSize,
-    Birthtime,
-    MapName,
-    EventCount,
-    PlaybackTime,
-}
-
-#[derive(PartialEq, Deserialize)]
-#[serde(rename_all = "snake_case")]
-pub enum Filter {
-    Name(String),
-    PlayerName(String),
-    MapName(String),
-}
 
 pub struct DemoMetadataCache {
     cache: HashMap<String, Arc<Demo>>,

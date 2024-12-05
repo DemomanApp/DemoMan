@@ -5,9 +5,9 @@ use tauri::{async_runtime::Mutex, State};
 use crate::{
     demo::{
         analyser::GameSummary, error::Result, filter_demos, read_demo_details,
-        read_demos_in_directory, sort_demos, Demo, DemoEvent,
+        read_demos_in_directory, sort_demos, Demo, DemoEvent, Filter, SortKey,
     },
-    demo_cache::{DemoMetadataCache, Filter, SortKey},
+    demo_cache::DemoMetadataCache,
     parsed_demo_cache::ParsedDemoCache,
     traits::Cache,
 };
