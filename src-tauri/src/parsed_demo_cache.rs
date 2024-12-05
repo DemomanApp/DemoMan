@@ -32,7 +32,7 @@ pub struct ParsedDemoCache {
     disk_cache: DiskCache,
 }
 
-impl<'a> ParsedDemoCache {
+impl ParsedDemoCache {
     pub fn new(path: PathBuf) -> Self {
         Self {
             disk_cache: DiskCache::new(path),
