@@ -82,7 +82,7 @@ export default function DemoList({ demos }: DemoListProps) {
           return newSelectedIndices;
         });
       } else {
-        navigate(`../show/${encodeURIComponent(demos[index].path)}`);
+        navigate(`../show/${btoa(demos[index].path)}`);
       }
     },
     [navigate, selectionMode, demos]

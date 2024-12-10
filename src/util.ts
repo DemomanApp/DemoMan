@@ -78,5 +78,5 @@ export function drop<V>(key: string) {
 }
 
 export function decodeParam(param: string | undefined): string | undefined {
-  return param === undefined ? undefined : decodeURIComponent(param);
+  return param === undefined ? undefined : atob(param);
 }

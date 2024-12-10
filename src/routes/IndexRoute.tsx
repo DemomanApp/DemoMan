@@ -20,7 +20,7 @@ export default () => {
     navigate("/demos", { replace: true });
   } else if (typeof fileArgument == "string") {
     navigate("/demos", { replace: true });
-    navigate(`/demos/show/${encodeURIComponent(fileArgument)}`);
+    navigate(`/demos/show/${btoa(fileArgument)}`);
   }
 
   return null;

@@ -15,7 +15,7 @@ export default function DemoDirButton({
   return (
     <UnstyledButton
       component={Link}
-      to={`dir/${encodeURIComponent(path)}`}
+      to={`dir/${btoa(path)}`}
       variant="default"
       className={classes.root}
     >

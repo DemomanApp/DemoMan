@@ -70,7 +70,8 @@ function DemoListLoader({
 }
 
 export default () => {
-  const { path } = useParams() as { path: Path };
+  const { path: encodedPath } = useParams() as { path: Path };
+  const path = atob(encodedPath);
 
   const [locationState, setLocationState] = useLocationState({
     query: "",

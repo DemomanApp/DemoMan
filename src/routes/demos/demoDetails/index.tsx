@@ -79,7 +79,7 @@ function DemoTitle({ demo }: { demo: Demo }) {
           size="sm"
           onClick={() =>
             openRenameDemoModal(demo, (newPath) => {
-              navigate(`/demos/show/${encodeURIComponent(newPath)}`, {
+              navigate(`/demos/show/${btoa(newPath)}`, {
                 replace: true,
               });
             })
