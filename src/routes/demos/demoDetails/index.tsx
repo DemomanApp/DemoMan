@@ -164,7 +164,14 @@ export default function DemoDetailsView() {
                             style={{ width: "100%", height: "100%" }}
                           >
                             No thumbnail available.
-                            <Button variant="subtle">Contribute</Button>
+                            <Button
+                              variant="subtle"
+                              component="a"
+                              href="https://github.com/DemomanApp/DemoMan/wiki/Contributing-a-map-thumbnail"
+                              target="_blank"
+                            >
+                              Contribute
+                            </Button>
                           </Stack>
                         }
                         className={classes.mapThumbnail}
