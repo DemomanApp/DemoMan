@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-import log from "tauri-plugin-log-api";
+import * as log from "@tauri-apps/plugin-log";
 
 import { getFileArgument } from "@/api";
 

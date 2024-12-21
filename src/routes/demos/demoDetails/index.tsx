@@ -8,7 +8,8 @@ import {
   useAsyncError,
   useNavigate,
 } from "react-router-dom";
-import * as log from "tauri-plugin-log-api";
+
+import * as log from "@tauri-apps/plugin-log";
 
 import {
   ActionIcon,

@@ -1,5 +1,5 @@
 import { open as openFilePicker } from "@tauri-apps/plugin-dialog";
-import * as log from "tauri-plugin-log-api";
+import * as log from "@tauri-apps/plugin-log";
 
 import { Button } from "@mantine/core";
 

@@ -1,4 +1,4 @@
-import * as log from "tauri-plugin-log-api";
+import * as log from "@tauri-apps/plugin-log";
 
 import {
   ChatMessageHighlight,
