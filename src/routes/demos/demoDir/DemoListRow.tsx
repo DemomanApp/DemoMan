@@ -1,4 +1,4 @@
-import { memo } from "react";
+import { MouseEventHandler, memo } from "react";
 import { useNavigate } from "react-router-dom";
 
 import {
@@ -38,7 +38,7 @@ import classes from "./DemoListRow.module.css";
 type DemoListRowProps = {
   demo: Demo;
   selected: boolean;
-  onClick(): void;
+  onClick: MouseEventHandler<HTMLDivElement>;
 };
 
 function HoverMenuItem({

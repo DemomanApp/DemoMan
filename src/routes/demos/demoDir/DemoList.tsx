@@ -42,14 +42,20 @@ const innerElementType = forwardRef<HTMLDivElement>(
 type ItemDataType = {
   demos: Demo[];
   selectedRows: boolean[];
-  handleRowClick(index: number): void;
+  handleRowClick(
+    event: React.MouseEvent<HTMLDivElement, MouseEvent>,
+    index: number
+  ): void;
 };
 
 const createItemData = memoize(
   (
     demos: Demo[],
     selectedRows: boolean[],
-    handleRowClick: (index: number) => void
+    handleRowClick: (
+      event: React.MouseEvent<HTMLDivElement, MouseEvent>,
+      index: number
+    ) => void
   ): ItemDataType => ({
     demos,
     selectedRows,
@@ -67,25 +73,48 @@ export default function DemoList({ demos }: DemoListProps) {
 
   const [selectedRows, setSelectedRows] = useState<boolean[]>([]);
   const [selectionMode, setSelectionMode] = useState(false);
+  const [lastSelectedIndex, setLastSelectedIndex] = useState<
+    number | undefined
+  >(undefined);
 
   // Reset the selected rows every time the demos are changed or selection mode is toggled
   useEffect(() => {
     setSelectedRows(Array(demos.length).fill(false));
+    setLastSelectedIndex(undefined);
   }, [demos, selectionMode]);
 
   const handleRowClick = useCallback(
-    (index: number) => {
+    (event: React.MouseEvent<HTMLDivElement, MouseEvent>, index: number) => {
       if (selectionMode) {
-        setSelectedRows((oldSelectedIndices) => {
-          const newSelectedIndices = [...oldSelectedIndices];
-          newSelectedIndices[index] = !newSelectedIndices[index];
-          return newSelectedIndices;
-        });
+        if (event.shiftKey && lastSelectedIndex !== undefined) {
+          setSelectedRows((oldSelectedIndices) => {
+            const newSelectedIndices = [...oldSelectedIndices];
+            const value = !newSelectedIndices[index];
+
+            const [from, to] =
+              index > lastSelectedIndex
+                ? [lastSelectedIndex, index]
+                : [index, lastSelectedIndex];
+
+            for (let i = from; i <= to; i++) {
+              newSelectedIndices[i] = value;
+            }
+
+            return newSelectedIndices;
+          });
+        } else {
+          setSelectedRows((oldSelectedIndices) => {
+            const newSelectedIndices = [...oldSelectedIndices];
+            newSelectedIndices[index] = !newSelectedIndices[index];
+            return newSelectedIndices;
+          });
+        }
+        setLastSelectedIndex(index);
       } else {
         navigate(`../show/${btoa(demos[index].path)}`);
       }
     },
-    [navigate, selectionMode, demos]
+    [navigate, selectionMode, demos, lastSelectedIndex]
   );
 
   const totalFileSize = useMemo(
@@ -153,7 +182,7 @@ export default function DemoList({ demos }: DemoListProps) {
                     <DemoListRow
                       demo={demos[index]}
                       selected={selectedRows[index]}
-                      onClick={() => handleRowClick(index)}
+                      onClick={(event) => handleRowClick(event, index)}
                     />
                   </div>
                 )}
