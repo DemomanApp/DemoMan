@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
+import log from "tauri-plugin-log-api";
+
 import { getFileArgument } from "@/api";
 
 export default () => {
@@ -14,7 +16,9 @@ export default () => {
 
   const navigate = useNavigate();
 
-  getFileArgument().then(setFileArgument);
+  getFileArgument()
+    .then(setFileArgument)
+    .catch((e) => log.error(`failed to get file argument: ${e}`));
 
   if (fileArgument === null) {
     navigate("/demos", { replace: true });
