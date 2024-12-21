@@ -1,7 +1,7 @@
 import { useMemo } from "react";
 
 import AutoSizer from "react-virtualized-auto-sizer";
-import { ScrollArea, Text } from "@mantine/core";
+import { Anchor, ScrollArea, Text } from "@mantine/core";
 
 import { GameSummary, PlayerSummary, primaryTeam } from "@/demo";
 import { PlayerBox } from "./PlayerBox";
@@ -47,7 +47,7 @@ export function PlayerTable({
   currentPlayer,
   setCurrentPlayer,
 }: PlayerTableProps) {
-  const [redPlayers, bluPlayers, _others] = useMemo(() => {
+  const [redPlayers, bluPlayers, others] = useMemo(() => {
     const redPlayers: PlayerSummary[] = [];
     const bluPlayers: PlayerSummary[] = [];
     const others: PlayerSummary[] = [];
@@ -111,6 +111,19 @@ export function PlayerTable({
             </ScrollArea>
           )}
         </AutoSizer>
+      </div>
+      <div className={classes.spectatorList}>
+        Spectators:{" "}
+        {others
+          .map((player) => (
+            <Anchor
+              className={classes.spectatorName}
+              onClick={() => setCurrentPlayer(player)}
+            >
+              {player.name}
+            </Anchor>
+          ))
+          .intersperse(<>{", "}</>)}
       </div>
     </div>
   );
