@@ -29,7 +29,8 @@ import { Demo, isStvDemo } from "@/demo";
 import { IconKillstreak } from "@/components/icons";
 import { openRenameDemoModal } from "@/modals/RenameDemoModal";
 import { openDeleteDemoModal } from "@/modals/DeleteDemoModal";
-import { sendCommand } from "@/api";
+import { sendRconCommand } from "@/api";
+import useStore from "@/hooks/useStore";
 import MapBox from "./MapBox";
 import Badges from "./Badges";
 
@@ -71,6 +72,8 @@ function DemoListRow({ demo, selected, onClick }: DemoListRowProps) {
 
   // TODO: update the page without reloading
   const reloadPage = () => navigate(0);
+
+  const [rconPassword, _] = useStore("rconPassword");
 
   const birthtime = new Date(demo.birthtime * 1000);
 
@@ -178,7 +181,9 @@ function DemoListRow({ demo, selected, onClick }: DemoListRowProps) {
         <HoverMenuItem
           Icon={IconPlayerPlayFilled}
           label="Play"
-          onClick={() => sendCommand(`playdemo "${demo.path}"`)}
+          onClick={() =>
+            sendRconCommand(`playdemo "${demo.path}"`, rconPassword)
+          }
         />
       </Paper>
     </Paper>

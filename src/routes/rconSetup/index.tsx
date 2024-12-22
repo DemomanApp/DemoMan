@@ -4,7 +4,7 @@ import { Alert, AppShell, Center, Paper, Stack, Text } from "@mantine/core";
 import { IconAlertCircle, IconCircleCheck } from "@tabler/icons-react";
 
 import useStore from "@/hooks/useStore";
-import { initRcon, sendCommand } from "@/api";
+import { sendRconCommand } from "@/api";
 import { AsyncButton, AsyncCopyButton } from "@/components";
 import { HeaderBar } from "@/AppShell";
 
@@ -54,20 +54,11 @@ export default function RconSetup() {
             <div>
               <AsyncButton
                 onClick={async () => {
-                  try {
-                    await initRcon(rconPassword);
-                  } catch {
-                    setError(
-                      "Connection refused. Make sure TF2 is running and has the correct launch options set."
-                    );
-                    setSuccess(false);
-                    return;
-                  }
                   let response;
                   try {
-                    response = await sendCommand("echo test");
-                  } catch {
-                    setError("RCON command failed.");
+                    response = await sendRconCommand("echo test", rconPassword);
+                  } catch (error) {
+                    setError(`Failed to send RCON command. Reason: ${error}`);
                     setSuccess(false);
                     return;
                   }
@@ -90,6 +81,8 @@ export default function RconSetup() {
                 color="red"
               >
                 {error}
+                <br />
+                Make sure TF2 is running and has the correct launch options set.
               </Alert>
             )}
             {success && (

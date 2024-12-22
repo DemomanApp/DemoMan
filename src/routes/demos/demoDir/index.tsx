@@ -10,6 +10,7 @@ import {
   IconPlug,
   IconFolder,
   IconAlertCircle,
+  IconTerminal,
 } from "@tabler/icons-react";
 
 import { Demo, DemoFilter, SortKey, SortOrder } from "@/demo";
@@ -134,6 +135,19 @@ export default () => {
                   >
                     Show in explorer
                   </Menu.Item>
+                  {import.meta.env.DEV && (
+                    <>
+                      <Menu.Divider />
+                      <Menu.Label>Devtools</Menu.Label>
+                      <Menu.Item
+                        leftSection={<IconTerminal size={14} />}
+                        component={Link}
+                        to="/rcon-console"
+                      >
+                        RCON console
+                      </Menu.Item>
+                    </>
+                  )}
                 </Menu.Dropdown>
               </Menu>
             </>

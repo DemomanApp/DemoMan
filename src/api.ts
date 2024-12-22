@@ -66,12 +66,8 @@ export async function getTf2Dir() {
   return invoke<string>("get_tf2_dir");
 }
 
-export async function initRcon(password: string) {
-  return invoke<void>("init_rcon", { password });
-}
-
-export async function sendCommand(command: string) {
-  return invoke<string>("send_command", { command });
+export async function sendRconCommand(command: string, password: string) {
+  return invoke<string>("send_rcon_command", { command, password });
 }
 
 export async function getFileArgument() {

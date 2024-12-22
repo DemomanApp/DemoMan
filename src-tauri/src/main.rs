@@ -16,10 +16,8 @@ use tauri_plugin_log::{
     Target, TargetKind,
 };
 
-use rcon::Connection;
-use tokio::net::TcpStream;
-
 use cli::Args;
+use commands::rcon::RconConnectionState;
 use demo_cache::DemoMetadataCache;
 
 mod cli;
@@ -33,8 +31,6 @@ mod traits;
 
 #[cfg(test)]
 mod tests;
-
-pub type RconConnection = Mutex<Option<Connection<TcpStream>>>;
 
 fn build_log_plugin<R: tauri::Runtime>() -> tauri::plugin::TauriPlugin<R> {
     const COLORS: ColoredLevelConfig = ColoredLevelConfig {
@@ -77,7 +73,7 @@ fn main() {
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_clipboard_manager::init())
         .plugin(build_log_plugin())
-        .manage(RconConnection::default())
+        .manage(RconConnectionState::default())
         .manage(args)
         .setup(|app| {
             let cache_path = app
@@ -103,8 +99,7 @@ fn main() {
             commands::demos::set_demo_events,
             commands::demos::set_demo_tags,
             commands::files::get_tf2_dir,
-            commands::rcon::init_rcon,
-            commands::rcon::send_command,
+            commands::rcon::send_rcon_command,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

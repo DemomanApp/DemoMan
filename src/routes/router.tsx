@@ -9,6 +9,7 @@ import SettingsView from "./settings";
 import RconSetup from "./rconSetup";
 import IndexRoute from "./IndexRoute";
 import LocationOverlay from "./LocationOverlay";
+import RconConsole from "./rconConsole";
 
 export default createBrowserRouter([
   {
@@ -44,6 +45,10 @@ export default createBrowserRouter([
       {
         path: "rcon-setup",
         element: <RconSetup />,
+      },
+      {
+        path: "rcon-console",
+        element: <RconConsole />,
       },
     ],
   },

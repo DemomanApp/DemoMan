@@ -43,7 +43,7 @@ import {
   getDemo,
   getDemoDetails,
   getKnownTags,
-  sendCommand,
+  sendRconCommand,
   setDemoTags,
 } from "@/api";
 import { HeaderBar } from "@/AppShell";
@@ -55,6 +55,7 @@ import { Demo, GameSummary } from "@/demo";
 import Highlights from "./Highlights";
 import DemoTagsInput from "./DemoTagsInput";
 import useLocationState from "@/hooks/useLocationState";
+import useStore from "@/hooks/useStore";
 import { openRenameDemoModal } from "@/modals/RenameDemoModal";
 
 import classes from "./demoDetails.module.css";
@@ -109,6 +110,8 @@ export default function DemoDetailsView() {
   const [locationState, setLocationState] = useLocationState({
     currentTab: "players",
   });
+
+  const [rconPassword, _] = useStore("rconPassword");
 
   return (
     <AppShell header={{ height: 50 }}>
@@ -207,7 +210,12 @@ export default function DemoDetailsView() {
                       </List>
                       <AsyncButton
                         rightSection={<IconPlayerPlay />}
-                        onClick={() => sendCommand(`playdemo "${demo.path}"`)}
+                        onClick={() =>
+                          sendRconCommand(
+                            `playdemo "${demo.path}"`,
+                            rconPassword
+                          )
+                        }
                       >
                         Play demo
                       </AsyncButton>

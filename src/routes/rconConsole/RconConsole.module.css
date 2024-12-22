@@ -1,0 +1,25 @@
+.root {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.history-row {
+  display: flex;
+  align-items: center;
+  padding: 4px;
+  font-family: monospace, monospace;
+}
+
+.history {
+  flex-grow: 1;
+}
+
+.input-wrapper {
+  width: 100%;
+  border-top: 1px solid var(--mantine-color-default-border);
+}
+
+.input {
+  font-family: monospace, monospace;
+}
