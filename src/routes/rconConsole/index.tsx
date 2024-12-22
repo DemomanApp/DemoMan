@@ -65,10 +65,12 @@ export default function RconConsole() {
         .then((response) => {
           historyHandles.append({ kind: "response", value: response });
         })
-        .catch((error) => {
+        // `error` can safely be assumed to be a string,
+        // since the tauri command returns a `Result<String, String>`
+        .catch((error: string) => {
           historyHandles.append({
             kind: "error",
-            value: JSON.stringify(error),
+            value: error,
           });
         });
     },
