@@ -17,7 +17,6 @@ use tauri_plugin_log::{
 };
 
 use cli::Args;
-use commands::rcon::RconConnectionState;
 use demo_cache::DemoMetadataCache;
 
 mod cli;
@@ -73,7 +72,6 @@ fn main() {
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_clipboard_manager::init())
         .plugin(build_log_plugin())
-        .manage(RconConnectionState::default())
         .manage(args)
         .setup(|app| {
             let cache_path = app
