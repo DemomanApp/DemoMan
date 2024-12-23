@@ -11,6 +11,7 @@ import "@mantine/dates/styles.css";
 
 import router from "./routes/router";
 import modals from "./modals";
+import { RconProvider } from "./RconContext";
 import "./globalExtensions";
 
 import "./index.css";
@@ -33,9 +34,11 @@ createRoot(document.getElementById("root")!).render(
         },
       }}
     >
-      <ModalsProvider modals={modals}>
-        <RouterProvider router={router} />
-      </ModalsProvider>
+      <RconProvider>
+        <ModalsProvider modals={modals}>
+          <RouterProvider router={router} />
+        </ModalsProvider>
+      </RconProvider>
     </MantineProvider>
   </StrictMode>
 );
