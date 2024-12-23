@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { ReactNode, useMemo } from "react";
 
 import AutoSizer from "react-virtualized-auto-sizer";
 import { Anchor, ScrollArea, Text } from "@mantine/core";
@@ -115,15 +115,16 @@ export function PlayerTable({
       <div className={classes.spectatorList}>
         Spectators:{" "}
         {others
-          .map((player) => (
+          .map<ReactNode>((player) => (
             <Anchor
               className={classes.spectatorName}
               onClick={() => setCurrentPlayer(player)}
+              key={player.user_id}
             >
               {player.name}
             </Anchor>
           ))
-          .intersperse(<>{", "}</>)}
+          .intersperse(", ")}
       </div>
     </div>
   );
