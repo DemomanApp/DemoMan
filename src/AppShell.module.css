@@ -20,26 +20,3 @@
   justify-content: right;
   flex-grow: 1;
 }
-
-.navbar-button {
-  width: 40px;
-  height: 40px;
-  margin: 5px;
-  border-radius: var(--mantine-radius-md);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: light-dark(var(--mantine-color-gray-7), var(--mantine-color-dark-0));
-
-  @mixin hover {
-    background-color: light-dark(
-      var(--mantine-color-gray-0),
-      var(--mantine-color-dark-5)
-    );
-  }
-
-  &[disabled] {
-    color: var(--mantine-color-gray-8);
-    cursor: default;
-  }
-}

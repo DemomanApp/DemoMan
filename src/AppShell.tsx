@@ -1,8 +1,9 @@
-import { ReactNode, forwardRef } from "react";
+import { ReactNode } from "react";
 import { useNavigate } from "react-router-dom";
 
-import { UnstyledButton } from "@mantine/core";
 import { IconChevronLeft, IconChevronRight } from "@tabler/icons-react";
+
+import { HeaderButton } from "./components";
 
 import classes from "./AppShell.module.css";
 
@@ -16,6 +17,7 @@ function HistoryButtons() {
 
   // This isn't perfect and might break at some point.
   // If you find a better way to do this,
+  // feel free to change it.
   const canGoBack = window.history.state.idx !== 0;
   const canGoForward = window.history.state.idx < window.history.length - 1;
 
@@ -42,27 +44,3 @@ export function HeaderBar({ center, right }: HeaderBarProps) {
     </>
   );
 }
-
-type HeaderButtonProps = {
-  onClick?(): void;
-  disabled?: boolean;
-  children: ReactNode;
-};
-
-export const HeaderButton = forwardRef<HTMLButtonElement, HeaderButtonProps>(
-  function _HeaderButton(
-    { onClick, disabled, children }: HeaderButtonProps,
-    ref
-  ) {
-    return (
-      <UnstyledButton
-        onClick={onClick}
-        className={classes.navbarButton}
-        disabled={disabled}
-        ref={ref}
-      >
-        {children}
-      </UnstyledButton>
-    );
-  }
-);

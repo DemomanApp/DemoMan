@@ -5,3 +5,4 @@ export { default as Fill } from "./Fill";
 export { default as KillIcon } from "./KillIcon";
 export { default as MapThumbnail } from "./MapThumbnail";
 export { default as LoaderFallback } from "./LoaderFallback";
+export { default as HeaderButton } from "./HeaderButton";

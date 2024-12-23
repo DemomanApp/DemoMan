@@ -14,13 +14,13 @@ import {
 } from "@tabler/icons-react";
 
 import { Demo, DemoFilter, SortKey, SortOrder } from "@/demo";
-import { HeaderButton, HeaderBar } from "@/AppShell";
+import { HeaderBar } from "@/AppShell";
 import { getDemosInDirectory } from "@/api";
 import DemoList from "./DemoList";
 import SearchInput from "./SearchInput";
 import { SortControl } from "./SortControl";
 import { Path } from "@/store";
-import { Fill, LoaderFallback } from "@/components";
+import { HeaderButton, Fill, LoaderFallback } from "@/components";
 import useLocationState from "@/hooks/useLocationState";
 
 type DemoListLoaderArgs = {

@@ -9,7 +9,7 @@ import {
 } from "@mantine/core";
 import { IconTag } from "@tabler/icons-react";
 
-import { HeaderButton } from "@/AppShell";
+import { HeaderButton } from "@/components";
 
 type Props = {
   tags: string[];
