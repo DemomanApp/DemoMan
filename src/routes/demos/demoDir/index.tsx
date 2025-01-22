@@ -108,6 +108,9 @@ export default () => {
                 transitionProps={{
                   transition: "pop-top-right",
                 }}
+                withArrow
+                arrowPosition="center"
+                arrowSize={12}
               >
                 <Menu.Target>
                   <HeaderButton>
