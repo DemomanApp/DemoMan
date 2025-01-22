@@ -91,7 +91,7 @@ export default function RconConsole() {
                 cursor: "default",
               }}
             >
-              Settings
+              RCON Console
             </Text>
           }
         />
