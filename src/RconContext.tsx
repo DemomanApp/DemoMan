@@ -41,11 +41,15 @@ export const RconProvider = ({ children }: { children: ReactNode }) => {
 
   const interval = useInterval(updateRconState, 5000);
 
-  useEffect(() => {
-    updateRconState();
-    interval.start();
-    return interval.stop;
-  }, []);
+  useEffect(
+    () => {
+      updateRconState();
+      interval.start();
+      return interval.stop;
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    []
+  );
 
   return (
     <RconContext.Provider value={rconState}>{children}</RconContext.Provider>
