@@ -33,7 +33,7 @@ jobs:
             librsvg2-dev
       - name: Install frontend dependencies
         run: npm install
-      - uses: tauri-apps/tauri-action@e537a6f7bc75cbe74c6668f28a9836bd8d0eac36 #@dev
+      - uses: tauri-apps/tauri-action@v0
         with:
           # Only build in debug mode so the following
           # steps don't have to compile again.
