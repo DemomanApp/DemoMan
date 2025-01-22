@@ -64,6 +64,8 @@ export default function RconConsole() {
       sendRconCommand(command, password!)
         .then((response) => {
           historyHandles.append({ kind: "response", value: response });
+          // eslint really wants this pointless return statement (promise/always-return)
+          return undefined;
         })
         // `error` can safely be assumed to be a string,
         // since the tauri command returns a `Result<String, String>`
@@ -74,7 +76,7 @@ export default function RconConsole() {
           });
         });
     },
-    [setPromptInput, historyHandles]
+    [setPromptInput, historyHandles, password]
   );
 
   return (
