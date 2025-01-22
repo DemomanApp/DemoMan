@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 
 import { IconChevronLeft, IconChevronRight } from "@tabler/icons-react";
 
-import { HeaderButton } from "./components";
+import { HeaderButton, RconIndicator } from "./components";
 
 import classes from "./AppShell.module.css";
 
@@ -38,6 +38,7 @@ export function HeaderBar({ center, right }: HeaderBarProps) {
     <>
       <div className={classes.headerLeft}>
         <HistoryButtons />
+        <RconIndicator />
       </div>
       <div className={classes.headerCenter}>{center}</div>
       <div className={classes.headerRight}>{right}</div>
