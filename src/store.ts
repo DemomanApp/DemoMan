@@ -3,17 +3,29 @@ export type Label = string;
 
 export type StoreSchema = {
   demoDirs: Record<Path, Label>;
-  rconPassword: string | undefined;
+  rconPassword: string;
   enableLocationOverlay: boolean;
   skipTrash: boolean;
 };
 
-export const storeDefaults: Required<StoreSchema> = {
-  demoDirs: {},
-  rconPassword: undefined,
-  enableLocationOverlay: false,
-  skipTrash: false,
-};
+export function storeDefault<K extends keyof StoreSchema>(
+  key: K
+): StoreSchema[K] {
+  const storeDefaults: {
+    [k in keyof StoreSchema]: StoreSchema[k] | (() => StoreSchema[k]);
+  } = {
+    demoDirs: {},
+    rconPassword: () => btoa(Math.random().toString()).substring(10, 20),
+    enableLocationOverlay: false,
+    skipTrash: false,
+  };
+
+  const defaultValue = storeDefaults[key];
+
+  return typeof defaultValue === "function"
+    ? defaultValue()
+    : (defaultValue as StoreSchema[K]); // Is it possible to get rid of this cast?
+}
 
 function deserialize(storeValue: string | null) {
   if (storeValue !== null) {
@@ -29,5 +41,5 @@ function deserialize(storeValue: string | null) {
 export function getStoreValue<K extends keyof StoreSchema>(
   key: K
 ): StoreSchema[K] {
-  return deserialize(window.localStorage.getItem(key)) ?? storeDefaults[key];
+  return deserialize(window.localStorage.getItem(key)) ?? storeDefault(key);
 }
