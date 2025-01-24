@@ -30,6 +30,8 @@ I'm currently working on version 2 of the app, rewritten from scratch with
 This version will have many exciting features that were
 not feasible to implement in version 1.
 
+Preview builds of version 2 are already available under the releases page on GitHub.
+
 # ❤️ Contributing
 
 Contributions are welcome and appreciated.
@@ -49,7 +51,7 @@ If you can't contribute code, you can still help:
 Prerequisites:
 
 - Install Rust and npm.
-- Follow [this guide](https://tauri.app/v1/guides/getting-started/prerequisites) to be able to build tauri apps.
+- Follow [this guide](https://v2.tauri.app/start/prerequisites/) for building tauri apps.
 
 Once that's done:
 
