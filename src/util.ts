@@ -43,12 +43,13 @@ export function formatFileSize(bytes: number): string {
 // beta\d*[a-z]*  : beta, beta1b
 // nb\d+          : nb7 (no idea what it means, but ashville uses it in one version)
 // fix            : _fix suffix
+// skial          : _skial suffix
 //
 // See https://www.debuggex.com/r/LroqdOxfjME38MNu
 // for a visualization of this regex along with a few test cases
 // extracted from real map names
 const mapSuffixRegex =
-  /^(final\d*|rc\d+[a-z]*|rcx|[a-z]\d+[a-z]*|[a-z]|beta\d+[a-z]*|nb\d+|fix)$/;
+  /^(final\d*|rc\d+[a-z]*|rcx|[a-z]\d+[a-z]*|[a-z]|beta\d+[a-z]*|nb\d+|fix|skial)$/;
 
 /**
  * Normalize a map name by removing suffixes such as _rc1, _final, _v3 and so on.
