@@ -1,5 +1,3 @@
-import { normalizeMapName } from "@/util";
-
 const MAP_THUMBNAILS = import.meta.glob<true, string, string>(
   "../assets/map_thumbnails/*.png",
   {
@@ -9,8 +7,23 @@ const MAP_THUMBNAILS = import.meta.glob<true, string, string>(
   }
 );
 
-function getThumbnail(mapName: string) {
-  return MAP_THUMBNAILS[`../assets/map_thumbnails/${mapName}.png`];
+function getThumbnail(mapName: string): string | undefined {
+  const mapNameParts = mapName.toLowerCase().split("_");
+
+  while (mapNameParts.length > 0) {
+    const partialName = mapNameParts.join("_");
+    const thumbnail = MAP_THUMBNAILS[`../assets/map_thumbnails/${partialName}.png`];
+
+    console.log(`thumbnail ${mapName} -> ${partialName} : ${thumbnail}`);
+
+    if (thumbnail !== undefined) {
+      return thumbnail;
+    }
+
+    mapNameParts.pop()
+  }
+
+  return undefined;
 }
 
 export type MapThumbnailProps = {
@@ -24,7 +37,7 @@ export default function MapThumbnail({
   className,
   fallback,
 }: MapThumbnailProps) {
-  const thumbnail = getThumbnail(normalizeMapName(mapName));
+  const thumbnail = getThumbnail(mapName);
   if (thumbnail === undefined) {
     return <div className={className}>{fallback}</div>;
   }
