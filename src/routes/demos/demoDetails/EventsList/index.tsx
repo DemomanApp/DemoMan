@@ -3,6 +3,8 @@ import { useRef } from "react";
 import AutoSizer from "react-virtualized-auto-sizer";
 import { FixedSizeList } from "react-window";
 
+import * as log from "@tauri-apps/plugin-log";
+
 import {
   ActionIcon,
   Button,
@@ -135,9 +137,9 @@ function EditModal({ demo, index, onConfirm }: EditModalProps) {
     newEvents.sort((a, b) => a.tick - b.tick);
 
     setDemoEvents(demo.path, newEvents)
-      .catch(console.error)
+      .catch(log.error)
       .finally(onConfirm)
-      .catch(console.error);
+      .catch(log.error);
   }
 
   return (
@@ -204,9 +206,9 @@ export default function EventsList({ demo }: EventsListProps) {
       newEvents.splice(index, 1);
 
       setDemoEvents(demo.path, newEvents)
-        .catch(console.error)
+        .catch(log.error)
         .finally(reloadPage)
-        .catch(console.error);
+        .catch(log.error);
     });
   };
 
