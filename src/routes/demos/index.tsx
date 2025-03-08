@@ -2,7 +2,7 @@ import useStore from "@/hooks/useStore";
 import { Fill } from "@/components";
 import DemoDirButton from "./DemoDirButton";
 import { Anchor, AppShell, Stack, Text, Title } from "@mantine/core";
-import { Link } from "react-router-dom";
+import { Link } from "react-router";
 import { HeaderBar } from "@/AppShell";
 
 export default () => {

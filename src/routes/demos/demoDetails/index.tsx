@@ -6,7 +6,7 @@ import {
   redirect,
   useAsyncError,
   useNavigate,
-} from "react-router-dom";
+} from "react-router";
 
 import * as log from "@tauri-apps/plugin-log";
 

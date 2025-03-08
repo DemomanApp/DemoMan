@@ -33,7 +33,7 @@
     "react": "^18.3.0",
     "react-async-hook": "^4.0.0",
     "react-dom": "^18.3.0",
-    "react-router-dom": "^6.20",
+    "react-router": "^7.0",
     "react-virtualized-auto-sizer": "^1.0.7",
     "react-window": "^1.8.7"
   },

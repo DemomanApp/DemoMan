@@ -1,4 +1,4 @@
-import { createBrowserRouter } from "react-router-dom";
+import { createBrowserRouter } from "react-router";
 
 import DemosRoute from "./demos";
 import DemoDirRoute from "./demos/demoDir";

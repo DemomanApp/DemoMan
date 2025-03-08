@@ -1,4 +1,4 @@
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router";
 
 type LocationStateSetter<T> = {
   <K extends keyof T>(k: K, v: T[K]): void;

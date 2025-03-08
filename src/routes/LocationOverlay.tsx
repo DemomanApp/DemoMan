@@ -1,5 +1,5 @@
 import useStore from "@/hooks/useStore";
-import { Outlet, useLocation } from "react-router-dom";
+import { Outlet, useLocation } from "react-router";
 
 export default function LocationOverlay() {
   const [enableLocationOverlay] = useStore("enableLocationOverlay");

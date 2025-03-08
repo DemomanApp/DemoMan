@@ -1,5 +1,5 @@
 import { MouseEventHandler, memo } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router";
 
 import {
   ActionIcon,

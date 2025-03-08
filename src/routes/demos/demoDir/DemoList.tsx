@@ -6,7 +6,7 @@ import {
   useMemo,
   forwardRef,
 } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router";
 import AutoSizer from "react-virtualized-auto-sizer";
 import { FixedSizeList, ListChildComponentProps } from "react-window";
 import memoize from "memoize-one";

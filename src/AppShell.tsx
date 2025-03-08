@@ -1,5 +1,5 @@
 import { ReactNode } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router";
 
 import { IconChevronLeft, IconChevronRight } from "@tabler/icons-react";
 

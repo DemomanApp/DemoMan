@@ -26,7 +26,7 @@ import {
   IconPlus,
   IconTrash,
 } from "@tabler/icons-react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router";
 import { useForm } from "@mantine/form";
 import { setDemoEvents } from "@/api";
 

@@ -1,3 +1,5 @@
+import { memo } from "react";
+
 const MAP_THUMBNAILS = import.meta.glob<true, string, string>(
   "../assets/map_thumbnails/*.png",
   {
@@ -13,8 +15,6 @@ function getThumbnail(mapName: string): string | undefined {
   while (mapNameParts.length > 0) {
     const partialName = mapNameParts.join("_");
     const thumbnail = MAP_THUMBNAILS[`../assets/map_thumbnails/${partialName}.png`];
-
-    console.log(`thumbnail ${mapName} -> ${partialName} : ${thumbnail}`);
 
     if (thumbnail !== undefined) {
       return thumbnail;
@@ -32,7 +32,7 @@ export type MapThumbnailProps = {
   fallback: JSX.Element;
 };
 
-export default function MapThumbnail({
+export default memo(function MapThumbnail({
   mapName,
   className,
   fallback,
@@ -42,4 +42,4 @@ export default function MapThumbnail({
     return <div className={className}>{fallback}</div>;
   }
   return <img src={thumbnail} className={className} />;
-}
+})
