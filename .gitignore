@@ -12,3 +12,5 @@ target
 
 .eslintcache
 .stylelintcache
+src-tauri/gen/schemas/windows-schema.json
+.history/

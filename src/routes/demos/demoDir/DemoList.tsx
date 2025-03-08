@@ -139,22 +139,11 @@ export default function DemoList({ demos }: DemoListProps) {
 
   const itemData = createItemData(demos, selectedRows, handleRowClick);
   return (
-    <div
-      style={{
-        height: "100%",
-        width: "100%",
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "stretch",
-      }}
-    >
+    <div style={{ height: "100%", width: "100%", display: "flex", flexDirection: "column", alignItems: "stretch" }}>
       <div style={{ flexGrow: 1 }}>
         <AutoSizer>
           {({ height, width }) => (
-            <ScrollArea
-              style={{ width, height }}
-              onScrollPositionChange={({ y }) => listRef.current?.scrollTo(y)}
-            >
+            <ScrollArea style={{ width, height }} onScrollPositionChange={({ y }) => listRef.current?.scrollTo(y)}>
               <FixedSizeList
                 height={height}
                 width={width}
@@ -165,11 +154,7 @@ export default function DemoList({ demos }: DemoListProps) {
                 innerElementType={innerElementType}
                 ref={listRef}
               >
-                {({
-                  data: { demos, selectedRows, handleRowClick },
-                  index,
-                  style,
-                }: ListChildComponentProps<ItemDataType>) => (
+                {({ data: { demos, selectedRows, handleRowClick }, index, style }: ListChildComponentProps<ItemDataType>) => (
                   <div
                     style={{
                       ...style,

@@ -1,5 +1,6 @@
 import { MouseEventHandler, memo } from "react";
 import { useNavigate } from "react-router-dom";
+import PropTypes from "prop-types";
 
 import {
   ActionIcon,
@@ -19,7 +20,7 @@ import {
   IconPencil,
   IconTrash,
   IconUser,
-  IconPlayerPlayFilled,
+  IconPlayerPlay,
   IconBookmarks,
   IconBookmark,
 } from "@tabler/icons-react";
@@ -29,6 +30,7 @@ import { Demo, isStvDemo } from "@/demo";
 import { IconKillstreak } from "@/components/icons";
 import { openRenameDemoModal } from "@/modals/RenameDemoModal";
 import { openDeleteDemoModal } from "@/modals/DeleteDemoModal";
+import { formatDuration } from "@/util"; // Assuming you have a utility to format duration
 import { sendRconCommand } from "@/api";
 import useStore from "@/hooks/useStore";
 import MapBox from "./MapBox";
@@ -39,35 +41,10 @@ import classes from "./DemoListRow.module.css";
 type DemoListRowProps = {
   demo: Demo;
   selected: boolean;
-  onClick: MouseEventHandler<HTMLDivElement>;
+  onClick: (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => void;
 };
 
-function HoverMenuItem({
-  Icon,
-  label,
-  onClick,
-}: {
-  Icon: IconType;
-  label: string;
-  onClick(): void;
-}) {
-  return (
-    <Tooltip label={label}>
-      <ActionIcon
-        onClick={(event: React.MouseEvent<HTMLButtonElement>) => {
-          onClick();
-          event.stopPropagation();
-        }}
-        variant="transparent"
-        color="gray"
-      >
-        <Icon size={20} />
-      </ActionIcon>
-    </Tooltip>
-  );
-}
-
-function DemoListRow({ demo, selected, onClick }: DemoListRowProps) {
+const DemoListRow: React.FC<DemoListRowProps> = ({ demo, selected, onClick }) => {
   const navigate = useNavigate();
 
   // TODO: update the page without reloading
@@ -107,6 +84,8 @@ function DemoListRow({ demo, selected, onClick }: DemoListRowProps) {
         <Group gap={4}>
           <IconCalendarEvent />
           <Text c="dimmed">{birthtime.toLocaleString()}</Text>
+          <IconPlayerPlay />
+          <Text c="dimmed">{formatDuration(demo.playbackTime)}</Text> {/* Display playback time */}
         </Group>
         {demo.events.length !== 0 && (
           <HoverCard
@@ -179,7 +158,7 @@ function DemoListRow({ demo, selected, onClick }: DemoListRowProps) {
           onClick={() => openRenameDemoModal(demo, reloadPage)}
         />
         <HoverMenuItem
-          Icon={IconPlayerPlayFilled}
+          Icon={IconPlayerPlay}
           label="Play"
           onClick={() =>
             sendRconCommand(`playdemo "${demo.path}"`, rconPassword)
@@ -187,6 +166,55 @@ function DemoListRow({ demo, selected, onClick }: DemoListRowProps) {
         />
       </Paper>
     </Paper>
+  );
+};
+
+DemoListRow.propTypes = {
+  demo: PropTypes.shape({
+    name: PropTypes.string.isRequired,
+    path: PropTypes.string.isRequired,
+    birthtime: PropTypes.number.isRequired,
+    filesize: PropTypes.number.isRequired,
+    events: PropTypes.arrayOf(
+      PropTypes.shape({
+        name: PropTypes.oneOf(["Killstreak", "Bookmark"]).isRequired,
+        value: PropTypes.string.isRequired,
+        tick: PropTypes.number.isRequired,
+      })
+    ).isRequired,
+    tags: PropTypes.arrayOf(PropTypes.string).isRequired,
+    serverName: PropTypes.string.isRequired,
+    clientName: PropTypes.string.isRequired,
+    mapName: PropTypes.string.isRequired,
+    playbackTime: PropTypes.number.isRequired,
+    numTicks: PropTypes.number.isRequired,
+  }).isRequired,
+  selected: PropTypes.bool.isRequired,
+  onClick: PropTypes.func.isRequired,
+};
+
+function HoverMenuItem({
+  Icon,
+  label,
+  onClick,
+}: {
+  Icon: IconType;
+  label: string;
+  onClick(): void;
+}) {
+  return (
+    <Tooltip label={label}>
+      <ActionIcon
+        onClick={(event: React.MouseEvent<HTMLButtonElement>) => {
+          onClick();
+          event.stopPropagation();
+        }}
+        variant="transparent"
+        color="gray"
+      >
+        <Icon size={20} />
+      </ActionIcon>
+    </Tooltip>
   );
 }
 
