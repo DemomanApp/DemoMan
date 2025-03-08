@@ -2,7 +2,6 @@ import { Suspense, useContext } from "react";
 import {
   Await,
   LoaderFunction,
-  defer,
   useLoaderData,
   redirect,
   useAsyncError,
@@ -43,7 +42,6 @@ import {
 import {
   getDemo,
   getDemoDetails,
-  getKnownTags,
   sendRconCommand,
   setDemoTags,
 } from "@/api";
@@ -99,13 +97,12 @@ function DemoTitle({ demo }: { demo: Demo }) {
 type LoaderData = {
   demo: Promise<Demo>;
   details: Promise<GameSummary>;
-  knownTags: Promise<string[]>;
 };
 
 export default function DemoDetailsView() {
   // I'm not sure if this is the correct type. Sadly,
   // the type is not documented by react-router.
-  const { demo, details, knownTags } = useLoaderData() as LoaderData;
+  const { demo, details } = useLoaderData() as LoaderData;
 
   const navigate = useNavigate();
 
@@ -131,17 +128,16 @@ export default function DemoDetailsView() {
           right={
             <Suspense>
               <Await
-                resolve={Promise.all([demo, knownTags])}
+                resolve={demo}
                 errorElement={<></>}
               >
-                {([demo, knownTags]) => (
+                {(demo) => (
                   <DemoTagsInput
                     tags={demo.tags}
                     setTags={(tags: string[]) => {
                       setDemoTags(demo.path, tags);
                       navigate(0);
                     }}
-                    knownTags={knownTags}
                   />
                 )}
               </Await>
@@ -340,9 +336,8 @@ export const loader: LoaderFunction = async ({ params }) => {
     return redirect("/demos");
   }
 
-  return defer({
+  return {
     demo: getDemo(demoPath),
     details: getDemoDetails(demoPath),
-    knownTags: getKnownTags(),
-  } satisfies LoaderData);
+  } satisfies LoaderData;
 };

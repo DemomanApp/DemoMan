@@ -1,5 +1,7 @@
 import { useState } from "react";
 
+import * as log from "@tauri-apps/plugin-log";
+
 import {
   CheckIcon,
   Combobox,
@@ -10,17 +12,22 @@ import {
 import { IconTag } from "@tabler/icons-react";
 
 import { HeaderButton } from "@/components";
+import { getKnownTags } from "@/api";
 
 type Props = {
   tags: string[];
   setTags: (tags: string[]) => void;
-  knownTags: string[];
 };
 
-export default function DemoTagsInput({ tags, setTags, knownTags }: Props) {
+export default function DemoTagsInput({ tags, setTags }: Props) {
   const [search, setSearch] = useState("");
-  const [data, setData] = useState(knownTags);
-  const exactOptionMatch = data.some((item) => item === search);
+  const [knownTags, setKnownTags] = useState<string[] | null>(null);
+  const [additionalKnownTags, setAdditionalKnownTags] = useState<string[]>([]);
+
+  const allKnownTags = [...(knownTags || []), ...additionalKnownTags];
+
+  const exactOptionMatch = allKnownTags.some((item) => item === search) || false;
+
 
   const combobox = useCombobox({
     onDropdownClose: () => {
@@ -31,6 +38,12 @@ export default function DemoTagsInput({ tags, setTags, knownTags }: Props) {
 
     onDropdownOpen: () => {
       combobox.focusSearchInput();
+
+      if (knownTags === null) {
+        getKnownTags()
+          .then(setKnownTags)
+          .catch(log.error);
+      }
     },
   });
 
@@ -38,7 +51,7 @@ export default function DemoTagsInput({ tags, setTags, knownTags }: Props) {
     setSearch("");
 
     if (val === "$create") {
-      setData((current) => [...current, search]);
+      setAdditionalKnownTags((current) => [...current, search]);
       setTags([...tags, search]);
     } else {
       setTags(
@@ -47,7 +60,7 @@ export default function DemoTagsInput({ tags, setTags, knownTags }: Props) {
     }
   };
 
-  const options = data
+  const options = allKnownTags
     .filter((item) => item.toLowerCase().includes(search.toLowerCase().trim()))
     .map((item) => (
       <Combobox.Option value={item} key={item} active={tags.includes(item)}>
