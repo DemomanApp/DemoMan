@@ -39,12 +39,7 @@ import {
   IconUsers,
 } from "@tabler/icons-react";
 
-import {
-  getDemo,
-  getDemoDetails,
-  sendRconCommand,
-  setDemoTags,
-} from "@/api";
+import { getDemo, getDemoDetails, sendRconCommand, setDemoTags } from "@/api";
 import { HeaderBar } from "@/AppShell";
 import { AsyncButton, MapThumbnail, LoaderFallback, Fill } from "@/components";
 import { formatFileSize, formatDuration, decodeParam } from "@/util";
@@ -116,9 +111,7 @@ export default function DemoDetailsView() {
     <AppShell header={{ height: 50 }}>
       <AppShell.Header>
         <HeaderBar
-          center={
-            <DemoTitle demo={demo} />
-          }
+          center={<DemoTitle demo={demo} />}
           right={
             <DemoTagsInput
               tags={demo.tags}
