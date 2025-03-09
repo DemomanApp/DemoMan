@@ -24,10 +24,10 @@ export default function DemoTagsInput({ tags, setTags }: Props) {
   const [knownTags, setKnownTags] = useState<string[] | null>(null);
   const [additionalKnownTags, setAdditionalKnownTags] = useState<string[]>([]);
 
-  const allKnownTags = [...(knownTags || []), ...additionalKnownTags];
+  const allKnownTags = [...(knownTags ?? []), ...additionalKnownTags];
 
-  const exactOptionMatch = allKnownTags.some((item) => item === search) || false;
-
+  const exactOptionMatch =
+    allKnownTags.some((item) => item === search) || false;
 
   const combobox = useCombobox({
     onDropdownClose: () => {
@@ -40,9 +40,7 @@ export default function DemoTagsInput({ tags, setTags }: Props) {
       combobox.focusSearchInput();
 
       if (knownTags === null) {
-        getKnownTags()
-          .then(setKnownTags)
-          .catch(log.error);
+        getKnownTags().then(setKnownTags).catch(log.error);
       }
     },
   });
