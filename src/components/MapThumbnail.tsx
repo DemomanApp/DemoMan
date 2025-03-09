@@ -14,13 +14,14 @@ function getThumbnail(mapName: string): string | undefined {
 
   while (mapNameParts.length > 0) {
     const partialName = mapNameParts.join("_");
-    const thumbnail = MAP_THUMBNAILS[`../assets/map_thumbnails/${partialName}.png`];
+    const thumbnail =
+      MAP_THUMBNAILS[`../assets/map_thumbnails/${partialName}.png`];
 
     if (thumbnail !== undefined) {
       return thumbnail;
     }
 
-    mapNameParts.pop()
+    mapNameParts.pop();
   }
 
   return undefined;
@@ -42,4 +43,4 @@ export default memo(function MapThumbnail({
     return <div className={className}>{fallback}</div>;
   }
   return <img src={thumbnail} className={className} />;
-})
+});
