@@ -65,11 +65,18 @@ const createItemData = memoize(
 
 type DemoListProps = {
   demos: Demo[];
+  scrollPos: number;
+  setScrollPos: (value: number) => void;
 };
 
-export default function DemoList({ demos }: DemoListProps) {
+export default function DemoList({
+  demos,
+  scrollPos,
+  setScrollPos,
+}: DemoListProps) {
   const navigate = useNavigate();
   const listRef = useRef<FixedSizeList>(null);
+  const viewportRef = useRef<HTMLDivElement>(null);
 
   const [selectedRows, setSelectedRows] = useState<boolean[]>([]);
   const [selectionMode, setSelectionMode] = useState(false);
@@ -82,6 +89,10 @@ export default function DemoList({ demos }: DemoListProps) {
     setSelectedRows(Array(demos.length).fill(false));
     setLastSelectedIndex(undefined);
   }, [demos, selectionMode]);
+
+  useEffect(() => {
+    viewportRef.current?.scrollTo({ top: scrollPos, behavior: "instant" });
+  });
 
   const handleRowClick = useCallback(
     (event: React.MouseEvent<HTMLDivElement, MouseEvent>, index: number) => {
@@ -153,7 +164,11 @@ export default function DemoList({ demos }: DemoListProps) {
           {({ height, width }) => (
             <ScrollArea
               style={{ width, height }}
-              onScrollPositionChange={({ y }) => listRef.current?.scrollTo(y)}
+              onScrollPositionChange={({ y }) => {
+                listRef.current?.scrollTo(y);
+                setScrollPos(y);
+              }}
+              viewportRef={viewportRef}
             >
               <FixedSizeList
                 height={height}

@@ -29,6 +29,8 @@ type DemoListLoaderArgs = {
   reverse: boolean;
   filters: DemoFilter[];
   query: string;
+  scrollPos: number;
+  setScrollPos: (value: number) => void;
 };
 
 function ErrorBox({ error }: { error: string }) {
@@ -51,6 +53,8 @@ function DemoListLoader({
   reverse,
   filters,
   query,
+  scrollPos,
+  setScrollPos,
 }: DemoListLoaderArgs) {
   const [demos, setDemos] = useState<Demo[] | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -62,7 +66,13 @@ function DemoListLoader({
   }, [path, sortKey, reverse, filters, query]);
 
   if (demos !== null) {
-    return <DemoList demos={demos} />;
+    return (
+      <DemoList
+        demos={demos}
+        scrollPos={scrollPos}
+        setScrollPos={setScrollPos}
+      />
+    );
   } else if (error !== null) {
     return <ErrorBox error={error} />;
   } else {
@@ -78,6 +88,7 @@ export default () => {
     query: "",
     sortKey: "birthtime" as SortKey,
     sortOrder: "descending" as SortOrder,
+    scrollPos: 0,
   });
 
   const filters: DemoFilter[] = [];
@@ -164,6 +175,8 @@ export default () => {
           reverse={locationState.sortOrder === "descending"}
           filters={filters}
           query={locationState.query}
+          scrollPos={locationState.scrollPos}
+          setScrollPos={setLocationState("scrollPos")}
         />
       </AppShell.Main>
     </AppShell>
