@@ -8,13 +8,13 @@ import DemoDetailsRoute, {
 import SettingsView from "./settings";
 import RconSetup from "./rconSetup";
 import IndexRoute from "./IndexRoute";
-import LocationOverlay from "./LocationOverlay";
+import RootRoute from "./RootRoute";
 import RconConsole from "./rconConsole";
 
 export default createBrowserRouter([
   {
     path: "/",
-    element: <LocationOverlay />,
+    element: <RootRoute />,
     children: [
       {
         index: true,

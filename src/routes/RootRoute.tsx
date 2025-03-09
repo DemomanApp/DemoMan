@@ -1,5 +1,7 @@
-import useStore from "@/hooks/useStore";
 import { Outlet, useLocation } from "react-router";
+
+import useStore from "@/hooks/useStore";
+import { NavigationProgress } from "@/components";
 
 export default function LocationOverlay() {
   const [enableLocationOverlay] = useStore("enableLocationOverlay");
@@ -7,6 +9,7 @@ export default function LocationOverlay() {
 
   return (
     <>
+      <NavigationProgress />
       {enableLocationOverlay && (
         <div
           style={{

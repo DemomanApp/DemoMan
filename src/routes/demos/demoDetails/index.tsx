@@ -95,13 +95,11 @@ function DemoTitle({ demo }: { demo: Demo }) {
 }
 
 type LoaderData = {
-  demo: Promise<Demo>;
+  demo: Demo;
   details: Promise<GameSummary>;
 };
 
 export default function DemoDetailsView() {
-  // I'm not sure if this is the correct type. Sadly,
-  // the type is not documented by react-router.
   const { demo, details } = useLoaderData() as LoaderData;
 
   const navigate = useNavigate();
@@ -119,29 +117,16 @@ export default function DemoDetailsView() {
       <AppShell.Header>
         <HeaderBar
           center={
-            <Suspense fallback={<Text c="dimmed">loading...</Text>}>
-              <Await resolve={demo} errorElement={<></>}>
-                {(demo) => <DemoTitle demo={demo} />}
-              </Await>
-            </Suspense>
+            <DemoTitle demo={demo} />
           }
           right={
-            <Suspense>
-              <Await
-                resolve={demo}
-                errorElement={<></>}
-              >
-                {(demo) => (
-                  <DemoTagsInput
-                    tags={demo.tags}
-                    setTags={(tags: string[]) => {
-                      setDemoTags(demo.path, tags);
-                      navigate(0);
-                    }}
-                  />
-                )}
-              </Await>
-            </Suspense>
+            <DemoTagsInput
+              tags={demo.tags}
+              setTags={(tags: string[]) => {
+                setDemoTags(demo.path, tags);
+                navigate(0);
+              }}
+            />
           }
         />
       </AppShell.Header>
@@ -336,8 +321,10 @@ export const loader: LoaderFunction = async ({ params }) => {
     return redirect("/demos");
   }
 
+  const demo = await getDemo(demoPath);
+
   return {
-    demo: getDemo(demoPath),
+    demo,
     details: getDemoDetails(demoPath),
   } satisfies LoaderData;
 };

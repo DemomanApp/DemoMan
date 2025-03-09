@@ -7,3 +7,4 @@ export { default as MapThumbnail } from "./MapThumbnail";
 export { default as LoaderFallback } from "./LoaderFallback";
 export { default as HeaderButton } from "./HeaderButton";
 export { default as RconIndicator } from "./RconIndicator";
+export { default as NavigationProgress } from "./NavigationProgress";
