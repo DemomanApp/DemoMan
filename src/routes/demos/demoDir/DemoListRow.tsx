@@ -25,6 +25,7 @@ import {
   IconBookmark,
 } from "@tabler/icons-react";
 import { areEqual } from "react-window";
+
 import { formatDuration } from "@/util";
 import { Demo, isStvDemo } from "@/demo";
 import { IconKillstreak } from "@/components/icons";
@@ -110,7 +111,7 @@ function DemoListRow({ demo, selected, onClick }: DemoListRowProps) {
           <Text c="dimmed">{birthtime.toLocaleString()}</Text>
           <span>&nbsp;</span>
           <IconClockPlay />
-          <Text c="dimmed">({formatDuration(demo.playbackTime)})</Text>
+            <Text c="dimmed">{formatDuration(demo.playbackTime)}</Text>
         </Group>
         {demo.events.length !== 0 && (
           <HoverCard
