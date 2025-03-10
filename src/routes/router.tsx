@@ -10,6 +10,7 @@ import RconSetup from "./rconSetup";
 import IndexRoute from "./IndexRoute";
 import RootRoute from "./RootRoute";
 import RconConsole from "./rconConsole";
+import AboutRoute from "./AboutRoute";
 
 export default createBrowserRouter([
   {
@@ -41,6 +42,10 @@ export default createBrowserRouter([
       {
         path: "settings",
         element: <SettingsView />,
+      },
+      {
+        path: "about",
+        element: <AboutRoute />,
       },
       {
         path: "rcon-setup",
