@@ -111,7 +111,7 @@ function DemoListRow({ demo, selected, onClick }: DemoListRowProps) {
           <Text c="dimmed">{birthtime.toLocaleString()}</Text>
           <span>&nbsp;</span>
           <IconClockPlay />
-            <Text c="dimmed">{formatDuration(demo.playbackTime)}</Text>
+          <Text c="dimmed">{formatDuration(demo.playbackTime)}</Text>
         </Group>
         {demo.events.length !== 0 && (
           <HoverCard
