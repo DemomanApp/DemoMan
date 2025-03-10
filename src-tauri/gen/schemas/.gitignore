@@ -1,0 +1,6 @@
+
+# Tauri generates platform-specific schemas (linux-schema.json, windows-schema.json, etc.).
+# These are not used at the moment, since we don't have platform-specific capability files.
+# Instead, we use desktop-schema.json for all platforms.
+*-schema.json
+!desktop-schema.json
