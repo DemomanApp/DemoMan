@@ -1,0 +1,9 @@
+.centerText {
+  text-align: center;
+}
+
+.buttonContainer {
+  display: flex;
+  flex-direction: row;
+  gap: var(--mantine-spacing-md);
+}

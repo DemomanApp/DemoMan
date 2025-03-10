@@ -2,6 +2,7 @@ import { Anchor, AppShell, Button, Container, Text } from "@mantine/core";
 
 import { HeaderBar } from "@/AppShell";
 import { IconBrandDiscord, IconBrandGithub } from "@tabler/icons-react";
+import "./AboutRoute.css";
 
 export default function AboutRoute() {
   return (
@@ -33,14 +34,8 @@ export default function AboutRoute() {
           }}
           size="sm"
         >
-          <img src="../../githubassets/Banner.png" width="75%" />
-          <div
-            style={{
-              display: "flex",
-              flexDirection: "row",
-              gap: "var(--mantine-spacing-md)",
-            }}
-          >
+          <img src="../../githubassets/Banner.png" width="75%" alt="DemoMan Banner" />
+          <div className="buttonContainer">
             <Button
               variant="subtle"
               leftSection={<IconBrandGithub />}
@@ -61,7 +56,7 @@ export default function AboutRoute() {
             </Button>
           </div>
           <div>Thank you for using DemoMan!</div>
-          <div style={{ textAlign: "center" }}>
+          <div className="centerText">
             Do you want to report a bug or suggest an idea for a new feature?
             <br />
             Please{" "}
