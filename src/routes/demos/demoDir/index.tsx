@@ -11,6 +11,7 @@ import {
   IconFolder,
   IconAlertCircle,
   IconTerminal,
+  IconInfoCircle,
 } from "@tabler/icons-react";
 
 import { Demo, DemoFilter, SortKey, SortOrder } from "@/demo";
@@ -148,6 +149,13 @@ export default () => {
                     onClick={() => open(path)}
                   >
                     Show in explorer
+                  </Menu.Item>
+                  <Menu.Item
+                    leftSection={<IconInfoCircle size={14} />}
+                    component={Link}
+                    to="/about"
+                  >
+                    About DemoMan
                   </Menu.Item>
                   {import.meta.env.DEV && (
                     <>
