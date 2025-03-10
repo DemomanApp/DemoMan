@@ -12,3 +12,6 @@ target
 
 .eslintcache
 .stylelintcache
+
+# Local History VSCode Extension
+.history/
