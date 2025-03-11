@@ -1,131 +1,115 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useState, useEffect } from "react";
 
-import { AppShell, Input, ScrollArea, Text } from "@mantine/core";
-import {
-  IconChevronLeft,
-  IconChevronRight,
-  IconChevronsRight,
-  IconX,
-} from "@tabler/icons-react";
-import AutoSizer from "react-virtualized-auto-sizer";
+import { Alert, AppShell, Center, Paper, Stack, Text, TextInput, Button } from "@mantine/core";
+import { IconAlertCircle, IconCircleCheck } from "@tabler/icons-react";
 
+import useStore from "@/hooks/useStore";
+import { sendRconCommand } from "@/api";
+import { AsyncButton, AsyncCopyButton } from "@/components";
 import { HeaderBar } from "@/AppShell";
 
-import classes from "./RconConsole.module.css";
-import { useListState } from "@mantine/hooks";
-import { sendRconCommand } from "@/api";
-import useStore from "@/hooks/useStore";
-
-type HistoryEntry = {
-  kind: "request" | "response" | "error";
-  value: string;
-};
-
-function HistoryRowIcon({ entryKind }: { entryKind: HistoryEntry["kind"] }) {
-  switch (entryKind) {
-    case "request":
-      return <IconChevronRight />;
-    case "response":
-      return <IconChevronLeft color="var(--mantine-color-blue-9)" />;
-    case "error":
-      return <IconX color="var(--mantine-color-red-9)" />;
-  }
-}
-
-function HistoryRow({ historyEntry }: { historyEntry: HistoryEntry }) {
-  return (
-    <div className={classes.historyRow}>
-      <HistoryRowIcon entryKind={historyEntry.kind} />
-      {historyEntry.value}
-    </div>
-  );
-}
-
-export default function RconConsole() {
-  const [password, _] = useStore("rconPassword");
-  const [promptInput, setPromptInput] = useState("");
-  const [history, historyHandles] = useListState<HistoryEntry>([]);
-
-  const viewport = useRef<HTMLDivElement>(null);
+export default function RconSetup() {
+  const [rconPassword, setRconPassword] = useStore("rconPassword");
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState(false);
+  const [newPassword, setNewPassword] = useState("");
 
   useEffect(() => {
-    viewport.current?.scrollTo({
-      top: viewport.current?.scrollHeight,
-      behavior: "smooth",
-    });
-  }, [history]);
+    if (rconPassword === undefined || rconPassword === "") {
+      // Set a new random password if none is set
+      setRconPassword(btoa(Math.random().toString()).substring(10, 20));
+    }
+  }, [rconPassword, setRconPassword]);
 
-  const handleSubmit = useCallback(
-    (command: string) => {
-      setPromptInput("");
+  const handlePasswordChange = () => {
+    if (newPassword.trim() === "") {
+      // Set a new random password if the input is empty
+      setRconPassword(btoa(Math.random().toString()).substring(10, 20));
+    } else {
+      setRconPassword(newPassword);
+    }
+    setNewPassword("");
+  };
 
-      historyHandles.append({ kind: "request", value: command });
-
-      sendRconCommand(command, password!)
-        .then((response) => {
-          historyHandles.append({ kind: "response", value: response });
-          // eslint really wants this pointless return statement (promise/always-return)
-          return undefined;
-        })
-        // `error` can safely be assumed to be a string,
-        // since the tauri command returns a `Result<String, String>`
-        .catch((error: string) => {
-          historyHandles.append({
-            kind: "error",
-            value: error,
-          });
-        });
-    },
-    [setPromptInput, historyHandles, password]
-  );
+  const launchFlags = `-usercon +rcon_password ${rconPassword} +ip 0.0.0.0 +hostport 27969 +net_start`;
 
   return (
     <AppShell header={{ height: 50 }}>
       <AppShell.Header>
-        <HeaderBar
-          center={
-            <Text
-              fw={500}
-              size="lg"
-              style={{
-                cursor: "default",
-              }}
-            >
-              RCON Console
-            </Text>
-          }
-        />
+        <HeaderBar />
       </AppShell.Header>
       <AppShell.Main>
-        <div className={classes.root}>
-          <div className={classes.history}>
-            <AutoSizer>
-              {({ height, width }) => (
-                <ScrollArea style={{ width, height }} viewportRef={viewport}>
-                  {history.map((historyEntry, idx) => (
-                    <HistoryRow historyEntry={historyEntry} key={idx} />
-                  ))}
-                </ScrollArea>
-              )}
-            </AutoSizer>
-          </div>
-          <Input
-            value={promptInput}
-            onChange={(event) => setPromptInput(event.currentTarget.value)}
-            variant="unstyled"
-            classNames={{
-              input: classes.input,
-              wrapper: classes.inputWrapper,
-            }}
-            placeholder="Enter RCON command..."
-            leftSection={<IconChevronsRight />}
-            onKeyDown={(event) => {
-              if (event.key === "Enter" && !event.repeat) {
-                handleSubmit(event.currentTarget.value);
-              }
-            }}
-          />
-        </div>
+        <Center style={{ height: "100%" }}>
+          <Stack>
+            <div>Add this to your launch options:</div>
+            <Paper
+              withBorder
+              p="xs"
+              style={{
+                display: "flex",
+                alignItems: "center",
+                fontFamily: "monospace",
+                gap: 8,
+              }}
+            >
+              <Text
+                style={{
+                  userSelect: "text",
+                  WebkitUserSelect: "text",
+                }}
+              >
+                {launchFlags}
+              </Text>
+              <AsyncCopyButton text={launchFlags} />
+            </Paper>
+            <TextInput
+              label="Set RCON Password"
+              placeholder="Enter new RCON password"
+              value={newPassword}
+              onChange={(event) => setNewPassword(event.currentTarget.value)}
+            />
+            <Button onClick={handlePasswordChange}>Set Password</Button>
+            <div>
+              <AsyncButton
+                onClick={async () => {
+                  let response;
+                  try {
+                    response = await sendRconCommand("echo test", rconPassword);
+                  } catch (error) {
+                    setError(`Failed to send RCON command. Reason: ${error}`);
+                    setSuccess(false);
+                    return;
+                  }
+                  if (response.trim() === "test") {
+                    setError(null);
+                    setSuccess(true);
+                  } else {
+                    setError(`Unexpected RCON response: "${response}"`);
+                    setSuccess(false);
+                  }
+                }}
+              >
+                Test connection
+              </AsyncButton>
+            </div>
+            {error !== null && (
+              <Alert
+                icon={<IconAlertCircle size={16} />}
+                title="Error"
+                color="red"
+              >
+                {error}
+                <br />
+                Make sure TF2 is running and has the correct launch options set.
+              </Alert>
+            )}
+            {success && (
+              <Alert icon={<IconCircleCheck size={16} />} title="Success!">
+                Connection established.
+              </Alert>
+            )}
+          </Stack>
+        </Center>
       </AppShell.Main>
     </AppShell>
   );

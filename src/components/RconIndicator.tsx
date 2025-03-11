@@ -10,7 +10,7 @@ import {
   Stack,
   Text,
 } from "@mantine/core";
-import { IconHelp, IconPlug, IconTool } from "@tabler/icons-react";
+import { IconHelp, IconPlug, IconTool, IconSettings } from "@tabler/icons-react";
 
 import { HeaderButton } from ".";
 import { RconContext, RconState } from "@/RconContext";
@@ -88,6 +88,15 @@ export default function RconStateIndicator() {
                 Set up RCON
               </Button>
             </div>
+          )}
+          {rconState.status === "connected" && (
+            <Button
+              leftSection={<IconSettings />}
+              component={Link}
+              to="/rcon-setup"
+            >
+              Change RCON Password
+            </Button>
           )}
           <Anchor
             href="https://github.com/DemomanApp/DemoMan/wiki/All-about-the-RCON-connection-feature"
