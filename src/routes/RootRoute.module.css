@@ -1,0 +1,15 @@
+.location-overlay {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  display: flex;
+  gap: var(--mantine-spacing-xs);
+  justify-content: center;
+  z-index: 9999;
+  pointer-events: none;
+}
+
+.location-overlay-item {
+  background-color: var(--mantine-color-default);
+  padding: 4px;
+}
