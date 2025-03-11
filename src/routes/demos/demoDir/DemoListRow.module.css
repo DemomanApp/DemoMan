@@ -32,7 +32,9 @@
     }
   }
 
-  transition: background-color 150ms ease, border-color 150ms ease;
+  transition:
+    background-color 150ms ease,
+    border-color 150ms ease;
 
   &[data-selected="true"] {
     box-shadow: 0 0 0 2px

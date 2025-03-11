@@ -30,6 +30,5 @@
 }
 
 .spectator-name {
-  color: var(--mantine-color-text)
+  color: var(--mantine-color-text);
 }
-
