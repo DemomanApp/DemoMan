@@ -20,7 +20,7 @@ export const RconContext = createContext<RconState>({ status: "unknown" });
 
 export const RconProvider = ({ children }: { children: ReactNode }) => {
   const [rconState, setRconState] = useState<RconState>({ status: "unknown" });
-  const [rconPassword, _setRconPassword] = useStore("rconPassword");
+  const [rconPassword, setRconPassword] = useStore("rconPassword");
 
   const updateRconState = useCallback(async () => {
     try {
@@ -41,15 +41,15 @@ export const RconProvider = ({ children }: { children: ReactNode }) => {
 
   const interval = useInterval(updateRconState, 5000);
 
-  useEffect(
-    () => {
-      updateRconState();
-      interval.start();
-      return interval.stop;
-    },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    []
-  );
+  useEffect(() => {
+    if (rconPassword === undefined || rconPassword.trim() === "") {
+      // Set a new random password if none is set
+      setRconPassword(btoa(Math.random().toString()).substring(10, 20));
+    }
+    updateRconState();
+    interval.start();
+    return interval.stop;
+  }, [rconPassword, setRconPassword, updateRconState, interval]);
 
   return (
     <RconContext.Provider value={rconState}>{children}</RconContext.Provider>
