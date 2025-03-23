@@ -5,17 +5,20 @@ import {
   useCallback,
   useMemo,
   forwardRef,
+  memo,
 } from "react";
 import { useNavigate } from "react-router";
 import AutoSizer from "react-virtualized-auto-sizer";
-import { FixedSizeList, ListChildComponentProps } from "react-window";
+import { FixedSizeList, ListChildComponentProps, areEqual } from "react-window";
 import memoize from "memoize-one";
 
+import { useDebouncedCallback } from "@mantine/hooks";
 import { ScrollArea } from "@mantine/core";
 
 import { Demo } from "@/demo";
 import DemoListRow from "./DemoListRow";
 import BottomBar from "./BottomBar";
+import useLocationRef from "@/hooks/useLocationRef";
 
 const PADDING_SIZE = 16;
 
@@ -42,88 +45,79 @@ const innerElementType = forwardRef<HTMLDivElement>(
 type ItemDataType = {
   demos: Demo[];
   selectedRows: boolean[];
-  handleRowClick(
-    event: React.MouseEvent<HTMLDivElement, MouseEvent>,
-    index: number
-  ): void;
+  handleSelect(event: React.MouseEvent, index: number): void;
 };
 
 const createItemData = memoize(
   (
     demos: Demo[],
     selectedRows: boolean[],
-    handleRowClick: (
-      event: React.MouseEvent<HTMLDivElement, MouseEvent>,
-      index: number
-    ) => void
+    handleSelect: (event: React.MouseEvent, index: number) => void
   ): ItemDataType => ({
     demos,
     selectedRows,
-    handleRowClick,
+    handleSelect,
   })
 );
 
 type DemoListProps = {
   demos: Demo[];
-  scrollPos: number;
-  setScrollPos: (value: number) => void;
 };
 
-export default function DemoList({
-  demos,
-  scrollPos,
-  setScrollPos,
-}: DemoListProps) {
+export default function DemoList({ demos }: DemoListProps) {
   const navigate = useNavigate();
   const listRef = useRef<FixedSizeList>(null);
-  const viewportRef = useRef<HTMLDivElement>(null);
 
-  const [selectedRows, setSelectedRows] = useState<boolean[]>([]);
-  const [selectionMode, setSelectionMode] = useState(false);
+  const [scrollPos, setScrollPos] = useLocationRef("scrollPos", 0);
+
+  const handleScroll = useDebouncedCallback(setScrollPos, 500);
+
+  const [selectedRows, setSelectedRows] = useState<boolean[]>(
+    Array(demos.length).fill(false)
+  );
   const [lastSelectedIndex, setLastSelectedIndex] = useState<
     number | undefined
   >(undefined);
 
-  // Reset the selected rows every time the demos are changed or selection mode is toggled
+  const selectionMode = useMemo(
+    () => selectedRows.some((row) => row),
+    [selectedRows]
+  );
+
+  // Reset the selected rows every time the demos are changed or selection mode is disabled
   useEffect(() => {
-    setSelectedRows(Array(demos.length).fill(false));
-    setLastSelectedIndex(undefined);
+    if (!selectionMode) {
+      setSelectedRows(Array(demos.length).fill(false));
+      setLastSelectedIndex(undefined);
+    }
   }, [demos, selectionMode]);
 
-  useEffect(() => {
-    viewportRef.current?.scrollTo({ top: scrollPos, behavior: "instant" });
-  });
+  const handleSelect = useCallback(
+    (event: React.MouseEvent, index: number) => {
+      if (event.shiftKey && lastSelectedIndex !== undefined) {
+        setSelectedRows((oldSelectedIndices) => {
+          const newSelectedIndices = [...oldSelectedIndices];
+          const value = !newSelectedIndices[index];
 
-  const handleRowClick = useCallback(
-    (event: React.MouseEvent<HTMLDivElement, MouseEvent>, index: number) => {
-      if (selectionMode) {
-        if (event.shiftKey && lastSelectedIndex !== undefined) {
-          setSelectedRows((oldSelectedIndices) => {
-            const newSelectedIndices = [...oldSelectedIndices];
-            const value = !newSelectedIndices[index];
+          const [from, to] =
+            index > lastSelectedIndex
+              ? [lastSelectedIndex, index]
+              : [index, lastSelectedIndex];
 
-            const [from, to] =
-              index > lastSelectedIndex
-                ? [lastSelectedIndex, index]
-                : [index, lastSelectedIndex];
+          for (let i = from; i <= to; i++) {
+            newSelectedIndices[i] = value;
+          }
 
-            for (let i = from; i <= to; i++) {
-              newSelectedIndices[i] = value;
-            }
-
-            return newSelectedIndices;
-          });
-        } else {
-          setSelectedRows((oldSelectedIndices) => {
-            const newSelectedIndices = [...oldSelectedIndices];
-            newSelectedIndices[index] = !newSelectedIndices[index];
-            return newSelectedIndices;
-          });
-        }
-        setLastSelectedIndex(index);
+          return newSelectedIndices;
+        });
       } else {
-        navigate(`../show/${btoa(demos[index].path)}`);
+        setSelectedRows((oldSelectedIndices) => {
+          const newSelectedIndices = [...oldSelectedIndices];
+          newSelectedIndices[index] = !newSelectedIndices[index];
+          return newSelectedIndices;
+        });
       }
+      setLastSelectedIndex(index);
     },
     [navigate, selectionMode, demos, lastSelectedIndex]
   );
@@ -148,7 +142,8 @@ export default function DemoList({
     [selectedRows]
   );
 
-  const itemData = createItemData(demos, selectedRows, handleRowClick);
+  const itemData = createItemData(demos, selectedRows, handleSelect);
+
   return (
     <div
       style={{
@@ -166,9 +161,11 @@ export default function DemoList({
               style={{ width, height }}
               onScrollPositionChange={({ y }) => {
                 listRef.current?.scrollTo(y);
-                setScrollPos(y);
+                handleScroll(y);
               }}
-              viewportRef={viewportRef}
+              viewportRef={(viewport) =>
+                viewport?.scrollTo({ top: scrollPos, behavior: "instant" })
+              }
             >
               <FixedSizeList
                 height={height}
@@ -180,27 +177,7 @@ export default function DemoList({
                 innerElementType={innerElementType}
                 ref={listRef}
               >
-                {({
-                  data: { demos, selectedRows, handleRowClick },
-                  index,
-                  style,
-                }: ListChildComponentProps<ItemDataType>) => (
-                  <div
-                    style={{
-                      ...style,
-                      left: (style.left as number) + PADDING_SIZE,
-                      top: (style.top as number) + PADDING_SIZE,
-                      width: `calc(${style.width} - ${2 * PADDING_SIZE}px)`,
-                      height: (style.height as number) - PADDING_SIZE,
-                    }}
-                  >
-                    <DemoListRow
-                      demo={demos[index]}
-                      selected={selectedRows[index]}
-                      onClick={(event) => handleRowClick(event, index)}
-                    />
-                  </div>
-                )}
+                {Row}
               </FixedSizeList>
             </ScrollArea>
           )}
@@ -212,8 +189,35 @@ export default function DemoList({
         selectedDemoCount={selectedDemoCount}
         selectedFileSize={selectedFileSize}
         selectionMode={selectionMode}
-        toggleSelectionMode={() => setSelectionMode(!selectionMode)}
       />
     </div>
   );
 }
+
+const Row = memo(
+  ({
+    data: { demos, selectedRows, handleSelect },
+    index,
+    style,
+  }: ListChildComponentProps<ItemDataType>) => (
+    <div
+      style={{
+        ...style,
+        left: (style.left as number) + PADDING_SIZE,
+        top: (style.top as number) + PADDING_SIZE,
+        width: `calc(${style.width} - ${2 * PADDING_SIZE}px)`,
+        height: (style.height as number) - PADDING_SIZE,
+      }}
+    >
+      <DemoListRow
+        key={demos[index].path}
+        demo={demos[index]}
+        selected={selectedRows[index]}
+        onSelect={(event) => {
+          handleSelect(event, index);
+        }}
+      />
+    </div>
+  ),
+  areEqual
+);

@@ -30,8 +30,6 @@ type DemoListLoaderArgs = {
   reverse: boolean;
   filters: DemoFilter[];
   query: string;
-  scrollPos: number;
-  setScrollPos: (value: number) => void;
 };
 
 function ErrorBox({ error }: { error: string }) {
@@ -54,8 +52,6 @@ function DemoListLoader({
   reverse,
   filters,
   query,
-  scrollPos,
-  setScrollPos,
 }: DemoListLoaderArgs) {
   const [demos, setDemos] = useState<Demo[] | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -67,13 +63,7 @@ function DemoListLoader({
   }, [path, sortKey, reverse, filters, query]);
 
   if (demos !== null) {
-    return (
-      <DemoList
-        demos={demos}
-        scrollPos={scrollPos}
-        setScrollPos={setScrollPos}
-      />
-    );
+    return <DemoList demos={demos} />;
   } else if (error !== null) {
     return <ErrorBox error={error} />;
   } else {
@@ -85,12 +75,15 @@ export default () => {
   const { path: encodedPath } = useParams() as { path: Path };
   const path = atob(encodedPath);
 
-  const [locationState, setLocationState] = useLocationState({
-    query: "",
-    sortKey: "birthtime" as SortKey,
-    sortOrder: "descending" as SortOrder,
-    scrollPos: 0,
-  });
+  const [query, setQuery] = useLocationState("query", "");
+  const [sortKey, setSortKey] = useLocationState<SortKey>(
+    "sortKey",
+    "birthtime"
+  );
+  const [sortOrder, setSortOrder] = useLocationState<SortOrder>(
+    "sortOrder",
+    "descending"
+  );
 
   const filters: DemoFilter[] = [];
 
@@ -100,18 +93,18 @@ export default () => {
         <HeaderBar
           center={
             <SearchInput
-              query={locationState.query}
-              setQuery={setLocationState("query")}
+              query={query}
+              setQuery={setQuery}
               debounceInterval={500}
             />
           }
           right={
             <>
               <SortControl
-                sortKey={locationState.sortKey}
-                setSortKey={setLocationState("sortKey")}
-                sortOrder={locationState.sortOrder}
-                setSortOrder={setLocationState("sortOrder")}
+                sortKey={sortKey}
+                setSortKey={setSortKey}
+                sortOrder={sortOrder}
+                setSortOrder={setSortOrder}
               />
               <div style={{ margin: "auto" }} />
               <Menu
@@ -179,12 +172,10 @@ export default () => {
       <AppShell.Main>
         <DemoListLoader
           path={path}
-          sortKey={locationState.sortKey}
-          reverse={locationState.sortOrder === "descending"}
+          sortKey={sortKey}
+          reverse={sortOrder === "descending"}
           filters={filters}
-          query={locationState.query}
-          scrollPos={locationState.scrollPos}
-          setScrollPos={setLocationState("scrollPos")}
+          query={query}
         />
       </AppShell.Main>
     </AppShell>

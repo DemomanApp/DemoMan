@@ -23,6 +23,9 @@ export default function LocationOverlay() {
           <div className={classes.locationOverlayItem}>
             <b>Hash</b> {location.hash}
           </div>
+          <div className={classes.locationOverlayItem}>
+            <b>State</b> {JSON.stringify(location.state)}
+          </div>
         </div>
       )}
       <Outlet />

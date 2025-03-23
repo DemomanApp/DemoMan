@@ -1,4 +1,4 @@
-import { Suspense, useContext } from "react";
+import { Suspense, useContext, useState } from "react";
 import {
   Await,
   LoaderFunction,
@@ -48,7 +48,6 @@ import EventsList from "./EventsList";
 import { Demo, GameSummary } from "@/demo";
 import Highlights from "./Highlights";
 import DemoTagsInput from "./DemoTagsInput";
-import useLocationState from "@/hooks/useLocationState";
 import useStore from "@/hooks/useStore";
 import { openRenameDemoModal } from "@/modals/RenameDemoModal";
 import { RconContext } from "@/RconContext";
@@ -99,9 +98,7 @@ export default function DemoDetailsView() {
 
   const navigate = useNavigate();
 
-  const [locationState, setLocationState] = useLocationState({
-    currentTab: "players",
-  });
+  const [currentTab, setCurrentTab] = useState("players");
 
   const [rconPassword, _] = useStore("rconPassword");
 
@@ -222,10 +219,10 @@ export default function DemoDetailsView() {
                       <Await resolve={details} errorElement={<ErrorElement />}>
                         {(gameSummary: GameSummary) => (
                           <Tabs
-                            value={locationState.currentTab}
+                            value={currentTab}
                             onChange={(newTab) =>
                               // newTab cannot be null since `allowTabDeactivation` is not set on `Tabs`
-                              setLocationState("currentTab", newTab!)
+                              setCurrentTab(newTab!)
                             }
                             // These styles prevent tall tab panels (mainly the timeline tab)
                             // from overflowing. I want the panel to take up exactly

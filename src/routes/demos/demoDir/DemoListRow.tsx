@@ -1,8 +1,8 @@
-import { MouseEventHandler, memo } from "react";
 import { useNavigate } from "react-router";
 
 import {
   ActionIcon,
+  Checkbox,
   Group,
   HoverCard,
   Paper,
@@ -24,7 +24,6 @@ import {
   IconBookmarks,
   IconBookmark,
 } from "@tabler/icons-react";
-import { areEqual } from "react-window";
 
 import { formatDuration } from "@/util";
 import { Demo, isStvDemo } from "@/demo";
@@ -41,7 +40,7 @@ import classes from "./DemoListRow.module.css";
 type DemoListRowProps = {
   demo: Demo;
   selected: boolean;
-  onClick: MouseEventHandler<HTMLDivElement>;
+  onSelect: React.MouseEventHandler;
 };
 
 function HoverMenuItem({
@@ -51,14 +50,14 @@ function HoverMenuItem({
 }: {
   Icon: IconType;
   label: string;
-  onClick(): void;
+  onClick: React.MouseEventHandler;
 }) {
   return (
     <Tooltip label={label}>
       <ActionIcon
         onClick={(event: React.MouseEvent<HTMLButtonElement>) => {
-          onClick();
           event.stopPropagation();
+          onClick(event);
         }}
         variant="transparent"
         color="gray"
@@ -69,7 +68,11 @@ function HoverMenuItem({
   );
 }
 
-function DemoListRow({ demo, selected, onClick }: DemoListRowProps) {
+export default function DemoListRow({
+  demo,
+  selected,
+  onSelect,
+}: DemoListRowProps) {
   const navigate = useNavigate();
 
   // TODO: update the page without reloading
@@ -84,9 +87,21 @@ function DemoListRow({ demo, selected, onClick }: DemoListRowProps) {
       className={classes.paper}
       radius="md"
       shadow="xl"
-      onClick={onClick}
+      onClick={() => {
+        navigate(`../show/${btoa(demo.path)}`);
+      }}
       data-selected={selected}
     >
+      <div
+        className={classes.checkboxRoot}
+        data-checked={selected}
+        onClick={(event) => {
+          event.stopPropagation();
+          onSelect(event);
+        }}
+      >
+        <Checkbox.Indicator checked={selected} />
+      </div>
       <MapBox mapName={demo.mapName} />
       <div className={classes.content}>
         <Group gap="xs">
@@ -194,5 +209,3 @@ function DemoListRow({ demo, selected, onClick }: DemoListRowProps) {
     </Paper>
   );
 }
-
-export default memo(DemoListRow, areEqual);

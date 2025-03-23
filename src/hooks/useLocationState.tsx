@@ -1,36 +1,17 @@
 import { useLocation, useNavigate } from "react-router";
 
-type LocationStateSetter<T> = {
-  <K extends keyof T>(k: K, v: T[K]): void;
-  <K extends keyof T>(k: K): (v: T[K]) => void;
-};
-
-export default function useLocationState<T>(
-  defaults: T
-): readonly [T, LocationStateSetter<T>] {
+export default function useLocationState<T>(key: string, fallback: T) {
   const location = useLocation();
   const navigate = useNavigate();
 
-  function setLocationState<T, K extends keyof T>(key: K, value: T[K]): void;
-  function setLocationState<T, K extends keyof T>(
-    key: K
-  ): (value: T[K]) => void;
+  const state = ((location.state ?? {})[key] as T) ?? fallback;
 
-  function setLocationState<T, K extends keyof T>(key: K, value?: T[K]) {
-    if (value === undefined) {
-      return (value: T[K]) => {
-        const state = { ...location.state, [key]: value };
-
-        navigate(".", { state, replace: true });
-      };
-    } else {
-      const state = { ...location.state, [key]: value };
-
-      navigate(".", { state, replace: true });
-    }
+  function setState(newState: T) {
+    navigate(".", {
+      state: { ...location.state, [key]: newState },
+      replace: true,
+    });
   }
 
-  const state = { ...defaults, ...location.state };
-
-  return [state, setLocationState] as const;
+  return [state, setState] as const;
 }
