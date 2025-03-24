@@ -1,31 +1,18 @@
-import { useState } from "react";
-import { useNavigate } from "react-router";
-
-import * as log from "@tauri-apps/plugin-log";
+import { redirect } from "react-router";
 
 import { getFileArgument } from "@/api";
 
-export default () => {
+export async function loader() {
   // This is the first route the app loads.
   // TODO: Check the store first, then redirect to an
   //       appropriate destination (e.g. setup page if necessary)
 
-  const [fileArgument, setFileArgument] = useState<string | null | undefined>(
-    undefined
-  );
-
-  const navigate = useNavigate();
-
-  getFileArgument()
-    .then(setFileArgument)
-    .catch((e) => log.error(`failed to get file argument: ${e}`));
+  const fileArgument = await getFileArgument();
 
   if (fileArgument === null) {
-    navigate("/demos", { replace: true });
-  } else if (typeof fileArgument == "string") {
-    navigate("/demos", { replace: true });
-    navigate(`/demos/show/${btoa(fileArgument)}`);
+    return redirect("/demos");
+  } else {
+    history.replaceState(history.state, "", "/demos");
+    return redirect(`/demos/show/${btoa(fileArgument)}`);
   }
-
-  return null;
-};
+}

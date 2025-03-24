@@ -7,19 +7,27 @@ import DemoDetailsRoute, {
 } from "./demos/demoDetails";
 import SettingsView from "./settings";
 import RconSetup from "./rconSetup";
-import IndexRoute from "./IndexRoute";
+import { loader as indexLoader } from "./IndexRoute";
 import RootRoute from "./RootRoute";
 import RconConsole from "./rconConsole";
 import AboutRoute from "./AboutRoute";
+import { Center } from "@mantine/core";
+
+// Not really needed, but suppresses a warning
+function HydrateFallback() {
+  return <Center>Loading...</Center>;
+}
 
 export default createBrowserRouter([
   {
     path: "/",
     element: <RootRoute />,
+    HydrateFallback,
     children: [
       {
         index: true,
-        element: <IndexRoute />,
+        element: null,
+        loader: indexLoader,
       },
       {
         path: "demos",
