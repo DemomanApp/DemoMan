@@ -9,6 +9,8 @@ import { ModalsProvider } from "@mantine/modals";
 import "@mantine/core/styles.css";
 import "@mantine/dates/styles.css";
 
+import "@fontsource-variable/hanken-grotesk";
+
 import router from "./routes/router";
 import modals from "./modals";
 import { RconProvider } from "./RconContext";
