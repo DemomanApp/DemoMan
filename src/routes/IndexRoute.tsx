@@ -1,4 +1,4 @@
-import { redirect } from "react-router";
+import { redirect, replace } from "react-router";
 
 import { getFileArgument } from "@/api";
 
@@ -10,7 +10,7 @@ export async function loader() {
   const fileArgument = await getFileArgument();
 
   if (fileArgument === null) {
-    return redirect("/demos");
+    return replace("/demos");
   } else {
     history.replaceState(history.state, "", "/demos");
     return redirect(`/demos/show/${btoa(fileArgument)}`);
