@@ -5,7 +5,7 @@ import { NavigationProgress } from "@/components";
 
 import classes from "./RootRoute.module.css";
 
-export default function LocationOverlay() {
+export default function RootRoute() {
   const [enableLocationOverlay] = useStore("enableLocationOverlay");
   const location = useLocation();
 
