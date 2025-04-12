@@ -550,7 +550,7 @@ impl Players {
                 }
             }
         } else {
-            trace!("New player: {name} with {:?}", user_id);
+            trace!("New player: {name} with {user_id:?}");
 
             self.players.insert(
                 user_id,

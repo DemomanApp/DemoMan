@@ -119,7 +119,7 @@ export default function DemoList({ demos }: DemoListProps) {
       }
       setLastSelectedIndex(index);
     },
-    [navigate, selectionMode, demos, lastSelectedIndex]
+    [lastSelectedIndex]
   );
 
   const totalFileSize = useMemo(
