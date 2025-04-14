@@ -9,6 +9,7 @@ import {
 } from "react-router";
 
 import * as log from "@tauri-apps/plugin-log";
+import { revealItemInDir } from "@tauri-apps/plugin-opener";
 
 import {
   ActionIcon,
@@ -30,6 +31,7 @@ import {
   IconCalendarEvent,
   IconClock,
   IconFileAnalytics,
+  IconFolder,
   IconPencil,
   IconPlayerPlay,
   IconPlugX,
@@ -41,7 +43,13 @@ import {
 
 import { getDemo, getDemoDetails, sendRconCommand, setDemoTags } from "@/api";
 import { HeaderBar } from "@/AppShell";
-import { AsyncButton, MapThumbnail, LoaderFallback, Fill } from "@/components";
+import {
+  AsyncButton,
+  MapThumbnail,
+  LoaderFallback,
+  Fill,
+  HeaderButton,
+} from "@/components";
 import { formatFileSize, formatDuration, decodeParam } from "@/util";
 import PlayerList from "./PlayerList";
 import EventsList from "./EventsList";
@@ -110,13 +118,24 @@ export default function DemoDetailsView() {
         <HeaderBar
           center={<DemoTitle demo={demo} />}
           right={
-            <DemoTagsInput
-              tags={demo.tags}
-              setTags={(tags: string[]) => {
-                setDemoTags(demo.path, tags);
-                navigate(0);
-              }}
-            />
+            <>
+              <Tooltip label="Show in explorer">
+                <HeaderButton
+                  onClick={() => {
+                    revealItemInDir(demo.path).catch(log.error);
+                  }}
+                >
+                  <IconFolder />
+                </HeaderButton>
+              </Tooltip>
+              <DemoTagsInput
+                tags={demo.tags}
+                setTags={(tags: string[]) => {
+                  setDemoTags(demo.path, tags);
+                  navigate(0);
+                }}
+              />
+            </>
           }
         />
       </AppShell.Header>

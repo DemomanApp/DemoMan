@@ -23,7 +23,11 @@ import {
   IconClockPlay,
   IconBookmarks,
   IconBookmark,
+  IconFolder,
 } from "@tabler/icons-react";
+
+import { revealItemInDir } from "@tauri-apps/plugin-opener";
+import * as log from "@tauri-apps/plugin-log";
 
 import { formatDuration } from "@/util";
 import { Demo, isStvDemo } from "@/demo";
@@ -204,6 +208,11 @@ export default function DemoListRow({
           onClick={() =>
             sendRconCommand(`playdemo "${demo.path}"`, rconPassword)
           }
+        />
+        <HoverMenuItem
+          Icon={IconFolder}
+          label="Show in explorer"
+          onClick={() => revealItemInDir(demo.path).catch(log.error)}
         />
       </Paper>
     </Paper>

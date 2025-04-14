@@ -7,6 +7,7 @@ import {
   Combobox,
   Group,
   Indicator,
+  Tooltip,
   useCombobox,
 } from "@mantine/core";
 import { IconTag } from "@tabler/icons-react";
@@ -85,9 +86,11 @@ export default function DemoTagsInput({ tags, setTags }: Props) {
             offset={10}
             size={16}
           >
-            <HeaderButton onClick={() => combobox.toggleDropdown()}>
-              <IconTag />
-            </HeaderButton>
+            <Tooltip label="Tags">
+              <HeaderButton onClick={() => combobox.toggleDropdown()}>
+                <IconTag />
+              </HeaderButton>
+            </Tooltip>
           </Indicator>
         </Combobox.Target>
 
