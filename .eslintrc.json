@@ -39,6 +39,12 @@
     "@typescript-eslint/no-unused-vars": [
       "warn",
       { "argsIgnorePattern": "^_", "varsIgnorePattern": "^_" }
+    ],
+    "promise/catch-or-return": [
+      "error",
+      {
+        "allowFinally": true
+      }
     ]
   },
   "ignorePatterns": ["vite.config.ts"],
