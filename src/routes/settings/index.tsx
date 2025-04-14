@@ -47,24 +47,24 @@ export default function SettingsView() {
           <Container size="xs" pt="md">
             <Stack>
                 <Group align="end" className={classes.rconPasswordRow}>
-                <TextInput
-                  label="RCON Password"
-                  description="Set or generate your own RCON password"
-                  placeholder="RCON Password"
-                  value={rconPassword !== null && rconPassword !== undefined ? rconPassword : ""}
-                  onChange={(e) => setRconPassword(e.currentTarget.value)}
-                  type="text"
-                  className={classes.rconPasswordInput}
-                />
-                <Tooltip label="Generate random password">
-                  <Button
-                  variant="default"
-                  onClick={generatePassword}
-                  leftSection={<IconRefresh size={16} />}
-                  >
-                  Generate
-                  </Button>
-                </Tooltip>
+                  <TextInput
+                    label="RCON Password"
+                    description="Set or generate your own RCON password"
+                    placeholder="RCON Password"
+                    value={rconPassword ?? ""}
+                    onChange={(e) => setRconPassword(e.currentTarget.value)}
+                    type="text"
+                    className={classes.rconPasswordInput}
+                  />
+                  <Tooltip label="Generate random password">
+                    <Button
+                      variant="default"
+                      onClick={generatePassword}
+                      leftSection={<IconRefresh size={16} />}
+                    >
+                      Generate
+                    </Button>
+                  </Tooltip>
                 </Group>
               <BooleanSetting
                 name="Skip trash"
