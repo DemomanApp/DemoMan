@@ -11,12 +11,13 @@ import {
   Tooltip,
 } from "@mantine/core";
 import { IconRefresh } from "@tabler/icons-react";
-import useStore from "@/hooks/useStore";
-import classes from "./settings.module.css";
 
+import useStore from "@/hooks/useStore";
 import BooleanSetting from "./BooleanSetting";
 import DemoDirsSetting from "./DemoDirsSetting";
 import { HeaderBar } from "@/AppShell";
+
+import classes from "./settings.module.css";
 
 export default function SettingsView() {
   const [rconPassword, setRconPassword] = useStore("rconPassword");
