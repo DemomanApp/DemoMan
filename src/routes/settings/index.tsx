@@ -5,13 +5,26 @@ import {
   ScrollArea,
   Stack,
   Text,
+  Group,
+  TextInput,
+  Button,
+  Tooltip,
 } from "@mantine/core";
+import { IconRefresh } from "@tabler/icons-react";
+import useStore from "@/hooks/useStore";
+import classes from "./settings.module.css";
 
 import BooleanSetting from "./BooleanSetting";
 import DemoDirsSetting from "./DemoDirsSetting";
 import { HeaderBar } from "@/AppShell";
 
 export default function SettingsView() {
+  const [rconPassword, setRconPassword] = useStore("rconPassword");
+
+  function generatePassword() {
+    setRconPassword(btoa(Math.random().toString()).substring(10, 20));
+  }
+
   return (
     <AppShell header={{ height: 50 }}>
       <AppShell.Header>
@@ -33,6 +46,26 @@ export default function SettingsView() {
         <ScrollArea h="100%">
           <Container size="xs" pt="md">
             <Stack>
+                <Group align="end" className={classes.rconPasswordRow}>
+                <TextInput
+                  label="RCON Password"
+                  description="Set or generate your own RCON password"
+                  placeholder="RCON Password"
+                  value={rconPassword !== null && rconPassword !== undefined ? rconPassword : ""}
+                  onChange={(e) => setRconPassword(e.currentTarget.value)}
+                  type="text"
+                  className={classes.rconPasswordInput}
+                />
+                <Tooltip label="Generate random password">
+                  <Button
+                  variant="default"
+                  onClick={generatePassword}
+                  leftSection={<IconRefresh size={16} />}
+                  >
+                  Generate
+                  </Button>
+                </Tooltip>
+                </Group>
               <BooleanSetting
                 name="Skip trash"
                 description="Delete demos permanently instead of moving them to trash"
