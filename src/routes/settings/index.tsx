@@ -47,26 +47,26 @@ export default function SettingsView() {
         <ScrollArea h="100%">
           <Container size="xs" pt="md">
             <Stack>
-                <Group align="end" className={classes.rconPasswordRow}>
-                  <TextInput
-                    label="RCON Password"
-                    description="Set or generate your own RCON password"
-                    placeholder="RCON Password"
-                    value={rconPassword ?? ""}
-                    onChange={(e) => setRconPassword(e.currentTarget.value)}
-                    type="text"
-                    className={classes.rconPasswordInput}
-                  />
-                  <Tooltip label="Generate random password">
-                    <Button
-                      variant="default"
-                      onClick={generatePassword}
-                      leftSection={<IconRefresh size={16} />}
-                    >
-                      Generate
-                    </Button>
-                  </Tooltip>
-                </Group>
+              <Group align="end" className={classes.rconPasswordRow}>
+                <TextInput
+                  label="RCON Password"
+                  description="Set or generate your own RCON password"
+                  placeholder="RCON Password"
+                  value={rconPassword ?? ""}
+                  onChange={(e) => setRconPassword(e.currentTarget.value)}
+                  type="text"
+                  className={classes.rconPasswordInput}
+                />
+                <Tooltip label="Generate random password">
+                  <Button
+                    variant="default"
+                    onClick={generatePassword}
+                    leftSection={<IconRefresh size={16} />}
+                  >
+                    Generate
+                  </Button>
+                </Tooltip>
+              </Group>
               <BooleanSetting
                 name="Skip trash"
                 description="Delete demos permanently instead of moving them to trash"
