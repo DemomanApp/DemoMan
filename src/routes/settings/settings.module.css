@@ -37,3 +37,14 @@
     }
   }
 }
+
+.rconPasswordRow {
+  width: 100%;
+  display: flex;
+  gap: var(--mantine-spacing-sm);
+}
+
+.rconPasswordInput {
+  flex-grow: 1;
+  align-items: center;
+}
