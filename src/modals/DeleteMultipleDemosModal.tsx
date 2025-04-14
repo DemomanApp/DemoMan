@@ -1,3 +1,5 @@
+import * as log from "@tauri-apps/plugin-log";
+
 import { ContextModalProps, modals } from "@mantine/modals";
 import { Button, Group, Stack } from "@mantine/core";
 
@@ -5,38 +7,39 @@ import { Demo } from "@/demo";
 import { deleteDemo } from "@/api";
 import useStore from "@/hooks/useStore";
 
-export async function openDeleteDemoModal(demo: Demo, onConfirm: () => void) {
+export async function openDeleteMultipleDemosModal(
+  demos: Demo[],
+  onConfirm: () => void
+) {
   modals.openContextModal({
-    modal: "delete_demo",
-    title: `Delete ${demo.name}`,
+    modal: "delete_multiple_demos",
+    title: `Delete ${demos.length} demos`,
     centered: true,
     innerProps: {
-      demo,
+      demos,
       onConfirm,
     },
   });
 }
 
-type DeleteDemoModalProps = { demo: Demo; onConfirm(): void };
+type DeleteMultipleDemosModalProps = { demos: Demo[]; onConfirm(): void };
 
-export const DeleteDemoModal = ({
+export const DeleteMultipleDemosModal = ({
   context,
   id,
-  innerProps: { demo, onConfirm },
-}: ContextModalProps<DeleteDemoModalProps>) => {
+  innerProps: { demos, onConfirm },
+}: ContextModalProps<DeleteMultipleDemosModalProps>) => {
   const [skipTrash, _] = useStore("skipTrash");
 
-  const handleDelete = async () => {
-    await deleteDemo(demo.path, !skipTrash);
-
-    onConfirm();
+  const handleDelete = () => {
+    Promise.all(demos.map((demo) => deleteDemo(demo.path, !skipTrash)))
+      .catch(log.error)
+      .finally(onConfirm);
   };
 
   return (
     <Stack gap="xs">
-      <div>
-        You are about to delete the demo &quot;{demo.name}&quot;. Are you sure?
-      </div>
+      <div>You are about to delete {demos.length} demos. Are you sure?</div>
       <Group gap="xs" justify="end">
         <Button variant="default" onClick={() => context.closeModal(id)}>
           Cancel

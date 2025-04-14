@@ -10,6 +10,7 @@ import {
 import AutoSizer from "react-virtualized-auto-sizer";
 import { FixedSizeList, ListChildComponentProps, areEqual } from "react-window";
 import memoize from "memoize-one";
+import { useNavigate } from "react-router";
 
 import { useDebouncedCallback } from "@mantine/hooks";
 import { ScrollArea } from "@mantine/core";
@@ -18,6 +19,7 @@ import { Demo } from "@/demo";
 import DemoListRow from "./DemoListRow";
 import BottomBar from "./BottomBar";
 import useLocationRef from "@/hooks/useLocationRef";
+import { openDeleteMultipleDemosModal } from "@/modals/DeleteMultipleDemosModal";
 
 const PADDING_SIZE = 16;
 
@@ -65,6 +67,10 @@ type DemoListProps = {
 
 export default function DemoList({ demos }: DemoListProps) {
   const listRef = useRef<FixedSizeList>(null);
+
+  // TODO: update the page without reloading
+  const navigate = useNavigate();
+  const reloadPage = () => navigate(0);
 
   const [scrollPos, setScrollPos] = useLocationRef("scrollPos", 0);
 
@@ -119,6 +125,19 @@ export default function DemoList({ demos }: DemoListProps) {
     },
     [lastSelectedIndex]
   );
+
+  const handleDeselectAll = () => {
+    setSelectedRows(Array(demos.length).fill(false));
+  };
+
+  const handleDeleteSelected = () => {
+    const demosToDelete = selectedRows
+      .map((selected, index) => [selected, index] as const)
+      .filter(([selected, _index]) => selected)
+      .map(([_selected, index]) => demos[index]);
+
+    openDeleteMultipleDemosModal(demosToDelete, reloadPage);
+  };
 
   const totalFileSize = useMemo(
     () => demos.reduce((total, demo) => total + demo.filesize, 0),
@@ -187,6 +206,8 @@ export default function DemoList({ demos }: DemoListProps) {
         selectedDemoCount={selectedDemoCount}
         selectedFileSize={selectedFileSize}
         selectionMode={selectionMode}
+        handleDeselectAll={handleDeselectAll}
+        handleDeleteSelected={handleDeleteSelected}
       />
     </div>
   );

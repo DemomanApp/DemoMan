@@ -16,9 +16,5 @@
 }
 
 .icon {
-  color: var(--mantine-color-text);
-}
-
-.icon[data-selection-mode="true"] {
   color: var(--mantine-color-white);
 }
