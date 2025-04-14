@@ -7,7 +7,6 @@ import {
   forwardRef,
   memo,
 } from "react";
-import { useNavigate } from "react-router";
 import AutoSizer from "react-virtualized-auto-sizer";
 import { FixedSizeList, ListChildComponentProps, areEqual } from "react-window";
 import memoize from "memoize-one";
@@ -65,7 +64,6 @@ type DemoListProps = {
 };
 
 export default function DemoList({ demos }: DemoListProps) {
-  const navigate = useNavigate();
   const listRef = useRef<FixedSizeList>(null);
 
   const [scrollPos, setScrollPos] = useLocationRef("scrollPos", 0);
