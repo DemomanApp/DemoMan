@@ -24,6 +24,7 @@
 .demo-dir {
   border-radius: var(--mantine-radius-md);
   padding: var(--mantine-spacing-xs);
+  position: relative;
 
   & .demo-dir-action {
     visibility: hidden;
@@ -38,6 +39,15 @@
   }
 }
 
+.demo-dir-actions {
+  visibility: hidden;
+  display: flex;
+}
+
+.demo-dir:hover .demo-dir-actions {
+  visibility: visible;
+}
+
 .rcon-password-row {
   width: 100%;
   display: flex;
@@ -46,4 +56,8 @@
 
 .rcon-password-input {
   flex-grow: 1;
+}
+
+.show-multi-dir-toggle {
+  margin-top: var(--mantine-spacing-md);
 }

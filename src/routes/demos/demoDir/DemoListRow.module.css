@@ -87,3 +87,12 @@
     background-color: var(--mantine-primary-color-filled);
   }
 }
+
+.dir-label-overlay {
+  position: absolute;
+  right: 12px;
+  bottom: 8px;
+  display: flex;
+  color: var(--mantine-color-white);
+  padding: 2px 8px;
+}

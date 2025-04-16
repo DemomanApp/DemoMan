@@ -6,6 +6,7 @@ export type StoreSchema = {
   rconPassword: string;
   enableLocationOverlay: boolean;
   skipTrash: boolean;
+  showMultipleDemoDirs: boolean; // NEW: setting for showing multiple demo dirs
 };
 
 export function storeDefault<K extends keyof StoreSchema>(
@@ -18,6 +19,7 @@ export function storeDefault<K extends keyof StoreSchema>(
     rconPassword: () => btoa(Math.random().toString()).substring(10, 20),
     enableLocationOverlay: false,
     skipTrash: false,
+    showMultipleDemoDirs: false, // NEW: default to single folder mode
   };
 
   const defaultValue = storeDefaults[key];

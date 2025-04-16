@@ -63,9 +63,10 @@ const createItemData = memoize(
 
 type DemoListProps = {
   demos: Demo[];
+  showDirectoryLabel?: boolean;
 };
 
-export default function DemoList({ demos }: DemoListProps) {
+export default function DemoList({ demos, showDirectoryLabel }: DemoListProps) {
   const listRef = useRef<FixedSizeList>(null);
 
   // TODO: update the page without reloading
@@ -190,7 +191,7 @@ export default function DemoList({ demos }: DemoListProps) {
                 style={{ overflow: "visible" }}
                 itemCount={demos.length}
                 itemSize={120 + PADDING_SIZE}
-                itemData={itemData}
+                itemData={{ ...itemData, showDirectoryLabel }}
                 innerElementType={innerElementType}
                 ref={listRef}
               >
@@ -215,10 +216,10 @@ export default function DemoList({ demos }: DemoListProps) {
 
 const Row = memo(
   ({
-    data: { demos, selectedRows, handleSelect },
+    data: { demos, selectedRows, handleSelect, showDirectoryLabel },
     index,
     style,
-  }: ListChildComponentProps<ItemDataType>) => (
+  }: ListChildComponentProps<ItemDataType & { showDirectoryLabel?: boolean }>) => (
     <div
       style={{
         ...style,
@@ -235,6 +236,7 @@ const Row = memo(
         onSelect={(event) => {
           handleSelect(event, index);
         }}
+        showDirectoryLabel={showDirectoryLabel}
       />
     </div>
   ),

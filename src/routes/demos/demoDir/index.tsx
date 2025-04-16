@@ -23,6 +23,7 @@ import { SortControl } from "./SortControl";
 import { Path } from "@/store";
 import { HeaderButton, Fill, LoaderFallback } from "@/components";
 import useLocationState from "@/hooks/useLocationState";
+import useStore from "@/hooks/useStore";
 
 type DemoListLoaderArgs = {
   path: string;
@@ -53,17 +54,81 @@ function DemoListLoader({
   filters,
   query,
 }: DemoListLoaderArgs) {
+  const [demoDirs] = useStore("demoDirs");
+  const [showMultipleDemoDirs] = useStore("showMultipleDemoDirs");
   const [demos, setDemos] = useState<Demo[] | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    getDemosInDirectory(path, sortKey, reverse, filters, query)
-      .then(setDemos)
-      .catch(setError);
-  }, [path, sortKey, reverse, filters, query]);
+    // Map sortKey to actual Demo property
+    function getSortValue(demo: Demo, sortKey: string) {
+      switch (sortKey) {
+        case "birthtime":
+          return demo.birthtime;
+        case "file_size":
+          return demo.filesize;
+        case "name":
+          return demo.name;
+        case "map_name":
+          return demo.mapName;
+        case "event_count":
+          return demo.events?.length ?? 0;
+        case "playback_time":
+          return demo.playbackTime;
+        default:
+          return undefined;
+      }
+    }
+
+    if (showMultipleDemoDirs) {
+      Promise.all(
+        Object.entries(demoDirs).map(async ([dirPath, label]) => {
+          try {
+            const demos = await getDemosInDirectory(dirPath, sortKey, reverse, filters, query);
+            return demos.map((demo: Demo) => ({ ...demo, _demoDirLabel: label, _demoDirPath: dirPath }));
+          } catch (e) {
+            setError(e instanceof Error ? e.message : String(e));
+            return [];
+          }
+        })
+      )
+        .then((results) => {
+          const allDemos = results.flat();
+          allDemos.sort((a, b) => {
+            const aVal = getSortValue(a, sortKey);
+            const bVal = getSortValue(b, sortKey);
+            // Handle undefined/null
+            if (aVal == null && bVal == null) return 0;
+            if (aVal == null) return reverse ? 1 : -1;
+            if (bVal == null) return reverse ? -1 : 1;
+            // Compare
+            if (typeof aVal === "string" && typeof bVal === "string") {
+              return reverse ? bVal.localeCompare(aVal) : aVal.localeCompare(bVal);
+            }
+            if (typeof aVal === "number" && typeof bVal === "number") {
+              return reverse ? bVal - aVal : aVal - bVal;
+            }
+            // Fallback to string compare
+            return reverse
+              ? String(bVal).localeCompare(String(aVal))
+              : String(aVal).localeCompare(String(bVal));
+          });
+          setDemos(allDemos);
+          return undefined; // Ensure a value is returned
+        })
+        .catch((e) => {
+          setError(e instanceof Error ? e.message : String(e));
+          return undefined; // Ensure a value is returned
+        });
+    } else {
+      getDemosInDirectory(path, sortKey, reverse, filters, query)
+        .then((demos) => setDemos(demos))
+        .catch((e) => setError(e instanceof Error ? e.message : String(e)));
+    }
+  }, [path, sortKey, reverse, filters, query, showMultipleDemoDirs, demoDirs]);
 
   if (demos !== null) {
-    return <DemoList demos={demos} />;
+    return <DemoList demos={demos} showDirectoryLabel={showMultipleDemoDirs} />;
   } else if (error !== null) {
     return <ErrorBox error={error} />;
   } else {
@@ -106,7 +171,7 @@ export default () => {
                 sortOrder={sortOrder}
                 setSortOrder={setSortOrder}
               />
-              <div style={{ margin: "auto" }} />
+              <div className="autoMargin" />
               <Menu
                 shadow="md"
                 position="bottom-end"

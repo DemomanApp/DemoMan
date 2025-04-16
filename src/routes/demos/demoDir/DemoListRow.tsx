@@ -45,7 +45,14 @@ type DemoListRowProps = {
   demo: Demo;
   selected: boolean;
   onSelect: React.MouseEventHandler;
+  showDirectoryLabel?: boolean;
 };
+
+// Extend Demo type for UI use to allow _demoDirLabel and _demoDirPath
+interface DemoWithDirLabel extends Demo {
+  _demoDirLabel?: string;
+  _demoDirPath?: string;
+}
 
 function HoverMenuItem({
   Icon,
@@ -76,6 +83,7 @@ export default function DemoListRow({
   demo,
   selected,
   onSelect,
+  showDirectoryLabel,
 }: DemoListRowProps) {
   const navigate = useNavigate();
 
@@ -85,6 +93,9 @@ export default function DemoListRow({
   const [rconPassword, _] = useStore("rconPassword");
 
   const birthtime = new Date(demo.birthtime * 1000);
+
+  // Use type assertion for extra fields
+  const demoWithDir = demo as DemoWithDirLabel;
 
   return (
     <Paper
@@ -119,6 +130,7 @@ export default function DemoListRow({
           )}
           <Badges items={demo.tags} max={3} />
         </Group>
+        {/* Directory label moved to bottom right overlay */}
         {!isStvDemo(demo) && (
           <Group gap={4}>
             <IconUser />
@@ -191,6 +203,13 @@ export default function DemoListRow({
           </HoverCard>
         )}
       </div>
+      {/* Directory label overlay at bottom right */}
+      {showDirectoryLabel === true && Boolean(demoWithDir._demoDirLabel) && (
+        <div className={classes.dirLabelOverlay}>
+          <IconFolder size={16} style={{ marginRight: 4 }} />
+          <Text c="dimmed" size="sm">{demoWithDir._demoDirLabel}</Text>
+        </div>
+      )}
       <Paper shadow="xl" withBorder className={classes.menu}>
         <HoverMenuItem
           Icon={IconTrash}
