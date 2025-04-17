@@ -11,8 +11,8 @@ export async function loader() {
 
   if (fileArgument === null) {
     return replace("/demos");
-  } else {
-    history.replaceState(history.state, "", "/demos");
-    return redirect(`/demos/show/${btoa(fileArgument)}`);
   }
+
+  history.replaceState(history.state, "", "/demos");
+  return redirect(`/demos/show/${btoa(fileArgument)}`);
 }

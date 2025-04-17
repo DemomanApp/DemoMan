@@ -1,7 +1,7 @@
+import { Text, useMantineColorScheme } from "@mantine/core";
+
 import KillStreakIcon from "@/assets/kill_icons/killstreak_icon.png";
 import KillStreakIconNeg from "@/assets/kill_icons/killstreak_icon_neg.png";
-
-import { Text, useMantineColorScheme } from "@mantine/core";
 
 export type KillstreakIconProps = {
   streak: number;
@@ -36,8 +36,5 @@ export default function KillstreakIcon({ streak }: KillstreakIconProps) {
         />
       </span>
     );
-  } else {
-    // No streak, render nothing
-    return <></>;
   }
 }

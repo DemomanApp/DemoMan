@@ -38,9 +38,9 @@ function involvedPlayers(
     case "Kill":
       if (highlight.assister !== null) {
         return [highlight.assister, highlight.killer, highlight.victim];
-      } else {
-        return [highlight.killer, highlight.victim];
       }
+      return [highlight.killer, highlight.victim];
+
     case "KillStreak":
       return [highlight.player];
     case "KillStreakEnded":
@@ -73,9 +73,8 @@ function doesHighlightIncludePlayer(
 
   if (players.length === 0) {
     return true;
-  } else {
-    return players.some((player) => samePlayer(playerId, player, aliases));
   }
+  return players.some((player) => samePlayer(playerId, player, aliases));
 }
 
 function visibleHighlightTypes(filters: Filters): HighlightType[] {
@@ -145,9 +144,8 @@ function filterHighlights(
           highlight.sender.name.toLowerCase().includes(query) ||
           highlight.text.toLowerCase().includes(query)
         );
-      } else {
-        return true;
       }
+      return true;
     });
   }
 

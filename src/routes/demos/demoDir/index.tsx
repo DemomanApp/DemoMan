@@ -64,11 +64,11 @@ function DemoListLoader({
 
   if (demos !== null) {
     return <DemoList demos={demos} />;
-  } else if (error !== null) {
-    return <ErrorBox error={error} />;
-  } else {
-    return <LoaderFallback />;
   }
+  if (error !== null) {
+    return <ErrorBox error={error} />;
+  }
+  return <LoaderFallback />;
 }
 
 export default () => {
