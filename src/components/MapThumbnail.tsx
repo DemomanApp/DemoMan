@@ -42,5 +42,11 @@ export default memo(function MapThumbnail({
   if (thumbnail === undefined) {
     return <div className={className}>{fallback}</div>;
   }
-  return <img src={thumbnail} className={className} />;
+  return (
+    <img
+      src={thumbnail}
+      className={className}
+      alt={`map thumbnail of ${mapName}`}
+    />
+  );
 });
