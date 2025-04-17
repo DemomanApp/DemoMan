@@ -103,7 +103,10 @@ export default function RconConsole() {
               {({ height, width }) => (
                 <ScrollArea style={{ width, height }} viewportRef={viewport}>
                   {history.map((historyEntry, idx) => (
-                    <HistoryRow historyEntry={historyEntry} key={idx} />
+                    <HistoryRow
+                      historyEntry={historyEntry}
+                      key={`${idx}${historyEntry.kind}${historyEntry.value}`}
+                    />
                   ))}
                 </ScrollArea>
               )}

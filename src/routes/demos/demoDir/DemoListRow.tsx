@@ -166,7 +166,12 @@ export default function DemoListRow({
               >
                 <Stack align="stretch" gap={0}>
                   {demo.events.map((event, idx) => (
-                    <Group key={idx} align="center" justify="left" gap={0}>
+                    <Group
+                      key={`${idx}${event.tick}`}
+                      align="center"
+                      justify="left"
+                      gap={0}
+                    >
                       {event.name === "Bookmark" ? (
                         <IconBookmark />
                       ) : (
