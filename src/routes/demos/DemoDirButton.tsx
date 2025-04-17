@@ -3,7 +3,7 @@ import { Link } from "react-router";
 import { Text, UnstyledButton } from "@mantine/core";
 
 import classes from "./DemoDirButton.module.css";
-import { Label, Path } from "@/store";
+import type { Label, Path } from "@/store";
 
 export default function DemoDirButton({
   path,

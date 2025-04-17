@@ -5,7 +5,7 @@ import { open } from "@tauri-apps/plugin-shell";
 import { ActionIcon, Tabs, Title, Tooltip } from "@mantine/core";
 import { IconBrandSteam } from "@tabler/icons-react";
 
-import { GameSummary, PlayerSummary, Scoreboard } from "@/demo";
+import type { GameSummary, PlayerSummary, Scoreboard } from "@/demo";
 import { ScoreboardTable } from "./ScoreboardTable";
 import ClassPlaytimeIndicator from "./ClassPlaytimeIndicator";
 
@@ -22,7 +22,7 @@ export function PlayerDetails({ player, gameSummary }: PlayerDetailsProps) {
   const scoreboard: Scoreboard | undefined =
     currentTab === "match"
       ? player.scoreboard
-      : player.round_scoreboards[parseInt(currentTab, 10)];
+      : player.round_scoreboards[Number.parseInt(currentTab, 10)];
 
   if (scoreboard === undefined) {
     setCurrentTab("match");

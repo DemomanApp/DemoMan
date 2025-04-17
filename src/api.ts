@@ -1,6 +1,6 @@
 import { invoke } from "@tauri-apps/api/core";
 
-import { Demo, DemoEvent, DemoFilter, GameSummary, SortKey } from "./demo";
+import type { Demo, DemoEvent, DemoFilter, GameSummary, SortKey } from "./demo";
 
 export async function getDemosInDirectory(
   dirPath: string,

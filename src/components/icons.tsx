@@ -1,6 +1,6 @@
-import { SVGProps } from "react";
+import type { SVGProps } from "react";
 
-import { Icon, TablerIconsProps } from "@tabler/icons-react";
+import type { Icon, TablerIconsProps } from "@tabler/icons-react";
 
 function svgProps(
   { color, size, stroke, ...other }: TablerIconsProps,

@@ -18,7 +18,7 @@ import {
 } from "@mantine/core";
 import { modals } from "@mantine/modals";
 
-import { Demo, DemoEvent } from "@/demo";
+import type { Demo, DemoEvent } from "@/demo";
 
 import classes from "./EventsList.module.css";
 import { IconKillstreak } from "@/components/icons";

@@ -5,7 +5,7 @@ import {
   Anchor,
   Button,
   Indicator,
-  IndicatorProps,
+  type IndicatorProps,
   Popover,
   Stack,
   Text,
@@ -13,7 +13,7 @@ import {
 import { IconHelp, IconPlug, IconTool } from "@tabler/icons-react";
 
 import { HeaderButton } from ".";
-import { RconContext, RconState } from "@/RconContext";
+import { RconContext, type RconState } from "@/RconContext";
 
 function helpText(rconState: RconState) {
   switch (rconState.status) {

@@ -1,5 +1,5 @@
-import { Button, ButtonProps } from "@mantine/core";
-import { ComponentPropsWithoutRef, forwardRef } from "react";
+import { Button, type ButtonProps } from "@mantine/core";
+import { type ComponentPropsWithoutRef, forwardRef } from "react";
 import { useAsyncCallback } from "react-async-hook";
 
 export type AsyncButtonProps = {

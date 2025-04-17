@@ -13,7 +13,7 @@ import {
   Tooltip,
 } from "@mantine/core";
 import {
-  Icon as IconType,
+  type Icon as IconType,
   IconCalendarEvent,
   IconDeviceTv,
   IconPencil,
@@ -30,7 +30,7 @@ import { revealItemInDir } from "@tauri-apps/plugin-opener";
 import * as log from "@tauri-apps/plugin-log";
 
 import { formatDuration } from "@/util";
-import { Demo, isStvDemo } from "@/demo";
+import { type Demo, isStvDemo } from "@/demo";
 import { IconKillstreak } from "@/components/icons";
 import { openRenameDemoModal } from "@/modals/RenameDemoModal";
 import { openDeleteDemoModal } from "@/modals/DeleteDemoModal";

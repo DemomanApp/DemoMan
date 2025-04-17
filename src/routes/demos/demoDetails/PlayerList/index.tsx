@@ -2,7 +2,7 @@ import { useState } from "react";
 
 import { Paper } from "@mantine/core";
 
-import { GameSummary, PlayerSummary } from "@/demo";
+import type { GameSummary, PlayerSummary } from "@/demo";
 import { PlayerTable } from "./PlayerTable";
 import { PlayerDetails } from "./PlayerDetails";
 

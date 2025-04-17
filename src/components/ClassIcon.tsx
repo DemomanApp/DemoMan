@@ -7,7 +7,7 @@ import HeavyIcon from "@/assets/class_icons/heavy.png";
 import PyroIcon from "@/assets/class_icons/pyro.png";
 import SpyIcon from "@/assets/class_icons/spy.png";
 import EngineerIcon from "@/assets/class_icons/engineer.png";
-import { Class, stringifyClass } from "@/demo";
+import { type Class, stringifyClass } from "@/demo";
 
 /*
   Class mapping:

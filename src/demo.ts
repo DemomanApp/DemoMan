@@ -21,15 +21,15 @@ export type Demo = {
 export type Team = "red" | "blue" | "spectator" | "other";
 
 export enum Class {
-  Scout,
-  Sniper,
-  Soldier,
-  Demoman,
-  Medic,
-  Heavy,
-  Pyro,
-  Spy,
-  Engineer,
+  Scout = 0,
+  Sniper = 1,
+  Soldier = 2,
+  Demoman = 3,
+  Medic = 4,
+  Heavy = 5,
+  Pyro = 6,
+  Spy = 7,
+  Engineer = 8,
 }
 
 export function stringifyClass(cls: Class) {

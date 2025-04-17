@@ -1,9 +1,9 @@
-import { ReactNode, useMemo } from "react";
+import { type ReactNode, useMemo } from "react";
 
 import AutoSizer from "react-virtualized-auto-sizer";
 import { Anchor, ScrollArea, Text } from "@mantine/core";
 
-import { GameSummary, PlayerSummary, primaryTeam } from "@/demo";
+import { type GameSummary, type PlayerSummary, primaryTeam } from "@/demo";
 import { PlayerBox } from "./PlayerBox";
 import { TableHeader } from "./TableHeader";
 

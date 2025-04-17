@@ -14,13 +14,13 @@ import {
   IconInfoCircle,
 } from "@tabler/icons-react";
 
-import { Demo, DemoFilter, SortKey, SortOrder } from "@/demo";
+import type { Demo, DemoFilter, SortKey, SortOrder } from "@/demo";
 import { HeaderBar } from "@/AppShell";
 import { getDemosInDirectory } from "@/api";
 import DemoList from "./DemoList";
 import SearchInput from "./SearchInput";
 import { SortControl } from "./SortControl";
-import { Path } from "@/store";
+import type { Path } from "@/store";
 import { HeaderButton, Fill, LoaderFallback } from "@/components";
 import useLocationState from "@/hooks/useLocationState";
 

@@ -1,6 +1,6 @@
 import { Checkbox, MultiSelect, TextInput } from "@mantine/core";
 
-import { GameSummary } from "@/demo";
+import type { GameSummary } from "@/demo";
 
 import classes from "./TimelineFilters.module.css";
 
