@@ -8,14 +8,14 @@ import {
   memo,
 } from "react";
 import AutoSizer from "react-virtualized-auto-sizer";
-import { FixedSizeList, ListChildComponentProps, areEqual } from "react-window";
+import { FixedSizeList, type ListChildComponentProps, areEqual } from "react-window";
 import memoize from "memoize-one";
 import { useNavigate } from "react-router";
 
 import { useDebouncedCallback } from "@mantine/hooks";
 import { ScrollArea } from "@mantine/core";
 
-import { Demo } from "@/demo";
+import type { Demo } from "@/demo";
 import DemoListRow from "./DemoListRow";
 import BottomBar from "./BottomBar";
 import useLocationRef from "@/hooks/useLocationRef";

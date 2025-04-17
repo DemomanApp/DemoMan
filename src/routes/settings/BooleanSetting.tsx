@@ -1,7 +1,7 @@
 import { Switch, Text } from "@mantine/core";
 
 import classes from "./settings.module.css";
-import { StoreSchema } from "@/store";
+import type { StoreSchema } from "@/store";
 import useStore from "@/hooks/useStore";
 
 type BooleanKey = {

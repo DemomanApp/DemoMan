@@ -1,5 +1,5 @@
 import { ClassIcon } from "@/components";
-import { PlayerSummary, stringifyClass } from "@/demo";
+import { type PlayerSummary, stringifyClass } from "@/demo";
 import { formatDuration } from "@/util";
 import { Progress, Tooltip } from "@mantine/core";
 

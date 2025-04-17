@@ -1,4 +1,4 @@
-import { ReactNode, createContext, useCallback, useState } from "react";
+import { type ReactNode, createContext, useCallback, useState } from "react";
 
 import { useInterval } from "@mantine/hooks";
 

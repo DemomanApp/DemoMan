@@ -2,10 +2,10 @@ import { path } from "@tauri-apps/api";
 
 import { Button, Group, Stack, TextInput } from "@mantine/core";
 import { useForm } from "@mantine/form";
-import { ContextModalProps, modals } from "@mantine/modals";
+import { type ContextModalProps, modals } from "@mantine/modals";
 
 import { renameDemo } from "@/api";
-import { Demo } from "@/demo";
+import type { Demo } from "@/demo";
 
 export async function openRenameDemoModal(
   demo: Demo,

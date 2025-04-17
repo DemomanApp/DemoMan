@@ -1,7 +1,7 @@
-import { ContextModalProps, modals } from "@mantine/modals";
+import { type ContextModalProps, modals } from "@mantine/modals";
 import { Button, Group, Stack } from "@mantine/core";
 
-import { Demo } from "@/demo";
+import type { Demo } from "@/demo";
 import { deleteDemo } from "@/api";
 import useStore from "@/hooks/useStore";
 

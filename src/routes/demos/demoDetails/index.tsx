@@ -1,7 +1,7 @@
 import { Suspense, useContext, useState } from "react";
 import {
   Await,
-  LoaderFunction,
+  type LoaderFunction,
   useLoaderData,
   redirect,
   useAsyncError,
@@ -53,7 +53,7 @@ import {
 import { formatFileSize, formatDuration, decodeParam } from "@/util";
 import PlayerList from "./PlayerList";
 import EventsList from "./EventsList";
-import { Demo, GameSummary } from "@/demo";
+import type { Demo, GameSummary } from "@/demo";
 import Highlights from "./Highlights";
 import DemoTagsInput from "./DemoTagsInput";
 import useStore from "@/hooks/useStore";
