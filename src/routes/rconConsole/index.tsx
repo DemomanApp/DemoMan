@@ -61,7 +61,7 @@ export default function RconConsole() {
 
       historyHandles.append({ kind: "request", value: command });
 
-      sendRconCommand(command, password!)
+      sendRconCommand(command, password)
         .then((response) => {
           historyHandles.append({ kind: "response", value: response });
           // eslint really wants this pointless return statement (promise/always-return)

@@ -240,7 +240,7 @@ export default function DemoDetailsView() {
                           <Tabs
                             value={currentTab}
                             onChange={(newTab) =>
-                              // newTab cannot be null since `allowTabDeactivation` is not set on `Tabs`
+                              // biome-ignore lint/style/noNonNullAssertion: newTab cannot be null since `allowTabDeactivation` is not set on `Tabs`
                               setCurrentTab(newTab!)
                             }
                             // These styles prevent tall tab panels (mainly the timeline tab)
