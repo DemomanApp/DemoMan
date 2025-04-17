@@ -19,6 +19,7 @@
   padding: var(--mantine-spacing-xs) var(--mantine-spacing-sm);
   border-radius: var(--mantine-radius-md);
   font-weight: 500;
+  /* biome-ignore format: preserve linebreaks */
   transition:
     color 100ms ease,
     background-color 100ms ease,

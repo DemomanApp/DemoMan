@@ -7,7 +7,8 @@
   --textbox-height: 24px;
   --image-aspect-ratio: calc(16 / 9);
   --width: calc(
-    (var(--total-height) - var(--textbox-height)) * var(--image-aspect-ratio)
+    (var(--total-height) - var(--textbox-height)) *
+    var(--image-aspect-ratio)
   );
   --border: 1px solid
     light-dark(var(--mantine-color-gray-3), var(--mantine-color-dark-4));
