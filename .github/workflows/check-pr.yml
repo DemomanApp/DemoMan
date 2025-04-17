@@ -32,7 +32,7 @@ jobs:
             libayatana-appindicator3-dev \
             librsvg2-dev
       - name: Install frontend dependencies
-        run: npm install
+        run: npm ci
       - uses: tauri-apps/tauri-action@v0
         with:
           # Only build in debug mode so the following
