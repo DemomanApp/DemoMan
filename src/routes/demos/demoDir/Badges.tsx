@@ -1,4 +1,4 @@
-import { Group, Badge, Text } from "@mantine/core";
+import { Badge, Group, Text } from "@mantine/core";
 
 export default function Badges({
   items,

@@ -2,8 +2,8 @@ import { Link } from "react-router";
 
 import { Text, UnstyledButton } from "@mantine/core";
 
-import classes from "./DemoDirButton.module.css";
 import type { Label, Path } from "@/store";
+import classes from "./DemoDirButton.module.css";
 
 export default function DemoDirButton({
   path,

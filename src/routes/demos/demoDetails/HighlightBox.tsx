@@ -1,28 +1,28 @@
 import * as log from "@tauri-apps/plugin-log";
 
-import {
-  type ChatMessageHighlight,
-  type AirshotHighlight,
-  type CrossbowAirshotHighlight,
-  type Highlight,
-  type KillHighlight,
-  type PointCapturedHighlight,
-  type RoundWinHighlight,
-  type PlayerConnectedHighlight,
-  type PlayerDisconnectedHighlight,
-  type HighlightPlayerSnapshot,
-  type Team,
-  type KillStreakHighlight,
-  type KillStreakEndedHighlight,
-  type PauseHighlight,
-  type RoundStalemateHighlight,
-  type RoundStartHighlight,
-  type PlayerTeamChangeHighlight,
-  destructureHighlight,
-} from "@/demo";
+import CapturePoints from "@/assets/translations/capture_points.json";
 import { KillIcon } from "@/components";
 import KillstreakIcon from "@/components/KillstreakIcon";
-import CapturePoints from "@/assets/translations/capture_points.json";
+import {
+  type AirshotHighlight,
+  type ChatMessageHighlight,
+  type CrossbowAirshotHighlight,
+  type Highlight,
+  type HighlightPlayerSnapshot,
+  type KillHighlight,
+  type KillStreakEndedHighlight,
+  type KillStreakHighlight,
+  type PauseHighlight,
+  type PlayerConnectedHighlight,
+  type PlayerDisconnectedHighlight,
+  type PlayerTeamChangeHighlight,
+  type PointCapturedHighlight,
+  type RoundStalemateHighlight,
+  type RoundStartHighlight,
+  type RoundWinHighlight,
+  type Team,
+  destructureHighlight,
+} from "@/demo";
 
 import classes from "./HighlightBox.module.css";
 

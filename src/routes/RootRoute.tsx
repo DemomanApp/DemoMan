@@ -1,7 +1,7 @@
 import { Outlet, useLocation } from "react-router";
 
-import useStore from "@/hooks/useStore";
 import { NavigationProgress } from "@/components";
+import useStore from "@/hooks/useStore";
 
 import classes from "./RootRoute.module.css";
 

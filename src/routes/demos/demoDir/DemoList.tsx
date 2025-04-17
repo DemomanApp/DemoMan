@@ -1,29 +1,29 @@
+import memoize from "memoize-one";
 import {
-  useRef,
-  useState,
-  useEffect,
-  useCallback,
-  useMemo,
   forwardRef,
   memo,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
 } from "react";
+import { useNavigate } from "react-router";
 import AutoSizer from "react-virtualized-auto-sizer";
 import {
   FixedSizeList,
   type ListChildComponentProps,
   areEqual,
 } from "react-window";
-import memoize from "memoize-one";
-import { useNavigate } from "react-router";
 
-import { useDebouncedCallback } from "@mantine/hooks";
 import { ScrollArea } from "@mantine/core";
+import { useDebouncedCallback } from "@mantine/hooks";
 
 import type { Demo } from "@/demo";
-import DemoListRow from "./DemoListRow";
-import BottomBar from "./BottomBar";
 import useLocationRef from "@/hooks/useLocationRef";
 import { openDeleteMultipleDemosModal } from "@/modals/DeleteMultipleDemosModal";
+import BottomBar from "./BottomBar";
+import DemoListRow from "./DemoListRow";
 
 const PADDING_SIZE = 16;
 

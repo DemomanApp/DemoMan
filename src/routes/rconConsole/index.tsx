@@ -11,10 +11,10 @@ import AutoSizer from "react-virtualized-auto-sizer";
 
 import { HeaderBar } from "@/AppShell";
 
-import classes from "./RconConsole.module.css";
-import { useListState } from "@mantine/hooks";
 import { sendRconCommand } from "@/api";
 import useStore from "@/hooks/useStore";
+import { useListState } from "@mantine/hooks";
+import classes from "./RconConsole.module.css";
 
 type HistoryEntry = {
   kind: "request" | "response" | "error";

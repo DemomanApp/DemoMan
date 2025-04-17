@@ -3,10 +3,10 @@ import { useState } from "react";
 import { Alert, AppShell, Center, Paper, Stack, Text } from "@mantine/core";
 import { IconAlertCircle, IconCircleCheck } from "@tabler/icons-react";
 
-import useStore from "@/hooks/useStore";
+import { HeaderBar } from "@/AppShell";
 import { sendRconCommand } from "@/api";
 import { AsyncButton, AsyncCopyButton } from "@/components";
-import { HeaderBar } from "@/AppShell";
+import useStore from "@/hooks/useStore";
 
 export default function RconSetup() {
   const [rconPassword, setRconPassword] = useStore("rconPassword");

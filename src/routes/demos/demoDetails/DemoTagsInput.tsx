@@ -12,8 +12,8 @@ import {
 } from "@mantine/core";
 import { IconTag } from "@tabler/icons-react";
 
-import { HeaderButton } from "@/components";
 import { getKnownTags } from "@/api";
+import { HeaderButton } from "@/components";
 
 type Props = {
   tags: string[];

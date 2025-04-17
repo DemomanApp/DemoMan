@@ -2,9 +2,9 @@ import { Suspense, useContext, useState } from "react";
 import {
   Await,
   type LoaderFunction,
-  useLoaderData,
   redirect,
   useAsyncError,
+  useLoaderData,
   useNavigate,
 } from "react-router";
 
@@ -41,24 +41,24 @@ import {
   IconUsers,
 } from "@tabler/icons-react";
 
-import { getDemo, getDemoDetails, sendRconCommand, setDemoTags } from "@/api";
 import { HeaderBar } from "@/AppShell";
+import { RconContext } from "@/RconContext";
+import { getDemo, getDemoDetails, sendRconCommand, setDemoTags } from "@/api";
 import {
   AsyncButton,
-  MapThumbnail,
-  LoaderFallback,
   Fill,
   HeaderButton,
+  LoaderFallback,
+  MapThumbnail,
 } from "@/components";
-import { formatFileSize, formatDuration, decodeParam } from "@/util";
-import PlayerList from "./PlayerList";
-import EventsList from "./EventsList";
 import type { Demo, GameSummary } from "@/demo";
-import Highlights from "./Highlights";
-import DemoTagsInput from "./DemoTagsInput";
 import useStore from "@/hooks/useStore";
 import { openRenameDemoModal } from "@/modals/RenameDemoModal";
-import { RconContext } from "@/RconContext";
+import { decodeParam, formatDuration, formatFileSize } from "@/util";
+import DemoTagsInput from "./DemoTagsInput";
+import EventsList from "./EventsList";
+import Highlights from "./Highlights";
+import PlayerList from "./PlayerList";
 
 import classes from "./demoDetails.module.css";
 

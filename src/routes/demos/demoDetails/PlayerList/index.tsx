@@ -3,8 +3,8 @@ import { useState } from "react";
 import { Paper } from "@mantine/core";
 
 import type { GameSummary, PlayerSummary } from "@/demo";
-import { PlayerTable } from "./PlayerTable";
 import { PlayerDetails } from "./PlayerDetails";
+import { PlayerTable } from "./PlayerTable";
 
 import classes from "./PlayerList.module.css";
 

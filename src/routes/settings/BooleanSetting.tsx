@@ -1,8 +1,8 @@
 import { Switch, Text } from "@mantine/core";
 
-import classes from "./settings.module.css";
-import type { StoreSchema } from "@/store";
 import useStore from "@/hooks/useStore";
+import type { StoreSchema } from "@/store";
+import classes from "./settings.module.css";
 
 type BooleanKey = {
   [storeKey in keyof StoreSchema]: StoreSchema[storeKey] extends boolean

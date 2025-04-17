@@ -1,21 +1,21 @@
 import {
   AppShell,
+  Button,
   Container,
   Divider,
+  Group,
   ScrollArea,
   Stack,
   Text,
-  Group,
   TextInput,
-  Button,
   Tooltip,
 } from "@mantine/core";
 import { IconRefresh } from "@tabler/icons-react";
 
+import { HeaderBar } from "@/AppShell";
 import useStore from "@/hooks/useStore";
 import BooleanSetting from "./BooleanSetting";
 import DemoDirsSetting from "./DemoDirsSetting";
-import { HeaderBar } from "@/AppShell";
 
 import classes from "./settings.module.css";
 

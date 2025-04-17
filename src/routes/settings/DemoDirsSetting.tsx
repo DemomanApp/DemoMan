@@ -1,6 +1,5 @@
 import { useState } from "react";
 
-import { useForm } from "@mantine/form";
 import {
   ActionIcon,
   Button,
@@ -12,13 +11,14 @@ import {
   TextInput,
   Tooltip,
 } from "@mantine/core";
+import { useForm } from "@mantine/form";
 import { IconPlus, IconTrash } from "@tabler/icons-react";
 
 import useStore from "@/hooks/useStore";
 import PathPicker from "./PathPicker";
 
-import classes from "./settings.module.css";
 import { drop } from "@/util";
+import classes from "./settings.module.css";
 
 export default function DemoDirsSetting() {
   const [demoDirs, setDemoDirs] = useStore("demoDirs");
