@@ -90,7 +90,7 @@
     }
   },
   "javascript": {
-    "formatter": { "quoteStyle": "double" },
+    "formatter": { "quoteStyle": "double", "trailingCommas": "es5" },
     "globals": ["React", "JSX"]
   }
 }

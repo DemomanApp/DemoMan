@@ -36,6 +36,7 @@
     }
   }
 
+  /* biome-ignore format: preserve linebreaks */
   transition:
     background-color 150ms ease,
     box-shadow 150ms ease;

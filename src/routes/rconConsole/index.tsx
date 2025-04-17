@@ -76,7 +76,7 @@ export default function RconConsole() {
           });
         });
     },
-    [historyHandles, password],
+    [historyHandles, password]
   );
 
   return (
