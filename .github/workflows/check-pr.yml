@@ -46,8 +46,8 @@ jobs:
       - name: Lint backend
         run: |
           cargo fmt --check
-          cargo clippy --all-features --tests
+          cargo clippy --all-features --tests -- -D warnings
       - name: Lint frontend
         run: |
-          npm run lint:js
-          npm run lint:css
+          npm run typecheck
+          npm run biome ci
