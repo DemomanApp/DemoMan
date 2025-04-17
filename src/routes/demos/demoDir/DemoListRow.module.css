@@ -18,14 +18,6 @@
   );
 
   &:hover {
-    & .menu {
-      display: flex;
-    }
-
-    & .checkbox-root {
-      display: block;
-    }
-
     background-color: light-dark(
       var(--mantine-color-gray-1),
       var(--mantine-color-dark-6)
@@ -42,10 +34,6 @@
     box-shadow 150ms ease;
 
   &[data-selected="true"] {
-    & .checkbox-root {
-      display: block;
-    }
-
     box-shadow: 0 0 0 2px
       light-dark(var(--mantine-primary-color-6), var(--mantine-primary-color-5));
     background-color: var(--mantine-primary-color-light);
@@ -70,6 +58,10 @@
   height: 32px;
 }
 
+.paper:hover .menu {
+  display: flex;
+}
+
 .checkbox-root {
   display: none; /* Changes to "flex" when hovered or selected */
   position: absolute;
@@ -87,4 +79,9 @@
   &[data-checked="true"] {
     background-color: var(--mantine-primary-color-filled);
   }
+}
+
+.paper[data-selected="true"] .checkbox-root,
+.paper:hover .checkbox-root {
+  display: block;
 }
