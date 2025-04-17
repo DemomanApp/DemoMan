@@ -43,7 +43,7 @@ function PlayerName({ player }: PlayerNameProps) {
 }
 
 function TeamName({ team }: { team: Team }) {
-  let teamName;
+  let teamName: string;
   switch (team) {
     case "red":
       teamName = "RED";
@@ -62,7 +62,7 @@ function TeamName({ team }: { team: Team }) {
 }
 
 function teamColor(team: Team): string {
-  let color;
+  let color: string;
   switch (team) {
     case "red":
       color = "var(--mantine-color-red-filled)";
@@ -165,7 +165,7 @@ function KillHighlightBox(highlight: KillHighlight) {
 
 function KillStreakHighlightBox(highlight: KillStreakHighlight) {
   const { player, streak } = highlight;
-  let message;
+  let message: string;
   switch (streak) {
     case 5:
       message = "is on a Killing Spree!";
@@ -203,7 +203,7 @@ function KillStreakHighlightBox(highlight: KillStreakHighlight) {
 function KillStreakEndedHighlightBox(highlight: KillStreakEndedHighlight) {
   const { killer, victim, streak } = highlight;
 
-  let message;
+  let message: JSX.Element;
   if (killer.user_id === victim.user_id) {
     message = (
       <span>
@@ -258,7 +258,7 @@ function CrossbowAirshotHighlightBox(highlight: CrossbowAirshotHighlight) {
 }
 
 function PointCapturedHighlightBox(highlight: PointCapturedHighlight) {
-  let icon;
+  let icon: string | undefined;
 
   // For some reason the two capture icons are slightly
   // misaligned: The red variant has more empty pixels

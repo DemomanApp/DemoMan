@@ -54,7 +54,7 @@ export default function RconSetup() {
             <div>
               <AsyncButton
                 onClick={async () => {
-                  let response;
+                  let response: string;
                   try {
                     response = await sendRconCommand("echo test", rconPassword);
                   } catch (error) {
