@@ -8,12 +8,8 @@
   padding: 8px;
   transition: 50ms background-color ease;
 
-  @mixin hover {
+  &:hover {
     background-color: var(--mantine-color-dark-6);
-
-    & .event-box-button {
-      opacity: 1;
-    }
   }
 }
 
@@ -30,4 +26,8 @@
 .event-box-button {
   transition: 50ms opacity ease;
   opacity: 0;
+}
+
+.event-box:hover .event-box-button {
+  opacity: 1;
 }

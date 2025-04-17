@@ -17,7 +17,7 @@
     var(--mantine-color-dark-7)
   );
 
-  @mixin hover {
+  &:hover {
     & .menu {
       display: flex;
     }
