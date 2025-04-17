@@ -21,7 +21,7 @@ export default function PathPicker({
         value={value}
         onChange={(e) => setValue(e.currentTarget.value)}
         {...otherProps}
-      ></input>
+      />
       <Button
         variant="default"
         onClick={() =>
