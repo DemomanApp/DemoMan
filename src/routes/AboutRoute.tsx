@@ -33,7 +33,11 @@ export default function AboutRoute() {
           }}
           size="sm"
         >
-          <img src="../../githubassets/Banner.png" width="75%" />
+          <img
+            src="../../githubassets/Banner.png"
+            width="75%"
+            alt="the DemoMan logo"
+          />
           <div
             style={{
               display: "flex",
