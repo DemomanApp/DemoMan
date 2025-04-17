@@ -9,7 +9,7 @@ export default function KillIcon({ killIcon }: KillIconProps) {
   const { colorScheme } = useMantineColorScheme();
   let weaponData = KillIconData[killIcon];
   if (weaponData === undefined) {
-    weaponData = KillIconData["skull"];
+    weaponData = KillIconData.skull;
   }
   const { iconFile, iconNegFile, x, y, width, height } = weaponData;
 
