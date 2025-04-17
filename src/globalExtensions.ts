@@ -12,7 +12,7 @@ if (!Object.prototype.hasOwnProperty.call(Array, "intersperse")) {
   Object.defineProperty(Array.prototype, "intersperse", {
     value: function intersperse<T>(this: T[], separator: T): T[] {
       return this.flatMap((item, idx) =>
-        idx == 0 ? [item] : [separator, item]
+        idx === 0 ? [item] : [separator, item]
       );
     },
   });

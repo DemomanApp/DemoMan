@@ -13,7 +13,7 @@ export default function AsyncCopyButton({ text }: AsyncCopyButtonProps) {
   return (
     <Tooltip label="Copy to clipboard">
       <ActionIcon
-        color={asyncWriteText.status == "success" ? "teal" : "gray"}
+        color={asyncWriteText.status === "success" ? "teal" : "gray"}
         onClick={() =>
           asyncWriteText.execute(text).then(() => {
             setTimeout(() => {
@@ -25,7 +25,7 @@ export default function AsyncCopyButton({ text }: AsyncCopyButtonProps) {
           })
         }
       >
-        {asyncWriteText.status == "success" ? (
+        {asyncWriteText.status === "success" ? (
           <IconCheck size={16} />
         ) : (
           <IconCopy size={16} />
