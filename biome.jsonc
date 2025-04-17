@@ -1,9 +1,9 @@
 {
   "$schema": "./node_modules/@biomejs/biome/configuration_schema.json",
-  "vcs": { "enabled": false, "clientKind": "git", "useIgnoreFile": false },
+  "vcs": { "enabled": true, "clientKind": "git", "useIgnoreFile": true },
   "files": {
     "ignoreUnknown": false,
-    "ignore": ["target", "dist", "src-tauri", "node_modules"]
+    "ignore": ["src-tauri"]
   },
   "formatter": { "enabled": true, "indentStyle": "space" },
   "organizeImports": { "enabled": true },
