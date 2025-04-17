@@ -52,7 +52,7 @@ export function PlayerTable({
     const bluPlayers: PlayerSummary[] = [];
     const others: PlayerSummary[] = [];
 
-    gameSummary.players.forEach((player) => {
+    for (const player of gameSummary.players) {
       const team = primaryTeam(player);
       if (team === "red") {
         redPlayers.push(player);
@@ -61,7 +61,7 @@ export function PlayerTable({
       } else {
         others.push(player);
       }
-    });
+    }
 
     // TODO: Allow the tables to be sorted by the column headers (kills, deaths, etc)
     redPlayers.sort((a, b) => b.scoreboard?.points - a.scoreboard?.points);
