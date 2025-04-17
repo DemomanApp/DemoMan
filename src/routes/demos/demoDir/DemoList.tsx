@@ -27,10 +27,8 @@ import { openDeleteMultipleDemosModal } from "@/modals/DeleteMultipleDemosModal"
 
 const PADDING_SIZE = 16;
 
-// eslint-disable-next-line react/display-name
 const innerElementType = forwardRef<HTMLDivElement>(
   (
-    // eslint-disable-next-line react/prop-types
     { style, ...rest }: React.ComponentProps<"div">,
     ref: React.ClassAttributes<HTMLDivElement>["ref"]
   ) => (
