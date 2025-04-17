@@ -23,6 +23,7 @@ function svgProps(
 
 export const IconKillstreak: Icon = (props) => (
   <svg {...svgProps(props, "killstreak")}>
+    <title>Killstreak icon</title>
     <path stroke="none" d="M0 0h24v24H0z" />
     <path d="m 20,12 -8,8 H 4 L 12,12 4,4 h 8 z" />
     <path d="m 4.5,9 3,3 -3,3 z" fill="currentColor" />
@@ -31,6 +32,7 @@ export const IconKillstreak: Icon = (props) => (
 
 export const IconStv: Icon = (props) => (
   <svg {...svgProps(props, "stv")}>
+    <title>STV icon</title>
     <path stroke="none" d="M0 0h24v24H0z" />
     <path d="M 7,8 H 4 A 1,1 0 0 0 3,9 v 2 a 1,1 0 0 0 1,1 h 2 a 1,1 0 0 1 1,1 v 2 A 1,1 0 0 1 6,16 H 3" />
     <path d="M 12,16 V 8 m -2,0 h 4" />
@@ -40,6 +42,7 @@ export const IconStv: Icon = (props) => (
 
 export const IconPov: Icon = (props) => (
   <svg {...svgProps(props, "pov")}>
+    <title>POV icon</title>
     <path stroke="none" d="M0 0h24v24H0z" />
     <path d="m 17,8 2,8 2,-8" />
     <path d="m 10,10 a 2,2 0 0 1 4,0 v 4 a 2,2 0 0 1 -4,0 z" />
