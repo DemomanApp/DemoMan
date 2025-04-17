@@ -19,9 +19,6 @@ export default function AsyncCopyButton({ text }: AsyncCopyButtonProps) {
             setTimeout(() => {
               asyncWriteText.reset();
             }, 1000);
-
-            // eslint wants each `.then` to return something...
-            return null;
           })
         }
       >
