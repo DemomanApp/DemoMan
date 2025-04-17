@@ -118,14 +118,16 @@ function KillHighlightBox(highlight: KillHighlight) {
         &nbsp;fell to a clumsy, painful death
       </div>
     );
-  } else if (highlight.kill_icon === "#suicide") {
+  }
+  if (highlight.kill_icon === "#suicide") {
     return (
       <div className={classes.highlightRight}>
         <PlayerName player={victim} />
         &nbsp;bid farewell, cruel world!
       </div>
     );
-  } else if (highlight.kill_icon === "#assisted_suicide") {
+  }
+  if (highlight.kill_icon === "#assisted_suicide") {
     return (
       <div className={classes.highlightRight}>
         <PlayerName player={killer} />
@@ -139,26 +141,26 @@ function KillHighlightBox(highlight: KillHighlight) {
         <PlayerName player={victim} />
       </div>
     );
-  } else {
-    return (
-      <div className={classes.highlightRight}>
-        {killer !== null &&
-          killer.user_id !== victim.user_id &&
-          killer.team !== "other" && <PlayerName player={killer} />}
-        {assister !== null && (
-          <>
-            &nbsp;+&nbsp;
-            <PlayerName player={assister} />
-          </>
-        )}
-        &nbsp;
-        <KillstreakIcon streak={highlight.streak} />
-        <KillIcon killIcon={highlight.kill_icon} />
-        &nbsp;
-        <PlayerName player={victim} />
-      </div>
-    );
   }
+
+  return (
+    <div className={classes.highlightRight}>
+      {killer !== null &&
+        killer.user_id !== victim.user_id &&
+        killer.team !== "other" && <PlayerName player={killer} />}
+      {assister !== null && (
+        <>
+          &nbsp;+&nbsp;
+          <PlayerName player={assister} />
+        </>
+      )}
+      &nbsp;
+      <KillstreakIcon streak={highlight.streak} />
+      <KillIcon killIcon={highlight.kill_icon} />
+      &nbsp;
+      <PlayerName player={victim} />
+    </div>
+  );
 }
 
 function KillStreakHighlightBox(highlight: KillStreakHighlight) {

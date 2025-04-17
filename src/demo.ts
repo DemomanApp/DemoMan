@@ -203,11 +203,11 @@ export function primaryTeam(player: PlayerSummary): Team {
 
   if (time_on_blue > time_on_red) {
     return "blue";
-  } else if (time_on_red > time_on_blue) {
-    return "red";
-  } else {
-    return "other";
   }
+  if (time_on_red > time_on_blue) {
+    return "red";
+  }
+  return "other";
 }
 
 export type UserIdAliases = Record<number, number>;
