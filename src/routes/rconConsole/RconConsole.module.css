@@ -8,6 +8,7 @@
   display: flex;
   align-items: center;
   padding: 4px;
+  /* biome-ignore lint/suspicious/noDuplicateFontNames: https://stackoverflow.com/questions/38781089/font-family-monospace-monospace */
   font-family: monospace, monospace;
 }
 
@@ -21,5 +22,6 @@
 }
 
 .input {
+  /* biome-ignore lint/suspicious/noDuplicateFontNames: https://stackoverflow.com/questions/38781089/font-family-monospace-monospace */
   font-family: monospace, monospace;
 }
