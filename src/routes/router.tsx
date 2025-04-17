@@ -1,17 +1,17 @@
 import { createBrowserRouter } from "react-router";
 
+import { Center } from "@mantine/core";
+import AboutRoute from "./AboutRoute";
+import { loader as indexLoader } from "./IndexRoute";
+import RootRoute from "./RootRoute";
 import DemosRoute from "./demos";
-import DemoDirRoute from "./demos/demoDir";
 import DemoDetailsRoute, {
   loader as demoDetailsLoader,
 } from "./demos/demoDetails";
-import SettingsView from "./settings";
-import RconSetup from "./rconSetup";
-import { loader as indexLoader } from "./IndexRoute";
-import RootRoute from "./RootRoute";
+import DemoDirRoute from "./demos/demoDir";
 import RconConsole from "./rconConsole";
-import AboutRoute from "./AboutRoute";
-import { Center } from "@mantine/core";
+import RconSetup from "./rconSetup";
+import SettingsView from "./settings";
 
 // Not really needed, but suppresses a warning
 function HydrateFallback() {

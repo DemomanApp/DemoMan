@@ -12,8 +12,8 @@ import {
 } from "@mantine/core";
 import { IconHelp, IconPlug, IconTool } from "@tabler/icons-react";
 
-import { HeaderButton } from ".";
 import { RconContext, type RconState } from "@/RconContext";
+import { HeaderButton } from ".";
 
 function helpText(rconState: RconState) {
   switch (rconState.status) {

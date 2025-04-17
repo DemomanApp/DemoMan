@@ -5,24 +5,24 @@ import { open } from "@tauri-apps/plugin-shell";
 
 import { Alert, AppShell, Menu } from "@mantine/core";
 import {
-  IconDots,
-  IconSettings,
-  IconPlug,
-  IconFolder,
   IconAlertCircle,
-  IconTerminal,
+  IconDots,
+  IconFolder,
   IconInfoCircle,
+  IconPlug,
+  IconSettings,
+  IconTerminal,
 } from "@tabler/icons-react";
 
-import type { Demo, DemoFilter, SortKey, SortOrder } from "@/demo";
 import { HeaderBar } from "@/AppShell";
 import { getDemosInDirectory } from "@/api";
+import { Fill, HeaderButton, LoaderFallback } from "@/components";
+import type { Demo, DemoFilter, SortKey, SortOrder } from "@/demo";
+import useLocationState from "@/hooks/useLocationState";
+import type { Path } from "@/store";
 import DemoList from "./DemoList";
 import SearchInput from "./SearchInput";
 import { SortControl } from "./SortControl";
-import type { Path } from "@/store";
-import { HeaderButton, Fill, LoaderFallback } from "@/components";
-import useLocationState from "@/hooks/useLocationState";
 
 type DemoListLoaderArgs = {
   path: string;

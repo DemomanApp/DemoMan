@@ -1,9 +1,9 @@
-import useStore from "@/hooks/useStore";
+import { HeaderBar } from "@/AppShell";
 import { Fill } from "@/components";
-import DemoDirButton from "./DemoDirButton";
+import useStore from "@/hooks/useStore";
 import { Anchor, AppShell, Stack, Text, Title } from "@mantine/core";
 import { Link } from "react-router";
-import { HeaderBar } from "@/AppShell";
+import DemoDirButton from "./DemoDirButton";
 
 export default () => {
   const [demoDirs] = useStore("demoDirs");

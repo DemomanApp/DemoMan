@@ -20,8 +20,9 @@ import { modals } from "@mantine/modals";
 
 import type { Demo, DemoEvent } from "@/demo";
 
-import classes from "./EventsList.module.css";
+import { setDemoEvents } from "@/api";
 import { IconKillstreak } from "@/components/icons";
+import { useForm } from "@mantine/form";
 import {
   IconBookmark,
   IconEdit,
@@ -29,8 +30,7 @@ import {
   IconTrash,
 } from "@tabler/icons-react";
 import { useNavigate } from "react-router";
-import { useForm } from "@mantine/form";
-import { setDemoEvents } from "@/api";
+import classes from "./EventsList.module.css";
 
 type EventsListProps = {
   demo: Demo;

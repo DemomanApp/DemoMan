@@ -13,31 +13,31 @@ import {
   Tooltip,
 } from "@mantine/core";
 import {
-  type Icon as IconType,
-  IconCalendarEvent,
-  IconDeviceTv,
-  IconPencil,
-  IconTrash,
-  IconUser,
-  IconPlayerPlayFilled,
-  IconClockPlay,
-  IconBookmarks,
   IconBookmark,
+  IconBookmarks,
+  IconCalendarEvent,
+  IconClockPlay,
+  IconDeviceTv,
   IconFolder,
+  IconPencil,
+  IconPlayerPlayFilled,
+  IconTrash,
+  type Icon as IconType,
+  IconUser,
 } from "@tabler/icons-react";
 
-import { revealItemInDir } from "@tauri-apps/plugin-opener";
 import * as log from "@tauri-apps/plugin-log";
+import { revealItemInDir } from "@tauri-apps/plugin-opener";
 
-import { formatDuration } from "@/util";
-import { type Demo, isStvDemo } from "@/demo";
-import { IconKillstreak } from "@/components/icons";
-import { openRenameDemoModal } from "@/modals/RenameDemoModal";
-import { openDeleteDemoModal } from "@/modals/DeleteDemoModal";
 import { sendRconCommand } from "@/api";
+import { IconKillstreak } from "@/components/icons";
+import { type Demo, isStvDemo } from "@/demo";
 import useStore from "@/hooks/useStore";
-import MapBox from "./MapBox";
+import { openDeleteDemoModal } from "@/modals/DeleteDemoModal";
+import { openRenameDemoModal } from "@/modals/RenameDemoModal";
+import { formatDuration } from "@/util";
 import Badges from "./Badges";
+import MapBox from "./MapBox";
 
 import classes from "./DemoListRow.module.css";
 

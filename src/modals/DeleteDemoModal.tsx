@@ -1,8 +1,8 @@
-import { type ContextModalProps, modals } from "@mantine/modals";
 import { Button, Group, Stack } from "@mantine/core";
+import { type ContextModalProps, modals } from "@mantine/modals";
 
-import type { Demo } from "@/demo";
 import { deleteDemo } from "@/api";
+import type { Demo } from "@/demo";
 import useStore from "@/hooks/useStore";
 
 export async function openDeleteDemoModal(demo: Demo, onConfirm: () => void) {

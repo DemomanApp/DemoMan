@@ -6,8 +6,8 @@ import { ActionIcon, Tabs, Title, Tooltip } from "@mantine/core";
 import { IconBrandSteam } from "@tabler/icons-react";
 
 import type { GameSummary, PlayerSummary, Scoreboard } from "@/demo";
-import { ScoreboardTable } from "./ScoreboardTable";
 import ClassPlaytimeIndicator from "./ClassPlaytimeIndicator";
+import { ScoreboardTable } from "./ScoreboardTable";
 
 import classes from "./PlayerDetails.module.css";
 
