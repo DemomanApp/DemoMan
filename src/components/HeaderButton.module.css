@@ -8,7 +8,7 @@
   justify-content: center;
   color: light-dark(var(--mantine-color-gray-7), var(--mantine-color-dark-0));
 
-  @mixin hover {
+  &:hover {
     background-color: light-dark(
       var(--mantine-color-gray-0),
       var(--mantine-color-dark-5)

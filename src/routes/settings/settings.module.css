@@ -29,7 +29,7 @@
     visibility: hidden;
   }
 
-  @mixin hover {
+  &:hover {
     background-color: var(--mantine-color-default);
 
     & .demo-dir-action {

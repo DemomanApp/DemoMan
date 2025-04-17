@@ -12,7 +12,7 @@
     background-color: var(--mantine-primary-color-light);
   }
 
-  @mixin hover {
+  &:hover {
     background-color: light-dark(
       var(--mantine-color-gray-3),
       var(--mantine-color-dark-5)
