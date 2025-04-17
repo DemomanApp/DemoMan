@@ -50,4 +50,4 @@ jobs:
       - name: Lint frontend
         run: |
           npm run typecheck
-          npm run biome ci
+          npx biome ci
