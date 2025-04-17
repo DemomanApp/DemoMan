@@ -4,7 +4,7 @@ export default function useLocationState<T>(key: string, fallback: T) {
   const location = useLocation();
   const navigate = useNavigate();
 
-  const state = ((location.state ?? {})[key] as T) ?? fallback;
+  const state = (location.state?.[key] as T) ?? fallback;
 
   function setState(newState: T) {
     navigate(".", {
