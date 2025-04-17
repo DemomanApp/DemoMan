@@ -53,7 +53,7 @@ export default function RconConsole() {
       top: viewport.current?.scrollHeight,
       behavior: "smooth",
     });
-  }, [history]);
+  });
 
   const handleSubmit = useCallback(
     (command: string) => {
@@ -76,7 +76,7 @@ export default function RconConsole() {
           });
         });
     },
-    [setPromptInput, historyHandles, password]
+    [historyHandles, password],
   );
 
   return (
