@@ -8,7 +8,8 @@
     "build": "tsc && vite build",
     "typecheck": "tsc --noEmit",
     "lint": "biome lint",
-    "check": "npm run typecheck && npm run lint",
+    "format": "biome format --write",
+    "check": "npm run typecheck && npm run lint && npm run format",
     "preview": "vite preview",
     "tauri": "tauri"
   },
