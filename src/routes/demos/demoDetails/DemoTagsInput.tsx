@@ -82,7 +82,7 @@ export default function DemoTagsInput({ tags, setTags }: Props) {
         <Combobox.Target withAriaAttributes={false}>
           <Indicator
             label={tags.length}
-            disabled={tags.length == 0}
+            disabled={tags.length === 0}
             offset={10}
             size={16}
           >

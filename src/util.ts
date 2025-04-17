@@ -1,5 +1,5 @@
 function plural_s(value: number, text: string) {
-  return `${value} ${text}${value == 1 ? "" : "s"}`;
+  return `${value} ${text}${value === 1 ? "" : "s"}`;
 }
 
 export function formatDuration(total_seconds: number): string {

@@ -22,7 +22,7 @@ export default function SearchInput({
   const [debouncedQuery] = useDebouncedValue(rawQuery, debounceInterval);
 
   useEffect(() => {
-    if (debouncedQuery != query) {
+    if (debouncedQuery !== query) {
       setQuery(debouncedQuery);
     }
   }, [setQuery, debouncedQuery, query]);

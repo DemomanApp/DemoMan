@@ -30,7 +30,7 @@ export default function DemoDirsSetting() {
     },
     validate: {
       label: (newLabel) => {
-        if (newLabel.length == 0) {
+        if (newLabel.length === 0) {
           return "Label cannot be empty";
         }
         if (Object.values(demoDirs).some((label) => label === newLabel)) {
@@ -39,7 +39,7 @@ export default function DemoDirsSetting() {
         return null;
       },
       path: (newPath: string) => {
-        if (newPath.length == 0) {
+        if (newPath.length === 0) {
           return "Path cannot be empty";
         }
         if (Object.keys(demoDirs).some((path) => path === newPath)) {
