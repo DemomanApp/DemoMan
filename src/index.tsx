@@ -18,7 +18,7 @@ import "./globalExtensions";
 
 import "./index.css";
 
-// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+// biome-ignore lint/style/noNonNullAssertion: there is always a root element
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <MantineProvider

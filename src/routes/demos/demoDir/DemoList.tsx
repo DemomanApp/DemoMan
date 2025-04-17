@@ -8,7 +8,11 @@ import {
   memo,
 } from "react";
 import AutoSizer from "react-virtualized-auto-sizer";
-import { FixedSizeList, type ListChildComponentProps, areEqual } from "react-window";
+import {
+  FixedSizeList,
+  type ListChildComponentProps,
+  areEqual,
+} from "react-window";
 import memoize from "memoize-one";
 import { useNavigate } from "react-router";
 
@@ -35,7 +39,7 @@ const innerElementType = forwardRef<HTMLDivElement>(
       style={{
         ...style,
         paddingLeft: PADDING_SIZE,
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        // biome-ignore lint/style/noNonNullAssertion: Style is always defined
         height: (style!.height as number) + PADDING_SIZE,
       }}
       {...rest}
