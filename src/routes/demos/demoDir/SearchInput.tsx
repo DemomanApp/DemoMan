@@ -25,7 +25,7 @@ export default function SearchInput({
     if (debouncedQuery != query) {
       setQuery(debouncedQuery);
     }
-  }, [setQuery, debouncedQuery, query, rawQuery]);
+  }, [setQuery, debouncedQuery, query]);
 
   return (
     <Input

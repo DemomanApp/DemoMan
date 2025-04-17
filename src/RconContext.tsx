@@ -1,10 +1,4 @@
-import {
-  ReactNode,
-  createContext,
-  useCallback,
-  useEffect,
-  useState,
-} from "react";
+import { ReactNode, createContext, useCallback, useState } from "react";
 
 import { useInterval } from "@mantine/hooks";
 
@@ -37,19 +31,9 @@ export const RconProvider = ({ children }: { children: ReactNode }) => {
     } catch (error) {
       setRconState({ status: "connection error", reason: error as string });
     }
-  }, [rconPassword, setRconState]);
+  }, [rconPassword]);
 
-  const interval = useInterval(updateRconState, 5000);
-
-  useEffect(
-    () => {
-      updateRconState();
-      interval.start();
-      return interval.stop;
-    },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    []
-  );
+  useInterval(updateRconState, 5000, { autoInvoke: true });
 
   return (
     <RconContext.Provider value={rconState}>{children}</RconContext.Provider>
