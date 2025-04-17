@@ -112,11 +112,13 @@ function visibleHighlightTypes(filters: Filters): HighlightType[] {
 }
 
 function filterHighlights(
-  highlights: HighlightEvent[],
+  unfilteredHighlights: HighlightEvent[],
   filters: Filters,
   aliases: UserIdAliases
 ): HighlightEvent[] {
   const visibleHighlights = visibleHighlightTypes(filters);
+  let highlights = unfilteredHighlights;
+
   highlights = highlights.filter((highlight) => {
     const { type } = destructureHighlight(highlight.event);
 
