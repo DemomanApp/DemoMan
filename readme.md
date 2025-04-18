@@ -3,8 +3,6 @@
        height="200">
 </p>
 <p align="center">
-  <a href="https://www.codefactor.io/repository/github/DemomanApp/DemoMan" alt="CodeFactor">
-    <img alt="CodeFactor" src="https://img.shields.io/codefactor/grade/github/DemomanApp/DemoMan?style=for-the-badge"></a>
   <a href="https://discord.gg/GduKxhYFhR">
     <img alt="Discord" src="https://img.shields.io/discord/966262251944292372?style=for-the-badge"></a>
   <a href="LICENSE.txt">
