@@ -7,9 +7,19 @@
     "dev": "vite",
     "build": "tsc && vite build",
     "typecheck": "tsc --noEmit",
-    "lint": "biome lint",
-    "format": "biome format --write",
-    "check": "npm run typecheck && npm run lint && biome check",
+
+    "lint:ts": "biome lint",
+    "lint:rs": "cargo clippy",
+    "lint": "npm run lint:ts && npm run lint:rs",
+
+    "format:ts": "biome format --write",
+    "format:rs": "cargo fmt",
+    "format": "npm run format:ts && npm run format:rs",
+
+    "check:ts": "npm run typecheck && biome check",
+    "check:rs": "cargo clippy && cargo fmt --check",
+    "check": "npm run check:ts && npm run check:rs",
+
     "preview": "vite preview",
     "tauri": "tauri"
   },
