@@ -39,6 +39,7 @@ function indicatorColor(rconState: RconState): IndicatorProps["color"] {
 
 export default function RconStateIndicator() {
   const rconState = useContext(RconContext);
+  const color = indicatorColor(rconState);
 
   return (
     <Popover
@@ -54,7 +55,8 @@ export default function RconStateIndicator() {
       <Popover.Target>
         <HeaderButton>
           <Indicator
-            color={indicatorColor(rconState)}
+            color={color}
+            disabled={color === undefined}
             position="bottom-end"
             style={{
               // Without hard-coding the size, the indicator affects the layout
