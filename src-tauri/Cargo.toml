@@ -1,6 +1,6 @@
 [package]
 name = "demoman"
-version = "2.0.0-alpha.5"
+version = "2.0.0-alpha.6"
 description = "The TF2 Demo Manager"
 authors = ["Narcha"]
 license = "GPL-3.0-only"
