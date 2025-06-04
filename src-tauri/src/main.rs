@@ -8,6 +8,8 @@
 // Disabled because of false positives inside tauri macros
 #![allow(clippy::used_underscore_binding)]
 
+use std::env;
+
 use clap::Parser;
 use log::LevelFilter;
 use tauri::{async_runtime::Mutex, Manager};
@@ -65,6 +67,13 @@ fn build_log_plugin<R: tauri::Runtime>() -> tauri::plugin::TauriPlugin<R> {
 }
 
 fn main() {
+    // https://github.com/tauri-apps/tauri/issues/10702#issuecomment-2934968558
+    #[cfg(target_os = "linux")]
+    {
+        env::set_var("__GL_THREADED_OPTIMIZATIONS", "0");
+        env::set_var("__NV_DISABLE_EXPLICIT_SYNC", "1");
+    }
+
     let args = Args::parse();
 
     tauri::Builder::default()
