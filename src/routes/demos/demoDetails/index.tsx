@@ -37,6 +37,7 @@ import {
   IconPlugX,
   IconServer,
   IconTimeline,
+  IconTrash,
   IconUser,
   IconUsers,
 } from "@tabler/icons-react";
@@ -54,6 +55,7 @@ import {
 import type { Demo, GameSummary } from "@/demo";
 import useStore from "@/hooks/useStore";
 import { openRenameDemoModal } from "@/modals/RenameDemoModal";
+import { openDeleteDemoModal } from "@/modals/DeleteDemoModal";
 import { decodeParam, formatDuration, formatFileSize } from "@/util";
 import DemoTagsInput from "./DemoTagsInput";
 import EventsList from "./EventsList";
@@ -119,6 +121,13 @@ export default function DemoDetailsView() {
           center={<DemoTitle demo={demo} />}
           right={
             <>
+              <Tooltip label="Delete demo">
+                <HeaderButton
+                  onClick={() => openDeleteDemoModal(demo, () => navigate(-1))}
+                >
+                  <IconTrash />
+                </HeaderButton>
+              </Tooltip>
               <Tooltip label="Show in explorer">
                 <HeaderButton
                   onClick={() => {
