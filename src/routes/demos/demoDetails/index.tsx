@@ -54,8 +54,8 @@ import {
 } from "@/components";
 import type { Demo, GameSummary } from "@/demo";
 import useStore from "@/hooks/useStore";
-import { openRenameDemoModal } from "@/modals/RenameDemoModal";
 import { openDeleteDemoModal } from "@/modals/DeleteDemoModal";
+import { openRenameDemoModal } from "@/modals/RenameDemoModal";
 import { decodeParam, formatDuration, formatFileSize } from "@/util";
 import DemoTagsInput from "./DemoTagsInput";
 import EventsList from "./EventsList";
