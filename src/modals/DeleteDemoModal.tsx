@@ -29,6 +29,8 @@ export const DeleteDemoModal = ({
   const handleDelete = async () => {
     await deleteDemo(demo.path, !skipTrash);
 
+    context.closeModal(id);
+
     onConfirm();
   };
 
