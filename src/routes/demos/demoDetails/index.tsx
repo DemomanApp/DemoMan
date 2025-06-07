@@ -33,8 +33,6 @@ import {
   IconFileAnalytics,
   IconFolder,
   IconPencil,
-  IconPlayerPlay,
-  IconPlugX,
   IconServer,
   IconTimeline,
   IconTrash,
@@ -43,14 +41,8 @@ import {
 } from "@tabler/icons-react";
 
 import { HeaderPortal } from "@/AppShell";
-import { getDemo, getDemoDetails, sendRconCommand, setDemoTags } from "@/api";
-import {
-  AsyncButton,
-  Fill,
-  HeaderButton,
-  LoaderFallback,
-  MapThumbnail,
-} from "@/components";
+import { getDemo, getDemoDetails, setDemoTags } from "@/api";
+import { Fill, HeaderButton, LoaderFallback, MapThumbnail } from "@/components";
 import type { Demo, GameSummary } from "@/demo";
 import useLocationState from "@/hooks/useLocationState";
 import useStore from "@/hooks/useStore";
@@ -61,6 +53,7 @@ import { decodeParam, formatDuration, formatFileSize } from "@/util";
 import DemoTagsInput from "./DemoTagsInput";
 import EventsList from "./EventsList";
 import Highlights from "./Highlights";
+import PlayDemoButton from "./PlayDemoButton";
 import PlayerList from "./PlayerList";
 
 import classes from "./demoDetails.module.css";
@@ -205,35 +198,11 @@ export default function DemoDetailsView() {
                         {formatDuration(demo.playbackTime)}
                       </List.Item>
                     </List>
-                    <Tooltip
-                      disabled={rconState.status === "connected"}
-                      label={
-                        <span
-                          style={{
-                            lineHeight: 1,
-                            display: "flex",
-                            alignItems: "center",
-                            gap: "0.2rem",
-                          }}
-                        >
-                          <IconPlugX />
-                          {"RCON connection required"}
-                        </span>
-                      }
-                    >
-                      <AsyncButton
-                        rightSection={<IconPlayerPlay />}
-                        onClick={() =>
-                          sendRconCommand(
-                            `playdemo "${demo.path}"`,
-                            rconPassword
-                          )
-                        }
-                        disabled={rconState.status !== "connected"}
-                      >
-                        Play demo
-                      </AsyncButton>
-                    </Tooltip>
+                    <PlayDemoButton
+                      demo={demo}
+                      rconPassword={rconPassword}
+                      rconState={rconState}
+                    />
                   </Stack>
                 </Group>
                 <div style={{ flexGrow: 1 }}>
