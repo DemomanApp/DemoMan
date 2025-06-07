@@ -44,6 +44,15 @@
     "dialog:allow-open",
     "dialog:allow-save",
     "shell:allow-open",
-    "opener:default"
+    "log:default",
+    "opener:default",
+    {
+      "identifier": "opener:allow-open-url",
+      "allow": [
+        {
+          "url": "steam:*"
+        }
+      ]
+    }
   ]
 }
