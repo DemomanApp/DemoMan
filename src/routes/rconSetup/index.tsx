@@ -20,16 +20,10 @@ import { AsyncButton, AsyncCopyButton } from "@/components";
 import useStore from "@/hooks/useStore";
 
 export default function RconSetup() {
-  const [rconPassword, setRconPassword] = useStore("rconPassword");
+  const [rconPassword, _setRconPassword] = useStore("rconPassword");
 
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
-
-  if (rconPassword === undefined) {
-    // Set a new random password
-    setRconPassword(btoa(Math.random().toString()).substring(10, 20));
-    return null;
-  }
 
   const launchFlags = `-usercon +rcon_password ${rconPassword} +ip 0.0.0.0 +hostport 27969 +net_start`;
 
