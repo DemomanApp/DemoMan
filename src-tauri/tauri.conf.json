@@ -40,10 +40,10 @@
     "windows": [
       {
         "fullscreen": false,
-        "height": 800,
+        "height": 1000,
+        "width": 1200,
         "resizable": true,
         "title": "DemoMan",
-        "width": 1200,
         "useHttpsScheme": true
       }
     ],
