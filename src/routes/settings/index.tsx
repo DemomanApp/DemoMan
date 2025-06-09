@@ -52,7 +52,7 @@ export default function SettingsView() {
                   label="RCON Password"
                   description="Set or generate your own RCON password"
                   placeholder="RCON Password"
-                  value={rconPassword ?? ""}
+                  value={rconPassword}
                   onChange={(e) => setRconPassword(e.currentTarget.value)}
                   type="text"
                   className={classes.rconPasswordInput}
