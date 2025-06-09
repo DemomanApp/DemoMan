@@ -1,6 +1,17 @@
+import { openUrl } from "@tauri-apps/plugin-opener";
+
 import { useState } from "react";
 
-import { Alert, AppShell, Center, Paper, Stack, Text } from "@mantine/core";
+import {
+  Alert,
+  AppShell,
+  Button,
+  Center,
+  Group,
+  Paper,
+  Stack,
+  Text,
+} from "@mantine/core";
 import { IconAlertCircle, IconCircleCheck } from "@tabler/icons-react";
 
 import { HeaderBar } from "@/AppShell";
@@ -51,7 +62,10 @@ export default function RconSetup() {
               </Text>
               <AsyncCopyButton text={launchFlags} />
             </Paper>
-            <div>
+            <Group>
+              <Button onClick={() => openUrl("steam://gameproperties/440")}>
+                Open TF2 properties
+              </Button>
               <AsyncButton
                 onClick={async () => {
                   let response: string;
@@ -73,7 +87,7 @@ export default function RconSetup() {
               >
                 Test connection
               </AsyncButton>
-            </div>
+            </Group>
             {error !== null && (
               <Alert
                 icon={<IconAlertCircle size={16} />}
