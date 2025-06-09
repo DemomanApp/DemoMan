@@ -43,6 +43,7 @@
     "dialog:allow-message",
     "dialog:allow-open",
     "dialog:allow-save",
+    "log:default",
     "shell:allow-open",
     "opener:default"
   ]
