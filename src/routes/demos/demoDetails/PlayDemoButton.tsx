@@ -12,18 +12,18 @@ import {
   Tooltip,
 } from "@mantine/core";
 import {
-  IconPlayerPlay,
-  IconCopy,
-  IconPlugX,
-  IconChevronDown,
   IconBrandSteam,
-  IconX,
   IconCheck,
+  IconChevronDown,
+  IconCopy,
+  IconPlayerPlay,
+  IconPlugX,
+  IconX,
 } from "@tabler/icons-react";
 
+import type { RconState } from "@/RconContext";
 import { launchAndPlayDemo, sendRconCommand } from "@/api";
 import type { Demo } from "@/demo";
-import type { RconState } from "@/RconContext";
 import useStore from "@/hooks/useStore";
 
 import classes from "./PlayDemoButton.module.css";
