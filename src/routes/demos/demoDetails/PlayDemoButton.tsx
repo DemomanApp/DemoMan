@@ -132,7 +132,7 @@ export default function PlayDemoButton({
       .onClick()
       .then(() => setCallbackState("succeeded"))
       .catch((reason) => {
-        log.error(reason);
+        log.error(`Failed to play demo with "${key}": ${reason}`);
         setCallbackState("failed");
       })
       .finally(() =>
