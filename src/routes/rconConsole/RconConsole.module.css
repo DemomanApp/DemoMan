@@ -10,6 +10,11 @@
   padding: 4px;
   /* biome-ignore lint/suspicious/noDuplicateFontNames: https://stackoverflow.com/questions/38781089/font-family-monospace-monospace */
   font-family: monospace, monospace;
+  white-space: pre-wrap;
+}
+
+.history-row-icon {
+  align-self: flex-start;
 }
 
 .history {

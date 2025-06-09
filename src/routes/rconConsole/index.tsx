@@ -24,11 +24,21 @@ type HistoryEntry = {
 function HistoryRowIcon({ entryKind }: { entryKind: HistoryEntry["kind"] }) {
   switch (entryKind) {
     case "request":
-      return <IconChevronRight />;
+      return <IconChevronRight className={classes.historyRowIcon} />;
     case "response":
-      return <IconChevronLeft color="var(--mantine-color-blue-9)" />;
+      return (
+        <IconChevronLeft
+          className={classes.historyRowIcon}
+          color="var(--mantine-color-blue-9)"
+        />
+      );
     case "error":
-      return <IconX color="var(--mantine-color-red-9)" />;
+      return (
+        <IconX
+          className={classes.historyRowIcon}
+          color="var(--mantine-color-red-9)"
+        />
+      );
   }
 }
 
