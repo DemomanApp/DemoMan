@@ -1,5 +1,4 @@
 import { writeText } from "@tauri-apps/plugin-clipboard-manager";
-import { Command } from "@tauri-apps/plugin-shell";
 import * as log from "@tauri-apps/plugin-log";
 
 import { useState } from "react";
@@ -22,7 +21,7 @@ import {
   IconCheck,
 } from "@tabler/icons-react";
 
-import { sendRconCommand } from "@/api";
+import { launchAndPlayDemo, sendRconCommand } from "@/api";
 import type { Demo } from "@/demo";
 import type { RconState } from "@/RconContext";
 import useStore from "@/hooks/useStore";
@@ -102,12 +101,7 @@ export default function PlayDemoButton({
       icon: <IconBrandSteam />,
       disabled: false,
       onClick() {
-        return Command.create("steam", [
-          "-applaunch",
-          "440",
-          "-novid",
-          `+playdemo ${demo.path}`,
-        ]).execute();
+        return launchAndPlayDemo(demo.path);
       },
       tooltip: undefined,
     },

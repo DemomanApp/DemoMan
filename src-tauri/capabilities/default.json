@@ -54,21 +54,6 @@
       "identifier": "opener:allow-open-url",
       "allow": [{"url": "steam:*"}]
     },
-    "process:default",
-    {
-      "identifier": "shell:allow-execute",
-      "allow": [
-        {
-          "name": "steam",
-          "cmd": "steam",
-          "args": [
-            "-applaunch",
-            "440",
-            "-novid",
-            {"validator": "\\+playdemo .+"}
-          ]
-        }
-      ]
-    }
+    "process:default"
   ]
 }

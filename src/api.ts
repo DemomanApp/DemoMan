@@ -73,3 +73,7 @@ export async function sendRconCommand(command: string, password: string) {
 export async function getFileArgument() {
   return invoke<string | null>("get_file_argument");
 }
+
+export async function launchAndPlayDemo(demoPath: string) {
+  return invoke<void>("launch_and_play_demo", { demoPath });
+}
