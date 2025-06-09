@@ -1,7 +1,8 @@
-import { useState } from "react";
 import { writeText } from "@tauri-apps/plugin-clipboard-manager";
+import { Command } from "@tauri-apps/plugin-shell";
 import * as log from "@tauri-apps/plugin-log";
-import { openUrl } from "@tauri-apps/plugin-opener";
+
+import { useState } from "react";
 
 import {
   ActionIcon,
@@ -101,7 +102,12 @@ export default function PlayDemoButton({
       icon: <IconBrandSteam />,
       disabled: false,
       onClick() {
-        return openUrl(`steam://run/440//-novid +playdemo ${demo.path}`);
+        return Command.create("steam", [
+          "-applaunch",
+          "440",
+          "-novid",
+          `+playdemo ${demo.path}`,
+        ]).execute();
       },
       tooltip: undefined,
     },
