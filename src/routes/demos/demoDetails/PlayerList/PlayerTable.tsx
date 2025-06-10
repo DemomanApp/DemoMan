@@ -97,7 +97,10 @@ export function PlayerTable({
       <div style={{ flexGrow: 1 }}>
         <AutoSizer>
           {({ height, width }) => (
-            <ScrollArea style={{ width, height }}>
+            <ScrollArea
+              style={{ width, height }}
+              classNames={{ viewport: classes.scrollShadow }}
+            >
               <PlayerColumn
                 players={bluPlayers}
                 currentPlayer={currentPlayer}
