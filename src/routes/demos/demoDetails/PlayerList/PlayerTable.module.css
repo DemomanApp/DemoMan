@@ -32,3 +32,23 @@
 .spectator-name {
   color: var(--mantine-color-text);
 }
+
+.scroll-shadow {
+  background: linear-gradient(var(--mantine-color-body) 33%, transparent),
+    linear-gradient(transparent, var(--mantine-color-body) 66%) 0 100%,
+    radial-gradient(
+      farthest-side at 50% 0,
+      rgba(20, 20, 20, 0.5),
+      rgba(0, 0, 0, 0)
+    ),
+    radial-gradient(
+      farthest-side at 50% 100%,
+      rgba(20, 20, 20, 0.5),
+      rgba(0, 0, 0, 0)
+    )
+    0 100%;
+  background-color: var(--mantine-color-body);
+  background-repeat: no-repeat;
+  background-attachment: local, local, scroll, scroll;
+  background-size: 100% 45px, 100% 45px, 100% 15px, 100% 15px;
+}
