@@ -22,6 +22,7 @@
       "appimage",
       "nsis"
     ],
+    "createUpdaterArtifacts": true,
     "longDescription": "Easily browse and organize all your demo files, find highlights, and edit bookmarks!",
     "shortDescription": "The TF2 Demo Manager",
     "fileAssociations": [
@@ -35,7 +36,14 @@
   "productName": "demoman",
   "mainBinaryName": "demoman",
   "identifier": "com.demomanapp.demoman",
-  "plugins": {},
+  "plugins": {
+    "updater": {
+      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IEY4RTkyRjUzNjdCMDEzRTEKUldUaEU3Qm5VeS9wK09ndVo5a2s2OXNMUFBVRzd6allla2Mxak5ISDBsK3QxcWxLYWREMG45LzYK",
+      "endpoints": [
+        "https://github.com/DemomanApp/DemoMan/releases/latest/download/latest.json"
+      ]
+    }
+  },
   "app": {
     "windows": [
       {
