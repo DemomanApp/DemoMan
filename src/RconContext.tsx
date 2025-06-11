@@ -1,4 +1,10 @@
-import { type ReactNode, createContext, useCallback, useState } from "react";
+import {
+  type ReactNode,
+  createContext,
+  useCallback,
+  useEffect,
+  useState,
+} from "react";
 
 import { useInterval } from "@mantine/hooks";
 
@@ -34,6 +40,10 @@ export const RconProvider = ({ children }: { children: ReactNode }) => {
   }, [rconPassword]);
 
   useInterval(updateRconState, 5000, { autoInvoke: true });
+
+  useEffect(() => {
+    updateRconState();
+  }, [updateRconState]);
 
   return (
     <RconContext.Provider value={rconState}>{children}</RconContext.Provider>
