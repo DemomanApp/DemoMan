@@ -1,11 +1,18 @@
+import { app } from "@tauri-apps/api";
+
+import { Suspense } from "react";
+import { Await } from "react-router";
+
 import { Anchor, AppShell, Button, Container, Text } from "@mantine/core";
+import { IconBrandDiscord, IconBrandGithub } from "@tabler/icons-react";
 
 import { HeaderBar } from "@/AppShell";
-import { IconBrandDiscord, IconBrandGithub } from "@tabler/icons-react";
 
 import banner from "../assets/banner.png";
 
 export default function AboutRoute() {
+  const versionPromise = app.getVersion();
+
   return (
     <AppShell header={{ height: 50 }}>
       <AppShell.Header>
@@ -113,6 +120,17 @@ export default function AboutRoute() {
             </Anchor>
             , without which most of the new features in this version would not
             have been possible.
+          </div>
+          <div>
+            <Suspense>
+              <Await resolve={versionPromise}>
+                {(version) => (
+                  <Text c="dimmed" size="sm">
+                    {version}
+                  </Text>
+                )}
+              </Await>
+            </Suspense>
           </div>
         </Container>
       </AppShell.Main>
