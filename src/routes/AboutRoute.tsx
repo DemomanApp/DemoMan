@@ -3,6 +3,8 @@ import { Anchor, AppShell, Button, Container, Text } from "@mantine/core";
 import { HeaderBar } from "@/AppShell";
 import { IconBrandDiscord, IconBrandGithub } from "@tabler/icons-react";
 
+import banner from "../assets/banner.png";
+
 export default function AboutRoute() {
   return (
     <AppShell header={{ height: 50 }}>
@@ -33,11 +35,7 @@ export default function AboutRoute() {
           }}
           size="sm"
         >
-          <img
-            src="../../githubassets/Banner.png"
-            width="75%"
-            alt="the DemoMan logo"
-          />
+          <img src={banner} width="75%" alt="the DemoMan logo" />
           <div
             style={{
               display: "flex",
