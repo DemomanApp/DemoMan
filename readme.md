@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="https://raw.githubusercontent.com/DemomanApp/DemoMan/main/githubassets/Banner.png"
+  <img src="https://raw.githubusercontent.com/DemomanApp/DemoMan/main/src/assets/banner.png"
        height="200">
 </p>
 <p align="center">
