@@ -6,6 +6,7 @@ export type StoreSchema = {
   rconPassword: string;
   enableLocationOverlay: boolean;
   skipTrash: boolean;
+  preferredPlayOption: "rcon" | "launch" | "copyCommand";
 };
 
 export function storeDefault<K extends keyof StoreSchema>(
@@ -18,6 +19,7 @@ export function storeDefault<K extends keyof StoreSchema>(
     rconPassword: () => btoa(Math.random().toString()).substring(10, 20),
     enableLocationOverlay: false,
     skipTrash: false,
+    preferredPlayOption: "rcon",
   };
 
   const defaultValue = storeDefaults[key];
