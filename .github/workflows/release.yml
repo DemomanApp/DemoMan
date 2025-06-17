@@ -43,5 +43,3 @@ jobs:
           tagName: __VERSION__
           releaseName: DemoMan __VERSION__
           releaseDraft: true
-          # Change this to false once we have a stable release
-          prerelease: true
