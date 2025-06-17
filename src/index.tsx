@@ -12,6 +12,7 @@ import "@mantine/dates/styles.css";
 import "@fontsource-variable/hanken-grotesk";
 
 import { RconProvider } from "./RconContext";
+import { UpdateStateProvider } from "./UpdateStateContext";
 import modals from "./modals";
 import router from "./routes/router";
 import "./globalExtensions";
@@ -36,11 +37,13 @@ createRoot(document.getElementById("root")!).render(
         },
       }}
     >
-      <RconProvider>
-        <ModalsProvider modals={modals}>
-          <RouterProvider router={router} />
-        </ModalsProvider>
-      </RconProvider>
+      <UpdateStateProvider>
+        <RconProvider>
+          <ModalsProvider modals={modals}>
+            <RouterProvider router={router} />
+          </ModalsProvider>
+        </RconProvider>
+      </UpdateStateProvider>
     </MantineProvider>
   </StrictMode>
 );

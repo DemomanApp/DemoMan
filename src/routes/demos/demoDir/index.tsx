@@ -1,12 +1,13 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { Link, useParams } from "react-router";
 
 import { open } from "@tauri-apps/plugin-shell";
 
-import { Alert, AppShell, Menu } from "@mantine/core";
+import { Alert, AppShell, Menu, Tooltip } from "@mantine/core";
 import {
   IconAlertCircle,
   IconDots,
+  IconDownload,
   IconFolder,
   IconInfoCircle,
   IconPlug,
@@ -15,6 +16,7 @@ import {
 } from "@tabler/icons-react";
 
 import { HeaderBar } from "@/AppShell";
+import { UpdateStateContext } from "@/UpdateStateContext";
 import { getDemosInDirectory } from "@/api";
 import { Fill, HeaderButton, LoaderFallback } from "@/components";
 import type { Demo, DemoFilter, SortKey, SortOrder } from "@/demo";
@@ -23,6 +25,7 @@ import type { Path } from "@/store";
 import DemoList from "./DemoList";
 import SearchInput from "./SearchInput";
 import { SortControl } from "./SortControl";
+import { openUpdateModal } from "@/modals/UpdateModal";
 
 type DemoListLoaderArgs = {
   path: string;
@@ -75,6 +78,8 @@ export default () => {
   const { path: encodedPath } = useParams() as { path: Path };
   const path = atob(encodedPath);
 
+  const updateState = useContext(UpdateStateContext);
+
   const [query, setQuery] = useLocationState("query", "");
   const [sortKey, setSortKey] = useLocationState<SortKey>(
     "sortKey",
@@ -107,6 +112,17 @@ export default () => {
                 setSortOrder={setSortOrder}
               />
               <div style={{ margin: "auto" }} />
+              {updateState.status === "update_available" && (
+                <Tooltip label="Update available!">
+                  <HeaderButton
+                    onClick={() => {
+                      openUpdateModal(updateState.update);
+                    }}
+                  >
+                    <IconDownload color="var(--mantine-color-green-6)" />
+                  </HeaderButton>
+                </Tooltip>
+              )}
               <Menu
                 shadow="md"
                 position="bottom-end"

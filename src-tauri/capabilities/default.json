@@ -54,6 +54,7 @@
           "url": "steam:*"
         }
       ]
-    }
+    },
+    "process:default"
   ]
 }
