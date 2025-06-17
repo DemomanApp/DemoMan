@@ -17,13 +17,13 @@ import {
 } from "@mantine/core";
 import { type ContextModalProps, modals } from "@mantine/modals";
 import { useFetch, useInterval } from "@mantine/hooks";
+import { IconBrandGithub, IconDownload } from "@tabler/icons-react";
 
 import { intlFormatDistance } from "date-fns";
 import Markdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 
 import { formatFileSize } from "@/util";
-import { IconBrandGithub, IconDownload } from "@tabler/icons-react";
 
 const API_ENDPOINT =
   "https://api.github.com/repos/DemomanApp/Demoman/releases/tags/";
