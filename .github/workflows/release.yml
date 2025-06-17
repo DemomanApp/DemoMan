@@ -42,7 +42,6 @@ jobs:
         with:
           tagName: __VERSION__
           releaseName: DemoMan __VERSION__
-          releaseBody: See the assets to download and install this version.
           releaseDraft: true
           # Change this to false once we have a stable release
           prerelease: true
