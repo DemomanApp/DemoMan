@@ -7,19 +7,15 @@
     "dev": "vite",
     "build": "tsc && vite build",
     "typecheck": "tsc --noEmit",
-
     "lint:ts": "biome lint",
     "lint:rs": "cargo clippy",
     "lint": "npm run lint:ts && npm run lint:rs",
-
     "format:ts": "biome format --write",
     "format:rs": "cargo fmt",
     "format": "npm run format:ts && npm run format:rs",
-
     "check:ts": "npm run typecheck && biome check",
     "check:rs": "cargo clippy && cargo fmt --check",
     "check": "npm run check:ts && npm run check:rs",
-
     "preview": "vite preview",
     "tauri": "tauri"
   },
@@ -36,15 +32,19 @@
     "@tauri-apps/plugin-dialog": "^2.2.1",
     "@tauri-apps/plugin-log": "^2.3.1",
     "@tauri-apps/plugin-opener": "^2.2.6",
+    "@tauri-apps/plugin-process": "^2.2.1",
     "@tauri-apps/plugin-shell": "^2.2.1",
     "@tauri-apps/plugin-updater": "^2.7.1",
+    "date-fns": "^4.1.0",
     "memoize-one": "^6.0.0",
     "react": "^18.3.0",
     "react-async-hook": "^4.0.0",
     "react-dom": "^18.3.0",
+    "react-markdown": "^10.1.0",
     "react-router": "^7.5.2",
     "react-virtualized-auto-sizer": "^1.0.26",
-    "react-window": "^1.8.11"
+    "react-window": "^1.8.11",
+    "remark-gfm": "^4.0.1"
   },
   "devDependencies": {
     "@biomejs/biome": "1.9.4",
