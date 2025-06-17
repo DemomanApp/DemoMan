@@ -66,6 +66,7 @@ export const UpdateModal = ({
   const [downloadState, setDownloadState] =
     useState<DownloadState>("not_started");
 
+  // https://docs.github.com/en/rest/releases/releases?apiVersion=2022-11-28#get-a-release-by-tag-name
   type GithubRelease = {
     body: string;
     html_url: string;
