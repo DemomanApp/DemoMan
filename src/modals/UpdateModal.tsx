@@ -74,7 +74,7 @@ export const UpdateModal = ({
   };
 
   const { data: githubRelease } = useFetch<GithubRelease>(
-    API_ENDPOINT + update.currentVersion // TODO this should be the new version
+    API_ENDPOINT + update.version
   );
 
   const changelog = useMemo(() => {
