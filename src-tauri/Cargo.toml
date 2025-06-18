@@ -2,7 +2,7 @@
 name = "demoman"
 version = "2.0.0-alpha.6"
 description = "The TF2 Demo Manager"
-authors = ["Narcha"]
+authors = ["DemoMan contributors"]
 license = "GPL-3.0-only"
 repository = "https://github.com/DemomanApp/DemoMan"
 default-run = "demoman"
