@@ -48,8 +48,10 @@
     "windows": [
       {
         "fullscreen": false,
-        "height": 1000,
         "width": 1200,
+        "height": 1000,
+        "minWidth": 800,
+        "minHeight": 800,
         "resizable": true,
         "title": "DemoMan",
         "useHttpsScheme": true
