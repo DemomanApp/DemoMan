@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 
-import { AppShell, Input, ScrollArea, Text } from "@mantine/core";
+import { Input, ScrollArea, Text } from "@mantine/core";
+import { useListState } from "@mantine/hooks";
 import {
   IconChevronLeft,
   IconChevronRight,
@@ -9,11 +10,9 @@ import {
 } from "@tabler/icons-react";
 import AutoSizer from "react-virtualized-auto-sizer";
 
-import { HeaderBar } from "@/AppShell";
-
+import { HeaderPortal } from "@/AppShell";
 import { sendRconCommand } from "@/api";
 import useStore from "@/hooks/useStore";
-import { useListState } from "@mantine/hooks";
 import classes from "./RconConsole.module.css";
 
 type HistoryEntry = {
@@ -88,56 +87,52 @@ export default function RconConsole() {
   );
 
   return (
-    <AppShell header={{ height: 50 }}>
-      <AppShell.Header>
-        <HeaderBar
-          center={
-            <Text
-              fw={500}
-              size="lg"
-              style={{
-                cursor: "default",
-              }}
-            >
-              RCON Console
-            </Text>
-          }
-        />
-      </AppShell.Header>
-      <AppShell.Main>
-        <div className={classes.root}>
-          <div className={classes.history}>
-            <AutoSizer>
-              {({ height, width }) => (
-                <ScrollArea style={{ width, height }} viewportRef={viewport}>
-                  {history.map((historyEntry, idx) => (
-                    <HistoryRow
-                      historyEntry={historyEntry}
-                      key={`${idx}${historyEntry.kind}${historyEntry.value}`}
-                    />
-                  ))}
-                </ScrollArea>
-              )}
-            </AutoSizer>
-          </div>
-          <Input
-            value={promptInput}
-            onChange={(event) => setPromptInput(event.currentTarget.value)}
-            variant="unstyled"
-            classNames={{
-              input: classes.input,
-              wrapper: classes.inputWrapper,
+    <>
+      <HeaderPortal
+        center={
+          <Text
+            fw={500}
+            size="lg"
+            style={{
+              cursor: "default",
             }}
-            placeholder="Enter RCON command..."
-            leftSection={<IconChevronsRight />}
-            onKeyDown={(event) => {
-              if (event.key === "Enter" && !event.repeat) {
-                handleSubmit(event.currentTarget.value);
-              }
-            }}
-          />
+          >
+            RCON Console
+          </Text>
+        }
+      />
+      <div className={classes.root}>
+        <div className={classes.history}>
+          <AutoSizer>
+            {({ height, width }) => (
+              <ScrollArea style={{ width, height }} viewportRef={viewport}>
+                {history.map((historyEntry, idx) => (
+                  <HistoryRow
+                    historyEntry={historyEntry}
+                    key={`${idx}${historyEntry.kind}${historyEntry.value}`}
+                  />
+                ))}
+              </ScrollArea>
+            )}
+          </AutoSizer>
         </div>
-      </AppShell.Main>
-    </AppShell>
+        <Input
+          value={promptInput}
+          onChange={(event) => setPromptInput(event.currentTarget.value)}
+          variant="unstyled"
+          classNames={{
+            input: classes.input,
+            wrapper: classes.inputWrapper,
+          }}
+          placeholder="Enter RCON command..."
+          leftSection={<IconChevronsRight />}
+          onKeyDown={(event) => {
+            if (event.key === "Enter" && !event.repeat) {
+              handleSubmit(event.currentTarget.value);
+            }
+          }}
+        />
+      </div>
+    </>
   );
 }
