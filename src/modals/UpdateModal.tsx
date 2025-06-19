@@ -2,9 +2,10 @@ import type { Update } from "@tauri-apps/plugin-updater";
 import { relaunch } from "@tauri-apps/plugin-process";
 import * as log from "@tauri-apps/plugin-log";
 
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import {
+  Alert,
   Button,
   Divider,
   Group,
@@ -16,7 +17,7 @@ import {
   Text,
 } from "@mantine/core";
 import { type ContextModalProps, modals } from "@mantine/modals";
-import { useFetch, useInterval } from "@mantine/hooks";
+import { useInterval } from "@mantine/hooks";
 import { IconBrandGithub, IconDownload } from "@tabler/icons-react";
 
 import { intlFormatDistance } from "date-fns";
@@ -24,6 +25,7 @@ import Markdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 
 import { formatFileSize } from "@/util";
+import type { Result } from "@/types";
 
 const API_ENDPOINT =
   "https://api.github.com/repos/DemomanApp/Demoman/releases/tags/";
@@ -66,23 +68,39 @@ export const UpdateModal = ({
   const [downloadState, setDownloadState] =
     useState<DownloadState>("not_started");
 
-  // https://docs.github.com/en/rest/releases/releases?apiVersion=2022-11-28#get-a-release-by-tag-name
   type GithubRelease = {
-    body: string;
-    html_url: string;
-    // ... and many more fields we don't care about
+    changelog: string;
+    releasePageUrl: string;
   };
 
-  const { data: githubRelease } = useFetch<GithubRelease>(
-    API_ENDPOINT + update.version
-  );
+  const [githubRelease, setGithubRelease] = useState<
+    Result<GithubRelease, string> | undefined
+  >(undefined);
 
-  const changelog = useMemo(() => {
-    return githubRelease?.body.replace(
-      /@(\S+)/g,
-      "[@$1](https://github.com/$1)"
-    );
-  }, [githubRelease]);
+  useEffect(() => {
+    (async () => {
+      const response = await fetch(API_ENDPOINT + update.version);
+      if (response.ok) {
+        const bodyJson = await response.json();
+
+        const changelog = bodyJson.body.replace(
+          // Add links to github usernames
+          /@(\S+)/g,
+          "[@$1](https://github.com/$1)"
+        );
+        const releasePageUrl = bodyJson.html_url;
+
+        setGithubRelease({
+          success: true,
+          data: { changelog, releasePageUrl },
+        });
+      } else {
+        throw `GitHub API returned status code ${response.status} (${response.statusText})`;
+      }
+    })().catch((reason) => {
+      setGithubRelease({ success: false, error: reason.toString() });
+    });
+  }, [update.version]);
 
   const handleUpdate = async () => {
     // TODO handle errors
@@ -111,23 +129,34 @@ export const UpdateModal = ({
     setDownloadState("finished");
   };
 
+  const relativeReleaseDate =
+    update.date !== undefined
+      ? intlFormatDistance(new Date(update.date), Date.now(), {
+          locale: "en-US",
+        })
+      : undefined;
+
   return (
     <Stack gap="xs">
       <div>
-        Current version: {update.currentVersion} <br />
-        New version: {update.version} <br />
-        Released:{" "}
-        {intlFormatDistance(new Date(update.date ?? ""), Date.now(), {
-          locale: "en-US", // TODO This should be changed to `navigator.language` once the rest of the app has localization
-        })}
-        <br />
+        Current version: <strong>{update.currentVersion}</strong> <br />
+        New version: <strong>{update.version}</strong> <br />
+        {relativeReleaseDate !== undefined && (
+          <>
+            Released: {relativeReleaseDate}
+            <br />
+          </>
+        )}
       </div>
-      {githubRelease !== null ? (
+      {githubRelease === undefined ? (
+        <Loader />
+      ) : githubRelease.success ? (
         <Paper
           withBorder
           shadow="sm"
           radius="md"
           bg="dark"
+          miw="400px"
           style={{ overflow: "hidden" }}
         >
           <Group justify="space-between" p="sm">
@@ -138,7 +167,7 @@ export const UpdateModal = ({
               variant="outline"
               leftSection={<IconBrandGithub />}
               component="a"
-              href={githubRelease.html_url}
+              href={githubRelease.data.releasePageUrl}
               target="_blank"
               rel="noreferrer"
             >
@@ -165,12 +194,12 @@ export const UpdateModal = ({
                 },
               }}
             >
-              {changelog}
+              {githubRelease.data.changelog}
             </Markdown>
           </ScrollArea.Autosize>
         </Paper>
       ) : (
-        <Loader />
+        <Alert>Failed to fetch release notes: {githubRelease.error}</Alert>
       )}
       {downloadState === "not_started" && (
         <Group gap="xs" justify="end">
