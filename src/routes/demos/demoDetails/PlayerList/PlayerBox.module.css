@@ -30,6 +30,7 @@
 }
 
 .player-name {
+  flex-grow: 1;
   text-overflow: ellipsis;
   overflow: hidden;
   white-space: nowrap;
@@ -42,4 +43,5 @@
 .simple-scoreboard-value {
   width: 32px;
   text-align: right;
+  flex-shrink: 0;
 }
