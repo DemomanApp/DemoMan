@@ -105,7 +105,6 @@ export const UpdateModal = ({
   const handleUpdate = async () => {
     // TODO handle errors
     await update.downloadAndInstall((event) => {
-      log.info(JSON.stringify(event));
       switch (event.event) {
         case "Started":
           log.info(`Starting download of ${event.data.contentLength} bytes`);
