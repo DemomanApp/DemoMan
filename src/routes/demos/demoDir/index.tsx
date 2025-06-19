@@ -21,11 +21,11 @@ import { getDemosInDirectory } from "@/api";
 import { Fill, HeaderButton, LoaderFallback } from "@/components";
 import type { Demo, DemoFilter, SortKey, SortOrder } from "@/demo";
 import useLocationState from "@/hooks/useLocationState";
+import { openUpdateModal } from "@/modals/UpdateModal";
 import type { Path } from "@/store";
 import DemoList from "./DemoList";
 import SearchInput from "./SearchInput";
 import { SortControl } from "./SortControl";
-import { openUpdateModal } from "@/modals/UpdateModal";
 
 type DemoListLoaderArgs = {
   path: string;
