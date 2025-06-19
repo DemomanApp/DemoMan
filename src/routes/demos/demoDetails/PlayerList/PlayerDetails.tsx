@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-import { open } from "@tauri-apps/plugin-shell";
+import { openUrl } from "@tauri-apps/plugin-opener";
 
 import { ActionIcon, Tabs, Title, Tooltip } from "@mantine/core";
 import { IconBrandSteam } from "@tabler/icons-react";
@@ -41,7 +41,9 @@ export function PlayerDetails({ player, gameSummary }: PlayerDetailsProps) {
                 color="gray"
                 size="lg"
                 onClick={() =>
-                  open(`https://steamcommunity.com/profiles/${player.steam_id}`)
+                  openUrl(
+                    `https://steamcommunity.com/profiles/${player.steam_id}`
+                  )
                 }
               >
                 <IconBrandSteam />
