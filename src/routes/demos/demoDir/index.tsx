@@ -1,7 +1,7 @@
 import { useContext, useEffect, useState } from "react";
 import { Link, useParams } from "react-router";
 
-import { open } from "@tauri-apps/plugin-shell";
+import { openPath } from "@tauri-apps/plugin-opener";
 
 import { Alert, AppShell, Menu, Tooltip } from "@mantine/core";
 import {
@@ -155,7 +155,7 @@ export default () => {
                   </Menu.Item>
                   <Menu.Item
                     leftSection={<IconFolder size={14} />}
-                    onClick={() => open(path)}
+                    onClick={() => openPath(path)}
                   >
                     Show in explorer
                   </Menu.Item>
