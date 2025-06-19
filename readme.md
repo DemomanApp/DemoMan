@@ -1,6 +1,5 @@
 <p align="center">
-  <img src="https://raw.githubusercontent.com/DemomanApp/DemoMan/main/src/assets/banner.png"
-       height="200">
+  <img src="./src/assets/banner.png" height="200">
 </p>
 <p align="center">
   <a href="https://discord.gg/GduKxhYFhR">
