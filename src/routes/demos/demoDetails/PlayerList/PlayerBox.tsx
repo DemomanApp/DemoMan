@@ -1,5 +1,3 @@
-import { Text } from "@mantine/core";
-
 import ClassIcon from "@/components/ClassIcon";
 import type { PlayerSummary } from "@/demo";
 
@@ -21,9 +19,7 @@ export function PlayerBox({ player, selected, onClick }: PlayerBoxProps) {
           <ClassIcon cls={primary_class} size={24} />
         )}
       </div>
-      <div style={{ flexGrow: 1 }}>
-        <Text className={classes.playerName}>{player.name}</Text>
-      </div>
+      <div className={classes.playerName}>{player.name}</div>
       {/* TODO: Show player's dominations */}
       <div className={classes.pointsScoreboardValue}>
         {player.scoreboard.points}
