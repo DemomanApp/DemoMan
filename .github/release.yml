@@ -1,0 +1,17 @@
+changelog:
+  exclude:
+    labels:
+      - "changelog:hidden"
+  categories:
+    - title: "Highlights 🎉"
+      labels:
+        - "changelog:highlight"
+    - title: "New Features"
+      labels:
+        - "changelog:feature"
+    - title: "Fixes"
+      labels:
+        - "changelog:fix"
+    - title: "Other Changes"
+      labels:
+        - "*"
