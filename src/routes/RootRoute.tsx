@@ -1,5 +1,6 @@
-import { Outlet, useLocation } from "react-router";
+import { useLocation } from "react-router";
 
+import { AppShell } from "@/AppShell";
 import { NavigationProgress } from "@/components";
 import useStore from "@/hooks/useStore";
 
@@ -28,7 +29,7 @@ export default function RootRoute() {
           </div>
         </div>
       )}
-      <Outlet />
+      <AppShell />
     </>
   );
 }

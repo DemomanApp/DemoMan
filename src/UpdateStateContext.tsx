@@ -18,15 +18,19 @@ export const UpdateStateProvider = ({ children }: { children: ReactNode }) => {
   });
 
   useEffect(() => {
-    check().then((update) => {
-      if (update !== null) {
-        log.info(`found update ${update.version}`);
+    check()
+      .then((update) => {
+        if (update !== null) {
+          log.info(`found update ${update.version}`);
 
-        setUpdateState({ status: "update_available", update });
-      } else {
-        setUpdateState({ status: "up_to_date" });
-      }
-    });
+          setUpdateState({ status: "update_available", update });
+        } else {
+          setUpdateState({ status: "up_to_date" });
+        }
+      })
+      .catch((reason) => {
+        log.warn(`failed to fetch update: ${reason}`);
+      });
   }, []);
 
   return (

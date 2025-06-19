@@ -44,9 +44,9 @@ export default function RconStateIndicator() {
   return (
     <Popover
       shadow="md"
-      position="bottom-start"
+      position="right-end"
       transitionProps={{
-        transition: "pop-top-left",
+        transition: "pop-bottom-left",
       }}
       withArrow
       arrowPosition="center"
