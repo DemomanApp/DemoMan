@@ -1,6 +1,6 @@
-import type { Update } from "@tauri-apps/plugin-updater";
-import { relaunch } from "@tauri-apps/plugin-process";
 import * as log from "@tauri-apps/plugin-log";
+import { relaunch } from "@tauri-apps/plugin-process";
+import type { Update } from "@tauri-apps/plugin-updater";
 
 import { useEffect, useRef, useState } from "react";
 
@@ -16,16 +16,16 @@ import {
   Stack,
   Text,
 } from "@mantine/core";
-import { type ContextModalProps, modals } from "@mantine/modals";
 import { useInterval } from "@mantine/hooks";
+import { type ContextModalProps, modals } from "@mantine/modals";
 import { IconBrandGithub, IconDownload } from "@tabler/icons-react";
 
 import { intlFormatDistance } from "date-fns";
 import Markdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 
-import { formatFileSize } from "@/util";
 import type { Result } from "@/types";
+import { formatFileSize } from "@/util";
 
 const API_ENDPOINT =
   "https://api.github.com/repos/DemomanApp/Demoman/releases/tags/";
