@@ -3,9 +3,9 @@ import { IconPlus, IconTrash } from "@tabler/icons-react";
 
 import useStore from "@/hooks/useStore";
 
+import { openAddDemoDirModal } from "@/modals/DemoDirModal";
 import { drop } from "@/util";
 import classes from "./settings.module.css";
-import { openAddDemoDirModal } from "@/modals/DemoDirModal";
 
 export default function DemoDirsSetting() {
   const [demoDirs, setDemoDirs] = useStore("demoDirs");
