@@ -1,8 +1,8 @@
 import { DeleteDemoModal } from "./DeleteDemoModal";
 import { DeleteMultipleDemosModal } from "./DeleteMultipleDemosModal";
+import { AddDemoDirModal } from "./DemoDirModal";
 import { RenameDemoModal } from "./RenameDemoModal";
 import { UpdateModal } from "./UpdateModal";
-import { AddDemoDirModal } from "./DemoDirModal";
 
 const modals = {
   update: UpdateModal,

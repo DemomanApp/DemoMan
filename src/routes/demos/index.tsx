@@ -6,8 +6,8 @@ import { IconPlus } from "@tabler/icons-react";
 import { HeaderPortal } from "@/AppShell";
 import { Fill } from "@/components";
 import useStore from "@/hooks/useStore";
-import DemoDirButton from "./DemoDirButton";
 import { openAddDemoDirModal } from "@/modals/DemoDirModal";
+import DemoDirButton from "./DemoDirButton";
 
 export default () => {
   const [demoDirs] = useStore("demoDirs");
