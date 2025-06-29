@@ -90,7 +90,7 @@ function intersperse<T>(array: T[], filler: (index: number) => T): T[] {
 
 function PlayerNames({ players }: { players: HighlightPlayerSnapshot[] }) {
   if (players.length === 0) {
-    return <></>;
+    return undefined;
   }
 
   return (
