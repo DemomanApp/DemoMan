@@ -71,46 +71,42 @@ export default function DemoTagsInput({ tags, setTags }: Props) {
     ));
 
   return (
-    <>
-      <Combobox
-        store={combobox}
-        width={250}
-        position="bottom-start"
-        withinPortal={false}
-        onOptionSubmit={handleValueSelect}
-      >
-        <Combobox.Target withAriaAttributes={false}>
-          <Indicator
-            label={tags.length}
-            disabled={tags.length === 0}
-            offset={10}
-            size={16}
-          >
-            <Tooltip label="Tags">
-              <HeaderButton onClick={() => combobox.toggleDropdown()}>
-                <IconTag />
-              </HeaderButton>
-            </Tooltip>
-          </Indicator>
-        </Combobox.Target>
+    <Combobox
+      store={combobox}
+      width={250}
+      position="bottom-start"
+      withinPortal={false}
+      onOptionSubmit={handleValueSelect}
+    >
+      <Combobox.Target withAriaAttributes={false}>
+        <Indicator
+          label={tags.length}
+          disabled={tags.length === 0}
+          offset={10}
+          size={16}
+        >
+          <Tooltip label="Tags">
+            <HeaderButton onClick={() => combobox.toggleDropdown()}>
+              <IconTag />
+            </HeaderButton>
+          </Tooltip>
+        </Indicator>
+      </Combobox.Target>
 
-        <Combobox.Dropdown>
-          <Combobox.Search
-            value={search}
-            onChange={(event) => setSearch(event.currentTarget.value)}
-            placeholder="Search or create tag"
-          />
-          <Combobox.Options>
-            {options}
+      <Combobox.Dropdown>
+        <Combobox.Search
+          value={search}
+          onChange={(event) => setSearch(event.currentTarget.value)}
+          placeholder="Search or create tag"
+        />
+        <Combobox.Options>
+          {options}
 
-            {!exactOptionMatch && search.trim().length > 0 && (
-              <Combobox.Option value="$create">
-                + Create {search}
-              </Combobox.Option>
-            )}
-          </Combobox.Options>
-        </Combobox.Dropdown>
-      </Combobox>
-    </>
+          {!exactOptionMatch && search.trim().length > 0 && (
+            <Combobox.Option value="$create">+ Create {search}</Combobox.Option>
+          )}
+        </Combobox.Options>
+      </Combobox.Dropdown>
+    </Combobox>
   );
 }
