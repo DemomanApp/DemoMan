@@ -35,7 +35,9 @@
     "rules": {
       "a11y": {
         // keyboard navigation is currently not supported.
-        "useKeyWithClickEvents": "off"
+        "useKeyWithClickEvents": "off",
+        // TODO: use semantic elements instead of <div>s and remove the following line
+        "noStaticElementInteractions": "off"
       }
     }
   },
