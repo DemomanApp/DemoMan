@@ -6,13 +6,13 @@ import { FixedSizeList } from "react-window";
 import { ScrollArea, Text } from "@mantine/core";
 
 import {
+  destructureHighlight,
   type GameSummary,
   type HighlightEvent,
   type HighlightPlayerSnapshot,
   type HighlightType,
   type TaggedHighlight,
   type UserIdAliases,
-  destructureHighlight,
 } from "@/demo";
 import HighlightBox from "./HighlightBox";
 import TimelineFilters, { type Filters } from "./TimelineFilters";

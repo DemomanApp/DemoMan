@@ -7,6 +7,7 @@ import {
   type AirshotHighlight,
   type ChatMessageHighlight,
   type CrossbowAirshotHighlight,
+  destructureHighlight,
   type Highlight,
   type HighlightPlayerSnapshot,
   type KillHighlight,
@@ -21,7 +22,6 @@ import {
   type RoundStartHighlight,
   type RoundWinHighlight,
   type Team,
-  destructureHighlight,
 } from "@/demo";
 
 import classes from "./HighlightBox.module.css";

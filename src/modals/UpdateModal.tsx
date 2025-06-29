@@ -4,6 +4,10 @@ import type { Update } from "@tauri-apps/plugin-updater";
 
 import { useEffect, useRef, useState } from "react";
 
+import { intlFormatDistance } from "date-fns";
+import Markdown from "react-markdown";
+import remarkGfm from "remark-gfm";
+
 import {
   Alert,
   Button,
@@ -19,10 +23,6 @@ import {
 import { useInterval } from "@mantine/hooks";
 import { type ContextModalProps, modals } from "@mantine/modals";
 import { IconBrandGithub, IconDownload } from "@tabler/icons-react";
-
-import { intlFormatDistance } from "date-fns";
-import Markdown from "react-markdown";
-import remarkGfm from "remark-gfm";
 
 import type { Result } from "@/types";
 import { formatFileSize } from "@/util";

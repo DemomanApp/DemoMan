@@ -11,10 +11,10 @@ import "@mantine/dates/styles.css";
 
 import "@fontsource-variable/hanken-grotesk";
 
-import { RconProvider } from "./RconContext";
-import { UpdateStateProvider } from "./UpdateStateContext";
 import modals from "./modals";
+import { RconProvider } from "./RconContext";
 import router from "./routes/router";
+import { UpdateStateProvider } from "./UpdateStateContext";
 import "./globalExtensions";
 
 import "./index.css";

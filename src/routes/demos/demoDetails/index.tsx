@@ -1,4 +1,8 @@
+import * as log from "@tauri-apps/plugin-log";
+import { revealItemInDir } from "@tauri-apps/plugin-opener";
+
 import { Suspense, useContext, useState } from "react";
+
 import {
   Await,
   type LoaderFunction,
@@ -7,9 +11,6 @@ import {
   useLoaderData,
   useNavigate,
 } from "react-router";
-
-import * as log from "@tauri-apps/plugin-log";
-import { revealItemInDir } from "@tauri-apps/plugin-opener";
 
 import {
   ActionIcon,
@@ -42,7 +43,6 @@ import {
 } from "@tabler/icons-react";
 
 import { HeaderPortal } from "@/AppShell";
-import { RconContext } from "@/RconContext";
 import { getDemo, getDemoDetails, sendRconCommand, setDemoTags } from "@/api";
 import {
   AsyncButton,
@@ -55,6 +55,7 @@ import type { Demo, GameSummary } from "@/demo";
 import useStore from "@/hooks/useStore";
 import { openDeleteDemoModal } from "@/modals/DeleteDemoModal";
 import { openRenameDemoModal } from "@/modals/RenameDemoModal";
+import { RconContext } from "@/RconContext";
 import { decodeParam, formatDuration, formatFileSize } from "@/util";
 import DemoTagsInput from "./DemoTagsInput";
 import EventsList from "./EventsList";

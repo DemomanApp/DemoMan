@@ -1,3 +1,5 @@
+import { type Class, stringifyClass } from "@/demo";
+
 import DemomanIcon from "@/assets/class_icons/demoman.png";
 import EngineerIcon from "@/assets/class_icons/engineer.png";
 import HeavyIcon from "@/assets/class_icons/heavy.png";
@@ -7,7 +9,6 @@ import ScoutIcon from "@/assets/class_icons/scout.png";
 import SniperIcon from "@/assets/class_icons/sniper.png";
 import SoldierIcon from "@/assets/class_icons/soldier.png";
 import SpyIcon from "@/assets/class_icons/spy.png";
-import { type Class, stringifyClass } from "@/demo";
 
 /*
   Class mapping:

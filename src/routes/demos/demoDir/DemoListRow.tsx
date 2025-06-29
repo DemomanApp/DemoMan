@@ -1,3 +1,6 @@
+import * as log from "@tauri-apps/plugin-log";
+import { revealItemInDir } from "@tauri-apps/plugin-opener";
+
 import { useNavigate } from "react-router";
 
 import {
@@ -25,9 +28,6 @@ import {
   type Icon as IconType,
   IconUser,
 } from "@tabler/icons-react";
-
-import * as log from "@tauri-apps/plugin-log";
-import { revealItemInDir } from "@tauri-apps/plugin-opener";
 
 import { sendRconCommand } from "@/api";
 import { IconKillstreak } from "@/components/icons";

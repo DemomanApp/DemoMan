@@ -2,9 +2,9 @@ import { ActionIcon, Stack, Text, Tooltip } from "@mantine/core";
 import { IconPlus, IconTrash } from "@tabler/icons-react";
 
 import useStore from "@/hooks/useStore";
-
 import { openAddDemoDirModal } from "@/modals/DemoDirModal";
 import { drop } from "@/util";
+
 import classes from "./settings.module.css";
 
 export default function DemoDirsSetting() {

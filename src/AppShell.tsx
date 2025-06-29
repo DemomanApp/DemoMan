@@ -1,4 +1,5 @@
 import { type ReactNode, useContext } from "react";
+
 import { Link, Outlet, useNavigate } from "react-router";
 
 import {
@@ -19,9 +20,8 @@ import {
 } from "@tabler/icons-react";
 
 import { HeaderButton, RconIndicator } from "@/components";
-
-import { UpdateStateContext } from "./UpdateStateContext";
 import { openUpdateModal } from "./modals/UpdateModal";
+import { UpdateStateContext } from "./UpdateStateContext";
 
 import classes from "./AppShell.module.css";
 

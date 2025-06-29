@@ -1,8 +1,9 @@
-import useStore from "@/hooks/useStore";
-import PathPicker from "@/routes/settings/PathPicker";
 import { Button, Group, Input, TextInput } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { type ContextModalProps, modals } from "@mantine/modals";
+
+import useStore from "@/hooks/useStore";
+import PathPicker from "@/routes/settings/PathPicker";
 
 export function openAddDemoDirModal() {
   modals.openContextModal({

@@ -1,4 +1,5 @@
 import { useMantineColorScheme } from "@mantine/core";
+
 import KillIconData from "./KillIconData";
 
 export type KillIconProps = {

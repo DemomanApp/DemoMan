@@ -1,14 +1,15 @@
 import { createBrowserRouter } from "react-router";
 
 import { Center } from "@mantine/core";
+
 import AboutRoute from "./AboutRoute";
-import { loader as indexLoader } from "./IndexRoute";
-import RootRoute from "./RootRoute";
 import DemosRoute from "./demos";
 import DemoDetailsRoute, {
   loader as demoDetailsLoader,
 } from "./demos/demoDetails";
 import DemoDirRoute from "./demos/demoDir";
+import { loader as indexLoader } from "./IndexRoute";
+import RootRoute from "./RootRoute";
 import RconConsole from "./rconConsole";
 import RconSetup from "./rconSetup";
 import SettingsView from "./settings";
