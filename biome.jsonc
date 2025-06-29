@@ -3,10 +3,10 @@
   "vcs": { "enabled": true, "clientKind": "git", "useIgnoreFile": true },
   "files": {
     "ignoreUnknown": false,
-    "ignore": ["src-tauri"]
+    "includes": ["**", "!**/src-tauri"]
   },
   "formatter": { "enabled": true, "indentStyle": "space" },
-  "organizeImports": { "enabled": true },
+  "assist": { "actions": { "source": { "organizeImports": "on" } } },
   "linter": {
     "enabled": true,
     "rules": {
@@ -19,12 +19,6 @@
         "noUnusedVariables": "error",
         "noUnusedFunctionParameters": "error",
         "useHookAtTopLevel": "error"
-      },
-      "style": {
-        "noNamespace": "error"
-      },
-      "suspicious": {
-        "noEmptyBlockStatements": "error"
       }
     }
   },
