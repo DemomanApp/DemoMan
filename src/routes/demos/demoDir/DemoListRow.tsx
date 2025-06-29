@@ -1,6 +1,8 @@
 import * as log from "@tauri-apps/plugin-log";
 import { revealItemInDir } from "@tauri-apps/plugin-opener";
 
+import type React from "react";
+
 import { useNavigate } from "react-router";
 
 import {
@@ -96,16 +98,17 @@ export default function DemoListRow({
       }}
       data-selected={selected}
     >
-      <div
-        className={classes.checkboxRoot}
-        data-checked={selected}
-        onClick={(event) => {
-          event.stopPropagation();
-          onSelect(event);
+      <Checkbox
+        checked={selected}
+        readOnly
+        classNames={{ root: classes.checkboxRoot }}
+        wrapperProps={{
+          onClick: (event: React.MouseEvent) => {
+            event.stopPropagation();
+            onSelect(event);
+          },
         }}
-      >
-        <Checkbox.Indicator checked={selected} />
-      </div>
+      />
       <MapBox mapName={demo.mapName} />
       <div className={classes.content}>
         <Group gap="xs">
