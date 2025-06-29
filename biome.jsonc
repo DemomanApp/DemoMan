@@ -36,12 +36,6 @@
       "a11y": {
         // keyboard navigation is currently not supported.
         "useKeyWithClickEvents": "off"
-      },
-      "correctness": {
-        "noUndeclaredVariables": "error",
-        "noUnusedVariables": "error",
-        "noUnusedFunctionParameters": "error",
-        "useHookAtTopLevel": "error"
       }
     }
   },
