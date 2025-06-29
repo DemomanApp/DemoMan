@@ -29,6 +29,9 @@ export default function BooleanSetting({
   return (
     <div className={classes.setting}>
       <div
+        role="switch"
+        aria-checked={storeValue}
+        tabIndex={0}
         className={classes.labelRowClickable}
         onClick={() => setStoreValue((v) => !v)}
       >
