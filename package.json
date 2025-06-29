@@ -46,7 +46,7 @@
     "remark-gfm": "^4.0.1"
   },
   "devDependencies": {
-    "@biomejs/biome": "1.9.4",
+    "@biomejs/biome": "^2.0.6",
     "@tauri-apps/cli": "^2.4.1",
     "@types/node": "^20.17.30",
     "@types/react": "^18.3.20",
