@@ -1,4 +1,5 @@
 import { useRef } from "react";
+
 import { useNavigation } from "react-router";
 
 /** Like useLocationState, but doesn't cause a rerender on update (like useRef, hence the name) */

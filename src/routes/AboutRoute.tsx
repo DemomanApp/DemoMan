@@ -1,6 +1,7 @@
 import { app } from "@tauri-apps/api";
 
 import { Suspense } from "react";
+
 import { Await } from "react-router";
 
 import { Anchor, Button, Container, Text } from "@mantine/core";

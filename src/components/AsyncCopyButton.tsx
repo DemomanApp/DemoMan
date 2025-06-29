@@ -1,8 +1,9 @@
 import { writeText } from "@tauri-apps/plugin-clipboard-manager";
 
+import { useAsyncCallback } from "react-async-hook";
+
 import { ActionIcon, Tooltip } from "@mantine/core";
 import { IconCheck, IconCopy } from "@tabler/icons-react";
-import { useAsyncCallback } from "react-async-hook";
 
 export type AsyncCopyButtonProps = {
   text: string;

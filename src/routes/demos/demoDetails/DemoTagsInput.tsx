@@ -1,6 +1,6 @@
-import { useState } from "react";
-
 import * as log from "@tauri-apps/plugin-log";
+
+import { useState } from "react";
 
 import {
   CheckIcon,

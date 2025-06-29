@@ -1,4 +1,3 @@
-import memoize from "memoize-one";
 import {
   forwardRef,
   memo,
@@ -8,12 +7,14 @@ import {
   useRef,
   useState,
 } from "react";
+
+import memoize from "memoize-one";
 import { useNavigate } from "react-router";
 import AutoSizer from "react-virtualized-auto-sizer";
 import {
+  areEqual,
   FixedSizeList,
   type ListChildComponentProps,
-  areEqual,
 } from "react-window";
 
 import { ScrollArea } from "@mantine/core";

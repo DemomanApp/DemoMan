@@ -1,5 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 
+import AutoSizer from "react-virtualized-auto-sizer";
+
 import { Input, ScrollArea, Text } from "@mantine/core";
 import { useListState } from "@mantine/hooks";
 import {
@@ -8,11 +10,11 @@ import {
   IconChevronsRight,
   IconX,
 } from "@tabler/icons-react";
-import AutoSizer from "react-virtualized-auto-sizer";
 
 import { HeaderPortal } from "@/AppShell";
 import { sendRconCommand } from "@/api";
 import useStore from "@/hooks/useStore";
+
 import classes from "./RconConsole.module.css";
 
 type HistoryEntry = {

@@ -1,7 +1,7 @@
 import * as log from "@tauri-apps/plugin-log";
-import { type Update, check } from "@tauri-apps/plugin-updater";
+import { check, type Update } from "@tauri-apps/plugin-updater";
 
-import { type ReactNode, createContext, useEffect, useState } from "react";
+import { createContext, type ReactNode, useEffect, useState } from "react";
 
 type UpdateState =
   | { status: "up_to_date" }

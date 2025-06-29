@@ -6,7 +6,30 @@
     "includes": ["**", "!**/src-tauri"]
   },
   "formatter": { "enabled": true, "indentStyle": "space" },
-  "assist": { "actions": { "source": { "organizeImports": "on" } } },
+  "assist": {
+    "actions": {
+      "source": {
+        "organizeImports": {
+          "level": "on",
+          "options": {
+            "groups": [
+              ["@tauri-apps/**/*"],
+              ":BLANK_LINE:",
+              ["react", "react/**", "react-dom", "react-dom/**"],
+              ":BLANK_LINE:",
+              ["**", "!:ALIAS:", "!:PATH:", "!@mantine/**", "!@tabler/**"],
+              ":BLANK_LINE:",
+              ["@mantine/**", "@tabler/**"],
+              ":BLANK_LINE:",
+              [":ALIAS:", ":PATH:", "!**/*.css", "!**/*.png"],
+              ":BLANK_LINE:",
+              ["**/*.css", "**/*.png"]
+            ]
+          }
+        }
+      }
+    }
+  },
   "linter": {
     "enabled": true,
     "rules": {

@@ -1,9 +1,10 @@
+import * as log from "@tauri-apps/plugin-log";
+
 import { useRef } from "react";
 
+import { useNavigate } from "react-router";
 import AutoSizer from "react-virtualized-auto-sizer";
 import { FixedSizeList } from "react-window";
-
-import * as log from "@tauri-apps/plugin-log";
 
 import {
   ActionIcon,
@@ -16,20 +17,19 @@ import {
   TextInput,
   Tooltip,
 } from "@mantine/core";
-import { modals } from "@mantine/modals";
-
-import type { Demo, DemoEvent } from "@/demo";
-
-import { setDemoEvents } from "@/api";
-import { IconKillstreak } from "@/components/icons";
 import { useForm } from "@mantine/form";
+import { modals } from "@mantine/modals";
 import {
   IconBookmark,
   IconEdit,
   IconPlus,
   IconTrash,
 } from "@tabler/icons-react";
-import { useNavigate } from "react-router";
+
+import { setDemoEvents } from "@/api";
+import { IconKillstreak } from "@/components/icons";
+import type { Demo, DemoEvent } from "@/demo";
+
 import classes from "./EventsList.module.css";
 
 type EventsListProps = {

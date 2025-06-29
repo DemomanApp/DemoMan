@@ -1,6 +1,6 @@
-import { useState } from "react";
-
 import { openUrl } from "@tauri-apps/plugin-opener";
+
+import { useState } from "react";
 
 import { ActionIcon, Tabs, Title, Tooltip } from "@mantine/core";
 import { IconBrandSteam } from "@tabler/icons-react";

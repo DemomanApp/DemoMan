@@ -1,7 +1,8 @@
+import { Progress, Tooltip } from "@mantine/core";
+
 import { ClassIcon } from "@/components";
 import { type PlayerSummary, stringifyClass } from "@/demo";
 import { formatDuration } from "@/util";
-import { Progress, Tooltip } from "@mantine/core";
 
 export default function ClassPlaytimeIndicator({
   player,
