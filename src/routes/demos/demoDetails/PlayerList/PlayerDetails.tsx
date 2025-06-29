@@ -66,7 +66,7 @@ export function PlayerDetails({ player, gameSummary }: PlayerDetailsProps) {
             {Array.from({ length: gameSummary.num_rounds }, (_x, roundNum) => (
               <Tabs.Tab
                 value={roundNum.toString()}
-                key={undefined}
+                key={roundNum.toString()}
                 disabled={player.round_scoreboards[roundNum] === undefined}
               >
                 Round {roundNum + 1}
