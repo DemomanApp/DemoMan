@@ -8,7 +8,7 @@ declare global {
   }
 }
 
-if (!Object.prototype.hasOwnProperty.call(Array, "intersperse")) {
+if (!Object.hasOwn(Array, "intersperse")) {
   Object.defineProperty(Array.prototype, "intersperse", {
     value: function intersperse<T>(this: T[], separator: T): T[] {
       return this.flatMap((item, idx) =>
@@ -18,11 +18,11 @@ if (!Object.prototype.hasOwnProperty.call(Array, "intersperse")) {
   });
 }
 
-if (!Object.prototype.hasOwnProperty.call(Array, "indexOfMax")) {
+if (!Object.hasOwn(Array, "indexOfMax")) {
   Object.defineProperty(Array.prototype, "indexOfMax", {
     value: function indexOfMax(this: number[]): number | undefined {
       let max = 0;
-      let max_index: number | undefined = undefined;
+      let max_index: number | undefined;
       this.forEach((value, index) => {
         if (value > max) {
           max = value;

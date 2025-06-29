@@ -61,7 +61,10 @@ function HeaderBar() {
 export function HeaderPortal({
   center,
   right,
-}: { center?: ReactNode; right?: ReactNode }) {
+}: {
+  center?: ReactNode;
+  right?: ReactNode;
+}) {
   return (
     <>
       <Portal target="#header-portal-center">{center}</Portal>
