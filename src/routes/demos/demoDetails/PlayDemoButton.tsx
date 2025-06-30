@@ -21,10 +21,10 @@ import {
   IconX,
 } from "@tabler/icons-react";
 
-import type { RconState } from "@/RconContext";
 import { launchAndPlayDemo, sendRconCommand } from "@/api";
 import type { Demo } from "@/demo";
 import useStore from "@/hooks/useStore";
+import type { RconState } from "@/RconContext";
 
 import classes from "./PlayDemoButton.module.css";
 
@@ -47,7 +47,11 @@ export default function PlayDemoButton({
   demo,
   rconPassword,
   rconState,
-}: { demo: Demo; rconPassword: string; rconState: RconState }) {
+}: {
+  demo: Demo;
+  rconPassword: string;
+  rconState: RconState;
+}) {
   const [preferredOptionKey, setPreferredOptionKey] = useStore(
     "preferredPlayOption"
   );
