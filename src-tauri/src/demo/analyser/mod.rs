@@ -326,12 +326,22 @@ impl PlayerState {
         conditions
     }
 
-    fn handle_life_end(&mut self, tick: DemoTick) {
+    fn handle_life_end(&mut self, teams_switched: bool, tick: DemoTick) {
         if let Some(last_spawn_tick) = self.last_spawn_tick {
             let life_duration = u32::from(tick - last_spawn_tick) as usize;
 
+            let team = if teams_switched {
+                match self.team {
+                    Team::Red => Team::Blue,
+                    Team::Blue => Team::Red,
+                    other => other,
+                }
+            } else {
+                self.team
+            };
+
             self.time_on_class[self.class] += life_duration;
-            self.time_on_team[self.team] += life_duration;
+            self.time_on_team[team] += life_duration;
 
             // Prevent this life from contributing to class playtime a
             // second time, for example by dying after a round ended
@@ -445,9 +455,13 @@ impl Players {
             .unwrap_or_default()
     }
 
-    pub fn finish(mut self, tick: DemoTick) -> (Vec<PlayerSummary>, HashMap<UserId, UserId>) {
+    pub fn finish(
+        mut self,
+        teams_switched: bool,
+        tick: DemoTick,
+    ) -> (Vec<PlayerSummary>, HashMap<UserId, UserId>) {
         for player in self.alive_players_mut() {
-            player.handle_life_end(tick);
+            player.handle_life_end(teams_switched, tick);
         }
 
         let Self { players, aliases } = self;
@@ -456,9 +470,9 @@ impl Players {
         (player_summaries, aliases)
     }
 
-    pub fn player_leave(&mut self, user_id: UserId, tick: DemoTick) {
+    pub fn player_leave(&mut self, teams_switched: bool, user_id: UserId, tick: DemoTick) {
         if let Some(player) = self.get_mut(user_id) {
-            player.handle_life_end(tick);
+            player.handle_life_end(teams_switched, tick);
         }
     }
 
@@ -579,6 +593,7 @@ pub struct GameDetailsAnalyser {
     blue_team_entity_id: EntityId,
     red_team_score: u32,
     blue_team_score: u32,
+    teams_switched: bool,
     local_entity_id: EntityId,
 
     initial_packet_entities_parsed: bool,
@@ -696,7 +711,7 @@ impl MessageHandler for GameDetailsAnalyser {
             .map(|player| player.user_id)
             .unwrap_or_default();
 
-        let (players, aliases) = players.finish(demo_tick);
+        let (players, aliases) = players.finish(self.teams_switched, demo_tick);
 
         Self::Output {
             local_user_id,
@@ -773,7 +788,7 @@ impl GameDetailsAnalyser {
             "CTFPlayerResource" => self.handle_player_resource(entity, parser_state),
             "CTFTeam" => self.handle_team(entity, parser_state),
             "CWeaponMedigun" => self.handle_medigun(entity, parser_state),
-
+            "CTFGameRulesProxy" => self.handle_game_rules(entity, parser_state),
             _ => {}
         }
     }
@@ -1096,6 +1111,17 @@ impl GameDetailsAnalyser {
         }
     }
 
+    fn handle_game_rules(&mut self, entity: &PacketEntity, parser_state: &ParserState) {
+        const TEAMS_SWITCHED_PROP: SendPropIdentifier =
+            SendPropIdentifier::new("DT_TFGameRules", "m_bTeamsSwitched");
+
+        for prop in entity.props(parser_state) {
+            if prop.identifier == TEAMS_SWITCHED_PROP {
+                self.teams_switched = i64::try_from(&prop.value).unwrap_or_default() != 0;
+            }
+        }
+    }
+
     fn parse_user_info(&mut self, index: usize, text: Option<&str>, data: Option<Stream>) {
         let Ok(index) = index.try_into() else {
             warn!("Index out of bounds in parse_user_info");
@@ -1185,7 +1211,7 @@ impl GameDetailsAnalyser {
         if let Some(victim) = victim {
             drop = victim.charge == 100;
             airshot = victim.has_cond(PlayerCondition::TF_COND_BLASTJUMPING);
-            victim.handle_life_end(self.demo_tick);
+            victim.handle_life_end(self.teams_switched, self.demo_tick);
         } else {
             drop = false;
             airshot = false;
@@ -1390,7 +1416,7 @@ impl GameDetailsAnalyser {
     fn handle_round_end(&mut self) {
         self.current_round += 1;
         for player in self.players.alive_players_mut() {
-            player.handle_life_end(self.demo_tick);
+            player.handle_life_end(self.teams_switched, self.demo_tick);
         }
     }
 
@@ -1431,7 +1457,8 @@ impl GameDetailsAnalyser {
             reason: event.reason.to_string(),
         });
 
-        self.players.player_leave(user_id, self.demo_tick);
+        self.players
+            .player_leave(self.teams_switched, user_id, self.demo_tick);
     }
 }
 
