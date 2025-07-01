@@ -31,7 +31,7 @@ use tf_demo_parser::{
         message::{
             gameevent::GameEventMessage,
             packetentities::{EntityId, PacketEntity},
-            usermessage::UserMessage,
+            usermessage::{HudTextLocation, UserMessage},
             Message,
         },
         packet::{
@@ -122,6 +122,9 @@ pub enum Highlight {
     },
     ChatMessage {
         sender: HighlightPlayerSnapshot,
+        text: String,
+    },
+    Message {
         text: String,
     },
     Airshot {
@@ -836,11 +839,21 @@ impl GameDetailsAnalyser {
     }
 
     fn handle_usermessage(&mut self, message: &UserMessage) {
-        if let UserMessage::SayText2(message) = message {
-            self.add_highlight(Highlight::ChatMessage {
-                sender: self.players.snapshot_by_entity_id(message.client),
-                text: message.plain_text(),
-            });
+        match message {
+            UserMessage::SayText2(message) => {
+                self.add_highlight(Highlight::ChatMessage {
+                    sender: self.players.snapshot_by_entity_id(message.client),
+                    text: message.plain_text(),
+                });
+            }
+            UserMessage::Text(message) => {
+                if message.location == HudTextLocation::PrintTalk {
+                    self.add_highlight(Highlight::Message {
+                        text: message.plain_text(),
+                    });
+                }
+            }
+            _ => {}
         }
     }
 

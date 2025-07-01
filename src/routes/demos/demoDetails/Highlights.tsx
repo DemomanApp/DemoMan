@@ -103,6 +103,7 @@ function visibleHighlightTypes(filters: Filters): HighlightType[] {
     result.push("KillStreakEnded");
   }
   if (filters.visibleHighlights.rounds) {
+    result.push("Message");
     result.push("RoundStalemate");
     result.push("RoundStart");
     result.push("RoundWin");
