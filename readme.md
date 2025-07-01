@@ -12,34 +12,33 @@
 
 <p align="center">The TF2 demo manager for Linux, Windows and MacOS.</p>
 
-# 🚧 Rewrite in progress 🚧
+# What is a demo manager and why do I need one?
 
-Version 1 of DemoMan is feature-complete and available for download.
-Visit the [releases page](https://github.com/DemomanApp/DemoMan/releases)
-to download the latest executable,
-and the [v1 branch](https://github.com/DemomanApp/DemoMan/tree/v1)
-of this repo for screenshots, features, and source code of version 1.
+Do you have hundreds of demos lying around, with no convenient way to know what happens in each one?
+DemoMan extracts lots of information about your demos, and makes them easily searchable.
+It also helps you organize your demos, and allows you to manage bookmarks.
 
-I'm currently working on version 2 of the app, rewritten from scratch with
-[Rust](https://www.rust-lang.org/),
-[Tauri](https://tauri.app/), and
-[Mantine](https://mantine.dev/).
-This version will have many exciting features that were
-not feasible to implement in version 1.
+# ✨ Features
 
-Preview builds of version 2 are already available under the releases page on GitHub.
+- Display/edit bookmarks
+- Display events from a demo (chat, killfeed, airshots, ...)
+- Display scoreboard, with per-round stats for each player
+- Play demo in TF2 with one click
+- Organize your demos with tags
+
+# 📸 Screenshots
 
 # ❤️ Contributing
 
 Contributions are welcome and appreciated.
-If you have any questions, feel free to contact me
+If you have any questions, feel free to chat with the devs
 on the project's [Discord server](https://discord.gg/GduKxhYFhR).
 Development is organized [here](https://github.com/orgs/DemomanApp/projects/2).
 
 If you can't contribute code, you can still help:
 
 - Give the repo a star on GitHub 😉
-- Contribute map thumbnails
+- [Contribute map thumbnails](https://github.com/DemomanApp/DemoMan/wiki/Contributing-a-map-thumbnail)
 - Report any issues you encounter
 - Let the devs know if you have any ideas/suggestions
 
@@ -55,6 +54,17 @@ Once that's done:
 1. Clone the repository and run `npm install`.
 2. Start the program by running `npm run tauri dev`.
 3. Create a packaged executable by running `npm run tauri build`.
+
+Before committing, run `npm run check` to run automatic code quality checks.
+
+# ⭐ Acknowledgements
+
+DemoMan would not have been possible without these awesome projects:
+
+- [Rust](https://www.rust-lang.org/)
+- [Tauri](https://tauri.app/)
+- [Mantine](https://mantine.dev/)
+- [demostf/parser](https://codeberg.org/demostf/parser/)
 
 # ⚖️ License
 
