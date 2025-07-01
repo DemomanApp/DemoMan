@@ -13,6 +13,7 @@ import {
   type KillHighlight,
   type KillStreakEndedHighlight,
   type KillStreakHighlight,
+  type MessageHighlight,
   type PauseHighlight,
   type PlayerConnectedHighlight,
   type PlayerDisconnectedHighlight,
@@ -237,6 +238,15 @@ function ChatMessageHighlightBox(highlight: ChatMessageHighlight) {
   );
 }
 
+function MessageHighlightBox(highlight: MessageHighlight) {
+  let text = highlight.text;
+  if (text === "#TF_TeamsSwitched") {
+    text = "Teams have been switched.";
+  }
+
+  return <div className={classes.highlightCenter}>{text}</div>;
+}
+
 function AirshotHighlightBox(highlight: AirshotHighlight) {
   const attackerName = highlight.attacker.name;
   const victimName = highlight.victim.name;
@@ -366,6 +376,8 @@ export default function HighlightBox({ event }: HighlightProps) {
       return KillStreakEndedHighlightBox(highlight);
     case "ChatMessage":
       return ChatMessageHighlightBox(highlight);
+    case "Message":
+      return MessageHighlightBox(highlight);
     case "Airshot":
       return AirshotHighlightBox(highlight);
     case "CrossbowAirshot":

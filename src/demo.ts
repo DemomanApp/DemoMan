@@ -77,6 +77,10 @@ export type ChatMessageHighlight = {
   text: string;
 };
 
+export type MessageHighlight = {
+  text: string;
+};
+
 export type AirshotHighlight = {
   attacker: HighlightPlayerSnapshot;
   victim: HighlightPlayerSnapshot;
@@ -129,6 +133,7 @@ export type Highlight =
   | { KillStreak: KillStreakHighlight }
   | { KillStreakEnded: KillStreakEndedHighlight }
   | { ChatMessage: ChatMessageHighlight }
+  | { Message: MessageHighlight }
   | { Airshot: AirshotHighlight }
   | { CrossbowAirshot: CrossbowAirshotHighlight }
   | { PointCaptured: PointCapturedHighlight }
@@ -147,6 +152,7 @@ export type TaggedHighlight =
   | { type: "KillStreak"; highlight: KillStreakHighlight }
   | { type: "KillStreakEnded"; highlight: KillStreakEndedHighlight }
   | { type: "ChatMessage"; highlight: ChatMessageHighlight }
+  | { type: "Message"; highlight: MessageHighlight }
   | { type: "Airshot"; highlight: AirshotHighlight }
   | { type: "CrossbowAirshot"; highlight: CrossbowAirshotHighlight }
   | { type: "PointCaptured"; highlight: PointCapturedHighlight }
