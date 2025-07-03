@@ -56,6 +56,8 @@ export default function ErrorBoundary() {
     );
   } else if (error instanceof Error) {
     return <ErrorBox>{error.message}</ErrorBox>;
+  } else if (typeof error === "string") {
+    return <ErrorBox>{error}</ErrorBox>;
   } else {
     return <ErrorBox>Unknown error: {JSON.stringify(error)}</ErrorBox>;
   }
