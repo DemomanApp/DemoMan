@@ -8,6 +8,7 @@ import DemoDetailsRoute, {
   loader as demoDetailsLoader,
 } from "./demos/demoDetails";
 import DemoDirRoute from "./demos/demoDir";
+import ErrorBoundary from "./ErrorBoundary";
 import { loader as indexLoader } from "./IndexRoute";
 import RootRoute from "./RootRoute";
 import RconConsole from "./rconConsole";
@@ -24,6 +25,7 @@ export default createBrowserRouter([
     path: "/",
     element: <RootRoute />,
     HydrateFallback,
+    ErrorBoundary,
     children: [
       {
         index: true,
@@ -36,33 +38,40 @@ export default createBrowserRouter([
           {
             index: true,
             element: <DemosRoute />,
+            ErrorBoundary,
           },
           {
             path: "dir/:path",
             element: <DemoDirRoute />,
+            ErrorBoundary,
           },
           {
             path: "show/:demoPath",
             element: <DemoDetailsRoute />,
             loader: demoDetailsLoader,
+            ErrorBoundary,
           },
         ],
       },
       {
         path: "settings",
         element: <SettingsView />,
+        ErrorBoundary,
       },
       {
         path: "about",
         element: <AboutRoute />,
+        ErrorBoundary,
       },
       {
         path: "rcon-setup",
         element: <RconSetup />,
+        ErrorBoundary,
       },
       {
         path: "rcon-console",
         element: <RconConsole />,
+        ErrorBoundary,
       },
     ],
   },

@@ -1,0 +1,7 @@
+.alert {
+  max-width: 50%;
+}
+
+.error-text {
+  user-select: text;
+}
