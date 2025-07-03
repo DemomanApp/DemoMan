@@ -4,12 +4,12 @@ import { useEffect, useState } from "react";
 
 import { useParams } from "react-router";
 
-import { Alert, Tooltip } from "@mantine/core";
-import { IconAlertCircle, IconFolder } from "@tabler/icons-react";
+import { Tooltip } from "@mantine/core";
+import { IconFolder } from "@tabler/icons-react";
 
 import { HeaderPortal } from "@/AppShell";
 import { getDemosInDirectory } from "@/api";
-import { Fill, HeaderButton, LoaderFallback } from "@/components";
+import { HeaderButton, LoaderFallback } from "@/components";
 import type { Demo, DemoFilter, SortKey, SortOrder } from "@/demo";
 import useLocationState from "@/hooks/useLocationState";
 import type { Path } from "@/store";
@@ -24,20 +24,6 @@ type DemoListLoaderArgs = {
   filters: DemoFilter[];
   query: string;
 };
-
-function ErrorBox({ error }: { error: string }) {
-  return (
-    <Fill>
-      <Alert
-        icon={<IconAlertCircle size={16} />}
-        title="An error occurred while scanning for demo files"
-        color="red"
-      >
-        {String(error)}
-      </Alert>
-    </Fill>
-  );
-}
 
 function DemoListLoader({
   path,
@@ -59,7 +45,7 @@ function DemoListLoader({
     return <DemoList demos={demos} />;
   }
   if (error !== null) {
-    return <ErrorBox error={error} />;
+    throw new Error(error);
   }
   return <LoaderFallback />;
 }
