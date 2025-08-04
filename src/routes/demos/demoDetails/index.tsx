@@ -1,7 +1,7 @@
 import * as log from "@tauri-apps/plugin-log";
 import { revealItemInDir } from "@tauri-apps/plugin-opener";
 
-import { Suspense, useContext, useState } from "react";
+import { Suspense, useContext } from "react";
 
 import {
   Await,
@@ -52,6 +52,7 @@ import {
   MapThumbnail,
 } from "@/components";
 import type { Demo, GameSummary } from "@/demo";
+import useLocationState from "@/hooks/useLocationState";
 import useStore from "@/hooks/useStore";
 import { openDeleteDemoModal } from "@/modals/DeleteDemoModal";
 import { openRenameDemoModal } from "@/modals/RenameDemoModal";
@@ -108,7 +109,7 @@ export default function DemoDetailsView() {
 
   const navigate = useNavigate();
 
-  const [currentTab, setCurrentTab] = useState("players");
+  const [currentTab, setCurrentTab] = useLocationState("tab", "players");
 
   const [rconPassword, _] = useStore("rconPassword");
 
