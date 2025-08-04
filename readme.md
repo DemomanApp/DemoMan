@@ -28,6 +28,24 @@ It also helps you organize your demos, and allows you to manage bookmarks.
 
 # 📸 Screenshots
 
+## Demo List
+
+![Demo list](./githubassets/screenshots/demo_list.png)
+
+## Demo Details
+
+### Scoreboard Tab
+
+![Demo details - scoreboard](./githubassets/screenshots/demo_details_scoreboard.png)
+
+### Bookmarks Tab
+
+![Demo details - bookmarks tab](./githubassets/screenshots/demo_details_bookmarks.png)
+
+### Events Tab
+
+![Demo details - events tab](./githubassets/screenshots/demo_details_events.png)
+
 # ❤️ Contributing
 
 Contributions are welcome and appreciated.
