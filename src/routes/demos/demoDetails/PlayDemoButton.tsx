@@ -12,7 +12,6 @@ import {
   Tooltip,
 } from "@mantine/core";
 import {
-  IconBrandSteam,
   IconCheck,
   IconChevronDown,
   IconCopy,
@@ -21,7 +20,7 @@ import {
   IconX,
 } from "@tabler/icons-react";
 
-import { launchAndPlayDemo, sendRconCommand } from "@/api";
+import { sendRconCommand } from "@/api";
 import type { Demo } from "@/demo";
 import useStore from "@/hooks/useStore";
 import type { RconState } from "@/RconContext";
@@ -97,15 +96,6 @@ export default function PlayDemoButton({
       disabled: false,
       onClick() {
         return writeText(`playdemo "${demo.path}"`);
-      },
-      tooltip: undefined,
-    },
-    launch: {
-      title: "Launch TF2 to play demo",
-      icon: <IconBrandSteam />,
-      disabled: false,
-      onClick() {
-        return launchAndPlayDemo(demo.path);
       },
       tooltip: undefined,
     },

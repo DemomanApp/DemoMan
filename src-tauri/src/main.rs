@@ -99,7 +99,6 @@ fn main() {
         })
         .invoke_handler(tauri::generate_handler![
             commands::cli::get_file_argument,
-            commands::launch_tf2::launch_and_play_demo,
             commands::demos::delete_demo,
             commands::demos::get_demo,
             commands::demos::get_demo_details,

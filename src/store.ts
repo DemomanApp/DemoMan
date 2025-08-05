@@ -6,7 +6,7 @@ export type StoreSchema = {
   rconPassword: string;
   enableLocationOverlay: boolean;
   skipTrash: boolean;
-  preferredPlayOption: "rcon" | "launch" | "copyCommand";
+  preferredPlayOption: "rcon" | "copyCommand";
 };
 
 export function storeDefault<K extends keyof StoreSchema>(

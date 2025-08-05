@@ -999,7 +999,6 @@ version = "2.0.0-alpha.6"
 dependencies = [
  "bincode",
  "bitbuffer",
- "cfg-if",
  "clap",
  "log",
  "num-derive",
