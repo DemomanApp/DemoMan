@@ -24,6 +24,12 @@ pub enum Error {
     DemoParsing(#[from] tf_demo_parser::ParseError),
     #[error("JSON (de-)serialization failed: {0}")]
     SerdeJson(#[from] serde_json::Error),
+    #[allow(
+        dead_code,
+        reason = "This is currently only constructed when compiling for Windows"
+    )]
+    #[error("Could not locate Steam installation")]
+    SteamNotInstalled,
 }
 
 impl From<disk_cache::Error> for Error {
