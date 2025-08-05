@@ -9,12 +9,22 @@ pub enum TF2DirError {
     Tf2NotFound,
 }
 
+impl From<steamlocate::Error> for TF2DirError {
+    fn from(_value: steamlocate::Error) -> Self {
+        TF2DirError::SteamNotFound
+    }
+}
+
 #[tauri::command]
 pub fn get_tf2_dir() -> Result<String, TF2DirError> {
     const TF2_ID: u32 = 440;
 
-    let mut steam_dir = SteamDir::locate().ok_or(TF2DirError::SteamNotFound)?;
-    let tf2_dir = steam_dir.app(&TF2_ID).ok_or(TF2DirError::Tf2NotFound)?;
+    let steam_dir = SteamDir::locate()?;
+    let (tf2, library) = steam_dir
+        .find_app(TF2_ID)?
+        .ok_or(TF2DirError::Tf2NotFound)?;
 
-    Ok(String::from(tf2_dir.path.to_string_lossy()))
+    Ok(String::from(
+        library.resolve_app_dir(&tf2).to_string_lossy(),
+    ))
 }
