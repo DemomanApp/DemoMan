@@ -23,7 +23,7 @@ rcon = { version = "0.6", features = ["rt-tokio"] }
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
 steamid-ng = "1.0"
-steamlocate = "1.2"
+steamlocate = "2.0"
 tauri = { version = "2", features = [] }
 tauri-plugin-clipboard-manager = "2"
 tauri-plugin-dialog = "2"
