@@ -30,21 +30,21 @@ It also helps you organize your demos, and allows you to manage bookmarks.
 
 ## Demo List
 
-![Demo list](./githubassets/screenshots/demo_list.png)
+![Demo list](./.github/assets/screenshots/demo_list.png)
 
 ## Demo Details
 
 ### Scoreboard Tab
 
-![Demo details - scoreboard](./githubassets/screenshots/demo_details_scoreboard.png)
+![Demo details - scoreboard](./.github/assets/screenshots/demo_details_scoreboard.png)
 
 ### Bookmarks Tab
 
-![Demo details - bookmarks tab](./githubassets/screenshots/demo_details_bookmarks.png)
+![Demo details - bookmarks tab](./.github/assets/screenshots/demo_details_bookmarks.png)
 
 ### Events Tab
 
-![Demo details - events tab](./githubassets/screenshots/demo_details_events.png)
+![Demo details - events tab](./.github/assets/screenshots/demo_details_events.png)
 
 # ❤️ Contributing
 
