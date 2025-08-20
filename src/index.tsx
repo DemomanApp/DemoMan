@@ -7,7 +7,6 @@ import { MantineProvider } from "@mantine/core";
 import { ModalsProvider } from "@mantine/modals";
 
 import "@mantine/core/styles.css";
-import "@mantine/dates/styles.css";
 
 import "@fontsource-variable/hanken-grotesk";
 

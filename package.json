@@ -22,7 +22,6 @@
   "dependencies": {
     "@fontsource-variable/hanken-grotesk": "^5.2.5",
     "@mantine/core": "^8.2",
-    "@mantine/dates": "^8.2",
     "@mantine/form": "^8.2",
     "@mantine/hooks": "^8.2",
     "@mantine/modals": "^8.2",
