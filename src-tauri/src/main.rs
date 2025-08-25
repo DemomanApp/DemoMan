@@ -71,11 +71,8 @@ fn main() {
     // To be removed once the upstream issue is resolved
     #[cfg(target_os = "linux")]
     {
-        // env::set_var("__GL_THREADED_OPTIMIZATIONS", "0");
-        // env::set_var("__NV_DISABLE_EXPLICIT_SYNC", "1");
-
-        // The above don't seem to work anymore
-        env::set_var("WEBKIT_DISABLE_COMPOSITING_MODE", "1");
+        env::set_var("__GL_THREADED_OPTIMIZATIONS", "0");
+        env::set_var("__NV_DISABLE_EXPLICIT_SYNC", "1");
     }
 
     let args = Args::parse();
