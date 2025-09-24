@@ -18,6 +18,10 @@ Do you have hundreds of demos lying around, with no convenient way to know what 
 DemoMan extracts lots of information about your demos, and makes them easily searchable.
 It also helps you organize your demos, and allows you to manage bookmarks.
 
+# 📥 Installation
+
+Head over to the [latest release](https://github.com/DemomanApp/DemoMan/releases/latest) and download the correct installer for your operating system.
+
 # ✨ Features
 
 - Display/edit bookmarks
