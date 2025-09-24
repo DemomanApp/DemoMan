@@ -39,11 +39,9 @@ jobs:
           # steps don't have to compile again.
           includeDebug: true
           includeRelease: false
-          args: "-- --locked"
+          args: "--no-bundle -- --locked"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
-          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
       - name: Run backend tests
         run: cargo test --all-features
       - name: Lint backend
