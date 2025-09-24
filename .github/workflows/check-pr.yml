@@ -39,6 +39,7 @@ jobs:
           # steps don't have to compile again.
           includeDebug: true
           includeRelease: false
+          args: "-- --locked"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
