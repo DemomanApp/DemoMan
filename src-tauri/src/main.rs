@@ -2,11 +2,6 @@
     all(not(debug_assertions), target_os = "windows"),
     windows_subsystem = "windows"
 )]
-#![warn(clippy::pedantic)]
-#![allow(clippy::module_name_repetitions)]
-#![allow(clippy::enum_variant_names)]
-// Disabled because of false positives inside tauri macros
-#![allow(clippy::used_underscore_binding)]
 
 use std::env;
 
