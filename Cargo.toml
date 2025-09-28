@@ -2,5 +2,12 @@
 members = ["src-tauri"]
 resolver = "2"
 
+[workspace.lints.clippy]
+pedantic = { level = "warn", priority = -1 }
+
+# Disabled because of false positives inside tauri macros
+# Can be removed once https://github.com/tauri-apps/tauri/pull/14225 is merged
+used_underscore_binding = "allow"
+
 [profile.dev]
 opt-level = 3

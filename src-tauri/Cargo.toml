@@ -9,6 +9,9 @@ default-run = "demoman"
 edition = "2021"
 rust-version = "1.76"
 
+[lints]
+workspace = true
+
 [build-dependencies]
 tauri-build = { version = "2.1.1", features = [] }
 
