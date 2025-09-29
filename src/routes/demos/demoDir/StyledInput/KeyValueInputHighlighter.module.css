@@ -1,0 +1,8 @@
+.filter {
+  color: var(--mantine-primary-color-light-color);
+
+  background-color: var(--mantine-primary-color-light);
+  border-radius: var(--mantine-radius-sm);
+  padding-inline: 1px;
+  margin-inline: -1px;
+}

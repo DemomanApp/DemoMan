@@ -1,8 +1,10 @@
 import { useEffect, useState } from "react";
 
-import { Input } from "@mantine/core";
+import { Combobox, Input, useCombobox } from "@mantine/core";
 import { useDebouncedValue } from "@mantine/hooks";
 import { IconSearch } from "@tabler/icons-react";
+
+import KeyValueInputHighlighter from "./StyledInput/KeyValueInputHighlighter";
 
 import classes from "./SearchInput.module.css";
 
@@ -17,27 +19,55 @@ export default function SearchInput({
   setQuery,
   debounceInterval,
 }: SearchInputProps) {
-  const [rawQuery, setRawQuery] = useState(query);
-
-  const [debouncedQuery] = useDebouncedValue(rawQuery, debounceInterval);
+  const combobox = useCombobox();
+  const [rawQueryText, setRawQueryText] = useState(query);
+  const [debouncedQueryText] = useDebouncedValue(
+    rawQueryText,
+    debounceInterval
+  );
 
   useEffect(() => {
-    if (debouncedQuery !== query) {
-      setQuery(debouncedQuery);
+    if (debouncedQueryText !== query) {
+      setQuery(debouncedQueryText);
     }
-  }, [setQuery, debouncedQuery, query]);
+  }, [setQuery, debouncedQueryText, query]);
 
   return (
-    <Input
-      variant="filled"
-      placeholder="Search"
-      size="sm"
-      leftSection={<IconSearch size={18} />}
-      classNames={{ input: classes.input, wrapper: classes.wrapper }}
-      value={rawQuery}
-      onChange={(event) => {
-        setRawQuery(event.currentTarget.value);
+    <Combobox
+      onOptionSubmit={(optionValue) => {
+        setRawQueryText(optionValue);
+        combobox.closeDropdown();
       }}
-    />
+      store={combobox}
+      withinPortal={false}
+    >
+      <Combobox.Target>
+        <Input
+          variant="filled"
+          size="md"
+          leftSection={<IconSearch size={18} />}
+          value={rawQueryText}
+          onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+            setRawQueryText(event.currentTarget.value);
+            combobox.openDropdown();
+            combobox.updateSelectedOptionIndex();
+          }}
+          classNames={{
+            input: classes.input,
+            wrapper: classes.wrapper,
+          }}
+          onClick={() => combobox.openDropdown()}
+          onFocus={() => combobox.openDropdown()}
+          onBlur={() => combobox.closeDropdown()}
+          placeholder="Search..."
+          component={KeyValueInputHighlighter}
+        />
+      </Combobox.Target>
+      <Combobox.Dropdown>
+        <Combobox.Options>
+          <Combobox.Empty>Nothing found</Combobox.Empty>
+        </Combobox.Options>
+      </Combobox.Dropdown>
+    </Combobox>
   );
 }

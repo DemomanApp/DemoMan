@@ -1,0 +1,42 @@
+.wrapper {
+  position: relative;
+  width: 100%;
+  display: flex;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: none;
+  align-items: center;
+}
+
+.styled-content {
+  position: absolute;
+  white-space: pre;
+  pointer-events: none;
+  align-content: center;
+}
+
+.input-wrapper {
+  width: 100%;
+}
+
+.sizer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 0;
+  white-space: pre;
+  visibility: hidden;
+}
+
+.input {
+  border: none;
+  outline: none;
+  position: relative;
+  z-index: 2;
+  min-width: 100%;
+  background: transparent;
+  color: transparent;
+  caret-color: var(--input-color);
+  overflow-x: auto;
+  overflow-y: hidden;
+}
