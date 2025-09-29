@@ -1,22 +1,22 @@
 .header-left,
 .header-center,
 .header-right {
-  flex-basis: 0;
+  flex: 0 0 auto;
   display: flex;
   align-items: center;
 }
 
 .header-left {
   justify-content: left;
-  flex-grow: 1;
+  width: 25%;
 }
 
 .header-center {
   justify-content: center;
-  flex-grow: 2;
+  width: 50%;
 }
 
 .header-right {
   justify-content: right;
-  flex-grow: 1;
+  width: 25%;
 }
