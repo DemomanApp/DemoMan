@@ -1,9 +1,9 @@
 import type { SVGProps } from "react";
 
-import type { Icon, TablerIconsProps } from "@tabler/icons-react";
+import type { Icon, IconProps } from "@tabler/icons-react";
 
 function svgProps(
-  { color, size, stroke, ...other }: TablerIconsProps,
+  { color, size, stroke, ...other }: IconProps,
   name: string
 ): SVGProps<SVGSVGElement> {
   return {
