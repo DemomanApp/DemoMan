@@ -1,4 +1,4 @@
-import { memo } from "react";
+import { memo, type ReactNode } from "react";
 
 const MAP_THUMBNAILS = import.meta.glob<true, string, string>(
   "../assets/map_thumbnails/*.png",
@@ -30,7 +30,7 @@ function getThumbnail(mapName: string): string | undefined {
 export type MapThumbnailProps = {
   mapName: string;
   className?: string;
-  fallback: JSX.Element;
+  fallback: ReactNode;
 };
 
 export default memo(function MapThumbnail({
