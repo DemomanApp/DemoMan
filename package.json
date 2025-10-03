@@ -25,7 +25,7 @@
     "@mantine/form": "^8.2",
     "@mantine/hooks": "^8.2",
     "@mantine/modals": "^8.2",
-    "@tabler/icons-react": "^2.47.0",
+    "@tabler/icons-react": "3.35.0",
     "@tauri-apps/api": "^2.8.0",
     "@tauri-apps/plugin-clipboard-manager": "^2.3.0",
     "@tauri-apps/plugin-dialog": "^2.4.0",
