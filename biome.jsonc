@@ -43,6 +43,6 @@
   },
   "javascript": {
     "formatter": { "quoteStyle": "double", "trailingCommas": "es5" },
-    "globals": ["React", "JSX"]
+    "globals": ["React"]
   }
 }
