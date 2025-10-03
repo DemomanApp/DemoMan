@@ -1,7 +1,7 @@
 import { writeText } from "@tauri-apps/plugin-clipboard-manager";
 import * as log from "@tauri-apps/plugin-log";
 
-import { useState } from "react";
+import { type ReactNode, useState } from "react";
 
 import {
   ActionIcon,
@@ -62,10 +62,10 @@ export default function PlayDemoButton({
 
   type PlayDemoOption = {
     title: string;
-    icon: JSX.Element;
+    icon: ReactNode;
     disabled: boolean;
     onClick(): Promise<unknown>;
-    tooltip?: JSX.Element;
+    tooltip?: ReactNode;
   };
 
   const options = {

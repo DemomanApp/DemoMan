@@ -1,5 +1,7 @@
 import * as log from "@tauri-apps/plugin-log";
 
+import type { ReactNode } from "react";
+
 import CapturePoints from "@/assets/translations/capture_points.json";
 import { KillIcon } from "@/components";
 import KillstreakIcon from "@/components/KillstreakIcon";
@@ -204,7 +206,7 @@ function KillStreakHighlightBox(highlight: KillStreakHighlight) {
 function KillStreakEndedHighlightBox(highlight: KillStreakEndedHighlight) {
   const { killer, victim, streak } = highlight;
 
-  let message: JSX.Element;
+  let message: ReactNode;
   if (killer.user_id === victim.user_id) {
     message = (
       <span>
