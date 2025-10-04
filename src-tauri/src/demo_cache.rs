@@ -3,6 +3,7 @@ use std::{
     ffi::OsStr,
     fs::remove_file,
     path::Path,
+    string::String,
     sync::Arc,
 };
 
@@ -54,13 +55,49 @@ impl DemoMetadataCache {
         Ok(())
     }
 
+    pub fn get_known_events(&self) -> Vec<String> {
+        self.collect_demo_properties_multiple(|demo| {
+            demo.events.iter().map(|event| event.value.as_str())
+        })
+    }
+
+    pub fn get_known_demo_names(&self) -> Vec<String> {
+        self.collect_demo_properties(|demo| &demo.name)
+    }
+
+    pub fn get_known_maps(&self) -> Vec<String> {
+        self.collect_demo_properties(|demo| &demo.map_name)
+    }
+
+    pub fn get_known_players(&self) -> Vec<String> {
+        self.collect_demo_properties(|demo| &demo.client_name)
+    }
+
     pub fn get_known_tags(&self) -> Vec<String> {
+        self.collect_demo_properties_multiple(|demo| demo.tags.iter().map(String::as_str))
+    }
+
+    pub fn collect_demo_properties(&self, f: impl Fn(&Demo) -> &str) -> Vec<String> {
         self.cache
             .values()
-            .flat_map(|demo| demo.tags.as_slice())
-            .collect::<HashSet<&String>>()
+            .map(|demo| f(demo))
+            .collect::<HashSet<&str>>()
             .into_iter()
-            .cloned()
+            .map(String::from)
+            .collect()
+    }
+
+    pub fn collect_demo_properties_multiple<'a, F, T>(&'a self, f: F) -> Vec<String>
+    where
+        F: Fn(&'a Demo) -> T,
+        T: Iterator<Item = &'a str>,
+    {
+        self.cache
+            .values()
+            .flat_map(|demo| f(demo))
+            .collect::<HashSet<&str>>()
+            .into_iter()
+            .map(String::from)
             .collect()
     }
 
