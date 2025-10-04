@@ -50,6 +50,12 @@ function DemoListLoader({
   return <LoaderFallback />;
 }
 
+const filterKeys = {
+  map: ["cp_foo", "cp_bar", "1", "1", "1", "1", "1", "1", "1"],
+  player: ["Narcha", "Metroid"],
+  type: ["stv", "pov"],
+};
+
 export default () => {
   const { path: encodedPath } = useParams() as { path: Path };
   const path = atob(encodedPath);
@@ -74,6 +80,7 @@ export default () => {
             query={query}
             setQuery={setQuery}
             debounceInterval={500}
+            filterKeys={filterKeys}
           />
         }
         right={

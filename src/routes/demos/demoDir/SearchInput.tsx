@@ -5,6 +5,7 @@ import { useDebouncedValue } from "@mantine/hooks";
 import { IconSearch } from "@tabler/icons-react";
 
 import KeyValueInputHighlighter from "./StyledInput/KeyValueInputHighlighter";
+import { useAutocomplete } from "./useAutocomplete";
 
 import classes from "./SearchInput.module.css";
 
@@ -12,19 +13,30 @@ type SearchInputProps = {
   query: string;
   setQuery(newQuery: string): void;
   debounceInterval: number;
+  filterKeys: Record<string, string[]>;
 };
 
 export default function SearchInput({
   query,
   setQuery,
   debounceInterval,
+  filterKeys,
 }: SearchInputProps) {
   const combobox = useCombobox();
+
   const [rawQueryText, setRawQueryText] = useState(query);
   const [debouncedQueryText] = useDebouncedValue(
     rawQueryText,
     debounceInterval
   );
+
+  const [dropdownItems, onOptionSubmit, onSelect, inputRef] = useAutocomplete(
+    rawQueryText,
+    setRawQueryText,
+    filterKeys
+  );
+
+  console.log({ rawQueryText });
 
   useEffect(() => {
     if (debouncedQueryText !== query) {
@@ -34,10 +46,7 @@ export default function SearchInput({
 
   return (
     <Combobox
-      onOptionSubmit={(optionValue) => {
-        setRawQueryText(optionValue);
-        combobox.closeDropdown();
-      }}
+      onOptionSubmit={onOptionSubmit}
       store={combobox}
       withinPortal={false}
     >
@@ -47,11 +56,6 @@ export default function SearchInput({
           size="md"
           leftSection={<IconSearch size={18} />}
           value={rawQueryText}
-          onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-            setRawQueryText(event.currentTarget.value);
-            combobox.openDropdown();
-            combobox.updateSelectedOptionIndex();
-          }}
           classNames={{
             input: classes.input,
             wrapper: classes.wrapper,
@@ -59,13 +63,30 @@ export default function SearchInput({
           onClick={() => combobox.openDropdown()}
           onFocus={() => combobox.openDropdown()}
           onBlur={() => combobox.closeDropdown()}
+          onChange={(event) => {
+            setRawQueryText(event.currentTarget.value);
+            console.log("change", event.target.selectionStart);
+          }}
+          onSelect={onSelect}
           placeholder="Search..."
           component={KeyValueInputHighlighter}
+          inputRef={inputRef}
         />
       </Combobox.Target>
       <Combobox.Dropdown>
         <Combobox.Options>
-          <Combobox.Empty>Nothing found</Combobox.Empty>
+          {dropdownItems.length === 0 ? (
+            <Combobox.Empty>Nothing found</Combobox.Empty>
+          ) : (
+            dropdownItems.map((dropdownItem, index) => (
+              <Combobox.Option
+                key={index.toString() + dropdownItem}
+                value={dropdownItem}
+              >
+                {dropdownItem}
+              </Combobox.Option>
+            ))
+          )}
         </Combobox.Options>
       </Combobox.Dropdown>
     </Combobox>

@@ -6,6 +6,9 @@ declare global {
     intersperse(this: Array<T>, separator: T): T[];
     indexOfMax(this: Array<number>): number | undefined;
   }
+  interface String {
+    splitAt(this: string, index: number): [string, string];
+  }
 }
 
 if (!Object.hasOwn(Array, "intersperse")) {
@@ -30,6 +33,14 @@ if (!Object.hasOwn(Array, "indexOfMax")) {
         }
       });
       return max_index;
+    },
+  });
+}
+
+if (!Object.hasOwn(String, "splitAt")) {
+  Object.defineProperty(String.prototype, "splitAt", {
+    value: function splitAt(this: string, index: number): [string, string] {
+      return [this.slice(0, index), this.slice(index)];
     },
   });
 }
