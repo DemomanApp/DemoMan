@@ -12,9 +12,9 @@ export type Parameters = {
 };
 
 export const keyValueQueryLanguage: QueryLanguage<Token, Parameters> = {
-  tokenizer: (query: string) => query.split(" "),
+  tokenizer: (query: string) => query.split(/(?<!\\) /),
   parser: (token: string, { filterKeys }): Token => {
-    const matches = /^([a-zA-Z0-9-_]+):([a-zA-Z0-9-_]*)$/.exec(token);
+    const matches = /^([a-zA-Z0-9-_]+):(.*)$/.exec(token);
     if (matches !== null) {
       const [_, key, value] = matches;
 
