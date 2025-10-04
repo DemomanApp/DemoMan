@@ -71,6 +71,7 @@ export default function SearchInput({
           placeholder="Search..."
           component={KeyValueInputHighlighter}
           inputRef={inputRef}
+          filterKeys={filterKeys}
         />
       </Combobox.Target>
       <Combobox.Dropdown>
