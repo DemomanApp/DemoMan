@@ -4,10 +4,14 @@ import { Combobox, Input, useCombobox } from "@mantine/core";
 import { useDebouncedValue } from "@mantine/hooks";
 import { IconSearch } from "@tabler/icons-react";
 
-import KeyValueInputHighlighter from "./StyledInput/KeyValueInputHighlighter";
 import { useAutocomplete } from "./useAutocomplete";
 
 import classes from "./SearchInput.module.css";
+import {
+  KeyValueInputHighlighter,
+  keyValueQueryLanguage,
+} from "./KeyValueQueryLanguage";
+import StyledInput from "./StyledInput";
 
 type SearchInputProps = {
   query: string;
@@ -69,9 +73,10 @@ export default function SearchInput({
           }}
           onSelect={onSelect}
           placeholder="Search..."
-          component={KeyValueInputHighlighter}
+          component={StyledInput}
+          queryLanguage={keyValueQueryLanguage}
+          queryLanguageParameters={{ filterKeys }}
           inputRef={inputRef}
-          filterKeys={filterKeys}
         />
       </Combobox.Target>
       <Combobox.Dropdown>
