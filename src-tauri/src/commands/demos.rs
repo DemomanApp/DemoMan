@@ -64,6 +64,28 @@ pub async fn set_demo_tags(
 }
 
 #[tauri::command]
+pub async fn get_known_events(
+    demo_cache: State<'_, Mutex<DemoMetadataCache>>,
+) -> Result<Vec<String>> {
+    log_command!("get_known_events");
+
+    let demo_cache = demo_cache.lock().await;
+
+    Ok(demo_cache.get_known_events())
+}
+
+#[tauri::command]
+pub async fn get_known_demo_names(
+    demo_cache: State<'_, Mutex<DemoMetadataCache>>,
+) -> Result<Vec<String>> {
+    log_command!("get_known_demo_names");
+
+    let demo_cache = demo_cache.lock().await;
+
+    Ok(demo_cache.get_known_demo_names())
+}
+
+#[tauri::command]
 pub async fn get_known_tags(
     demo_cache: State<'_, Mutex<DemoMetadataCache>>,
 ) -> Result<Vec<String>> {
@@ -72,6 +94,28 @@ pub async fn get_known_tags(
     let demo_cache = demo_cache.lock().await;
 
     Ok(demo_cache.get_known_tags())
+}
+
+#[tauri::command]
+pub async fn get_known_maps(
+    demo_cache: State<'_, Mutex<DemoMetadataCache>>,
+) -> Result<Vec<String>> {
+    log_command!("get_known_maps");
+
+    let demo_cache = demo_cache.lock().await;
+
+    Ok(demo_cache.get_known_maps())
+}
+
+#[tauri::command]
+pub async fn get_known_players(
+    demo_cache: State<'_, Mutex<DemoMetadataCache>>,
+) -> Result<Vec<String>> {
+    log_command!("get_known_players");
+
+    let demo_cache = demo_cache.lock().await;
+
+    Ok(demo_cache.get_known_players())
 }
 
 #[tauri::command]
