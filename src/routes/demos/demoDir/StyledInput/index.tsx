@@ -1,6 +1,8 @@
-import { type ReactNode, useCallback, useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef } from "react";
 
 import { useMergedRef } from "@mantine/hooks";
+
+import type { QueryLanguage } from "../QueryLanguage";
 
 import classes from "./StyledInput.module.css";
 
@@ -8,31 +10,31 @@ export type InputRefProp = {
   inputRef?: React.RefObject<HTMLInputElement | null>;
 };
 
-type StyledInputProps<Token> = React.ComponentProps<"input"> &
+type StyledInputProps<Token, Parameters> = React.ComponentProps<"input"> &
   InputRefProp & {
-    tokenizer(query: string): string[];
-    parser(token: string): Token;
-    renderToken(token: Token): ReactNode;
+    queryLanguage: QueryLanguage<Token, Parameters>;
+    queryLanguageParameters: Parameters;
   };
 
-export default <Token,>({
+export default <Token, Parameters>({
   value,
-  tokenizer,
-  parser,
-  renderToken,
   style,
   className,
   ref,
   inputRef: inputRefProp,
+  queryLanguage,
+  queryLanguageParameters,
   ...otherProps
-}: StyledInputProps<Token>) => {
+}: StyledInputProps<Token, Parameters>) => {
   const inputRef = useRef<HTMLInputElement>(null);
   const sizerRef = useRef<HTMLDivElement>(null);
   const highlightRef = useRef<HTMLDivElement>(null);
 
   const mergedInputRef = useMergedRef(inputRef, inputRefProp);
 
-  const tokens = tokenizer(value as string).map(parser);
+  const tokens = queryLanguage
+    .tokenizer(value as string, queryLanguageParameters)
+    .map((token) => queryLanguage.parser(token, queryLanguageParameters));
 
   const updateSizer = useCallback((input: string) => {
     if (sizerRef.current !== null && inputRef.current !== null) {
@@ -58,7 +60,7 @@ export default <Token,>({
     >
       <div className={classes.wrapper}>
         <div ref={highlightRef} className={classes.styledContent}>
-          {tokens.map(renderToken).intersperse(" ")}
+          {queryLanguage.renderTokens(tokens, queryLanguageParameters)}
         </div>
 
         <div className={classes.inputWrapper}>
