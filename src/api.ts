@@ -58,6 +58,14 @@ export async function getDemoDetails(demoPath: string) {
   });
 }
 
+export async function getKnownMaps() {
+  return invoke<string[]>("get_known_maps");
+}
+
+export async function getKnownPlayers() {
+  return invoke<string[]>("get_known_players");
+}
+
 export async function getKnownTags() {
   return invoke<string[]>("get_known_tags");
 }

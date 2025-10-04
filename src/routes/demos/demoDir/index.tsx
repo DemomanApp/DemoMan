@@ -8,7 +8,12 @@ import { Tooltip } from "@mantine/core";
 import { IconFolder } from "@tabler/icons-react";
 
 import { HeaderPortal } from "@/AppShell";
-import { getDemosInDirectory } from "@/api";
+import {
+  getDemosInDirectory,
+  getKnownMaps,
+  getKnownPlayers,
+  getKnownTags,
+} from "@/api";
 import { HeaderButton, LoaderFallback } from "@/components";
 import type { Demo, DemoFilter, SortKey, SortOrder } from "@/demo";
 import useLocationState from "@/hooks/useLocationState";
@@ -16,6 +21,7 @@ import type { Path } from "@/store";
 import DemoList from "./DemoList";
 import SearchInput from "./SearchInput";
 import { SortControl } from "./SortControl";
+import { useAsync } from "react-async-hook";
 
 type DemoListLoaderArgs = {
   path: string;
@@ -50,12 +56,6 @@ function DemoListLoader({
   return <LoaderFallback />;
 }
 
-const filterKeys = {
-  map: ["cp_foo", "cp_bar", "1", "1", "1", "1", "1", "1", "1"],
-  player: ["Narcha", "Metroid"],
-  type: ["stv", "pov"],
-};
-
 export default () => {
   const { path: encodedPath } = useParams() as { path: Path };
   const path = atob(encodedPath);
@@ -69,6 +69,24 @@ export default () => {
     "sortOrder",
     "descending"
   );
+
+  const asyncKnownMaps = useAsync(getKnownMaps, []);
+  const knownMaps = asyncKnownMaps.result ?? [];
+
+  const asyncKnownPlayers = useAsync(getKnownPlayers, []);
+  const knownPlayers = asyncKnownPlayers.result ?? [];
+
+  const asyncKnownTags = useAsync(getKnownTags, []);
+  const knownTags = asyncKnownTags.result ?? [];
+
+  const filterKeys = {
+    map: knownMaps,
+    player: knownPlayers,
+    tag: knownTags,
+    type: ["stv", "pov"],
+  };
+
+  console.log({ asyncKnownMaps, knownMaps, asyncKnownPlayers, knownPlayers });
 
   const filters: DemoFilter[] = [];
 

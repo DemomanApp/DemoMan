@@ -4,14 +4,11 @@ import { Combobox, Input, useCombobox } from "@mantine/core";
 import { useDebouncedValue } from "@mantine/hooks";
 import { IconSearch } from "@tabler/icons-react";
 
+import { keyValueQueryLanguage } from "./KeyValueQueryLanguage";
+import StyledInput from "./StyledInput";
 import { useAutocomplete } from "./useAutocomplete";
 
 import classes from "./SearchInput.module.css";
-import {
-  KeyValueInputHighlighter,
-  keyValueQueryLanguage,
-} from "./KeyValueQueryLanguage";
-import StyledInput from "./StyledInput";
 
 type SearchInputProps = {
   query: string;

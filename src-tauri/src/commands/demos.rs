@@ -75,6 +75,28 @@ pub async fn get_known_tags(
 }
 
 #[tauri::command]
+pub async fn get_known_maps(
+    demo_cache: State<'_, Mutex<DemoMetadataCache>>,
+) -> Result<Vec<String>> {
+    log_command!("get_known_maps");
+
+    let demo_cache = demo_cache.lock().await;
+
+    Ok(demo_cache.get_known_maps())
+}
+
+#[tauri::command]
+pub async fn get_known_players(
+    demo_cache: State<'_, Mutex<DemoMetadataCache>>,
+) -> Result<Vec<String>> {
+    log_command!("get_known_players");
+
+    let demo_cache = demo_cache.lock().await;
+
+    Ok(demo_cache.get_known_players())
+}
+
+#[tauri::command]
 pub async fn delete_demo(
     demo_path: &str,
     trash: bool,
