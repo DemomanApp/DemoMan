@@ -8,7 +8,6 @@ import {
 } from "react";
 
 export const useAutocomplete = (
-  // inputRef: React.RefObject<HTMLInputElement | null>,
   queryText: string,
   setQueryText: (value: string) => void,
   filterKeys: Record<string, string[]>
@@ -80,13 +79,16 @@ export const useAutocomplete = (
 
   const onOptionSubmit = useCallback(
     (optionValue: string) => {
+      const escapedValue = optionValue
+        .replaceAll("\\", "\\\\")
+        .replaceAll(" ", "\\ ");
       if (currentTokenKeyValue !== null) {
         const [currentTokenKey, _currentTokenValue] = currentTokenKeyValue;
         setQueryText(
-          `${beforeCurrentToken}${currentTokenKey}:${optionValue} ${afterCursor}`
+          `${beforeCurrentToken}${currentTokenKey}:${escapedValue} ${afterCursor}`
         );
       } else {
-        setQueryText(beforeCurrentToken + optionValue + afterCursor);
+        setQueryText(beforeCurrentToken + escapedValue + afterCursor);
       }
     },
     [setQueryText, currentTokenKeyValue, afterCursor, beforeCurrentToken]

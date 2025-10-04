@@ -94,8 +94,6 @@ export default () => {
     type: ["stv", "pov"],
   };
 
-  console.log({ asyncKnownMaps, knownMaps, asyncKnownPlayers, knownPlayers });
-
   const filters: DemoFilter[] = [];
 
   return (
