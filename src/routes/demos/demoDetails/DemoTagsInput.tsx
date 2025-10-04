@@ -74,7 +74,9 @@ export default function DemoTagsInput({ tags, setTags }: Props) {
     <Combobox
       store={combobox}
       width={250}
-      position="bottom-start"
+      position="bottom-end"
+      withArrow
+      arrowPosition="center"
       withinPortal={false}
       onOptionSubmit={handleValueSelect}
     >
