@@ -263,9 +263,13 @@ export type SortKey = keyof typeof sortKeys;
 export type SortOrder = "ascending" | "descending";
 
 export type DemoFilter =
-  | { Name: string }
-  | { PlayerName: string }
-  | { MapName: string };
+  | { demo_type: string }
+  | { event: string }
+  | { file_name: string }
+  | { free_text: string }
+  | { map_name: string }
+  | { player_name: string }
+  | { tag_name: string };
 
 export function isStvDemo(demo: Demo) {
   return demo.serverName === "";

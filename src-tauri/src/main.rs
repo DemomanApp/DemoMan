@@ -99,6 +99,8 @@ fn main() {
             commands::demos::get_demo,
             commands::demos::get_demo_details,
             commands::demos::get_demos_in_directory,
+            commands::demos::get_known_demo_names,
+            commands::demos::get_known_events,
             commands::demos::get_known_maps,
             commands::demos::get_known_players,
             commands::demos::get_known_tags,

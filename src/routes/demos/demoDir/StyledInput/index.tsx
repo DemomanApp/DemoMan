@@ -10,11 +10,14 @@ export type InputRefProp = {
   inputRef?: React.RefObject<HTMLInputElement | null>;
 };
 
+export type QueryLanguageProp<Token, Parameters> = {
+  queryLanguage: QueryLanguage<Token, Parameters>;
+  queryLanguageParameters: Parameters;
+};
+
 type StyledInputProps<Token, Parameters> = React.ComponentProps<"input"> &
-  InputRefProp & {
-    queryLanguage: QueryLanguage<Token, Parameters>;
-    queryLanguageParameters: Parameters;
-  };
+  InputRefProp &
+  QueryLanguageProp<Token, Parameters>;
 
 export default <Token, Parameters>({
   value,
@@ -45,9 +48,6 @@ export default <Token, Parameters>({
 
   useEffect(() => {
     updateSizer(value as string);
-    if (inputRef.current !== null) {
-      inputRef.current.dispatchEvent(new Event("input", { bubbles: true }));
-    }
   }, [updateSizer, value]);
 
   return (
@@ -62,7 +62,6 @@ export default <Token, Parameters>({
         <div ref={highlightRef} className={classes.styledContent}>
           {queryLanguage.renderTokens(tokens, queryLanguageParameters)}
         </div>
-
         <div className={classes.inputWrapper}>
           <div className={classes.sizer} ref={sizerRef} />
           <input

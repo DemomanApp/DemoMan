@@ -10,7 +10,7 @@ import {
 export const useAutocomplete = (
   queryText: string,
   setQueryText: (value: string) => void,
-  filterKeys: Record<string, string[]>
+  filterPatterns: Record<string, string[]>
 ) => {
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -58,14 +58,14 @@ export const useAutocomplete = (
 
   useEffect(() => {
     if (currentTokenKeyValue === null) {
-      const keys = Object.keys(filterKeys)
+      const keys = Object.keys(filterPatterns)
         .filter((key) => key.includes(currentToken))
         .map((key) => `${key}:`);
       setDropdownItems(keys);
     } else {
       const [currentTokenKey, currentTokenValue] = currentTokenKeyValue;
 
-      const values = filterKeys[currentTokenKey];
+      const values = filterPatterns[currentTokenKey];
 
       if (values !== undefined) {
         setDropdownItems(
@@ -75,7 +75,7 @@ export const useAutocomplete = (
         setDropdownItems([]);
       }
     }
-  }, [currentToken, currentTokenKeyValue, filterKeys]);
+  }, [currentToken, currentTokenKeyValue, filterPatterns]);
 
   const onOptionSubmit = useCallback(
     (optionValue: string) => {
@@ -96,8 +96,6 @@ export const useAutocomplete = (
 
   const onSelect: ReactEventHandler<HTMLInputElement> = useCallback((event) => {
     const selectionStart = event.currentTarget.selectionStart;
-
-    console.log("select", selectionStart);
 
     if (selectionStart !== null) {
       setCursorIndex(selectionStart);

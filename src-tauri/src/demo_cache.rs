@@ -55,6 +55,16 @@ impl DemoMetadataCache {
         Ok(())
     }
 
+    pub fn get_known_events(&self) -> Vec<String> {
+        self.collect_demo_properties_multiple(|demo| {
+            demo.events.iter().map(|event| event.value.as_str())
+        })
+    }
+
+    pub fn get_known_demo_names(&self) -> Vec<String> {
+        self.collect_demo_properties(|demo| &demo.name)
+    }
+
     pub fn get_known_maps(&self) -> Vec<String> {
         self.collect_demo_properties(|demo| &demo.map_name)
     }

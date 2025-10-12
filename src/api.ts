@@ -6,15 +6,13 @@ export async function getDemosInDirectory(
   dirPath: string,
   sortKey: SortKey,
   reverse: boolean,
-  filters: DemoFilter[],
-  query: string
+  filters: DemoFilter[]
 ) {
   return invoke<Demo[]>("get_demos_in_directory", {
     dirPath,
     sortKey,
     reverse,
     filters,
-    query,
   });
 }
 
@@ -56,6 +54,14 @@ export async function getDemoDetails(demoPath: string) {
   return invoke<GameSummary>("get_demo_details", {
     demoPath,
   });
+}
+
+export async function getKnownEvents() {
+  return invoke<string[]>("get_known_events");
+}
+
+export async function getKnownDemoNames() {
+  return invoke<string[]>("get_known_demo_names");
 }
 
 export async function getKnownMaps() {
