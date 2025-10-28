@@ -25,6 +25,7 @@ createRoot(document.getElementById("root")!).render(
       defaultColorScheme="dark"
       theme={{
         focusRing: "never",
+        fontFamily: "Hanken Grotesk Variable",
         components: {
           Tooltip: {
             defaultProps: {
