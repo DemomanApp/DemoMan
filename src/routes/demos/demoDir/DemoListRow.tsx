@@ -174,6 +174,7 @@ export default function DemoListRow({
                       align="center"
                       justify="left"
                       gap={0}
+                      wrap="nowrap"
                     >
                       {event.name === "Bookmark" ? (
                         <IconBookmark />
@@ -184,11 +185,18 @@ export default function DemoListRow({
                         style={{
                           flexGrow: 1,
                           marginRight: "var(--mantine-spacing-xs)",
+                          whiteSpace: "pre",
                         }}
                       >
                         {event.value}
                       </Text>
-                      <Text c="dimmed" size="xs">
+                      <Text
+                        c="dimmed"
+                        size="xs"
+                        ff="monospace"
+                        w="5ch"
+                        ta="end"
+                      >
                         {event.tick}
                       </Text>
                     </Group>
