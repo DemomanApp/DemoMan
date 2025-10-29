@@ -33,7 +33,7 @@ import {
 
 import { sendRconCommand } from "@/api";
 import { IconKillstreak } from "@/components/icons";
-import { type Demo, isStvDemo } from "@/demo";
+import { type Demo } from "@/demo";
 import useStore from "@/hooks/useStore";
 import { openDeleteDemoModal } from "@/modals/DeleteDemoModal";
 import { openRenameDemoModal } from "@/modals/RenameDemoModal";
@@ -115,14 +115,14 @@ export default function DemoListRow({
           <Title order={3} style={{ lineHeight: 1 }}>
             {demo.name}
           </Title>
-          {isStvDemo(demo) && (
+          {demo.isStv && (
             <Tooltip label="STV Demo">
               <IconDeviceTv />
             </Tooltip>
           )}
           <Badges items={demo.tags} max={3} />
         </Group>
-        {!isStvDemo(demo) && (
+        {!demo.isStv && (
           <Group gap={4}>
             <IconUser />
             <Text c="dimmed">{demo.clientName}</Text>

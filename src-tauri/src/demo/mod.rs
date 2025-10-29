@@ -55,6 +55,7 @@ pub struct Demo {
     pub map_name: String,
     pub playback_time: f32,
     pub num_ticks: u32,
+    pub is_stv: bool,
 }
 
 impl Demo {
@@ -66,6 +67,8 @@ impl Demo {
         tags: Vec<String>,
         metadata: &fs::Metadata,
     ) -> Self {
+        let is_stv = header.server.is_empty();
+
         Self {
             name,
             path,
@@ -83,6 +86,7 @@ impl Demo {
             map_name: header.map,
             playback_time: header.duration,
             num_ticks: header.ticks,
+            is_stv,
         }
     }
 
@@ -262,63 +266,165 @@ fn compare_demos_by(key: SortKey, reverse: bool, d1: &Demo, d2: &Demo) -> Orderi
     }
 }
 
-#[derive(PartialEq, Deserialize)]
+#[derive(Debug, PartialEq, Deserialize)]
 #[serde(rename_all = "snake_case")]
 pub enum Filter {
-    Name(String),
-    PlayerName(String),
+    DemoType(String),
+    Event(String),
+    FileName(String),
+    FreeText(String),
     MapName(String),
+    PlayerName(String),
+    TagName(String),
 }
 
-fn filter_matches(demo: &Demo, filters: &[Filter]) -> bool {
-    if filters.is_empty() {
-        true
-    } else {
-        filters.iter().any(|filter| match filter {
-            Filter::Name(name) => demo.name.contains(name),
-            Filter::PlayerName(player_name) => demo.client_name.contains(player_name),
-            Filter::MapName(map_name) => demo.map_name.contains(map_name),
-        })
-    }
+#[derive(Default, Debug)]
+struct Filters {
+    demo_type: Vec<String>,
+    event: Vec<String>,
+    file_name: Vec<String>,
+    free_text: Vec<String>,
+    map_name: Vec<String>,
+    player_name: Vec<String>,
+    tag_name: Vec<String>,
 }
 
-fn query_matches(demo: &Demo, query: &str) -> bool {
-    if query.is_empty() {
-        return true;
+impl Filters {
+    fn from_filter_list(filters: &[Filter]) -> Self {
+        let mut result = Self::default();
+
+        for filter in filters {
+            match filter {
+                Filter::DemoType(value) => result.demo_type.push(value.to_lowercase()),
+                Filter::Event(value) => result.event.push(value.to_lowercase()),
+                Filter::FileName(value) => result.file_name.push(value.to_lowercase()),
+                Filter::FreeText(value) => result.free_text.push(value.to_lowercase()),
+                Filter::MapName(value) => result.map_name.push(value.to_lowercase()),
+                Filter::PlayerName(value) => result.player_name.push(value.to_lowercase()),
+                Filter::TagName(value) => result.tag_name.push(value.to_lowercase()),
+            }
+        }
+
+        result
     }
 
-    let query = query.to_ascii_lowercase();
+    fn matches(&self, demo: &Demo) -> bool {
+        self.matches_type(demo)
+            && self.matches_event(demo)
+            && self.matches_name(demo)
+            && self.matches_free_text(demo)
+            && self.matches_map(demo)
+            && self.matches_client(demo)
+            && self.matches_tag(demo)
+    }
 
-    let Demo {
-        name,
-        events,
-        tags,
-        server_name,
-        client_name,
-        map_name,
-        ..
-    } = demo;
+    fn matches_type(&self, demo: &Demo) -> bool {
+        if self.demo_type.is_empty() {
+            return true;
+        }
 
-    [name, server_name, client_name, map_name]
-        .iter()
-        .any(|field| field.to_ascii_lowercase().contains(&query))
-        || events
+        let demo_type = if demo.is_stv { "stv" } else { "pov" };
+        self.demo_type.iter().any(|query| demo_type.contains(query))
+    }
+
+    fn matches_event(&self, demo: &Demo) -> bool {
+        if self.event.is_empty() {
+            return true;
+        }
+
+        let events: Vec<_> = demo
+            .events
             .iter()
-            .any(|event| event.value.to_ascii_lowercase().contains(&query))
-        || tags
+            .map(|event| event.value.to_lowercase())
+            .collect();
+
+        self.event
             .iter()
-            .any(|tag| tag.to_ascii_lowercase().contains(&query))
+            .any(|query| events.iter().any(|event| event.contains(query)))
+    }
+
+    fn matches_name(&self, demo: &Demo) -> bool {
+        if self.file_name.is_empty() {
+            return true;
+        }
+
+        let demo_name = demo.name.to_lowercase();
+
+        self.file_name.iter().any(|query| demo_name.contains(query))
+    }
+
+    fn matches_free_text(&self, demo: &Demo) -> bool {
+        if self.free_text.is_empty() {
+            return true;
+        }
+
+        let Demo {
+            name,
+            events,
+            tags,
+            server_name,
+            client_name,
+            map_name,
+            ..
+        } = demo;
+
+        let fields: Vec<_> = [name, server_name, client_name, map_name]
+            .into_iter()
+            .chain(events.iter().map(|event| &event.value))
+            .chain(tags)
+            .map(|field| field.to_lowercase())
+            .collect();
+
+        self.free_text
+            .iter()
+            .any(|query| fields.iter().any(|field| field.contains(query)))
+    }
+
+    fn matches_map(&self, demo: &Demo) -> bool {
+        if self.map_name.is_empty() {
+            return true;
+        }
+
+        let map_name = demo.map_name.to_lowercase();
+
+        self.map_name.iter().any(|query| map_name.contains(query))
+    }
+
+    fn matches_client(&self, demo: &Demo) -> bool {
+        if self.player_name.is_empty() {
+            return true;
+        }
+
+        let client_name = demo.client_name.to_lowercase();
+
+        self.player_name
+            .iter()
+            .any(|query| client_name.contains(query))
+    }
+
+    fn matches_tag(&self, demo: &Demo) -> bool {
+        if self.tag_name.is_empty() {
+            return true;
+        }
+
+        let tags: Vec<_> = demo.tags.iter().map(|tag| tag.to_lowercase()).collect();
+
+        self.tag_name
+            .iter()
+            .any(|query| tags.iter().any(|tag| tag.contains(query)))
+    }
 }
 
 pub fn sort_demos(demos: &mut [Arc<Demo>], sort_key: SortKey, reverse: bool) {
     demos.sort_unstable_by(|d1, d2| compare_demos_by(sort_key, reverse, d1, d2));
 }
 
-pub fn filter_demos(demos: &[Arc<Demo>], filters: &[Filter], query: &str) -> Vec<Arc<Demo>> {
+pub fn filter_demos(demos: &[Arc<Demo>], filters: &[Filter]) -> Vec<Arc<Demo>> {
+    let filters = Filters::from_filter_list(filters);
+
     demos
         .iter()
-        .filter(|demo| filter_matches(demo, filters))
-        .filter(|demo| query_matches(demo, query))
+        .filter(|demo| filters.matches(demo))
         .cloned()
         .collect()
 }
