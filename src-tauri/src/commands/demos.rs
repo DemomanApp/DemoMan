@@ -23,7 +23,6 @@ pub async fn get_demos_in_directory(
     sort_key: SortKey,
     reverse: bool,
     filters: Vec<Filter>,
-    query: String,
     demo_list_cache: State<'_, Mutex<DemoMetadataCache>>,
 ) -> Result<Vec<Arc<Demo>>> {
     log_command!("get_demos_in_directory {dir_path}");
@@ -32,7 +31,7 @@ pub async fn get_demos_in_directory(
 
     let mut demos = read_demos_in_directory(dir_path, &mut demo_cache)?;
     sort_demos(demos.as_mut_slice(), sort_key, reverse);
-    let filtered_demos = filter_demos(&demos, &filters, &query);
+    let filtered_demos = filter_demos(&demos, &filters);
 
     Ok(filtered_demos)
 }

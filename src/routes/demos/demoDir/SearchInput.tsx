@@ -4,25 +4,26 @@ import { Combobox, Input, useCombobox } from "@mantine/core";
 import { useDebouncedValue } from "@mantine/hooks";
 import { IconSearch } from "@tabler/icons-react";
 
-import { keyValueQueryLanguage } from "./KeyValueQueryLanguage";
-import StyledInput from "./StyledInput";
+import StyledInput, { type QueryLanguageProp } from "./StyledInput";
 import { useAutocomplete } from "./useAutocomplete";
 
 import classes from "./SearchInput.module.css";
 
-type SearchInputProps = {
+type SearchInputProps<Token, Parameters> = {
   query: string;
   setQuery(newQuery: string): void;
   debounceInterval: number;
-  filterKeys: Record<string, string[]>;
-};
+  filterPatterns: Record<string, string[]>;
+} & QueryLanguageProp<Token, Parameters>;
 
-export default function SearchInput({
+export default function SearchInput<Token, Parameters>({
   query,
   setQuery,
   debounceInterval,
-  filterKeys,
-}: SearchInputProps) {
+  filterPatterns,
+  queryLanguage,
+  queryLanguageParameters,
+}: SearchInputProps<Token, Parameters>) {
   const combobox = useCombobox();
 
   const [rawQueryText, setRawQueryText] = useState(query);
@@ -34,10 +35,8 @@ export default function SearchInput({
   const [dropdownItems, onOptionSubmit, onSelect, inputRef] = useAutocomplete(
     rawQueryText,
     setRawQueryText,
-    filterKeys
+    filterPatterns
   );
-
-  console.log({ rawQueryText });
 
   useEffect(() => {
     if (debouncedQueryText !== query) {
@@ -66,13 +65,15 @@ export default function SearchInput({
           onBlur={() => combobox.closeDropdown()}
           onChange={(event) => {
             setRawQueryText(event.currentTarget.value);
-            console.log("change", event.target.selectionStart);
           }}
-          onSelect={onSelect}
+          onSelect={(event) => {
+            combobox.resetSelectedOption();
+            onSelect(event);
+          }}
           placeholder="Search..."
           component={StyledInput}
-          queryLanguage={keyValueQueryLanguage}
-          queryLanguageParameters={{ filterKeys }}
+          queryLanguage={queryLanguage}
+          queryLanguageParameters={queryLanguageParameters}
           inputRef={inputRef}
         />
       </Combobox.Target>
