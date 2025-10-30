@@ -1,8 +1,12 @@
 name: Check PR
 
 on:
+  push:
+    branches:
+      - main
   pull_request:
-    branches-ignore: ["v1"]
+    branches-ignore:
+      - v1
   workflow_dispatch:
 
 jobs:
