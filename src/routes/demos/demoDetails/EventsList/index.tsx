@@ -253,6 +253,7 @@ const RowComponent = ({
       ...style,
       display: "flex",
       alignItems: "center",
+      paddingInline: "var(--mantine-spacing-sm)",
     }}
   >
     <EventBox
