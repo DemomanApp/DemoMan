@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 
-import { Input, ScrollArea, Text } from "@mantine/core";
+import { Input, Text } from "@mantine/core";
 import { useListState } from "@mantine/hooks";
 import {
   IconChevronLeft,
@@ -103,14 +103,14 @@ export default function RconConsole() {
       />
       <div className={classes.root}>
         <div className={classes.history}>
-          <ScrollArea viewportRef={viewport}>
+          <div ref={viewport}>
             {history.map((historyEntry, idx) => (
               <HistoryRow
                 historyEntry={historyEntry}
                 key={`${idx}${historyEntry.kind}${historyEntry.value}`}
               />
             ))}
-          </ScrollArea>
+          </div>
         </div>
         <Input
           value={promptInput}

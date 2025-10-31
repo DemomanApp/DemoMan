@@ -16,7 +16,6 @@ import {
   Loader,
   Paper,
   Progress,
-  ScrollArea,
   Stack,
   Text,
 } from "@mantine/core";
@@ -174,12 +173,12 @@ export const UpdateModal = ({
             </Button>
           </Group>
           <Divider />
-          <ScrollArea.Autosize
-            mah="300px"
-            styles={{
-              viewport: { paddingInlineStart: "var(--mantine-spacing-sm)" },
+          <div
+            style={{
+              maxHeight: "300px",
+              overflowY: "auto",
+              paddingInline: "var(--mantine-spacing-sm)",
             }}
-            offsetScrollbars
           >
             <Markdown
               remarkPlugins={[remarkGfm]} // Needed for links
@@ -195,7 +194,7 @@ export const UpdateModal = ({
             >
               {githubRelease.data.changelog}
             </Markdown>
-          </ScrollArea.Autosize>
+          </div>
         </Paper>
       ) : (
         <Alert>Failed to fetch release notes: {githubRelease.error}</Alert>

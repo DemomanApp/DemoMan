@@ -3,7 +3,6 @@ import {
   Container,
   Divider,
   Group,
-  ScrollArea,
   Stack,
   Text,
   TextInput,
@@ -40,7 +39,7 @@ export default function SettingsView() {
           </Text>
         }
       />
-      <ScrollArea h="100%">
+      <div style={{ height: "100%", overflowY: "auto" }}>
         <Container size="xs" pt="md">
           <Stack>
             <Group align="end" className={classes.rconPasswordRow}>
@@ -82,7 +81,7 @@ export default function SettingsView() {
             )}
           </Stack>
         </Container>
-      </ScrollArea>
+      </div>
     </>
   );
 }
