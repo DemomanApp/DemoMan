@@ -116,20 +116,22 @@ export function PlayerTable({
           )}
         </AutoSizer>
       </div>
-      <div className={classes.spectatorList}>
-        Spectators:{" "}
-        {others
-          .map<ReactNode>((player) => (
-            <Anchor
-              className={classes.spectatorName}
-              onClick={() => setCurrentPlayer(player)}
-              key={player.user_id}
-            >
-              {player.name}
-            </Anchor>
-          ))
-          .intersperse(", ")}
-      </div>
+      {others.length !== 0 && (
+        <div className={classes.spectatorList}>
+          Spectators:{" "}
+          {others
+            .map<ReactNode>((player) => (
+              <Anchor
+                className={classes.spectatorName}
+                onClick={() => setCurrentPlayer(player)}
+                key={player.user_id}
+              >
+                {player.name}
+              </Anchor>
+            ))
+            .intersperse(", ")}
+        </div>
+      )}
     </div>
   );
 }
