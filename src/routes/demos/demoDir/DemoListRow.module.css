@@ -19,17 +19,6 @@
     var(--mantine-color-dark-7)
   );
 
-  &:hover {
-    background-color: light-dark(
-      var(--mantine-color-gray-1),
-      var(--mantine-color-dark-6)
-    );
-
-    &[data-selected="true"] {
-      background-color: var(--mantine-primary-color-light-hover);
-    }
-  }
-
   /* biome-ignore format: preserve linebreaks */
   transition:
     background-color 150ms ease,
@@ -39,6 +28,17 @@
     box-shadow: 0 0 0 2px
       light-dark(var(--mantine-primary-color-6), var(--mantine-primary-color-5));
     background-color: var(--mantine-primary-color-light);
+  }
+
+  &:hover {
+    background-color: light-dark(
+      var(--mantine-color-gray-1),
+      var(--mantine-color-dark-6)
+    );
+
+    &[data-selected="true"] {
+      background-color: var(--mantine-primary-color-light-hover);
+    }
   }
 }
 
