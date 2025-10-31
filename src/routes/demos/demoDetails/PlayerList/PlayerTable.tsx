@@ -1,6 +1,8 @@
 import { type ReactNode, useMemo } from "react";
 
-import { Anchor, Text } from "@mantine/core";
+import { getScrollbarSize } from "react-window";
+
+import { Anchor } from "@mantine/core";
 
 import { type GameSummary, type PlayerSummary, primaryTeam } from "@/demo";
 import { PlayerBox } from "./PlayerBox";
@@ -68,6 +70,8 @@ export function PlayerTable({
     return [redPlayers, bluPlayers, others];
   }, [gameSummary]);
 
+  const scrollbarSize = useMemo(getScrollbarSize, []);
+
   return (
     <div
       style={{
@@ -78,30 +82,21 @@ export function PlayerTable({
       }}
     >
       <div>
-        <div className={classes.header}>
-          <Text fz={30} fw={600} c="blue.7">
-            BLU
-          </Text>
-          <Text fz={30} fw={600} c="blue.7">
-            {gameSummary.blue_team_score}
-          </Text>
+        <div className={classes.bluHeader}>
+          <span>BLU</span>
+          <span>{gameSummary.blue_team_score}</span>
         </div>
-        <div className={classes.header}>
-          <Text fz={30} fw={600} c="red.7">
-            {gameSummary.red_team_score}
-          </Text>
-          <Text fz={30} fw={600} c="red.7">
-            RED
-          </Text>
+        <div className={classes.redHeader}>
+          <span>{gameSummary.red_team_score}</span>
+          <span>RED</span>
         </div>
       </div>
-      <div className={classes.divider} />
-      <div>
+      <div style={{ paddingRight: scrollbarSize }}>
         <TableHeader />
         <TableHeader />
       </div>
       <div
-        style={{ flexGrow: 1, overflow: "auto" }}
+        style={{ flexGrow: 1, overflow: "auto", scrollbarGutter: "stable" }}
         className={classes.scrollShadow}
       >
         <PlayerColumn
