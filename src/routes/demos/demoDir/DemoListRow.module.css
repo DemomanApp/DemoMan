@@ -1,6 +1,11 @@
 /* TODO fix the background color when hovering,
  * maybe add a hover effect to the thumbnail as well */
 
+.wrapper {
+  position: relative;
+  margin: 8px 16px;
+}
+
 .paper {
   height: 120px;
   cursor: pointer;
@@ -58,7 +63,7 @@
   height: 32px;
 }
 
-.paper:hover .menu {
+.wrapper:hover .menu {
   display: flex;
 }
 

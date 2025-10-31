@@ -33,7 +33,7 @@ import {
 
 import { sendRconCommand } from "@/api";
 import { IconKillstreak } from "@/components/icons";
-import { type Demo } from "@/demo";
+import type { Demo } from "@/demo";
 import useStore from "@/hooks/useStore";
 import { openDeleteDemoModal } from "@/modals/DeleteDemoModal";
 import { openRenameDemoModal } from "@/modals/RenameDemoModal";
@@ -89,124 +89,126 @@ export default function DemoListRow({
   const birthtime = new Date(demo.birthtime * 1000);
 
   return (
-    <Paper
-      className={classes.paper}
-      radius="md"
-      shadow="xl"
-      onClick={() => {
-        navigate(`../show/${btoa(demo.path)}`);
-      }}
-      data-selected={selected}
-    >
-      <Checkbox
-        checked={selected}
-        readOnly
-        classNames={{ root: classes.checkboxRoot }}
-        wrapperProps={{
-          onClick: (event: React.MouseEvent) => {
-            event.stopPropagation();
-            onSelect(event);
-          },
+    <div className={classes.wrapper}>
+      <Paper
+        className={classes.paper}
+        radius="md"
+        shadow="xl"
+        onClick={() => {
+          navigate(`../show/${btoa(demo.path)}`);
         }}
-      />
-      <MapBox mapName={demo.mapName} />
-      <div className={classes.content}>
-        <Group gap="xs">
-          <Title order={3} style={{ lineHeight: 1 }}>
-            {demo.name}
-          </Title>
-          {demo.isStv && (
-            <Tooltip label="STV Demo">
-              <IconDeviceTv />
-            </Tooltip>
-          )}
-          <Badges items={demo.tags} max={3} />
-        </Group>
-        {!demo.isStv && (
-          <Group gap={4}>
-            <IconUser />
-            <Text c="dimmed">{demo.clientName}</Text>
+        data-selected={selected}
+      >
+        <Checkbox
+          checked={selected}
+          readOnly
+          classNames={{ root: classes.checkboxRoot }}
+          wrapperProps={{
+            onClick: (event: React.MouseEvent) => {
+              event.stopPropagation();
+              onSelect(event);
+            },
+          }}
+        />
+        <MapBox mapName={demo.mapName} />
+        <div className={classes.content}>
+          <Group gap="xs">
+            <Title order={3} style={{ lineHeight: 1 }}>
+              {demo.name}
+            </Title>
+            {demo.isStv && (
+              <Tooltip label="STV Demo">
+                <IconDeviceTv />
+              </Tooltip>
+            )}
+            <Badges items={demo.tags} max={3} />
           </Group>
-        )}
-        <Group gap={4}>
-          <IconCalendarEvent />
-          <Text c="dimmed">{birthtime.toLocaleString()}</Text>
-          <span>&nbsp;</span>
-          <IconClockPlay />
-          <Text c="dimmed">{formatDuration(demo.playbackTime)}</Text>
-        </Group>
-        {demo.events.length !== 0 && (
-          <HoverCard
-            withArrow
-            position="right-end"
-            styles={(theme) => ({
-              dropdown: {
-                padding: 0,
-                paddingLeft: theme.spacing.xs,
-              },
-            })}
-          >
-            <HoverCard.Target>
-              <Group gap={4}>
-                <IconBookmarks />
-                <Text c="dimmed">
-                  {demo.events.length}{" "}
-                  {demo.events.length === 1 ? "Bookmark" : "Bookmarks"}
-                </Text>
-              </Group>
-            </HoverCard.Target>
-            <HoverCard.Dropdown>
-              <ScrollArea.Autosize
-                mah="10rem"
-                offsetScrollbars
-                type="auto"
-                styles={(theme) => ({
-                  viewport: {
-                    paddingTop: theme.spacing.xs,
-                    paddingBottom: theme.spacing.xs,
-                  },
-                })}
-              >
-                <Stack align="stretch" gap={0}>
-                  {demo.events.map((event, idx) => (
-                    <Group
-                      key={`${idx}${event.tick}`}
-                      align="center"
-                      justify="left"
-                      gap={0}
-                      wrap="nowrap"
-                    >
-                      {event.name === "Bookmark" ? (
-                        <IconBookmark />
-                      ) : (
-                        <IconKillstreak />
-                      )}
-                      <Text
-                        style={{
-                          flexGrow: 1,
-                          marginRight: "var(--mantine-spacing-xs)",
-                          whiteSpace: "pre",
-                        }}
+          {!demo.isStv && (
+            <Group gap={4}>
+              <IconUser />
+              <Text c="dimmed">{demo.clientName}</Text>
+            </Group>
+          )}
+          <Group gap={4}>
+            <IconCalendarEvent />
+            <Text c="dimmed">{birthtime.toLocaleString()}</Text>
+            <span>&nbsp;</span>
+            <IconClockPlay />
+            <Text c="dimmed">{formatDuration(demo.playbackTime)}</Text>
+          </Group>
+          {demo.events.length !== 0 && (
+            <HoverCard
+              withArrow
+              position="right-end"
+              styles={(theme) => ({
+                dropdown: {
+                  padding: 0,
+                  paddingLeft: theme.spacing.xs,
+                },
+              })}
+            >
+              <HoverCard.Target>
+                <Group gap={4}>
+                  <IconBookmarks />
+                  <Text c="dimmed">
+                    {demo.events.length}{" "}
+                    {demo.events.length === 1 ? "Bookmark" : "Bookmarks"}
+                  </Text>
+                </Group>
+              </HoverCard.Target>
+              <HoverCard.Dropdown>
+                <ScrollArea.Autosize
+                  mah="10rem"
+                  offsetScrollbars
+                  type="auto"
+                  styles={(theme) => ({
+                    viewport: {
+                      paddingTop: theme.spacing.xs,
+                      paddingBottom: theme.spacing.xs,
+                    },
+                  })}
+                >
+                  <Stack align="stretch" gap={0}>
+                    {demo.events.map((event, idx) => (
+                      <Group
+                        key={`${idx}${event.tick}`}
+                        align="center"
+                        justify="left"
+                        gap={0}
+                        wrap="nowrap"
                       >
-                        {event.value}
-                      </Text>
-                      <Text
-                        c="dimmed"
-                        size="xs"
-                        ff="monospace"
-                        w="5ch"
-                        ta="end"
-                      >
-                        {event.tick}
-                      </Text>
-                    </Group>
-                  ))}
-                </Stack>
-              </ScrollArea.Autosize>
-            </HoverCard.Dropdown>
-          </HoverCard>
-        )}
-      </div>
+                        {event.name === "Bookmark" ? (
+                          <IconBookmark />
+                        ) : (
+                          <IconKillstreak />
+                        )}
+                        <Text
+                          style={{
+                            flexGrow: 1,
+                            marginRight: "var(--mantine-spacing-xs)",
+                            whiteSpace: "pre",
+                          }}
+                        >
+                          {event.value}
+                        </Text>
+                        <Text
+                          c="dimmed"
+                          size="xs"
+                          ff="monospace"
+                          w="5ch"
+                          ta="end"
+                        >
+                          {event.tick}
+                        </Text>
+                      </Group>
+                    ))}
+                  </Stack>
+                </ScrollArea.Autosize>
+              </HoverCard.Dropdown>
+            </HoverCard>
+          )}
+        </div>
+      </Paper>
       <Paper shadow="xl" withBorder className={classes.menu}>
         <HoverMenuItem
           Icon={IconTrash}
@@ -231,6 +233,6 @@ export default function DemoListRow({
           onClick={() => revealItemInDir(demo.path).catch(log.error)}
         />
       </Paper>
-    </Paper>
+    </div>
   );
 }

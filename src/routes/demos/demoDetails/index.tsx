@@ -205,7 +205,7 @@ export default function DemoDetailsView() {
                     />
                   </Stack>
                 </Group>
-                <div style={{ flexGrow: 1 }}>
+                <div style={{ flexGrow: 1, minHeight: 0 }}>
                   <Suspense fallback={<LoaderFallback />}>
                     <Await resolve={details} errorElement={<ErrorElement />}>
                       {(gameSummary: GameSummary) => (

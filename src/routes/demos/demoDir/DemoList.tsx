@@ -1,23 +1,8 @@
-import {
-  forwardRef,
-  memo,
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
-import memoize from "memoize-one";
 import { useNavigate } from "react-router";
-import AutoSizer from "react-virtualized-auto-sizer";
-import {
-  areEqual,
-  FixedSizeList,
-  type ListChildComponentProps,
-} from "react-window";
+import { List, type RowComponentProps } from "react-window";
 
-import { ScrollArea } from "@mantine/core";
 import { useDebouncedCallback } from "@mantine/hooks";
 
 import type { Demo } from "@/demo";
@@ -28,49 +13,17 @@ import DemoListRow from "./DemoListRow";
 
 const PADDING_SIZE = 16;
 
-const innerElementType = forwardRef<HTMLDivElement>(
-  (
-    { style, ...rest }: React.ComponentProps<"div">,
-    ref: React.ClassAttributes<HTMLDivElement>["ref"]
-  ) => (
-    <div
-      ref={ref}
-      style={{
-        ...style,
-        paddingLeft: PADDING_SIZE,
-        // biome-ignore lint/style/noNonNullAssertion: Style is always defined
-        height: (style!.height as number) + PADDING_SIZE,
-      }}
-      {...rest}
-    />
-  )
-);
-
-type ItemDataType = {
+type RowProps = {
   demos: Demo[];
   selectedRows: boolean[];
   handleSelect(event: React.MouseEvent, index: number): void;
 };
-
-const createItemData = memoize(
-  (
-    demos: Demo[],
-    selectedRows: boolean[],
-    handleSelect: (event: React.MouseEvent, index: number) => void
-  ): ItemDataType => ({
-    demos,
-    selectedRows,
-    handleSelect,
-  })
-);
 
 type DemoListProps = {
   demos: Demo[];
 };
 
 export default function DemoList({ demos }: DemoListProps) {
-  const listRef = useRef<FixedSizeList>(null);
-
   // TODO: update the page without reloading
   const navigate = useNavigate();
   const reloadPage = () => navigate(0);
@@ -162,8 +115,6 @@ export default function DemoList({ demos }: DemoListProps) {
     [selectedRows]
   );
 
-  const itemData = createItemData(demos, selectedRows, handleSelect);
-
   return (
     <div
       style={{
@@ -174,35 +125,17 @@ export default function DemoList({ demos }: DemoListProps) {
         alignItems: "stretch",
       }}
     >
-      <div style={{ flexGrow: 1 }}>
-        <AutoSizer>
-          {({ height, width }) => (
-            <ScrollArea
-              style={{ width, height }}
-              onScrollPositionChange={({ y }) => {
-                listRef.current?.scrollTo(y);
-                handleScroll(y);
-              }}
-              viewportRef={(viewport) =>
-                viewport?.scrollTo({ top: scrollPos, behavior: "instant" })
-              }
-            >
-              <FixedSizeList
-                height={height}
-                width={width}
-                style={{ overflow: "visible" }}
-                itemCount={demos.length}
-                itemSize={120 + PADDING_SIZE}
-                itemData={itemData}
-                innerElementType={innerElementType}
-                ref={listRef}
-              >
-                {Row}
-              </FixedSizeList>
-            </ScrollArea>
-          )}
-        </AutoSizer>
-      </div>
+      <List
+        style={{ height: "1fr", paddingBlock: PADDING_SIZE / 2 }}
+        rowComponent={RowComponent}
+        rowProps={{ demos, selectedRows, handleSelect }}
+        rowCount={demos.length}
+        rowHeight={120 + PADDING_SIZE}
+        onScroll={(event) => handleScroll(event.currentTarget.scrollTop)}
+        listRef={(ref) => {
+          ref?.element?.scrollTo({ top: scrollPos, behavior: "instant" });
+        }}
+      />
       <BottomBar
         totalDemoCount={demos.length}
         totalFileSize={totalFileSize}
@@ -216,30 +149,21 @@ export default function DemoList({ demos }: DemoListProps) {
   );
 }
 
-const Row = memo(
-  ({
-    data: { demos, selectedRows, handleSelect },
-    index,
-    style,
-  }: ListChildComponentProps<ItemDataType>) => (
-    <div
-      style={{
-        ...style,
-        left: (style.left as number) + PADDING_SIZE,
-        top: (style.top as number) + PADDING_SIZE,
-        width: `calc(${style.width} - ${2 * PADDING_SIZE}px)`,
-        height: (style.height as number) - PADDING_SIZE,
+const RowComponent = ({
+  index,
+  style,
+  demos,
+  selectedRows,
+  handleSelect,
+}: RowComponentProps<RowProps>) => (
+  <div style={style}>
+    <DemoListRow
+      key={demos[index].path}
+      demo={demos[index]}
+      selected={selectedRows[index]}
+      onSelect={(event) => {
+        handleSelect(event, index);
       }}
-    >
-      <DemoListRow
-        key={demos[index].path}
-        demo={demos[index]}
-        selected={selectedRows[index]}
-        onSelect={(event) => {
-          handleSelect(event, index);
-        }}
-      />
-    </div>
-  ),
-  areEqual
+    />
+  </div>
 );
