@@ -1,9 +1,8 @@
-import { useMemo, useRef, useState } from "react";
+import { useMemo, useState } from "react";
 
-import AutoSizer from "react-virtualized-auto-sizer";
-import { FixedSizeList } from "react-window";
+import { List, type RowComponentProps } from "react-window";
 
-import { ScrollArea, Text } from "@mantine/core";
+import { Text } from "@mantine/core";
 
 import {
   destructureHighlight,
@@ -156,8 +155,6 @@ function filterHighlights(
 }
 
 export default function HighlightsList({ gameSummary }: TimelineProps) {
-  const listRef = useRef<FixedSizeList>(null);
-
   const [filters, setFilters] = useState<Filters>({
     playerIds: [],
     chatSearch: "",
@@ -191,52 +188,44 @@ export default function HighlightsList({ gameSummary }: TimelineProps) {
         filters={filters}
         setFilters={setFilters}
       />
-      <div style={{ flexGrow: 1 }}>
-        <AutoSizer>
-          {({ height, width }) => (
-            <ScrollArea
-              style={{ width, height }}
-              onScrollPositionChange={({ y }) => listRef.current?.scrollTo(y)}
-            >
-              <FixedSizeList
-                height={height}
-                width={width}
-                style={{ overflow: "visible" }}
-                itemCount={highlights.length}
-                itemSize={40}
-                ref={listRef}
-              >
-                {({ style, index }) => {
-                  const { event, tick } = highlights[index];
-                  return (
-                    <div
-                      style={{
-                        ...style,
-                        display: "flex",
-                        alignItems: "center",
-                      }}
-                    >
-                      <Text
-                        c="dimmed"
-                        size="sm"
-                        style={{
-                          width: "8ch",
-                          fontFamily: "monospace",
-                          textAlign: "right",
-                          paddingRight: 8,
-                        }}
-                      >
-                        {tick}
-                      </Text>
-                      <HighlightBox event={event} />
-                    </div>
-                  );
-                }}
-              </FixedSizeList>
-            </ScrollArea>
-          )}
-        </AutoSizer>
-      </div>
+      <List
+        rowComponent={RowComponent}
+        rowProps={{ highlights }}
+        rowCount={highlights.length}
+        rowHeight={40}
+      />
     </div>
   );
 }
+
+const RowComponent = ({
+  style,
+  index,
+  highlights,
+}: RowComponentProps<{ highlights: HighlightEvent[] }>) => {
+  const { event, tick } = highlights[index];
+
+  return (
+    <div
+      style={{
+        ...style,
+        display: "flex",
+        alignItems: "center",
+      }}
+    >
+      <Text
+        c="dimmed"
+        size="sm"
+        style={{
+          width: "8ch",
+          fontFamily: "monospace",
+          textAlign: "right",
+          paddingRight: 8,
+        }}
+      >
+        {tick}
+      </Text>
+      <HighlightBox event={event} />
+    </div>
+  );
+};

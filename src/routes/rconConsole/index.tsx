@@ -1,7 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 
-import AutoSizer from "react-virtualized-auto-sizer";
-
 import { Input, ScrollArea, Text } from "@mantine/core";
 import { useListState } from "@mantine/hooks";
 import {
@@ -105,18 +103,14 @@ export default function RconConsole() {
       />
       <div className={classes.root}>
         <div className={classes.history}>
-          <AutoSizer>
-            {({ height, width }) => (
-              <ScrollArea style={{ width, height }} viewportRef={viewport}>
-                {history.map((historyEntry, idx) => (
-                  <HistoryRow
-                    historyEntry={historyEntry}
-                    key={`${idx}${historyEntry.kind}${historyEntry.value}`}
-                  />
-                ))}
-              </ScrollArea>
-            )}
-          </AutoSizer>
+          <ScrollArea viewportRef={viewport}>
+            {history.map((historyEntry, idx) => (
+              <HistoryRow
+                historyEntry={historyEntry}
+                key={`${idx}${historyEntry.kind}${historyEntry.value}`}
+              />
+            ))}
+          </ScrollArea>
         </div>
         <Input
           value={promptInput}

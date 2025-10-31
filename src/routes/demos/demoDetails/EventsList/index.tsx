@@ -1,17 +1,13 @@
 import * as log from "@tauri-apps/plugin-log";
 
-import { useRef } from "react";
-
 import { useNavigate } from "react-router";
-import AutoSizer from "react-virtualized-auto-sizer";
-import { FixedSizeList } from "react-window";
+import { List, type RowComponentProps } from "react-window";
 
 import {
   ActionIcon,
   Button,
   Group,
   NumberInput,
-  ScrollArea,
   Stack,
   Text,
   TextInput,
@@ -191,8 +187,6 @@ function openAddModal(demo: Demo, onConfirm: () => void) {
 }
 
 export default function EventsList({ demo }: EventsListProps) {
-  const listRef = useRef<FixedSizeList>(null);
-
   const navigate = useNavigate();
 
   // TODO: gracefully update the state without causing the entire page to reload
@@ -227,41 +221,44 @@ export default function EventsList({ demo }: EventsListProps) {
           Add Bookmark...
         </Button>
       </Group>
-      <div style={{ flexGrow: 1 }}>
-        <AutoSizer>
-          {({ height, width }) => (
-            <ScrollArea
-              style={{ width, height }}
-              onScrollPositionChange={({ y }) => listRef.current?.scrollTo(y)}
-            >
-              <FixedSizeList
-                height={height}
-                width={width}
-                style={{ overflow: "visible" }}
-                itemCount={demo.events.length}
-                itemSize={40}
-                ref={listRef}
-              >
-                {({ style, index }) => (
-                  <div
-                    style={{
-                      ...style,
-                      display: "flex",
-                      alignItems: "center",
-                    }}
-                  >
-                    <EventBox
-                      event={demo.events[index]}
-                      onDelete={() => handleDelete(index)}
-                      onEdit={() => handleEdit(index)}
-                    />
-                  </div>
-                )}
-              </FixedSizeList>
-            </ScrollArea>
-          )}
-        </AutoSizer>
-      </div>
+      <List
+        rowComponent={RowComponent}
+        rowProps={{
+          demo,
+          handleDelete,
+          handleEdit,
+        }}
+        rowCount={demo.events.length}
+        rowHeight={40}
+      />
     </Stack>
   );
 }
+
+type RowProps = {
+  demo: Demo;
+  handleDelete(index: number): void;
+  handleEdit(index: number): void;
+};
+
+const RowComponent = ({
+  style,
+  index,
+  demo,
+  handleDelete,
+  handleEdit,
+}: RowComponentProps<RowProps>) => (
+  <div
+    style={{
+      ...style,
+      display: "flex",
+      alignItems: "center",
+    }}
+  >
+    <EventBox
+      event={demo.events[index]}
+      onDelete={() => handleDelete(index)}
+      onEdit={() => handleEdit(index)}
+    />
+  </div>
+);

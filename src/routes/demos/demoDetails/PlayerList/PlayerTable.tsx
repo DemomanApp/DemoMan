@@ -1,7 +1,5 @@
 import { type ReactNode, useMemo } from "react";
 
-import AutoSizer from "react-virtualized-auto-sizer";
-
 import { Anchor, ScrollArea, Text } from "@mantine/core";
 
 import { type GameSummary, type PlayerSummary, primaryTeam } from "@/demo";
@@ -96,25 +94,18 @@ export function PlayerTable({
         <TableHeader />
       </div>
       <div style={{ flexGrow: 1 }}>
-        <AutoSizer>
-          {({ height, width }) => (
-            <ScrollArea
-              style={{ width, height }}
-              classNames={{ viewport: classes.scrollShadow }}
-            >
-              <PlayerColumn
-                players={bluPlayers}
-                currentPlayer={currentPlayer}
-                setCurrentPlayer={setCurrentPlayer}
-              />
-              <PlayerColumn
-                players={redPlayers}
-                currentPlayer={currentPlayer}
-                setCurrentPlayer={setCurrentPlayer}
-              />
-            </ScrollArea>
-          )}
-        </AutoSizer>
+        <ScrollArea classNames={{ viewport: classes.scrollShadow }}>
+          <PlayerColumn
+            players={bluPlayers}
+            currentPlayer={currentPlayer}
+            setCurrentPlayer={setCurrentPlayer}
+          />
+          <PlayerColumn
+            players={redPlayers}
+            currentPlayer={currentPlayer}
+            setCurrentPlayer={setCurrentPlayer}
+          />
+        </ScrollArea>
       </div>
       <div className={classes.spectatorList}>
         Spectators:{" "}
