@@ -11,7 +11,6 @@ import {
   Group,
   HoverCard,
   Paper,
-  ScrollArea,
   Stack,
   Text,
   Title,
@@ -140,33 +139,27 @@ export default function DemoListRow({
             <HoverCard
               withArrow
               position="right-end"
-              styles={(theme) => ({
+              styles={{
                 dropdown: {
                   padding: 0,
-                  paddingLeft: theme.spacing.xs,
                 },
-              })}
+              }}
             >
               <HoverCard.Target>
                 <Group gap={4}>
                   <IconBookmarks />
                   <Text c="dimmed">
-                    {demo.events.length}{" "}
-                    {demo.events.length === 1 ? "Bookmark" : "Bookmarks"}
+                    {`${demo.events.length} ${demo.events.length === 1 ? "Bookmark" : "Bookmarks"}`}
                   </Text>
                 </Group>
               </HoverCard.Target>
               <HoverCard.Dropdown>
-                <ScrollArea.Autosize
-                  mah="10rem"
-                  offsetScrollbars
-                  type="auto"
-                  styles={(theme) => ({
-                    viewport: {
-                      paddingTop: theme.spacing.xs,
-                      paddingBottom: theme.spacing.xs,
-                    },
-                  })}
+                <div
+                  style={{
+                    maxHeight: "10rem",
+                    overflowY: "auto",
+                    padding: "var(--mantine-spacing-xs)",
+                  }}
                 >
                   <Stack align="stretch" gap={0}>
                     {demo.events.map((event, idx) => (
@@ -203,7 +196,7 @@ export default function DemoListRow({
                       </Group>
                     ))}
                   </Stack>
-                </ScrollArea.Autosize>
+                </div>
               </HoverCard.Dropdown>
             </HoverCard>
           )}

@@ -1,6 +1,6 @@
 import { type ReactNode, useMemo } from "react";
 
-import { Anchor, ScrollArea, Text } from "@mantine/core";
+import { Anchor, Text } from "@mantine/core";
 
 import { type GameSummary, type PlayerSummary, primaryTeam } from "@/demo";
 import { PlayerBox } from "./PlayerBox";
@@ -69,7 +69,14 @@ export function PlayerTable({
   }, [gameSummary]);
 
   return (
-    <div style={{ flexGrow: 1, display: "flex", flexDirection: "column" }}>
+    <div
+      style={{
+        flexGrow: 1,
+        display: "flex",
+        flexDirection: "column",
+        minHeight: 0,
+      }}
+    >
       <div>
         <div className={classes.header}>
           <Text fz={30} fw={600} c="blue.7">
@@ -93,19 +100,20 @@ export function PlayerTable({
         <TableHeader />
         <TableHeader />
       </div>
-      <div style={{ flexGrow: 1 }}>
-        <ScrollArea classNames={{ viewport: classes.scrollShadow }}>
-          <PlayerColumn
-            players={bluPlayers}
-            currentPlayer={currentPlayer}
-            setCurrentPlayer={setCurrentPlayer}
-          />
-          <PlayerColumn
-            players={redPlayers}
-            currentPlayer={currentPlayer}
-            setCurrentPlayer={setCurrentPlayer}
-          />
-        </ScrollArea>
+      <div
+        style={{ flexGrow: 1, overflow: "auto" }}
+        className={classes.scrollShadow}
+      >
+        <PlayerColumn
+          players={bluPlayers}
+          currentPlayer={currentPlayer}
+          setCurrentPlayer={setCurrentPlayer}
+        />
+        <PlayerColumn
+          players={redPlayers}
+          currentPlayer={currentPlayer}
+          setCurrentPlayer={setCurrentPlayer}
+        />
       </div>
       <div className={classes.spectatorList}>
         Spectators:{" "}
