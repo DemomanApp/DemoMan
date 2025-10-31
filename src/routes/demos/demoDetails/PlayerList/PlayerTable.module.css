@@ -1,20 +1,22 @@
-.header {
+.blu-header,
+.red-header {
   width: 50%;
   display: inline-flex;
   justify-content: space-between;
   padding: 8px;
+  border-bottom: 4px solid;
+  font-size: 1.8em;
+  font-weight: 600;
 }
 
-.divider {
-  height: 4px;
-  width: 100%;
-  background: linear-gradient(
-    90deg,
-    var(--mantine-color-blue-7) 0%,
-    var(--mantine-color-blue-7) 50%,
-    var(--mantine-color-red-7) 50%,
-    var(--mantine-color-red-7) 100%
-  );
+.blu-header {
+  color: var(--mantine-color-blue-7);
+  border-color: var(--mantine-color-blue-7);
+}
+
+.red-header {
+  color: var(--mantine-color-red-7);
+  border-color: var(--mantine-color-red-7);
 }
 
 .player-list-column {
