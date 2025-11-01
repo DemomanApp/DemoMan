@@ -14,7 +14,7 @@
 }
 
 .event-box-tick {
-  font-family: monospace;
+  font-family: var(--mantine-font-family-monospace);
   width: 8ch;
   text-align: end;
 }

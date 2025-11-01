@@ -187,7 +187,7 @@ export default function DemoListRow({
                         <Text
                           c="dimmed"
                           size="xs"
-                          ff="monospace"
+                          ff="var(--mantine-font-family-monospace)"
                           w="5ch"
                           ta="end"
                         >

@@ -8,6 +8,7 @@ import { ModalsProvider } from "@mantine/modals";
 
 import "@mantine/core/styles.css";
 
+import "@fontsource-variable/fira-code";
 import "@fontsource-variable/hanken-grotesk";
 
 import modals from "./modals";
@@ -26,6 +27,7 @@ createRoot(document.getElementById("root")!).render(
       theme={{
         focusRing: "never",
         fontFamily: "Hanken Grotesk Variable",
+        fontFamilyMonospace: "Fira Code Variable",
         components: {
           Tooltip: {
             defaultProps: {
