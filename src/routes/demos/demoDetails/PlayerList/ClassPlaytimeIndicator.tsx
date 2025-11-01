@@ -33,6 +33,7 @@ export default function ClassPlaytimeIndicator({
         <Progress.Section
           value={(100 * playtime) / totalPlaytime}
           color={`blue.${9 - index}`}
+          styles={{ section: { minWidth: 24 } }}
         >
           <ClassIcon size={20} cls={cls} />
         </Progress.Section>
