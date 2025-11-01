@@ -184,7 +184,11 @@ export default function DemoDetailsView() {
                         {demo.clientName}
                       </List.Item>
                       <List.Item icon={<IconServer />}>
-                        <span style={{ fontFamily: "monospace, monospace" }}>
+                        <span
+                          style={{
+                            fontFamily: "var(--mantine-font-family-monospace)",
+                          }}
+                        >
                           {demo.serverName}
                         </span>
                       </List.Item>

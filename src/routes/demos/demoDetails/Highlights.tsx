@@ -218,7 +218,7 @@ const RowComponent = ({
         size="sm"
         style={{
           width: "8ch",
-          fontFamily: "monospace",
+          fontFamily: "var(--mantine-font-family-monospace)",
           textAlign: "right",
           paddingRight: 8,
         }}

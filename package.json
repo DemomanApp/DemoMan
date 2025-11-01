@@ -20,6 +20,7 @@
     "tauri": "tauri"
   },
   "dependencies": {
+    "@fontsource-variable/fira-code": "^5.2.7",
     "@fontsource-variable/hanken-grotesk": "^5.2.5",
     "@mantine/core": "^8.2",
     "@mantine/form": "^8.2",

@@ -50,7 +50,7 @@ export default function RconSetup() {
             style={{
               display: "flex",
               alignItems: "center",
-              fontFamily: "monospace",
+              fontFamily: "var(--mantine-font-family-monospace)",
               gap: 8,
             }}
           >
