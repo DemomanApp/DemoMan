@@ -27,6 +27,7 @@
 .class-icon {
   margin-right: 8px;
   width: 24px;
+  margin-block: auto;
 }
 
 .player-name {
