@@ -91,12 +91,19 @@ export function PlayerTable({
           <span>RED</span>
         </div>
       </div>
-      <div style={{ paddingRight: scrollbarSize }}>
+      <div
+        style={{ paddingInline: scrollbarSize }}
+        className={classes.tableHeaderContainer}
+      >
         <TableHeader />
         <TableHeader />
       </div>
       <div
-        style={{ flexGrow: 1, overflow: "auto", scrollbarGutter: "stable" }}
+        style={{
+          flexGrow: 1,
+          overflow: "auto",
+          scrollbarGutter: "stable both-edges",
+        }}
         className={classes.scrollShadow}
       >
         <PlayerColumn
