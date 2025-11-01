@@ -36,6 +36,10 @@ Head over to the [latest release](https://github.com/DemomanApp/DemoMan/releases
 
 ![Demo list](./.github/assets/screenshots/demo_list.png)
 
+## Smart Filtering
+
+![Search input](./.github/assets/screenshots/search_input.png)
+
 ## Demo Details
 
 ### Scoreboard Tab
