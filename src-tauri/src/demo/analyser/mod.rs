@@ -845,12 +845,10 @@ impl GameDetailsAnalyser {
                     text: message.plain_text(),
                 });
             }
-            UserMessage::Text(message) => {
-                if message.location == HudTextLocation::PrintTalk {
-                    self.add_highlight(Highlight::Message {
-                        text: message.plain_text(),
-                    });
-                }
+            UserMessage::Text(message) if message.location == HudTextLocation::PrintTalk => {
+                self.add_highlight(Highlight::Message {
+                    text: message.plain_text(),
+                });
             }
             _ => {}
         }
@@ -1254,10 +1252,8 @@ impl GameDetailsAnalyser {
                         kill_icon = "headshot";
                     }
                 }
-                CustomDamage::TF_DMG_CUSTOM_BURNING => {
-                    if killer_id == victim_id {
-                        kill_icon = "firedeath";
-                    }
+                CustomDamage::TF_DMG_CUSTOM_BURNING if killer_id == victim_id => {
+                    kill_icon = "firedeath";
                 }
                 CustomDamage::TF_DMG_CUSTOM_BURNING_ARROW => {
                     kill_icon = "huntsman_burning";
@@ -1287,15 +1283,13 @@ impl GameDetailsAnalyser {
                 }
                 CustomDamage::TF_DMG_CUSTOM_MERASMUS_ZAP
                 | CustomDamage::TF_DMG_CUSTOM_MERASMUS_GRENADE
-                | CustomDamage::TF_DMG_CUSTOM_MERASMUS_DECAPITATION => {
-                    if killer_id == 0 {
-                        killer_name_override = Some("MERASMUS!".into());
-                    }
+                | CustomDamage::TF_DMG_CUSTOM_MERASMUS_DECAPITATION
+                    if killer_id == 0 =>
+                {
+                    killer_name_override = Some("MERASMUS!".into());
                 }
-                CustomDamage::TF_DMG_CUSTOM_SPELL_SKELETON => {
-                    if killer_id == 0 {
-                        killer_name_override = Some("SKELETON".into());
-                    }
+                CustomDamage::TF_DMG_CUSTOM_SPELL_SKELETON if killer_id == 0 => {
+                    killer_name_override = Some("SKELETON".into());
                 }
                 CustomDamage::TF_DMG_CUSTOM_KART => {
                     kill_icon = "bumper_kart";
