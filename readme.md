@@ -8,6 +8,7 @@
     <img alt="GitHub" src="https://img.shields.io/github/license/DemomanApp/DemoMan?style=for-the-badge"></a>
   <a href="https://github.com/DemomanApp/DemoMan/releases/latest">
     <img alt="GitHub release" src="https://img.shields.io/github/v/release/DemomanApp/DemoMan?include_prereleases&style=for-the-badge"></a>
+  <img alt="GitHub Downloads" src="https://img.shields.io/github/downloads/demomanapp/demoman/total?style=for-the-badge">
 </p>
 
 <p align="center">The TF2 demo manager for Linux, Windows and MacOS.</p>
