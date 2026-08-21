@@ -24,6 +24,7 @@ impl DemoMetadataCache {
     }
 
     pub fn get_demo_mut(&mut self, path: &str) -> Result<&mut Demo> {
+        #[expect(unstable_name_collisions)]
         self.cache
             .entry(path.into())
             .or_try_insert_with(|| read_demo(path).map(Arc::new))
@@ -31,6 +32,7 @@ impl DemoMetadataCache {
     }
 
     pub fn get_demo(&mut self, path: &str) -> Result<Arc<Demo>> {
+        #[expect(unstable_name_collisions)]
         self.cache
             .entry(path.into())
             .or_try_insert_with(|| read_demo(path).map(Arc::new))
