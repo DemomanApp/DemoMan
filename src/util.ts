@@ -42,3 +42,11 @@ export function drop<V>(key: string) {
 export function decodeParam(param: string | undefined): string | undefined {
   return param === undefined ? undefined : atob(param);
 }
+
+export const union = <T>(...sets: Set<T>[]) => new Set(...sets.flat());
+
+export const intersection = <T>(a: Set<T>, b: Set<T>) =>
+  new Set([...a].filter((x) => b.has(x)));
+
+export const difference = <T>(a: Set<T>, b: Set<T>) =>
+  new Set([...a].filter((x) => !b.has(x)));

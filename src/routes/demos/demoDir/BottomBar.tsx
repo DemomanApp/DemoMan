@@ -1,5 +1,5 @@
 import { Button, Text } from "@mantine/core";
-import { IconTrash, IconX } from "@tabler/icons-react";
+import { IconTag, IconTrash, IconX } from "@tabler/icons-react";
 
 import { formatFileSize } from "@/util";
 
@@ -13,6 +13,7 @@ export type Props = {
   selectionMode: boolean;
   handleDeselectAll(): void;
   handleDeleteSelected(): void;
+  handleTagSelected(): void;
 };
 
 export default function BottomBar({
@@ -23,6 +24,7 @@ export default function BottomBar({
   selectionMode,
   handleDeselectAll,
   handleDeleteSelected,
+  handleTagSelected,
 }: Props) {
   return (
     <div className={classes.root} data-selection-mode={selectionMode}>
@@ -35,6 +37,16 @@ export default function BottomBar({
             {selectedDemoCount} Selected ({formatFileSize(selectedFileSize)})
           </Text>
           <div style={{ flexGrow: 1 }} />
+          <Button
+            variant="subtle"
+            radius={0}
+            color="inherit"
+            size="md"
+            leftSection={<IconTag />}
+            onClick={handleTagSelected}
+          >
+            Tags
+          </Button>
           <Button
             variant="subtle"
             radius={0}

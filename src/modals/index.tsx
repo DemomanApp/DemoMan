@@ -2,6 +2,7 @@ import { DeleteDemoModal } from "./DeleteDemoModal";
 import { DeleteMultipleDemosModal } from "./DeleteMultipleDemosModal";
 import { AddDemoDirModal } from "./DemoDirModal";
 import { RenameDemoModal } from "./RenameDemoModal";
+import { TagMultipleDemosModal } from "./TagMultipleDemosModal";
 import { UpdateModal } from "./UpdateModal";
 
 const modals = {
@@ -10,6 +11,7 @@ const modals = {
   rename_demo: RenameDemoModal,
   delete_demo: DeleteDemoModal,
   delete_multiple_demos: DeleteMultipleDemosModal,
+  tag_multiple_demos: TagMultipleDemosModal,
 };
 
 declare module "@mantine/modals" {

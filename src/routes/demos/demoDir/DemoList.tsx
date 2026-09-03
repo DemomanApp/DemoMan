@@ -8,6 +8,7 @@ import { useDebouncedCallback } from "@mantine/hooks";
 import type { Demo } from "@/demo";
 import useLocationRef from "@/hooks/useLocationRef";
 import { openDeleteMultipleDemosModal } from "@/modals/DeleteMultipleDemosModal";
+import { openTagMultipleDemosModal } from "@/modals/TagMultipleDemosModal";
 import BottomBar from "./BottomBar";
 import DemoListRow from "./DemoListRow";
 
@@ -95,6 +96,15 @@ export default function DemoList({ demos }: DemoListProps) {
     openDeleteMultipleDemosModal(demosToDelete, reloadPage);
   };
 
+  const handleTagSelected = () => {
+    const demosToTag = selectedRows
+      .map((selected, index) => [selected, index] as const)
+      .filter(([selected, _index]) => selected)
+      .map(([_selected, index]) => demos[index]);
+
+    openTagMultipleDemosModal(demosToTag, reloadPage);
+  };
+
   const totalFileSize = useMemo(
     () => demos.reduce((total, demo) => total + demo.filesize, 0),
     [demos]
@@ -144,6 +154,7 @@ export default function DemoList({ demos }: DemoListProps) {
         selectionMode={selectionMode}
         handleDeselectAll={handleDeselectAll}
         handleDeleteSelected={handleDeleteSelected}
+        handleTagSelected={handleTagSelected}
       />
     </div>
   );
