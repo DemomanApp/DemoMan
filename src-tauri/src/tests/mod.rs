@@ -41,7 +41,7 @@ fn test_demo_loading() {
         demo.events,
         vec![DemoEvent {
             name: DemoEventType::Bookmark,
-            value: "New Bookmark".to_owned(),
+            value: "New bookmark".to_owned(),
             tick: 0,
         }]
     );

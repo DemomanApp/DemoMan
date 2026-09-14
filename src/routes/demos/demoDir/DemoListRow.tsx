@@ -115,7 +115,7 @@ export default function DemoListRow({
               {demo.name}
             </Title>
             {demo.isStv && (
-              <Tooltip label="STV Demo">
+              <Tooltip label="STV demo">
                 <IconDeviceTv />
               </Tooltip>
             )}

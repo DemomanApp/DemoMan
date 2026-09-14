@@ -44,9 +44,9 @@ export default function SettingsView() {
           <Stack>
             <Group align="end" className={classes.rconPasswordRow}>
               <TextInput
-                label="RCON Password"
+                label="RCON password"
                 description="Set or generate your own RCON password"
-                placeholder="RCON Password"
+                placeholder="RCON password"
                 value={rconPassword}
                 onChange={(e) => setRconPassword(e.currentTarget.value)}
                 type="text"

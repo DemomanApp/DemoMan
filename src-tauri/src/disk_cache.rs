@@ -7,7 +7,7 @@ use crate::traits::Cache;
 
 #[derive(Debug, thiserror::Error)]
 pub enum Error {
-    #[error("I/O Error: {0}")]
+    #[error("I/O error: {0}")]
     Io(#[from] std::io::Error),
 
     #[error("(de-)serialization error: {0}")]

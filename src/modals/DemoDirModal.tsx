@@ -20,7 +20,7 @@ export const AddDemoDirModal = ({ id }: ContextModalProps) => {
 
   const form = useForm<{ label: string; path: string }>({
     initialValues: {
-      label: "My Demos",
+      label: "My demos",
       path: "",
     },
     validate: {
