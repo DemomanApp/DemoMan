@@ -273,6 +273,7 @@ pub enum Filter {
     Event(String),
     FileName(String),
     FreeText(String),
+    Has(String),
     MapName(String),
     PlayerName(String),
     TagName(String),
@@ -284,6 +285,7 @@ struct Filters {
     event: Vec<String>,
     file_name: Vec<String>,
     free_text: Vec<String>,
+    has: Vec<String>,
     map_name: Vec<String>,
     player_name: Vec<String>,
     tag_name: Vec<String>,
@@ -299,6 +301,7 @@ impl Filters {
                 Filter::Event(value) => result.event.push(value.to_lowercase()),
                 Filter::FileName(value) => result.file_name.push(value.to_lowercase()),
                 Filter::FreeText(value) => result.free_text.push(value.to_lowercase()),
+                Filter::Has(value) => result.has.push(value.to_lowercase()),
                 Filter::MapName(value) => result.map_name.push(value.to_lowercase()),
                 Filter::PlayerName(value) => result.player_name.push(value.to_lowercase()),
                 Filter::TagName(value) => result.tag_name.push(value.to_lowercase()),
@@ -313,6 +316,7 @@ impl Filters {
             && self.matches_event(demo)
             && self.matches_name(demo)
             && self.matches_free_text(demo)
+            && self.matches_has(demo)
             && self.matches_map(demo)
             && self.matches_client(demo)
             && self.matches_tag(demo)
@@ -378,6 +382,15 @@ impl Filters {
         self.free_text
             .iter()
             .any(|query| fields.iter().any(|field| field.contains(query)))
+    }
+
+    fn matches_has(&self, demo: &Demo) -> bool {
+        self.has.is_empty()
+            || self.has.iter().any(|query| match query.as_str() {
+                "events" => !demo.events.is_empty(),
+                "tags" => !demo.tags.is_empty(),
+                _ => false,
+            })
     }
 
     fn matches_map(&self, demo: &Demo) -> bool {
