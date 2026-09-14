@@ -294,26 +294,22 @@ struct Filters {
 }
 
 impl Filters {
-    fn from_filter_list(filters: &[Filter]) -> Self {
-        let mut result = Self::default();
-
-        for filter in filters {
-            match filter {
-                Filter::DemoType(value) => result.demo_type.push(value.to_lowercase()),
-                Filter::Event(value) => result.event.push(value.to_lowercase()),
-                Filter::FileName(value) => result.file_name.push(value.to_lowercase()),
-                Filter::FreeText(value) => result.free_text.push(value.to_lowercase()),
-                Filter::Has(value) => result.has.push(value.to_lowercase()),
-                Filter::MapName(value) => result.map_name.push(value.to_lowercase()),
-                Filter::Not(filter) => result
-                    .not
-                    .push(Self::from_filter_list(std::slice::from_ref(filter.as_ref()))),
-                Filter::PlayerName(value) => result.player_name.push(value.to_lowercase()),
-                Filter::TagName(value) => result.tag_name.push(value.to_lowercase()),
+    fn add_filter(&mut self, filter: &Filter) {
+        match filter {
+            Filter::DemoType(value) => self.demo_type.push(value.to_lowercase()),
+            Filter::Event(value) => self.event.push(value.to_lowercase()),
+            Filter::FileName(value) => self.file_name.push(value.to_lowercase()),
+            Filter::FreeText(value) => self.free_text.push(value.to_lowercase()),
+            Filter::Has(value) => self.has.push(value.to_lowercase()),
+            Filter::MapName(value) => self.map_name.push(value.to_lowercase()),
+            Filter::Not(filter) => {
+                let mut excluded = Self::default();
+                excluded.add_filter(filter);
+                self.not.push(excluded);
             }
+            Filter::PlayerName(value) => self.player_name.push(value.to_lowercase()),
+            Filter::TagName(value) => self.tag_name.push(value.to_lowercase()),
         }
-
-        result
     }
 
     fn matches(&self, demo: &Demo) -> bool {
@@ -434,12 +430,24 @@ impl Filters {
     }
 }
 
+impl<'a> FromIterator<&'a Filter> for Filters {
+    fn from_iter<T: IntoIterator<Item = &'a Filter>>(filters: T) -> Self {
+        let mut result = Self::default();
+
+        for filter in filters {
+            result.add_filter(filter);
+        }
+
+        result
+    }
+}
+
 pub fn sort_demos(demos: &mut [Arc<Demo>], sort_key: SortKey, reverse: bool) {
     demos.sort_unstable_by(|d1, d2| compare_demos_by(sort_key, reverse, d1, d2));
 }
 
 pub fn filter_demos(demos: &[Arc<Demo>], filters: &[Filter]) -> Vec<Arc<Demo>> {
-    let filters = Filters::from_filter_list(filters);
+    let filters: Filters = filters.iter().collect();
 
     demos
         .iter()
