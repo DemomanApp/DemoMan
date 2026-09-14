@@ -39,7 +39,14 @@ type DemoListLoaderArgs = {
   onDemosChanged(): void;
 };
 
-type FilterPatternKey = "type" | "event" | "name" | "map" | "player" | "tag";
+type FilterPatternKey =
+  | "type"
+  | "event"
+  | "name"
+  | "map"
+  | "player"
+  | "tag"
+  | "has";
 
 const reassembleFilter = (filter: { key: string; value: string }) =>
   `${filter.key}:${filter.value}`;
@@ -69,6 +76,8 @@ function tokenToDemoFilter(token: Token): DemoFilter | null {
           };
         case "tag":
           return { tag_name: replaceBackslashPlaceholder(token.value.value) };
+        case "has":
+          return { has: replaceBackslashPlaceholder(token.value.value) };
         default:
           return {
             free_text: replaceBackslashPlaceholder(
@@ -159,6 +168,7 @@ export default () => {
       map: knownMaps,
       player: knownPlayers,
       tag: knownTags,
+      has: ["events", "tags"],
     } satisfies Record<FilterPatternKey, string[]>;
 
     const queryLanguageParameters = { filterPatterns };

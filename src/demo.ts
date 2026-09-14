@@ -268,6 +268,7 @@ export type DemoFilter =
   | { event: string }
   | { file_name: string }
   | { free_text: string }
+  | { has: string }
   | { map_name: string }
   | { player_name: string }
   | { tag_name: string };
