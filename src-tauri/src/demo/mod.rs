@@ -275,6 +275,7 @@ pub enum Filter {
     FreeText(String),
     Has(String),
     MapName(String),
+    Not(Box<Filter>),
     PlayerName(String),
     TagName(String),
 }
@@ -287,6 +288,7 @@ struct Filters {
     free_text: Vec<String>,
     has: Vec<String>,
     map_name: Vec<String>,
+    not: Vec<Filters>,
     player_name: Vec<String>,
     tag_name: Vec<String>,
 }
@@ -303,6 +305,9 @@ impl Filters {
                 Filter::FreeText(value) => result.free_text.push(value.to_lowercase()),
                 Filter::Has(value) => result.has.push(value.to_lowercase()),
                 Filter::MapName(value) => result.map_name.push(value.to_lowercase()),
+                Filter::Not(filter) => result
+                    .not
+                    .push(Self::from_filter_list(std::slice::from_ref(filter.as_ref()))),
                 Filter::PlayerName(value) => result.player_name.push(value.to_lowercase()),
                 Filter::TagName(value) => result.tag_name.push(value.to_lowercase()),
             }
@@ -320,6 +325,7 @@ impl Filters {
             && self.matches_map(demo)
             && self.matches_client(demo)
             && self.matches_tag(demo)
+            && self.not.iter().all(|filter| !filter.matches(demo))
     }
 
     fn matches_type(&self, demo: &Demo) -> bool {

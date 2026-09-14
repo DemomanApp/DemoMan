@@ -270,5 +270,6 @@ export type DemoFilter =
   | { free_text: string }
   | { has: string }
   | { map_name: string }
+  | { not: DemoFilter }
   | { player_name: string }
   | { tag_name: string };

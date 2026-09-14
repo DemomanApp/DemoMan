@@ -61,11 +61,11 @@ export const keyValueQueryLanguage: QueryLanguage<Token, Parameters> = {
     return tokens;
   },
   parser: (token: string, { filterPatterns }): Token => {
-    const matches = /^([a-zA-Z0-9-_]+):(.*)$/.exec(token);
+    const matches = /^(!?[a-zA-Z0-9-_]+):(.*)$/.exec(token);
     if (matches !== null) {
       const [_, key, value] = matches;
 
-      if (Object.keys(filterPatterns).includes(key)) {
+      if (Object.keys(filterPatterns).includes(key.replace(/^!/, ""))) {
         return { type: "filter", value: { key, value } };
       } else {
         return { type: "invalid-filter", value: { key, value } };
