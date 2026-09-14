@@ -1,6 +1,6 @@
 import * as log from "@tauri-apps/plugin-log";
 
-import { useNavigate } from "react-router";
+import { useRevalidator } from "react-router";
 import { List, type RowComponentProps } from "react-window";
 
 import {
@@ -91,10 +91,11 @@ function openDeleteModal(event: DemoEvent, onConfirm: () => void) {
 type EditModalProps = {
   demo: Demo;
   index?: number;
-  onConfirm(): void;
+  onConfirm(): void | Promise<void>;
+  onClose(): void;
 };
 
-function EditModal({ demo, index, onConfirm }: EditModalProps) {
+function EditModal({ demo, index, onConfirm, onClose }: EditModalProps) {
   const initialValues: DemoEvent =
     index === undefined
       ? { name: "Bookmark", tick: 0, value: "General" }
@@ -133,8 +134,10 @@ function EditModal({ demo, index, onConfirm }: EditModalProps) {
     newEvents.sort((a, b) => a.tick - b.tick);
 
     setDemoEvents(demo.path, newEvents)
-      .catch(log.error)
-      .finally(onConfirm)
+      .then(() => {
+        onClose();
+        return onConfirm();
+      })
       .catch(log.error);
   }
 
@@ -160,7 +163,7 @@ function EditModal({ demo, index, onConfirm }: EditModalProps) {
           />
         </Group>
         <Group gap="xs" justify="end">
-          <Button variant="default" onClick={modals.closeAll}>
+          <Button variant="default" onClick={onClose}>
             Cancel
           </Button>
           <Button type="submit">Confirm</Button>
@@ -171,47 +174,52 @@ function EditModal({ demo, index, onConfirm }: EditModalProps) {
 }
 
 function openEditModal(demo: Demo, index: number, onConfirm: () => void) {
-  modals.open({
+  const modalId = modals.open({
     title: "Edit bookmark",
     centered: true,
-    children: <EditModal demo={demo} index={index} onConfirm={onConfirm} />,
+    children: (
+      <EditModal
+        demo={demo}
+        index={index}
+        onConfirm={onConfirm}
+        onClose={() => modals.close(modalId)}
+      />
+    ),
   });
 }
 
 function openAddModal(demo: Demo, onConfirm: () => void) {
-  modals.open({
+  const modalId = modals.open({
     title: "Add bookmark",
     centered: true,
-    children: <EditModal demo={demo} onConfirm={onConfirm} />,
+    children: (
+      <EditModal
+        demo={demo}
+        onConfirm={onConfirm}
+        onClose={() => modals.close(modalId)}
+      />
+    ),
   });
 }
 
 export default function EventsList({ demo }: EventsListProps) {
-  const navigate = useNavigate();
-
-  // TODO: gracefully update the state without causing the entire page to reload
-  const reloadPage = () => {
-    navigate(0);
-  };
+  const { revalidate } = useRevalidator();
 
   const handleDelete = (index: number) => {
     openDeleteModal(demo.events[index], () => {
       const newEvents = [...demo.events];
       newEvents.splice(index, 1);
 
-      setDemoEvents(demo.path, newEvents)
-        .catch(log.error)
-        .finally(reloadPage)
-        .catch(log.error);
+      setDemoEvents(demo.path, newEvents).then(revalidate).catch(log.error);
     });
   };
 
   const handleEdit = (index: number) => {
-    openEditModal(demo, index, reloadPage);
+    openEditModal(demo, index, revalidate);
   };
 
   const handleAdd = () => {
-    openAddModal(demo, reloadPage);
+    openAddModal(demo, revalidate);
   };
 
   return (

@@ -1,7 +1,7 @@
 import * as log from "@tauri-apps/plugin-log";
 import { revealItemInDir } from "@tauri-apps/plugin-opener";
 
-import { Suspense, useContext } from "react";
+import { Suspense, useContext, useState } from "react";
 
 import {
   Await,
@@ -10,6 +10,7 @@ import {
   useAsyncError,
   useLoaderData,
   useNavigate,
+  useRevalidator,
 } from "react-router";
 
 import {
@@ -99,6 +100,8 @@ type LoaderData = {
 
 export default function DemoDetailsView() {
   const { demo, details } = useLoaderData() as LoaderData;
+  const revalidator = useRevalidator();
+  const [savingTags, setSavingTags] = useState(false);
 
   const navigate = useNavigate();
 
@@ -132,9 +135,17 @@ export default function DemoDetailsView() {
             </Tooltip>
             <DemoTagsInput
               tags={demo.tags}
-              setTags={(tags: string[]) => {
-                setDemoTags(demo.path, tags);
-                navigate(0);
+              disabled={savingTags}
+              setTags={async (tags: string[]) => {
+                setSavingTags(true);
+                try {
+                  await setDemoTags(demo.path, tags);
+                  await revalidator.revalidate();
+                } catch (error) {
+                  log.error(String(error));
+                } finally {
+                  setSavingTags(false);
+                }
               }}
             />
           </>

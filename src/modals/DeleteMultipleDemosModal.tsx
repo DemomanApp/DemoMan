@@ -32,9 +32,12 @@ export const DeleteMultipleDemosModal = ({
   const [skipTrash, _] = useStore("skipTrash");
 
   const handleDelete = () => {
-    Promise.all(demos.map((demo) => deleteDemo(demo.path, !skipTrash)))
-      .catch(log.error)
-      .finally(onConfirm);
+    Promise.all(
+      demos.map((demo) => deleteDemo(demo.path, !skipTrash).catch(log.error))
+    ).finally(() => {
+      context.closeModal(id);
+      onConfirm();
+    });
   };
 
   return (

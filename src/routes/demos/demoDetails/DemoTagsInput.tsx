@@ -17,10 +17,11 @@ import { HeaderButton } from "@/components";
 
 type Props = {
   tags: string[];
+  disabled: boolean;
   setTags: (tags: string[]) => void;
 };
 
-export default function DemoTagsInput({ tags, setTags }: Props) {
+export default function DemoTagsInput({ tags, disabled, setTags }: Props) {
   const [search, setSearch] = useState("");
   const [knownTags, setKnownTags] = useState<string[] | null>(null);
   const [additionalKnownTags, setAdditionalKnownTags] = useState<string[]>([]);
@@ -47,6 +48,7 @@ export default function DemoTagsInput({ tags, setTags }: Props) {
   });
 
   const handleValueSelect = (val: string) => {
+    if (disabled) return;
     setSearch("");
 
     if (val === "$create") {
@@ -62,7 +64,12 @@ export default function DemoTagsInput({ tags, setTags }: Props) {
   const options = allKnownTags
     .filter((item) => item.toLowerCase().includes(search.toLowerCase().trim()))
     .map((item) => (
-      <Combobox.Option value={item} key={item} active={tags.includes(item)}>
+      <Combobox.Option
+        value={item}
+        key={item}
+        active={tags.includes(item)}
+        disabled={disabled}
+      >
         <Group justify="space-between">
           <span>{item}</span>
           {tags.includes(item) ? <CheckIcon size={12} /> : null}
@@ -105,7 +112,9 @@ export default function DemoTagsInput({ tags, setTags }: Props) {
           {options}
 
           {!exactOptionMatch && search.trim().length > 0 && (
-            <Combobox.Option value="$create">+ Create {search}</Combobox.Option>
+            <Combobox.Option value="$create" disabled={disabled}>
+              + Create {search}
+            </Combobox.Option>
           )}
         </Combobox.Options>
       </Combobox.Dropdown>
