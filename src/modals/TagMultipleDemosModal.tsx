@@ -118,11 +118,12 @@ export const TagMultipleDemosModal = ({
 
     Promise.all(
       demosAndNewTags.map(([demo, newTags]) =>
-        setDemoTags(demo.path, [...newTags])
+        setDemoTags(demo.path, [...newTags]).catch(log.error)
       )
-    )
-      .catch(log.error)
-      .finally(onConfirm);
+    ).finally(() => {
+      context.closeModal(id);
+      onConfirm();
+    });
   };
 
   const handleChange = (tag: string, newState: boolean) => {

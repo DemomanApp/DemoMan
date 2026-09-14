@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 
-import { useNavigate } from "react-router";
 import { List, type RowComponentProps } from "react-window";
 
 import { useDebouncedCallback } from "@mantine/hooks";
@@ -18,17 +17,15 @@ type RowProps = {
   demos: Demo[];
   selectedRows: boolean[];
   handleSelect(event: React.MouseEvent, index: number): void;
+  onDemosChanged(): void;
 };
 
 type DemoListProps = {
   demos: Demo[];
+  onDemosChanged(): void;
 };
 
-export default function DemoList({ demos }: DemoListProps) {
-  // TODO: update the page without reloading
-  const navigate = useNavigate();
-  const reloadPage = () => navigate(0);
-
+export default function DemoList({ demos, onDemosChanged }: DemoListProps) {
   const [scrollPos, setScrollPos] = useLocationRef("scrollPos", 0);
 
   const handleScroll = useDebouncedCallback(setScrollPos, 500);
@@ -45,13 +42,17 @@ export default function DemoList({ demos }: DemoListProps) {
     [selectedRows]
   );
 
-  // Reset the selected rows every time the demos are changed or selection mode is disabled
+  // Selection indices are no longer valid after demos are removed or reordered.
+  useEffect(() => {
+    setSelectedRows(Array(demos.length).fill(false));
+    setLastSelectedIndex(undefined);
+  }, [demos]);
+
   useEffect(() => {
     if (!selectionMode) {
-      setSelectedRows(Array(demos.length).fill(false));
       setLastSelectedIndex(undefined);
     }
-  }, [demos, selectionMode]);
+  }, [selectionMode]);
 
   const handleSelect = useCallback(
     (event: React.MouseEvent, index: number) => {
@@ -93,7 +94,7 @@ export default function DemoList({ demos }: DemoListProps) {
       .filter(([selected, _index]) => selected)
       .map(([_selected, index]) => demos[index]);
 
-    openDeleteMultipleDemosModal(demosToDelete, reloadPage);
+    openDeleteMultipleDemosModal(demosToDelete, onDemosChanged);
   };
 
   const handleTagSelected = () => {
@@ -102,7 +103,7 @@ export default function DemoList({ demos }: DemoListProps) {
       .filter(([selected, _index]) => selected)
       .map(([_selected, index]) => demos[index]);
 
-    openTagMultipleDemosModal(demosToTag, reloadPage);
+    openTagMultipleDemosModal(demosToTag, onDemosChanged);
   };
 
   const totalFileSize = useMemo(
@@ -138,7 +139,7 @@ export default function DemoList({ demos }: DemoListProps) {
       <List
         style={{ height: "1fr", paddingBlock: PADDING_SIZE / 2 }}
         rowComponent={RowComponent}
-        rowProps={{ demos, selectedRows, handleSelect }}
+        rowProps={{ demos, selectedRows, handleSelect, onDemosChanged }}
         rowCount={demos.length}
         rowHeight={120 + PADDING_SIZE}
         onScroll={(event) => handleScroll(event.currentTarget.scrollTop)}
@@ -166,11 +167,13 @@ const RowComponent = ({
   demos,
   selectedRows,
   handleSelect,
+  onDemosChanged,
 }: RowComponentProps<RowProps>) => (
   <div style={style}>
     <DemoListRow
       key={demos[index].path}
       demo={demos[index]}
+      onDemosChanged={onDemosChanged}
       selected={selectedRows[index]}
       onSelect={(event) => {
         handleSelect(event, index);

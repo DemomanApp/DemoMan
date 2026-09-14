@@ -35,6 +35,8 @@ type DemoListLoaderArgs = {
   sortKey: SortKey;
   reverse: boolean;
   filters: DemoFilter[];
+  revision: number;
+  onDemosChanged(): void;
 };
 
 type FilterPatternKey = "type" | "event" | "name" | "map" | "player" | "tag";
@@ -90,21 +92,31 @@ function DemoListLoader({
   sortKey,
   reverse,
   filters,
+  revision,
+  onDemosChanged,
 }: DemoListLoaderArgs) {
   const [demos, setDemos] = useState<Demo[] | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    let active = true;
     getDemosInDirectory(path, sortKey, reverse, filters)
-      .then(setDemos)
-      .catch(setError);
-  }, [path, sortKey, reverse, filters]);
+      .then((demos) => {
+        if (active) setDemos(demos);
+      })
+      .catch((error) => {
+        if (active) setError(error);
+      });
+    return () => {
+      active = false;
+    };
+  }, [path, sortKey, reverse, filters, revision]);
 
-  if (demos !== null) {
-    return <DemoList demos={demos} />;
-  }
   if (error !== null) {
     throw new Error(error);
+  }
+  if (demos !== null) {
+    return <DemoList demos={demos} onDemosChanged={onDemosChanged} />;
   }
   return <LoaderFallback />;
 }
@@ -112,6 +124,7 @@ function DemoListLoader({
 export default () => {
   const { path: encodedPath } = useParams() as { path: Path };
   const path = atob(encodedPath);
+  const [revision, setRevision] = useState(0);
 
   const [query, setQuery] = useLocationState("query", "");
   const [sortKey, setSortKey] = useLocationState<SortKey>(
@@ -123,19 +136,19 @@ export default () => {
     "descending"
   );
 
-  const asyncKnownEvents = useAsync(getKnownEvents, []);
+  const asyncKnownEvents = useAsync(() => getKnownEvents(), [revision]);
   const knownEvents = asyncKnownEvents.result ?? [];
 
-  const asyncKnownDemoNames = useAsync(getKnownDemoNames, []);
+  const asyncKnownDemoNames = useAsync(() => getKnownDemoNames(), [revision]);
   const knownDemoNames = asyncKnownDemoNames.result ?? [];
 
-  const asyncKnownMaps = useAsync(getKnownMaps, []);
+  const asyncKnownMaps = useAsync(() => getKnownMaps(), [revision]);
   const knownMaps = asyncKnownMaps.result ?? [];
 
-  const asyncKnownPlayers = useAsync(getKnownPlayers, []);
+  const asyncKnownPlayers = useAsync(() => getKnownPlayers(), [revision]);
   const knownPlayers = asyncKnownPlayers.result ?? [];
 
-  const asyncKnownTags = useAsync(getKnownTags, []);
+  const asyncKnownTags = useAsync(() => getKnownTags(), [revision]);
   const knownTags = asyncKnownTags.result ?? [];
 
   const { filterPatterns, queryLanguageParameters, filters } = useMemo(() => {
@@ -198,6 +211,8 @@ export default () => {
         sortKey={sortKey}
         reverse={sortOrder === "descending"}
         filters={filters}
+        revision={revision}
+        onDemosChanged={() => setRevision((value) => value + 1)}
       />
     </>
   );

@@ -46,6 +46,7 @@ type DemoListRowProps = {
   demo: Demo;
   selected: boolean;
   onSelect: React.MouseEventHandler;
+  onDemosChanged(): void;
 };
 
 function HoverMenuItem({
@@ -77,11 +78,9 @@ export default function DemoListRow({
   demo,
   selected,
   onSelect,
+  onDemosChanged,
 }: DemoListRowProps) {
   const navigate = useNavigate();
-
-  // TODO: update the page without reloading
-  const reloadPage = () => navigate(0);
 
   const [rconPassword, _] = useStore("rconPassword");
 
@@ -206,12 +205,12 @@ export default function DemoListRow({
         <HoverMenuItem
           Icon={IconTrash}
           label="Delete"
-          onClick={() => openDeleteDemoModal(demo, reloadPage)}
+          onClick={() => openDeleteDemoModal(demo, onDemosChanged)}
         />
         <HoverMenuItem
           Icon={IconPencil}
           label="Rename"
-          onClick={() => openRenameDemoModal(demo, reloadPage)}
+          onClick={() => openRenameDemoModal(demo, onDemosChanged)}
         />
         <HoverMenuItem
           Icon={IconPlayerPlayFilled}
