@@ -45,7 +45,6 @@ export const useAutocomplete = (
     };
   }, [queryText, cursorIndex]);
 
-  // biome-ignore lint/correctness/useExhaustiveDependencies(queryText): We want to detect changes in queryText
   useEffect(() => {
     if (
       inputRef.current !== undefined &&
