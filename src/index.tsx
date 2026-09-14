@@ -1,3 +1,6 @@
+import "core-js/stable/iterator";
+import "core-js/stable/set";
+
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 
