@@ -37,7 +37,7 @@ export default function PathPicker({
           try {
             const selectedPath = await openFilePicker({
               directory: true,
-              title: "Select Demo Directory",
+              title: "Select demo directory",
               defaultPath: value === "" ? tfDemoDir : value,
             });
 

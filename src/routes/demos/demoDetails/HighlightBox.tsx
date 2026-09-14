@@ -171,13 +171,13 @@ function KillStreakHighlightBox(highlight: KillStreakHighlight) {
   let message: string;
   switch (streak) {
     case 5:
-      message = "is on a Killing Spree!";
+      message = "is on a killing spree!";
       break;
     case 10:
-      message = "is Unstoppable!";
+      message = "is unstoppable!";
       break;
     case 15:
-      message = "is on a Rampage!";
+      message = "is on a rampage!";
       break;
     case 20:
       message = "is GOD-like!";

@@ -115,7 +115,7 @@ export default function TimelineFilters({
           onChange={handleChange("chat")}
         />
         <ToggleButton
-          label="Player Joins"
+          label="Player joins"
           checked={filters.visibleHighlights.connectionMessages}
           onChange={handleChange("connectionMessages")}
         />

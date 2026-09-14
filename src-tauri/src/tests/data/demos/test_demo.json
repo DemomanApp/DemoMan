@@ -2,7 +2,7 @@
 	"events": [
 		{
 			"name": "Bookmark",
-			"value": "New Bookmark",
+			"value": "New bookmark",
 			"tick": 0
 		}
 	],
