@@ -58,13 +58,14 @@ export const useAutocomplete = (
   useEffect(() => {
     if (currentTokenKeyValue === null) {
       const keys = Object.keys(filterPatterns)
+        .map((key) => (currentToken.startsWith("!") ? `!${key}` : key))
         .filter((key) => key.includes(currentToken))
         .map((key) => `${key}:`);
       setDropdownItems(keys);
     } else {
       const [currentTokenKey, currentTokenValue] = currentTokenKeyValue;
 
-      const values = filterPatterns[currentTokenKey];
+      const values = filterPatterns[currentTokenKey.replace(/^!/, "")];
 
       if (values !== undefined) {
         setDropdownItems(

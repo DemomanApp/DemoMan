@@ -61,6 +61,14 @@ function tokenToDemoFilter(token: Token): DemoFilter | null {
         return null;
       }
 
+      if (token.value.key.startsWith("!")) {
+        const filter = tokenToDemoFilter({
+          ...token,
+          value: { ...token.value, key: token.value.key.slice(1) },
+        });
+        return filter === null ? null : { not: filter };
+      }
+
       switch (token.value.key as FilterPatternKey | string) {
         case "type":
           return { demo_type: replaceBackslashPlaceholder(token.value.value) };
