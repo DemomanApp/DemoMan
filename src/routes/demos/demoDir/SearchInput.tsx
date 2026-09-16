@@ -1,6 +1,12 @@
 import { useEffect, useState } from "react";
 
-import { Anchor, Combobox, Input, useCombobox } from "@mantine/core";
+import {
+  Anchor,
+  Combobox,
+  Input,
+  ScrollArea,
+  useCombobox,
+} from "@mantine/core";
 import { useDebouncedValue } from "@mantine/hooks";
 import { IconSearch } from "@tabler/icons-react";
 
@@ -77,18 +83,20 @@ export default function SearchInput({
       </Combobox.Target>
       <Combobox.Dropdown>
         <Combobox.Options>
-          {dropdownItems.length === 0 ? (
-            <Combobox.Empty>Nothing found</Combobox.Empty>
-          ) : (
-            dropdownItems.map((dropdownItem, index) => (
-              <Combobox.Option
-                key={index.toString() + dropdownItem}
-                value={dropdownItem}
-              >
-                {dropdownItem}
-              </Combobox.Option>
-            ))
-          )}
+          <ScrollArea.Autosize mah={300} type="scroll">
+            {dropdownItems.length === 0 ? (
+              <Combobox.Empty>Nothing found</Combobox.Empty>
+            ) : (
+              dropdownItems.map((dropdownItem, index) => (
+                <Combobox.Option
+                  key={index.toString() + dropdownItem}
+                  value={dropdownItem}
+                >
+                  {dropdownItem}
+                </Combobox.Option>
+              ))
+            )}
+          </ScrollArea.Autosize>
         </Combobox.Options>
         <Combobox.Footer>
           Supports special search syntax{" "}
