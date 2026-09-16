@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-import { Combobox, Input, useCombobox } from "@mantine/core";
+import { Anchor, Combobox, Input, useCombobox } from "@mantine/core";
 import { useDebouncedValue } from "@mantine/hooks";
 import { IconSearch } from "@tabler/icons-react";
 
@@ -90,6 +90,15 @@ export default function SearchInput({
             ))
           )}
         </Combobox.Options>
+        <Combobox.Footer>
+          Supports special search syntax{" "}
+          <Anchor
+            href="https://github.com/DemomanApp/DemoMan/wiki/Filtering"
+            target="_blank"
+          >
+            learn more
+          </Anchor>
+        </Combobox.Footer>
       </Combobox.Dropdown>
     </Combobox>
   );
