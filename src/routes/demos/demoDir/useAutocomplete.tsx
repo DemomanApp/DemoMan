@@ -2,10 +2,16 @@ import {
   type ReactEventHandler,
   useCallback,
   useEffect,
+  useLayoutEffect,
   useMemo,
   useRef,
   useState,
 } from "react";
+
+import {
+  keyValueQueryLanguage,
+  quoteQueryValue,
+} from "./KeyValueQueryLanguage";
 
 export const useAutocomplete = (
   queryText: string,
@@ -13,45 +19,50 @@ export const useAutocomplete = (
   filterPatterns: Record<string, string[]>
 ) => {
   const inputRef = useRef<HTMLInputElement>(null);
+  const completionCursor = useRef<number | null>(null);
 
   const [cursorIndex, setCursorIndex] = useState(0);
   const [dropdownItems, setDropdownItems] = useState<string[]>([]);
 
-  const {
-    beforeCurrentToken,
-    currentToken,
-    currentTokenKeyValue,
-    afterCursor,
-  } = useMemo(() => {
-    const [beforeCursor, afterCursor] = queryText.splitAt(cursorIndex);
-    const lastTokenBoundary = beforeCursor.lastIndexOf(" ") + 1;
-    const [beforeCurrentToken, currentToken] =
-      beforeCursor.splitAt(lastTokenBoundary);
+  const { beforeCurrentToken, currentToken, currentTokenKeyValue, afterToken } =
+    useMemo(() => {
+      const beforeCursor = queryText.slice(0, cursorIndex);
+      const currentToken =
+        keyValueQueryLanguage
+          .tokenizer(beforeCursor, { filterPatterns })
+          .at(-1) ?? "";
+      const start = beforeCursor.length - currentToken.length;
+      const fullToken = keyValueQueryLanguage.tokenizer(
+        queryText.slice(start),
+        { filterPatterns }
+      )[0];
+      const token = keyValueQueryLanguage.parser(currentToken, {
+        filterPatterns,
+      });
+      const currentTokenKeyValue =
+        token.type === "text"
+          ? null
+          : ([token.value.key, token.value.value] as const);
 
-    const currentTokenColonIndex = currentToken.indexOf(":");
-    const currentTokenKeyValue =
-      currentTokenColonIndex === -1
-        ? null
-        : ([
-            currentToken.slice(0, currentTokenColonIndex),
-            currentToken.slice(currentTokenColonIndex + 1),
-          ] as const);
+      return {
+        beforeCurrentToken: queryText.slice(0, start),
+        currentToken,
+        currentTokenKeyValue,
+        afterToken: queryText.slice(start + fullToken.length),
+      };
+    }, [queryText, cursorIndex, filterPatterns]);
 
-    return {
-      beforeCurrentToken,
-      currentToken,
-      currentTokenKeyValue,
-      afterCursor,
-    };
-  }, [queryText, cursorIndex]);
-
-  useEffect(() => {
-    if (
-      inputRef.current !== undefined &&
-      inputRef.current !== null &&
-      inputRef.current.selectionEnd !== null
-    ) {
-      setCursorIndex(inputRef.current.selectionEnd);
+  useLayoutEffect(() => {
+    const input = inputRef.current;
+    if (completionCursor.current !== null) {
+      input?.setSelectionRange(
+        completionCursor.current,
+        completionCursor.current
+      );
+      completionCursor.current = null;
+    }
+    if (input?.selectionEnd !== null && input?.selectionEnd !== undefined) {
+      setCursorIndex(input.selectionEnd);
     }
   }, [queryText]);
 
@@ -79,19 +90,32 @@ export const useAutocomplete = (
 
   const onOptionSubmit = useCallback(
     (optionValue: string) => {
-      const escapedValue = optionValue
-        .replaceAll("\\", "\\\\")
-        .replaceAll(" ", "\\ ");
-      if (currentTokenKeyValue !== null) {
-        const [currentTokenKey, _currentTokenValue] = currentTokenKeyValue;
-        setQueryText(
-          `${beforeCurrentToken}${currentTokenKey}:${escapedValue} ${afterCursor}`
-        );
+      const completion =
+        currentTokenKeyValue === null
+          ? optionValue
+          : `${currentTokenKeyValue[0]}:${quoteQueryValue(optionValue)} `;
+      const suffix =
+        currentTokenKeyValue !== null && afterToken.startsWith(" ")
+          ? afterToken.slice(1)
+          : afterToken;
+      const nextQuery = beforeCurrentToken + completion + suffix;
+      const nextCursor = beforeCurrentToken.length + completion.length;
+
+      if (nextQuery === queryText) {
+        inputRef.current?.setSelectionRange(nextCursor, nextCursor);
+        setCursorIndex(nextCursor);
       } else {
-        setQueryText(beforeCurrentToken + escapedValue + afterCursor);
+        completionCursor.current = nextCursor;
+        setQueryText(nextQuery);
       }
     },
-    [setQueryText, currentTokenKeyValue, afterCursor, beforeCurrentToken]
+    [
+      setQueryText,
+      queryText,
+      currentTokenKeyValue,
+      afterToken,
+      beforeCurrentToken,
+    ]
   );
 
   const onSelect: ReactEventHandler<HTMLInputElement> = useCallback((event) => {
