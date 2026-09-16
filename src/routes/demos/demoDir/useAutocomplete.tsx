@@ -73,8 +73,11 @@ export const useAutocomplete = (
       const values = filterPatterns[currentTokenKey.replace(/^!/, "")];
 
       if (values !== undefined) {
+        const lowercaseTokenValue = currentTokenValue.toLocaleLowerCase();
         setDropdownItems(
-          values.filter((value) => value.includes(currentTokenValue))
+          values.filter((value) =>
+            value.toLocaleLowerCase().includes(lowercaseTokenValue)
+          )
         );
       } else {
         setDropdownItems([]);
