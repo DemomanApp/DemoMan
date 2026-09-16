@@ -4,26 +4,25 @@ import { Combobox, Input, useCombobox } from "@mantine/core";
 import { useDebouncedValue } from "@mantine/hooks";
 import { IconSearch } from "@tabler/icons-react";
 
-import StyledInput, { type QueryLanguageProp } from "./StyledInput";
+import { highlight } from "./KeyValueQueryLanguage";
+import StyledInput from "./StyledInput";
 import { useAutocomplete } from "./useAutocomplete";
 
 import classes from "./SearchInput.module.css";
 
-type SearchInputProps<Token, Parameters> = {
+type SearchInputProps = {
   query: string;
   setQuery(newQuery: string): void;
   debounceInterval: number;
   filterPatterns: Record<string, string[]>;
-} & QueryLanguageProp<Token, Parameters>;
+};
 
-export default function SearchInput<Token, Parameters>({
+export default function SearchInput({
   query,
   setQuery,
   debounceInterval,
   filterPatterns,
-  queryLanguage,
-  queryLanguageParameters,
-}: SearchInputProps<Token, Parameters>) {
+}: SearchInputProps) {
   const combobox = useCombobox();
 
   const [rawQueryText, setRawQueryText] = useState(query);
@@ -72,8 +71,7 @@ export default function SearchInput<Token, Parameters>({
           }}
           placeholder="Search..."
           component={StyledInput}
-          queryLanguage={queryLanguage}
-          queryLanguageParameters={queryLanguageParameters}
+          highlight={highlight}
           inputRef={inputRef}
         />
       </Combobox.Target>
