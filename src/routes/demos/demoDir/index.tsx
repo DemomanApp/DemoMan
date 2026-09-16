@@ -22,11 +22,7 @@ import type { Demo, DemoFilter, SortKey, SortOrder } from "@/demo";
 import useLocationState from "@/hooks/useLocationState";
 import type { Path } from "@/store";
 import DemoList from "./DemoList";
-import {
-  keyValueQueryLanguage,
-  literalBackslashPlaceholder,
-  type Token,
-} from "./KeyValueQueryLanguage";
+import { keyValueQueryLanguage, type Token } from "./KeyValueQueryLanguage";
 import SearchInput from "./SearchInput";
 import { SortControl } from "./SortControl";
 
@@ -51,9 +47,6 @@ type FilterPatternKey =
 const reassembleFilter = (filter: { key: string; value: string }) =>
   `${filter.key}:${filter.value}`;
 
-const replaceBackslashPlaceholder = (value: string) =>
-  value.replaceAll(literalBackslashPlaceholder, "\\");
-
 function tokenToDemoFilter(token: Token): DemoFilter | null {
   switch (token.type) {
     case "filter":
@@ -71,27 +64,21 @@ function tokenToDemoFilter(token: Token): DemoFilter | null {
 
       switch (token.value.key as FilterPatternKey | string) {
         case "type":
-          return { demo_type: replaceBackslashPlaceholder(token.value.value) };
+          return { demo_type: token.value.value };
         case "event":
-          return { event: replaceBackslashPlaceholder(token.value.value) };
+          return { event: token.value.value };
         case "name":
-          return { file_name: replaceBackslashPlaceholder(token.value.value) };
+          return { file_name: token.value.value };
         case "map":
-          return { map_name: replaceBackslashPlaceholder(token.value.value) };
+          return { map_name: token.value.value };
         case "player":
-          return {
-            player_name: replaceBackslashPlaceholder(token.value.value),
-          };
+          return { player_name: token.value.value };
         case "tag":
-          return { tag_name: replaceBackslashPlaceholder(token.value.value) };
+          return { tag_name: token.value.value };
         case "has":
-          return { has: replaceBackslashPlaceholder(token.value.value) };
+          return { has: token.value.value };
         default:
-          return {
-            free_text: replaceBackslashPlaceholder(
-              reassembleFilter(token.value)
-            ),
-          };
+          return { free_text: reassembleFilter(token.value) };
       }
     case "text":
       if (token.value === "") {

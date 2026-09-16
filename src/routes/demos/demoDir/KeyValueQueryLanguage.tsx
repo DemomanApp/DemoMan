@@ -2,76 +2,53 @@ import type { QueryLanguage } from "./QueryLanguage";
 
 import classes from "./KeyValueQueryLanguage.module.css";
 
-export const literalBackslashPlaceholder = "\u{E005C}";
-
-export type Token =
+export type Token = { raw: string } & (
   | { type: "text"; value: string }
   | { type: "filter"; value: { key: string; value: string } }
-  | { type: "invalid-filter"; value: { key: string; value: string } };
+  | { type: "invalid-filter"; value: { key: string; value: string } }
+);
 
 export type Parameters = {
   filterPatterns: Record<string, string[]>;
 };
 
-export const backslashEscape = (value: string) =>
-  value
-    .replaceAll("\\", "\\\\")
-    .replaceAll(" ", "\\ ")
-    .replaceAll(literalBackslashPlaceholder, "\\");
-
 export const keyValueQueryLanguage: QueryLanguage<Token, Parameters> = {
   tokenizer: (query: string) => {
-    let escapeNextSymbol = false;
-    let currentToken = "";
     const tokens: string[] = [];
+    let start = 0;
+    let quoted = false;
+    let escaped = false;
 
-    for (const symbol of query) {
-      switch (symbol) {
-        case " ":
-          if (escapeNextSymbol) {
-            currentToken += " ";
-            escapeNextSymbol = false;
-          } else {
-            tokens.push(currentToken);
-            currentToken = "";
-          }
-          break;
-        case "\\":
-          if (escapeNextSymbol) {
-            currentToken += "\\";
-            escapeNextSymbol = false;
-          } else {
-            escapeNextSymbol = true;
-          }
-          break;
-        default:
-          if (escapeNextSymbol) {
-            currentToken += literalBackslashPlaceholder;
-            escapeNextSymbol = false;
-          }
-          currentToken += symbol;
+    for (let index = 0; index < query.length; index++) {
+      const symbol = query[index];
+      if (escaped) {
+        escaped = false;
+      } else if (symbol === "\\") {
+        escaped = true;
+      } else if (symbol === '"') {
+        quoted = !quoted;
+      } else if (symbol === " " && !quoted) {
+        tokens.push(query.slice(start, index));
+        start = index + 1;
       }
     }
 
-    if (escapeNextSymbol) {
-      currentToken += literalBackslashPlaceholder;
-    }
-    tokens.push(currentToken);
-
+    tokens.push(query.slice(start));
     return tokens;
   },
   parser: (token: string, { filterPatterns }): Token => {
     const matches = /^(!?[a-zA-Z0-9-_]+):(.*)$/.exec(token);
     if (matches !== null) {
-      const [_, key, value] = matches;
+      const [_, key, rawValue] = matches;
+      const value = decodeQueryValue(rawValue);
 
       if (Object.keys(filterPatterns).includes(key.replace(/^!/, ""))) {
-        return { type: "filter", value: { key, value } };
+        return { type: "filter", raw: token, value: { key, value } };
       } else {
-        return { type: "invalid-filter", value: { key, value } };
+        return { type: "invalid-filter", raw: token, value: { key, value } };
       }
     }
-    return { type: "text", value: token };
+    return { type: "text", raw: token, value: decodeQueryValue(token) };
   },
   renderTokens: (tokens: Token[]) =>
     tokens
@@ -83,12 +60,9 @@ export const keyValueQueryLanguage: QueryLanguage<Token, Parameters> = {
                 className={classes.filter}
                 key={`${index} ${token.value.key} ${token.value.value}`}
               >
-                <span className={classes.filterKey}>
-                  {backslashEscape(token.value.key)}
-                </span>
-                :
+                <span className={classes.filterKey}>{token.value.key}</span>:
                 <span className={classes.filterValue}>
-                  {backslashEscape(token.value.value)}
+                  {token.raw.slice(token.value.key.length + 1)}
                 </span>
               </span>
             );
@@ -98,18 +72,26 @@ export const keyValueQueryLanguage: QueryLanguage<Token, Parameters> = {
                 className={classes.invalidFilter}
                 key={`${index} ${token.value.key} ${token.value.value}`}
               >
-                <span className={classes.filterKey}>
-                  {backslashEscape(token.value.key)}
-                </span>
-                :
+                <span className={classes.filterKey}>{token.value.key}</span>:
                 <span className={classes.filterValue}>
-                  {backslashEscape(token.value.value)}
+                  {token.raw.slice(token.value.key.length + 1)}
                 </span>
               </span>
             );
           default:
-            return backslashEscape(token.value);
+            return token.raw;
         }
       })
       .intersperse(" "),
 };
+
+export const decodeQueryValue = (value: string) =>
+  value.replace(
+    /\\([\\ "])|"/g,
+    (_match, escaped: string | undefined) => escaped ?? ""
+  );
+
+export const quoteQueryValue = (value: string) =>
+  /[\s"\\]/.test(value)
+    ? `"${value.replaceAll("\\", "\\\\").replaceAll('"', '\\"')}"`
+    : value;
