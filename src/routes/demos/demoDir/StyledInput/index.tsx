@@ -2,42 +2,32 @@ import { useCallback, useEffect, useRef } from "react";
 
 import { useMergedRef } from "@mantine/hooks";
 
-import type { QueryLanguage } from "../QueryLanguage";
-
 import classes from "./StyledInput.module.css";
 
 export type InputRefProp = {
   inputRef?: React.RefObject<HTMLInputElement | null>;
 };
 
-export type QueryLanguageProp<Token, Parameters> = {
-  queryLanguage: QueryLanguage<Token, Parameters>;
-  queryLanguageParameters: Parameters;
-};
+type StyledInputProps = React.ComponentProps<"input"> &
+  InputRefProp & {
+    value: string;
+    highlight(value: string): React.ReactNode;
+  };
 
-type StyledInputProps<Token, Parameters> = React.ComponentProps<"input"> &
-  InputRefProp &
-  QueryLanguageProp<Token, Parameters>;
-
-export default <Token, Parameters>({
+export default ({
   value,
   style,
   className,
   ref,
   inputRef: inputRefProp,
-  queryLanguage,
-  queryLanguageParameters,
+  highlight,
   ...otherProps
-}: StyledInputProps<Token, Parameters>) => {
+}: StyledInputProps) => {
   const inputRef = useRef<HTMLInputElement>(null);
   const sizerRef = useRef<HTMLDivElement>(null);
   const highlightRef = useRef<HTMLDivElement>(null);
 
   const mergedInputRef = useMergedRef(inputRef, inputRefProp);
-
-  const tokens = queryLanguage
-    .tokenizer(value as string, queryLanguageParameters)
-    .map((token) => queryLanguage.parser(token, queryLanguageParameters));
 
   const updateSizer = useCallback((input: string) => {
     if (sizerRef.current !== null && inputRef.current !== null) {
@@ -47,7 +37,7 @@ export default <Token, Parameters>({
   }, []);
 
   useEffect(() => {
-    updateSizer(value as string);
+    updateSizer(value);
   }, [updateSizer, value]);
 
   return (
@@ -60,7 +50,7 @@ export default <Token, Parameters>({
     >
       <div className={classes.wrapper}>
         <div ref={highlightRef} className={classes.styledContent}>
-          {queryLanguage.renderTokens(tokens, queryLanguageParameters)}
+          {highlight(value)}
         </div>
         <div className={classes.inputWrapper}>
           <div className={classes.sizer} ref={sizerRef} />

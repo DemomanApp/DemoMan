@@ -9,8 +9,10 @@ import {
 } from "react";
 
 import {
-  keyValueQueryLanguage,
+  filterKeys,
+  parseToken,
   quoteQueryValue,
+  tokenizeQuery,
 } from "./KeyValueQueryLanguage";
 
 export const useAutocomplete = (
@@ -27,18 +29,10 @@ export const useAutocomplete = (
   const { beforeCurrentToken, currentToken, currentTokenKeyValue, afterToken } =
     useMemo(() => {
       const beforeCursor = queryText.slice(0, cursorIndex);
-      const currentToken =
-        keyValueQueryLanguage
-          .tokenizer(beforeCursor, { filterPatterns })
-          .at(-1) ?? "";
+      const currentToken = tokenizeQuery(beforeCursor).at(-1) ?? "";
       const start = beforeCursor.length - currentToken.length;
-      const fullToken = keyValueQueryLanguage.tokenizer(
-        queryText.slice(start),
-        { filterPatterns }
-      )[0];
-      const token = keyValueQueryLanguage.parser(currentToken, {
-        filterPatterns,
-      });
+      const fullToken = tokenizeQuery(queryText.slice(start))[0];
+      const token = parseToken(currentToken);
       const currentTokenKeyValue =
         token.type === "text"
           ? null
@@ -50,7 +44,7 @@ export const useAutocomplete = (
         currentTokenKeyValue,
         afterToken: queryText.slice(start + fullToken.length),
       };
-    }, [queryText, cursorIndex, filterPatterns]);
+    }, [queryText, cursorIndex]);
 
   useLayoutEffect(() => {
     const input = inputRef.current;
@@ -68,7 +62,7 @@ export const useAutocomplete = (
 
   useEffect(() => {
     if (currentTokenKeyValue === null) {
-      const keys = Object.keys(filterPatterns)
+      const keys = filterKeys
         .map((key) => (currentToken.startsWith("!") ? `!${key}` : key))
         .filter((key) => key.includes(currentToken))
         .map((key) => `${key}:`);

@@ -22,7 +22,12 @@ import type { Demo, DemoFilter, SortKey, SortOrder } from "@/demo";
 import useLocationState from "@/hooks/useLocationState";
 import type { Path } from "@/store";
 import DemoList from "./DemoList";
-import { keyValueQueryLanguage, type Token } from "./KeyValueQueryLanguage";
+import {
+  type FilterKey,
+  parseToken,
+  type Token,
+  tokenizeQuery,
+} from "./KeyValueQueryLanguage";
 import SearchInput from "./SearchInput";
 import { SortControl } from "./SortControl";
 
@@ -34,15 +39,6 @@ type DemoListLoaderArgs = {
   revision: number;
   onDemosChanged(): void;
 };
-
-type FilterPatternKey =
-  | "type"
-  | "event"
-  | "name"
-  | "map"
-  | "player"
-  | "tag"
-  | "has";
 
 const reassembleFilter = (filter: { key: string; value: string }) =>
   `${filter.key}:${filter.value}`;
@@ -62,7 +58,7 @@ function tokenToDemoFilter(token: Token): DemoFilter | null {
         return filter === null ? null : { not: filter };
       }
 
-      switch (token.value.key as FilterPatternKey | string) {
+      switch (token.value.key) {
         case "type":
           return { demo_type: token.value.value };
         case "event":
@@ -155,31 +151,28 @@ export default () => {
   const asyncKnownTags = useAsync(() => getKnownTags(), [revision]);
   const knownTags = asyncKnownTags.result ?? [];
 
-  const { filterPatterns, queryLanguageParameters, filters } = useMemo(() => {
-    const filterPatterns = {
-      type: ["stv", "pov"],
-      event: knownEvents,
-      name: knownDemoNames,
-      map: knownMaps,
-      player: knownPlayers,
-      tag: knownTags,
-      has: ["events", "tags"],
-    } satisfies Record<FilterPatternKey, string[]>;
+  const filterPatterns = useMemo(
+    () =>
+      ({
+        type: ["stv", "pov"],
+        event: knownEvents,
+        name: knownDemoNames,
+        map: knownMaps,
+        player: knownPlayers,
+        tag: knownTags,
+        has: ["events", "tags"],
+      }) satisfies Record<FilterKey, string[]>,
+    [knownEvents, knownDemoNames, knownMaps, knownPlayers, knownTags]
+  );
 
-    const queryLanguageParameters = { filterPatterns };
-
-    const tokens = keyValueQueryLanguage
-      .tokenizer(query, queryLanguageParameters)
-      .map((tokenString) =>
-        keyValueQueryLanguage.parser(tokenString, queryLanguageParameters)
-      );
-
-    const filters = tokens
-      .map(tokenToDemoFilter)
-      .filter((filter) => filter !== null);
-
-    return { filterPatterns, queryLanguageParameters, filters };
-  }, [query, knownEvents, knownDemoNames, knownMaps, knownPlayers, knownTags]);
+  const filters = useMemo(
+    () =>
+      tokenizeQuery(query)
+        .map(parseToken)
+        .map(tokenToDemoFilter)
+        .filter((filter) => filter !== null),
+    [query]
+  );
 
   return (
     <>
@@ -190,8 +183,6 @@ export default () => {
             setQuery={setQuery}
             debounceInterval={500}
             filterPatterns={filterPatterns}
-            queryLanguage={keyValueQueryLanguage}
-            queryLanguageParameters={queryLanguageParameters}
           />
         }
         right={
