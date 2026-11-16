@@ -88,6 +88,10 @@ export default function DemoList({ demos, onDemosChanged }: DemoListProps) {
     setSelectedRows(Array(demos.length).fill(false));
   };
 
+  const handleSelectAll = () => {
+    setSelectedRows(Array(demos.length).fill(true));
+  };
+
   const handleDeleteSelected = () => {
     const demosToDelete = selectedRows
       .map((selected, index) => [selected, index] as const)
@@ -126,6 +130,11 @@ export default function DemoList({ demos, onDemosChanged }: DemoListProps) {
     [selectedRows]
   );
 
+  const allVisibleSelected = useMemo(
+    () => demos.length > 0 && selectedDemoCount === demos.length,
+    [demos.length, selectedDemoCount]
+  );
+
   return (
     <div
       style={{
@@ -153,6 +162,8 @@ export default function DemoList({ demos, onDemosChanged }: DemoListProps) {
         selectedDemoCount={selectedDemoCount}
         selectedFileSize={selectedFileSize}
         selectionMode={selectionMode}
+        allVisibleSelected={allVisibleSelected}
+        handleSelectAll={handleSelectAll}
         handleDeselectAll={handleDeselectAll}
         handleDeleteSelected={handleDeleteSelected}
         handleTagSelected={handleTagSelected}
